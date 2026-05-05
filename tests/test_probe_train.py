@@ -13,6 +13,7 @@ LAYER_IDX = 0
 
 def _make_cache(tmp_path: Path, seed: int = 42) -> str:
     torch.manual_seed(seed)
+    sample_ids = [f"sample_{i % 10}" for i in range(N)]
     groups = [f"group_{i % 10}" for i in range(N)]
     H = torch.randn(N, HIDDEN_DIM)
     y = torch.randint(0, 2, (N,), dtype=torch.int64)
@@ -21,7 +22,7 @@ def _make_cache(tmp_path: Path, seed: int = 42) -> str:
     y[masked] = -1
     rel_pos = torch.linspace(0, 1, N)
 
-    cache = {"H": H, "y": y, "rel_pos": rel_pos, "group_id": groups}
+    cache = {"H": H, "y": y, "rel_pos": rel_pos, "sample_id": sample_ids, "group_id": groups}
     cache_path = tmp_path / "layer_0.pt"
     torch.save(cache, cache_path)
     return str(cache_path)
@@ -90,7 +91,7 @@ def test_mean_centering_uses_train_stats(tmp_path):
             H[i * 10:(i + 1) * 10] = torch.ones(10, HIDDEN_DIM)
     y = torch.zeros(200, dtype=torch.int64)
     rel_pos = torch.zeros(200)  # all in bin 0
-    cache = {"H": H, "y": y, "rel_pos": rel_pos, "group_id": [f"g{i // 10}" for i in range(200)]}
+    cache = {"H": H, "y": y, "rel_pos": rel_pos, "sample_id": [f"s{i // 10}" for i in range(200)], "group_id": [f"g{i // 10}" for i in range(200)]}
     path = tmp_path / "layer_0.pt"
     torch.save(cache, path)
     results = train_probe_layer(str(path), 0, lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS)

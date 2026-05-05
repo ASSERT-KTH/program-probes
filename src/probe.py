@@ -57,9 +57,10 @@ def train_probe_layer(
     H = data["H"]
     y = data["y"]
     rel_pos = data["rel_pos"]
+    sample_ids = data["sample_id"]
     group_ids = data["group_id"]
 
-    train_groups, val_groups, test_groups = _split_groups(group_ids, seed)
+    train_samples, val_samples, test_samples = _split_groups(sample_ids, seed)
 
     hidden_dim = H.shape[1]
     results = []
@@ -75,11 +76,11 @@ def train_probe_layer(
 
         bin_H = H[bin_mask]
         bin_y = y[bin_mask]
-        bin_groups = [group_ids[i] for i in range(len(group_ids)) if bin_mask[i]]
+        bin_samples = [sample_ids[i] for i in range(len(sample_ids)) if bin_mask[i]]
 
-        train_mask = torch.tensor([g in train_groups for g in bin_groups])
-        val_mask = torch.tensor([g in val_groups for g in bin_groups])
-        test_mask = torch.tensor([g in test_groups for g in bin_groups])
+        train_mask = torch.tensor([s in train_samples for s in bin_samples])
+        val_mask = torch.tensor([s in val_samples for s in bin_samples])
+        test_mask = torch.tensor([s in test_samples for s in bin_samples])
 
         if train_mask.sum() == 0 or val_mask.sum() == 0 or test_mask.sum() == 0:
             continue

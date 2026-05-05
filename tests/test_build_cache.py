@@ -37,6 +37,7 @@ def test_static_probe_broadcast(tmp_path):
     assert cache["H"].shape[0] == 6 * N_STEPS
     assert cache["y"].shape[0] == 6 * N_STEPS
     assert cache["rel_pos"].shape[0] == 6 * N_STEPS
+    assert len(cache["sample_id"]) == 6 * N_STEPS
     assert len(cache["group_id"]) == 6 * N_STEPS
 
 

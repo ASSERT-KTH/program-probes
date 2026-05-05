@@ -23,7 +23,7 @@ def build_cache(
         out_dir.mkdir(parents=True, exist_ok=True)
 
         for layer_idx in probe_layer_indices:
-            H_list, y_list, rel_pos_list, group_id_list = [], [], [], []
+            H_list, y_list, rel_pos_list, sample_id_list, group_id_list = [], [], [], [], []
 
             for data in all_data:
                 acts = data["activations"][layer_idx]  # [T, hidden_dim]
@@ -32,6 +32,7 @@ def build_cache(
                     continue
 
                 label = data["labels"].get(probe_name)
+                sample = data["sample_id"]
                 group = data["group_id"]
 
                 if isinstance(label, list):
@@ -44,6 +45,7 @@ def build_cache(
                         H_list.append(acts[t].float().unsqueeze(0))
                         y_list.append(y_int)
                         rel_pos_list.append(rel)
+                        sample_id_list.append(sample)
                         group_id_list.append(group)
                 else:
                     # static probe: broadcast scalar to all positions
@@ -53,6 +55,7 @@ def build_cache(
                         H_list.append(acts[t].float().unsqueeze(0))
                         y_list.append(y_int)
                         rel_pos_list.append(rel)
+                        sample_id_list.append(sample)
                         group_id_list.append(group)
 
             if not H_list:
@@ -62,6 +65,7 @@ def build_cache(
                 "H": torch.cat(H_list, dim=0),
                 "y": torch.tensor(y_list, dtype=torch.int64),
                 "rel_pos": torch.tensor(rel_pos_list, dtype=torch.float32),
+                "sample_id": sample_id_list,
                 "group_id": group_id_list,
             }
             torch.save(cache, out_dir / f"layer_{layer_idx}.pt")
