@@ -118,7 +118,7 @@ def train_probe_layer(
         model = nn.Linear(hidden_dim, 2)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-        best_val_acc = -1.0
+        best_val_loss = float("inf")
         best_weights = copy.deepcopy(model.state_dict())
         no_improve = 0
         n_epochs = 0
@@ -160,8 +160,8 @@ def train_probe_layer(
                     "weight_norm": weight_norm,
                 })
 
-            if val_acc > best_val_acc:
-                best_val_acc = val_acc
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
                 best_weights = copy.deepcopy(model.state_dict())
                 no_improve = 0
             else:
@@ -183,12 +183,13 @@ def train_probe_layer(
 
         val_m = _clf_metrics(val_probs, val_preds_np, val_labels_np)
         test_m = _clf_metrics(test_probs, test_preds_np, test_labels_np)
+        val_acc = (val_preds_np == val_labels_np).mean()
         test_acc = (test_preds_np == test_labels_np).mean()
 
         results.append(ProbeResult(
             layer=layer_idx,
             bin_idx=bin_idx,
-            val_acc=best_val_acc,
+            val_acc=float(val_acc),
             val_f1=val_m["f1"],
             val_precision=val_m["precision"],
             val_recall=val_m["recall"],
@@ -235,11 +236,23 @@ def run_sweep(
     def sweep_fn():
         with wandb.init() as run:
             cfg = run.config
+
+            def log_fn(metrics: dict) -> None:
+                b = metrics["bin_idx"]
+                wandb.log({
+                    f"bin_{b}/train_loss": metrics["train_loss"],
+                    f"bin_{b}/val_loss": metrics["val_loss"],
+                    f"bin_{b}/val_acc": metrics["val_acc"],
+                    f"bin_{b}/grad_norm": metrics["grad_norm"],
+                    f"bin_{b}/weight_norm": metrics["weight_norm"],
+                })
+
             results = train_probe_layer(
                 middle_cache, middle_layer,
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins,
+                log_fn=log_fn,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
