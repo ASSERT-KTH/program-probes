@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Program Probes Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Program Probes</h1>
+    <div id="controls">
+      <label>Run: <select id="run-selector"></select></label>
+    </div>
+  </header>
+
+  <main id="panels">
+    <section id="panel-heatmap" class="panel">
+      <h2>Probe Heatmap</h2>
+      <div id="probe-tabs"></div>
+      <div id="heatmap-container"></div>
+      <div id="linechart-container"></div>
+    </section>
+
+    <section id="panel-samples" class="panel">
+      <h2>Sample Browser</h2>
+      <div id="filter-controls">
+        <label>Probe: <select id="filter-probe"></select></label>
+        <label>Label:
+          <select id="filter-label">
+            <option value="all">All</option>
+            <option value="correct">All correct</option>
+            <option value="incorrect">All incorrect</option>
+            <option value="mixed">Mixed</option>
+          </select>
+        </label>
+      </div>
+      <div id="sample-list"></div>
+    </section>
+
+    <section id="panel-detail" class="panel">
+      <h2>Detail View</h2>
+      <div id="detail-content">
+        <p class="placeholder">Select a sample to view details.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

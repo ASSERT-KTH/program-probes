@@ -1,0 +1,3 @@
+dataset: humaneval
+adapter: humaneval
+execution_timeout: 10

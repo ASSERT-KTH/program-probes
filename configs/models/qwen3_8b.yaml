@@ -1,0 +1,3 @@
+model_id: "Qwen/Qwen3-8B"
+probe_layers: [8, 17, 26, 35]
+adapter: qwen

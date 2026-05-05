@@ -1,1 +1,156 @@
 # program-probes
+
+Measures whether a language model's internal hidden states linearly predict properties of its own output before those properties are realised.
+
+Pipeline: inference + activation hooks → per-sample `.pt` files → per-(layer, probe) cache tensors → linear probe training with W&B sweep → accuracy heatmaps → static dashboard.
+
+## Setup
+
+```bash
+uv sync
+```
+
+## Running locally
+
+### 1. Extract activations
+
+```bash
+uv run python run_extract.py \
+  --model-config configs/models/qwen3_8b.yaml \
+  --task-config configs/tasks/humaneval.yaml \
+  --hardware-config configs/hardware/single_a100.yaml \
+  --generation-config configs/generation.yaml \
+  --probe will_be_correct \
+  --run-id my_run
+```
+
+### 2. Build cache
+
+```bash
+uv run python run_build_cache.py \
+  --run-id my_run \
+  --probe will_be_correct
+```
+
+### 3. Probe sweep (W&B)
+
+```bash
+uv run python run_probe.py sweep \
+  --run-id my_run \
+  --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml
+```
+
+### 4. Probe final run
+
+```bash
+uv run python run_probe.py final \
+  --run-id my_run \
+  --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  --lr 1e-3 \
+  --weight-decay 1e-4 \
+  --batch-size 512 \
+  --patience 10
+```
+
+### 5. Figures
+
+```bash
+uv run python run_figures.py \
+  --run-id my_run \
+  --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml
+```
+
+### 6. Export dashboard
+
+```bash
+uv run python run_export_dashboard.py \
+  --run-id my_run \
+  --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  --task-config configs/tasks/humaneval.yaml
+```
+
+Then open `dashboard/index.html` directly in a browser.
+
+## SLURM (Berzelius)
+
+```bash
+sbatch slurm/extract.sh \
+  --model-config configs/models/qwen3_8b.yaml \
+  --task-config configs/tasks/humaneval.yaml \
+  --hardware-config configs/hardware/single_a100.yaml \
+  --generation-config configs/generation.yaml \
+  --probe will_be_correct \
+  --run-id my_run
+
+# 8-GPU run:
+sbatch --gpus=8 slurm/extract.sh \
+  --hardware-config configs/hardware/eight_a100.yaml ...
+
+sbatch slurm/build_cache.sh --run-id my_run --probe will_be_correct
+
+# W&B sweep as job array (30 agents):
+sbatch --array=0-29 slurm/probe_sweep.sh \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml
+
+sbatch slurm/probe_final.sh \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  --lr 1e-3 --weight-decay 1e-4 --batch-size 512 --patience 10
+
+sbatch slurm/figures.sh --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml
+
+sbatch slurm/export_dashboard.sh \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  --task-config configs/tasks/humaneval.yaml
+```
+
+## Tests
+
+```bash
+uv run pytest
+```
+
+All tests run without GPU, network access, or real model downloads. Complete in under 30 seconds.
+
+## HumanEval split note
+
+HumanEval has 164 problems. The 70/15/15 group-level split gives approximately 115/25/24 problems. For a larger dataset, switch to MBPP (374 problems) by changing one line in `configs/tasks/humaneval.yaml`:
+
+```yaml
+dataset: mbpp
+adapter: mbpp
+```
+
+## Extension guide
+
+### Add a model adapter
+
+1. Create `src/models/mymodel.py` subclassing `ModelAdapter`.
+2. Implement `load`, `get_layer_modules`, `get_hidden_dim`, `tokenize`, `generate`.
+3. Add a YAML in `configs/models/` and register the adapter name in `src/extract._load_model_adapter`.
+
+### Add a task adapter
+
+1. Create `src/tasks/mytask.py` subclassing `TaskAdapter`.
+2. Implement `load_dataset`, `format_prompt`, `check_correct`, `group_id`.
+3. Add a YAML in `configs/tasks/` and register in `src/extract._load_task_adapter`.
+
+### Add an agent scaffold
+
+1. Subclass `AgentAdapter` from `src/agents/base.py` and implement `run_episode`.
+2. Wire it into `run_extract.py` via a new `--agent-config` flag.
+3. Dynamic probes become available automatically once `edit_history` is populated.
+
+### Add a probe
+
+1. Create `src/probes/myprobe.py` subclassing `ProbeAdapter`.
+2. Set `name`, `is_dynamic`, and implement `compute_label`.
+3. Register the probe name in `src/extract._load_probe`.
+4. Pass `--probe myprobe` to any entrypoint.
