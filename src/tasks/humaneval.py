@@ -3,8 +3,19 @@ import sys
 from src.tasks.base import TaskAdapter, ChatPrompt
 from src.configs import TaskConfig
 
-_INSTRUCTION_PREFIX = "Please provide a self-contained Python script that solves the following problem in a markdown code block:"
+_INSTRUCTION_PREFIX = (
+    "Please provide a self-contained Python script that solves the following problem "
+    "in a markdown code block. Do not include any explanation or text outside the code block."
+)
 _RESPONSE_PREFIX = "Below is a Python script with a self-contained function that solves the problem and passes corresponding tests:\n```python"
+
+
+def _extract_code(generated: str) -> str:
+    # The model is prefilled with ```python\n, so generated begins with code.
+    # Take everything up to the first closing fence.
+    if "```" in generated:
+        return generated[:generated.index("```")].strip()
+    return generated.strip()
 
 
 class HumanEvalAdapter(TaskAdapter):
@@ -18,10 +29,10 @@ class HumanEvalAdapter(TaskAdapter):
         return ChatPrompt(user_content=user_content, assistant_prefill=_RESPONSE_PREFIX)
 
     def check_correct(self, generated: str, sample: dict) -> bool:
-        # Chat model outputs a full self-contained script; also try concatenation as fallback.
-        candidates = [generated, sample["prompt"] + generated]
-        for code in candidates:
-            test_code = code + "\n" + sample["test"] + "\ncheck(" + sample["entry_point"] + ")"
+        code = _extract_code(generated)
+        candidates = [code, sample["prompt"] + code]
+        for candidate in candidates:
+            test_code = candidate + "\n" + sample["test"] + "\ncheck(" + sample["entry_point"] + ")"
             try:
                 result = subprocess.run(
                     [sys.executable, "-c", test_code],

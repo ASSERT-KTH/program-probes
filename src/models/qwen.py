@@ -61,9 +61,6 @@ class QwenAdapter(ModelAdapter):
             think_end = 0
 
         content_tokens = new_tokens[think_end:]
-        decoded = self._tokenizer.decode(content_tokens, skip_special_tokens=True)
-        # Strip closing code fence if model closed the markdown block
-        if decoded.rstrip().endswith("```"):
-            decoded = decoded.rstrip()[:-3]
-        decoded = decoded.strip("\n")
-        return decoded, new_tokens
+        decoded = self._tokenizer.decode(content_tokens, skip_special_tokens=True).strip("\n")
+        raw = self._tokenizer.decode(new_tokens, skip_special_tokens=False).strip("\n")
+        return decoded, new_tokens, raw

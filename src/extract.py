@@ -112,7 +112,7 @@ def run_extraction(
                 handle = layer_modules[li].register_forward_hook(make_hook(li))
                 handles.append(handle)
 
-            generated_text, token_ids = model_adapter.generate(
+            generated_text, token_ids, raw_text = model_adapter.generate(
                 inputs, generation_config.max_new_tokens, generation_config.temperature,
                 top_p=generation_config.top_p,
                 top_k=generation_config.top_k,
@@ -162,6 +162,7 @@ def run_extraction(
                 "metadata": {
                     "prompt": chat_prompt.user_content,
                     "generated_text": generated_text,
+                    "raw_text": raw_text,
                     "task_sample": sample,
                 },
             }

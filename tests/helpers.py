@@ -24,9 +24,9 @@ class MockModelAdapter(ModelAdapter):
     def tokenize(self, prompt: ChatPrompt) -> dict:
         return {"input_ids": torch.zeros(1, 5, dtype=torch.long)}
 
-    def generate(self, inputs: dict, max_new_tokens: int, temperature: float, top_p: float | None = None, top_k: int | None = None, min_p: float | None = None) -> tuple[str, list[int]]:
+    def generate(self, inputs: dict, max_new_tokens: int, temperature: float, top_p: float | None = None, top_k: int | None = None, min_p: float | None = None) -> tuple[str, list[int], str]:
         token_ids = list(range(self._N_TOKENS))
-        return self.FIXED_OUTPUT, token_ids
+        return self.FIXED_OUTPUT, token_ids, self.FIXED_OUTPUT
 
 
 class MockTaskAdapter(TaskAdapter):

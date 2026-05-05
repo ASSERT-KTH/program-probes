@@ -32,7 +32,7 @@ def test_model_adapter_tokenize(mock_model_adapter, model_config, hardware_confi
 def test_model_adapter_generate(mock_model_adapter, model_config, hardware_config):
     mock_model_adapter.load(model_config, hardware_config)
     inputs = mock_model_adapter.tokenize("hello")
-    text, tokens = mock_model_adapter.generate(inputs, max_new_tokens=10, temperature=0.7)
+    text, tokens, raw = mock_model_adapter.generate(inputs, max_new_tokens=10, temperature=0.7)
     assert isinstance(text, str)
     assert isinstance(tokens, list)
     assert len(tokens) > 0

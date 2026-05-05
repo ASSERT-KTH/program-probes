@@ -9,4 +9,4 @@
 set -euo pipefail
 mkdir -p logs
 
-uv run python run_probe.py final "$@"
+uv run python run_probe.py "$@" final
