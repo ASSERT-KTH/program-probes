@@ -1,0 +1,237 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  background: #f5f5f5;
+  color: #222;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px;
+  background: #1a1a2e;
+  color: #fff;
+}
+
+header h1 { font-size: 18px; font-weight: 600; }
+
+#controls label { font-size: 13px; }
+
+#controls select {
+  margin-left: 6px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: none;
+}
+
+#panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+  height: calc(100vh - 54px);
+  overflow: hidden;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel h2 {
+  font-size: 15px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+
+/* Probe tabs */
+#probe-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.probe-tab {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  background: #f5f5f5;
+}
+
+.probe-tab.active {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #1a1a2e;
+}
+
+/* Heatmap */
+#heatmap-container svg, #linechart-container svg { width: 100%; }
+
+.heatmap-cell { stroke: #fff; stroke-width: 0.5; }
+.heatmap-cell:hover { stroke: #333; stroke-width: 1.5; }
+
+.tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  display: none;
+}
+
+/* Sample list */
+#filter-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#filter-controls label { font-size: 12px; }
+
+#sample-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.sample-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  cursor: pointer;
+  background: #fafafa;
+  font-size: 12px;
+}
+
+.sample-row:hover { background: #eef2ff; border-color: #aab4f5; }
+.sample-row.selected { background: #dde5ff; border-color: #5566cc; }
+
+.sample-group { font-weight: 600; min-width: 80px; }
+
+.correctness-bar {
+  display: flex;
+  height: 10px;
+  width: 60px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #eee;
+}
+
+.bar-correct { background: #4caf50; }
+.bar-incorrect { background: #f44336; }
+
+.probe-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.probe-badge {
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  background: #e0e0e0;
+  white-space: nowrap;
+}
+
+/* Detail view */
+#detail-content { display: flex; flex-direction: column; gap: 12px; }
+
+.placeholder { color: #999; font-style: italic; }
+
+.prompt-block {
+  background: #f4f4f4;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.prompt-toggle {
+  font-size: 12px;
+  cursor: pointer;
+  color: #5566cc;
+  user-select: none;
+}
+
+.gen-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.gen-tab {
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 12px;
+  background: #f5f5f5;
+}
+
+.gen-tab.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+
+.generated-text {
+  background: #f4f4f4;
+  border-radius: 6px;
+  padding: 8px;
+  font-family: monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.label-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.label-true { background: #c8f5c8; color: #1a6e1a; }
+.label-false { background: #fdd; color: #9b1a1a; }
+.label-none { background: #eee; color: #666; }
+
+.detail-probes { display: flex; flex-direction: column; gap: 4px; }
+
+.detail-probe-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.detail-probe-name { min-width: 140px; font-family: monospace; }
+
+.timeline-bar {
+  display: flex;
+  height: 14px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex: 1;
+  background: #eee;
+  min-width: 60px;
+}
+
+.timeline-segment { height: 100%; }
+.timeline-true { background: #4caf50; }
+.timeline-false { background: #f44336; }
+.timeline-none { background: #ddd; }

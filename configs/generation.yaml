@@ -1,0 +1,5 @@
+max_new_tokens: 1024
+n_generations: 10
+temperature: 0.7
+stride: 5
+seed: 42
