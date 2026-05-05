@@ -12,6 +12,7 @@ dependencies = [
     "matplotlib>=3.9",
     "pydantic>=2.0",
     "pytest>=8.0",
+    "scikit-learn>=1.8.0",
 ]
 
 [build-system]

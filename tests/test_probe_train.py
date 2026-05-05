@@ -99,6 +99,36 @@ def test_mean_centering_uses_train_stats(tmp_path):
     assert isinstance(results, list)
 
 
+def test_probe_result_has_extended_metrics(tmp_path):
+    cache_path = _make_cache(tmp_path)
+    results = train_probe_layer(
+        cache_path, LAYER_IDX,
+        lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS
+    )
+    for r in results:
+        assert 0.0 <= r.val_f1 <= 1.0
+        assert 0.0 <= r.val_auc <= 1.0
+        assert 0.0 <= r.test_f1 <= 1.0
+        assert 0.0 <= r.test_auc <= 1.0
+        assert r.n_epochs >= 1
+
+
+def test_log_fn_called_per_epoch(tmp_path):
+    cache_path = _make_cache(tmp_path)
+    log_calls = []
+    results = train_probe_layer(
+        cache_path, LAYER_IDX,
+        lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS,
+        log_fn=log_calls.append,
+    )
+    assert len(log_calls) > 0
+    entry = log_calls[0]
+    assert "train_loss" in entry
+    assert "val_loss" in entry
+    assert "grad_norm" in entry
+    assert "weight_norm" in entry
+
+
 def test_bin_index_clamped():
     assert _bin_index(0.0) == 0
     assert _bin_index(1.0) == 9  # clamped to n_bins-1

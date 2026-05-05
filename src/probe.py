@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 from dataclasses import dataclass
+from typing import Callable
 
 
 @dataclass
@@ -13,10 +14,19 @@ class ProbeResult:
     layer: int
     bin_idx: int
     val_acc: float
+    val_f1: float
+    val_precision: float
+    val_recall: float
+    val_auc: float
     test_acc: float
+    test_f1: float
+    test_precision: float
+    test_recall: float
+    test_auc: float
     n_train: int
     n_val: int
     n_test: int
+    n_epochs: int
 
 
 def _set_seeds(seed: int) -> None:
@@ -42,6 +52,16 @@ def _bin_index(rel_pos: float, n_bins: int = 10) -> int:
     return min(int(math.floor(rel_pos * n_bins)), n_bins - 1)
 
 
+def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> dict:
+    from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+    return {
+        "f1": f1_score(labels, preds, zero_division=0.0),
+        "precision": precision_score(labels, preds, zero_division=0.0),
+        "recall": recall_score(labels, preds, zero_division=0.0),
+        "auc": roc_auc_score(labels, probs) if len(np.unique(labels)) > 1 else 0.5,
+    }
+
+
 def train_probe_layer(
     cache_path: str,
     layer_idx: int,
@@ -51,6 +71,7 @@ def train_probe_layer(
     patience: int,
     seed: int,
     n_bins: int = 10,
+    log_fn: Callable[[dict], None] | None = None,
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -63,10 +84,10 @@ def train_probe_layer(
     train_samples, val_samples, test_samples = _split_groups(sample_ids, seed)
 
     hidden_dim = H.shape[1]
+    criterion = nn.CrossEntropyLoss()
     results = []
 
     for bin_idx in range(n_bins):
-        # Gather indices for this bin, excluding masked positions
         bin_mask = torch.tensor([
             _bin_index(rel_pos[i].item(), n_bins) == bin_idx and y[i].item() >= 0
             for i in range(len(y))
@@ -89,7 +110,6 @@ def train_probe_layer(
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
 
-        # Mean-center using train statistics only
         mean = H_train.mean(dim=0)
         H_train = H_train - mean
         H_val = H_val - mean
@@ -97,29 +117,48 @@ def train_probe_layer(
 
         model = nn.Linear(hidden_dim, 2)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
-        criterion = nn.CrossEntropyLoss()
 
         best_val_acc = -1.0
         best_weights = copy.deepcopy(model.state_dict())
         no_improve = 0
+        n_epochs = 0
 
         n_train_samples = H_train.shape[0]
         for epoch in range(1000):
             model.train()
             perm = torch.randperm(n_train_samples)
+            epoch_grad_norms = []
             for start in range(0, n_train_samples, batch_size):
                 idx = perm[start:start + batch_size]
                 logits = model(H_train[idx])
                 loss = criterion(logits, y_train[idx])
                 optimizer.zero_grad()
                 loss.backward()
+                epoch_grad_norms.append(model.weight.grad.norm().item())
                 optimizer.step()
 
             model.eval()
             with torch.no_grad():
                 val_logits = model(H_val)
+                val_loss = criterion(val_logits, y_val).item()
+                train_loss = criterion(model(H_train), y_train).item()
                 val_preds = val_logits.argmax(dim=1)
                 val_acc = (val_preds == y_val).float().mean().item()
+                weight_norm = model.weight.norm().item()
+
+            n_epochs = epoch + 1
+
+            if log_fn is not None:
+                log_fn({
+                    "layer": layer_idx,
+                    "bin_idx": bin_idx,
+                    "epoch": epoch,
+                    "train_loss": train_loss,
+                    "val_loss": val_loss,
+                    "val_acc": val_acc,
+                    "grad_norm": float(np.mean(epoch_grad_norms)),
+                    "weight_norm": weight_norm,
+                })
 
             if val_acc > best_val_acc:
                 best_val_acc = val_acc
@@ -133,17 +172,36 @@ def train_probe_layer(
         model.load_state_dict(best_weights)
         model.eval()
         with torch.no_grad():
-            test_preds = model(H_test).argmax(dim=1)
-            test_acc = (test_preds == y_test).float().mean().item()
+            val_probs = torch.softmax(model(H_val), dim=1)[:, 1].numpy()
+            val_preds_np = (val_probs >= 0.5).astype(int)
+            val_labels_np = y_val.numpy()
+
+            test_logits = model(H_test)
+            test_probs = torch.softmax(test_logits, dim=1)[:, 1].numpy()
+            test_preds_np = (test_probs >= 0.5).astype(int)
+            test_labels_np = y_test.numpy()
+
+        val_m = _clf_metrics(val_probs, val_preds_np, val_labels_np)
+        test_m = _clf_metrics(test_probs, test_preds_np, test_labels_np)
+        test_acc = (test_preds_np == test_labels_np).mean()
 
         results.append(ProbeResult(
             layer=layer_idx,
             bin_idx=bin_idx,
             val_acc=best_val_acc,
-            test_acc=test_acc,
+            val_f1=val_m["f1"],
+            val_precision=val_m["precision"],
+            val_recall=val_m["recall"],
+            val_auc=val_m["auc"],
+            test_acc=float(test_acc),
+            test_f1=test_m["f1"],
+            test_precision=test_m["precision"],
+            test_recall=test_m["recall"],
+            test_auc=test_m["auc"],
             n_train=H_train.shape[0],
             n_val=H_val.shape[0],
             n_test=H_test.shape[0],
+            n_epochs=n_epochs,
         ))
 
     return results
@@ -165,7 +223,7 @@ def run_sweep(
 
     sweep_config = {
         "method": "bayes",
-        "metric": {"name": "mean_val_acc", "goal": "maximize"},
+        "metric": {"name": "mean_val_f1", "goal": "maximize"},
         "parameters": {
             "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-2},
             "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
@@ -183,8 +241,11 @@ def run_sweep(
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins,
             )
-            mean_val = np.mean([r.val_acc for r in results]) if results else 0.0
-            wandb.log({"mean_val_acc": mean_val})
+            wandb.log({
+                "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
+                "mean_val_acc": np.mean([r.val_acc for r in results]) if results else 0.0,
+                "mean_val_auc": np.mean([r.val_auc for r in results]) if results else 0.5,
+            })
 
     sweep_id = wandb.sweep(sweep_config, project="program-probes")
     wandb.agent(sweep_id, sweep_fn)
@@ -210,17 +271,40 @@ def run_final(
     with wandb.init(project="program-probes", job_type="final") as run:
         for layer_idx in probe_layers:
             cache_path = str(cache_base / f"layer_{layer_idx}.pt")
+
+            def make_log_fn(layer):
+                def log_fn(metrics: dict) -> None:
+                    b = metrics["bin_idx"]
+                    wandb.log({
+                        f"layer_{layer}/bin_{b}/train_loss": metrics["train_loss"],
+                        f"layer_{layer}/bin_{b}/val_loss": metrics["val_loss"],
+                        f"layer_{layer}/bin_{b}/val_acc": metrics["val_acc"],
+                        f"layer_{layer}/bin_{b}/grad_norm": metrics["grad_norm"],
+                        f"layer_{layer}/bin_{b}/weight_norm": metrics["weight_norm"],
+                    })
+                return log_fn
+
             results = train_probe_layer(
                 cache_path, layer_idx,
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
                 seed=seed, n_bins=n_bins,
+                log_fn=make_log_fn(layer_idx),
             )
             all_results[layer_idx] = results
             for r in results:
                 wandb.log({
                     f"layer_{layer_idx}/bin_{r.bin_idx}/test_acc": r.test_acc,
-                    f"layer_{layer_idx}/bin_{r.bin_idx}/val_acc": r.val_acc,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/test_f1": r.test_f1,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/test_precision": r.test_precision,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/test_recall": r.test_recall,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/test_auc": r.test_auc,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/val_f1": r.val_f1,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/val_auc": r.val_auc,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_epochs": r.n_epochs,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_train": r.n_train,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_val": r.n_val,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_test": r.n_test,
                 })
 
     out = Path(results_dir) / run_id / probe_name
