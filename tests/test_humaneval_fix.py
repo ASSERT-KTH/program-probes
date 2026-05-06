@@ -23,7 +23,7 @@ def test_format_prompt_returns_chat_prompt(adapter):
     prompt = adapter.format_prompt(sample)
     assert isinstance(prompt, ChatPrompt)
     assert isinstance(prompt.user_content, str)
-    assert isinstance(prompt.assistant_prefill, str)
+    assert prompt.assistant_prefill is None
 
 
 def test_format_prompt_includes_buggy_code(adapter):
@@ -37,6 +37,12 @@ def test_format_prompt_has_fix_instruction(adapter):
     sample = _make_sample()
     prompt = adapter.format_prompt(sample)
     assert "fix" in prompt.user_content.lower()
+
+
+def test_format_prompt_no_prefill(adapter):
+    sample = _make_sample()
+    prompt = adapter.format_prompt(sample)
+    assert prompt.assistant_prefill is None
 
 
 def test_check_correct_with_correct_code(adapter):
@@ -62,6 +68,7 @@ def test_check_correct_with_wrong_code(adapter):
 def test_check_correct_strips_fence(adapter):
     sample = _make_sample()
     correct_code = (
+        "```python\n"
         "from typing import List\n"
         "def has_close_elements(numbers: List[float], threshold: float) -> bool:\n"
         "    return any(abs(a - b) < threshold for i, a in enumerate(numbers) for b in numbers[i+1:])\n"
@@ -81,9 +88,22 @@ def test_group_id(adapter):
     assert adapter.group_id(sample) == "HumanEval/0"
 
 
-def test_extract_code_strips_fence():
-    text = "def foo():\n    return 1\n```\n### Explanation\nSome text."
+def test_extract_code_python_fence():
+    text = "```python\ndef foo():\n    return 1\n```\n### Explanation\nSome text."
     assert _extract_code(text) == "def foo():\n    return 1"
+
+
+def test_extract_code_plain_fence():
+    text = "```\ndef foo():\n    return 1\n```"
+    assert _extract_code(text) == "def foo():\n    return 1"
+
+
+def test_extract_code_picks_last_block():
+    text = (
+        "Here is a partial fix:\n```python\ndistance = abs(a - b)\n```\n"
+        "Here is the full fix:\n```python\ndef foo():\n    return 42\n```"
+    )
+    assert _extract_code(text) == "def foo():\n    return 42"
 
 
 def test_extract_code_no_fence():

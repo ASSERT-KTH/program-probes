@@ -3,16 +3,14 @@ import sys
 from src.tasks.base import TaskAdapter, ChatPrompt
 from src.configs import TaskConfig
 
-_INSTRUCTION_PREFIX = (
-    "Please fix the buggy Python function below and provide the corrected version "
-    "in a markdown code block. Do not include any explanation or text outside the code block."
-)
-_RESPONSE_PREFIX = "Below is the fixed Python script:\n```python"
+_FIX_SUFFIX = "Provide the complete fixed function in a final markdown code block at the end of your response."
 
 
 def _extract_code(generated: str) -> str:
-    if "```" in generated:
-        return generated[:generated.index("```")].strip()
+    import re
+    blocks = re.findall(r"```(?:python)?\n(.*?)```", generated, re.DOTALL)
+    if blocks:
+        return blocks[-1].strip()
     return generated.strip()
 
 
@@ -24,8 +22,12 @@ class HumanEvalFixAdapter(TaskAdapter):
 
     def format_prompt(self, sample: dict) -> ChatPrompt:
         buggy_code = sample["prompt"] + sample["buggy_solution"]
-        user_content = f"{_INSTRUCTION_PREFIX}\n```python\n{buggy_code.strip()}\n```\n"
-        return ChatPrompt(user_content=user_content, assistant_prefill=_RESPONSE_PREFIX)
+        user_content = (
+            f"Fix bugs in {sample['entry_point']}.\n\n"
+            f"```python\n{buggy_code.strip()}\n```\n\n"
+            f"{_FIX_SUFFIX}"
+        )
+        return ChatPrompt(user_content=user_content, assistant_prefill=None)
 
     def check_correct(self, generated: str, sample: dict) -> bool:
         code = _extract_code(generated)
