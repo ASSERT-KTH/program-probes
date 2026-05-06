@@ -15,8 +15,7 @@ def main():
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
-    sweep_p = subparsers.add_parser("sweep")
-    sweep_p.add_argument("--sweep-id", default=None)
+    subparsers.add_parser("sweep")
 
     final_p = subparsers.add_parser("final")
     final_p.add_argument("--lr", type=float, required=True)

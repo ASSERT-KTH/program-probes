@@ -1,0 +1,2 @@
+adapter: humaneval_fix
+dataset: bigcode/humanevalpack
