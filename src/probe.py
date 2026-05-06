@@ -226,10 +226,10 @@ def run_sweep(
         "method": "bayes",
         "metric": {"name": "mean_val_f1", "goal": "maximize"},
         "parameters": {
-            "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-2},
+            "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-1},
             "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
             "batch_size": {"values": [256, 512, 1024]},
-            "patience": {"values": [5, 10, 20]},
+            "patience": {"values": [5, 10, 20, 50, 100]},
         },
     }
 

@@ -27,6 +27,9 @@ def _load_task_adapter(adapter_name: str):
     if adapter_name == "humaneval":
         from src.tasks.humaneval import HumanEvalAdapter
         return HumanEvalAdapter()
+    if adapter_name == "humaneval_fix":
+        from src.tasks.humaneval_fix import HumanEvalFixAdapter
+        return HumanEvalFixAdapter()
     raise ValueError(f"Unknown task adapter: {adapter_name}")
 
 
