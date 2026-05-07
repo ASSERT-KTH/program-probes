@@ -3,7 +3,10 @@ import sys
 from src.tasks.base import TaskAdapter, ChatPrompt
 from src.configs import TaskConfig
 
-_FIX_SUFFIX = "Provide the complete fixed function in a final markdown code block at the end of your response."
+_FIX_SUFFIX = (
+    "Your response must end with the complete fixed function in a markdown python code block. "
+    "Do not include any text or code blocks after it."
+)
 
 
 def _extract_code(generated: str) -> str:
@@ -27,7 +30,7 @@ class HumanEvalFixAdapter(TaskAdapter):
             f"```python\n{buggy_code.strip()}\n```\n\n"
             f"{_FIX_SUFFIX}"
         )
-        return ChatPrompt(user_content=user_content, assistant_prefill=None)
+        return ChatPrompt(user_content=user_content)
 
     def check_correct(self, generated: str, sample: dict) -> bool:
         code = _extract_code(generated)

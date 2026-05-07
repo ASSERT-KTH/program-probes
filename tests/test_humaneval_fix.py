@@ -23,7 +23,6 @@ def test_format_prompt_returns_chat_prompt(adapter):
     prompt = adapter.format_prompt(sample)
     assert isinstance(prompt, ChatPrompt)
     assert isinstance(prompt.user_content, str)
-    assert prompt.assistant_prefill is None
 
 
 def test_format_prompt_includes_buggy_code(adapter):
@@ -37,12 +36,6 @@ def test_format_prompt_has_fix_instruction(adapter):
     sample = _make_sample()
     prompt = adapter.format_prompt(sample)
     assert "fix" in prompt.user_content.lower()
-
-
-def test_format_prompt_no_prefill(adapter):
-    sample = _make_sample()
-    prompt = adapter.format_prompt(sample)
-    assert prompt.assistant_prefill is None
 
 
 def test_check_correct_with_correct_code(adapter):
