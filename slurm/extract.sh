@@ -16,3 +16,4 @@ uv run python run_extract.py \
   --shard-rank "$RANK" \
   --num-shards "$NUM_SHARDS" \
   "$@"
+

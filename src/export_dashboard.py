@@ -51,13 +51,13 @@ def export_dashboard(
             samples_by_id[sid] = {
                 "sample_id": sid,
                 "group_id": data["group_id"],
-                "prompt": meta["prompt"],
+                "prompt": meta.get("prompt", meta.get("prompt_token_ids", "")),
                 "generations": [],
             }
 
         gen_entry = {
             "generation_idx": gen_idx,
-            "generated_text": meta["generated_text"],
+            "generated_text": meta.get("raw_text", meta.get("generated_text", "")),
             "labels": {k: v for k, v in labels.items() if k in probe_names},
         }
         samples_by_id[sid]["generations"].append(gen_entry)
