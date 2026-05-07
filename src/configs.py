@@ -3,19 +3,22 @@ from typing import Literal
 
 
 class GenerationConfig(BaseModel):
+    # Sampling
     max_new_tokens: int = 1024
     n_generations: int = 10
     temperature: float = 0.7
     top_p: float | None = None
     top_k: int | None = None
     min_p: float | None = None
+    repetition_penalty: float | None = None
+    presence_penalty: float | None = None
     stride: int = 5
     seed: int = 42
-
-
-class HardwareConfig(BaseModel):
-    device_map: str = "auto"
+    # Compute
     dtype: Literal["bfloat16", "float16", "float32"] = "bfloat16"
+    num_gpus: int = 1
+    vllm_batch_size: int = 64
+    extraction_batch_size: int = 8
 
 
 class ModelConfig(BaseModel):
