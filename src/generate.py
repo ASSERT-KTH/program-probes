@@ -80,24 +80,19 @@ def run_generation(
     max_model_len = max_prompt_len + gen_config.max_new_tokens
     model_adapter.load_for_generation(model_config, gen_config, max_model_len)
 
-    # Send all pending prompts to vLLM at once — its scheduler handles internal
-    # batching optimally. Sub-batch only for progress checkpointing.
-    checkpoint_size = gen_config.vllm_batch_size
-    for batch_start in range(0, len(pending), checkpoint_size):
-        batch = pending[batch_start:batch_start + checkpoint_size]
-        batch_prompts = [item[2] for item in batch]
-        gen_results = model_adapter.generate(batch_prompts, gen_config)
+    all_prompts = [item[2] for item in pending]
+    gen_results = model_adapter.generate(all_prompts, gen_config)
 
-        for (sample, gi, _), gen_result in zip(batch, gen_results):
-            results.append({
-                "sample_id": task_adapter.sample_id(sample),
-                "group_id": task_adapter.group_id(sample),
-                "gen_idx": gi,
-                "prompt_token_ids": gen_result.prompt_token_ids,
-                "generated_token_ids": gen_result.generated_token_ids,
-                "raw_text": gen_result.raw_text,
-                "task_sample": sample,
-            })
+    for (sample, gi, _), gen_result in zip(pending, gen_results):
+        results.append({
+            "sample_id": task_adapter.sample_id(sample),
+            "group_id": task_adapter.group_id(sample),
+            "gen_idx": gi,
+            "prompt_token_ids": gen_result.prompt_token_ids,
+            "generated_token_ids": gen_result.generated_token_ids,
+            "raw_text": gen_result.raw_text,
+            "task_sample": sample,
+        })
 
-        with open(out_path, "w") as f:
-            json.dump(results, f)
+    with open(out_path, "w") as f:
+        json.dump(results, f)

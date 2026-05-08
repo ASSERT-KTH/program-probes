@@ -8,5 +8,4 @@ stride: 5
 seed: 42
 dtype: bfloat16
 num_gpus: 4
-vllm_batch_size: 64
 extraction_batch_size: 8

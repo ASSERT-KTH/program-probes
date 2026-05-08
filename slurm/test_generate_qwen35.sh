@@ -2,6 +2,7 @@
 #SBATCH -J pp-gen-test-qwen35
 #SBATCH -p berzelius
 #SBATCH --gpus=1
+#SBATCH -C thin
 #SBATCH -t 00:30:00
 #SBATCH -o logs/test_generate_qwen35_%j.out
 #SBATCH -e logs/test_generate_qwen35_%j.err

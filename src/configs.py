@@ -17,7 +17,6 @@ class GenerationConfig(BaseModel):
     # Compute
     dtype: Literal["bfloat16", "float16", "float32"] = "bfloat16"
     num_gpus: int = 1
-    vllm_batch_size: int = 64
     extraction_batch_size: int = 8
 
 
