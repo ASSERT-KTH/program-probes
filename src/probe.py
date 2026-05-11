@@ -75,7 +75,7 @@ def train_probe_layer(
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
-    H = data["H"]
+    H = data["H"].float()
     y = data["y"]
     rel_pos = data["rel_pos"]
     sample_ids = data["sample_id"]
@@ -208,11 +208,30 @@ def train_probe_layer(
     return results
 
 
+def create_sweep() -> str:
+    import wandb
+    sweep_config = {
+        "method": "bayes",
+        "metric": {"name": "mean_val_f1", "goal": "maximize"},
+        "parameters": {
+            "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-1},
+            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
+            "batch_size": {"values": [256, 512, 1024]},
+            "patience": {"values": [10, 100]},
+        },
+    }
+    sweep_id = wandb.sweep(sweep_config, project="program-probes")
+    print(f"Created sweep: {sweep_id}", flush=True)
+    return sweep_id
+
+
 def run_sweep(
     run_id: str,
     probe_name: str,
     probe_layers: list[int],
     seed: int,
+    sweep_id: str | None = None,
+    count: int | None = None,
     cache_dir: str = "cache",
     n_bins: int = 10,
 ) -> None:
@@ -222,16 +241,8 @@ def run_sweep(
     middle_layer = probe_layers[len(probe_layers) // 2]
     middle_cache = str(cache_base / f"layer_{middle_layer}.pt")
 
-    sweep_config = {
-        "method": "bayes",
-        "metric": {"name": "mean_val_f1", "goal": "maximize"},
-        "parameters": {
-            "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-1},
-            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
-            "batch_size": {"values": [256, 512, 1024]},
-            "patience": {"values": [5, 10, 20, 50, 100]},
-        },
-    }
+    if sweep_id is None:
+        sweep_id = create_sweep()
 
     def sweep_fn():
         with wandb.init() as run:
@@ -260,8 +271,7 @@ def run_sweep(
                 "mean_val_auc": np.mean([r.val_auc for r in results]) if results else 0.5,
             })
 
-    sweep_id = wandb.sweep(sweep_config, project="program-probes")
-    wandb.agent(sweep_id, sweep_fn)
+    wandb.agent(sweep_id, sweep_fn, project="program-probes", count=count)
 
 
 def run_final(
