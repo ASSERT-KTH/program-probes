@@ -1,4 +1,4 @@
-max_new_tokens: 81920
+max_new_tokens: 32768
 n_generations: 1
 temperature: 1.0
 top_p: 0.95
@@ -8,4 +8,4 @@ presence_penalty: 1.5
 repetition_penalty: 1.0
 stride: 5
 seed: 42
-num_gpus: 4
+num_gpus: 1
