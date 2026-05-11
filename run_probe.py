@@ -15,7 +15,9 @@ def main():
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
-    subparsers.add_parser("sweep")
+    sweep_p = subparsers.add_parser("sweep")
+    sweep_p.add_argument("--sweep-id", default=None, help="Join an existing W&B sweep instead of creating a new one")
+    sweep_p.add_argument("--count", type=int, default=None, help="Max number of runs this agent will execute")
 
     final_p = subparsers.add_parser("final")
     final_p.add_argument("--lr", type=float, required=True)
@@ -32,6 +34,8 @@ def main():
             probe_name=args.probe,
             probe_layers=model_cfg.probe_layers,
             seed=args.seed,
+            sweep_id=args.sweep_id,
+            count=args.count,
             cache_dir=args.cache_dir,
             n_bins=args.n_bins,
         )
