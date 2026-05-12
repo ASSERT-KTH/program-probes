@@ -11,6 +11,7 @@ def main():
     parser.add_argument("--task-config", required=True)
     parser.add_argument("--output-dir", default="outputs")
     parser.add_argument("--results-dir", default="results")
+    parser.add_argument("--cache-dir", default="cache")
     parser.add_argument("--dashboard-dir", default="dashboard")
     parser.add_argument("--n-bins", type=int, default=10)
     args = parser.parse_args()
@@ -26,6 +27,7 @@ def main():
         model_name=model_cfg.model_id,
         output_dir=args.output_dir,
         results_dir=args.results_dir,
+        cache_dir=args.cache_dir,
         dashboard_dir=args.dashboard_dir,
         n_bins=args.n_bins,
     )

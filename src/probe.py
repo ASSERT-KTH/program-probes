@@ -81,7 +81,15 @@ def train_probe_layer(
     sample_ids = data["sample_id"]
     group_ids = data["group_id"]
 
-    train_samples, val_samples, test_samples = _split_groups(sample_ids, seed)
+    train_groups, val_groups, test_groups = _split_groups(group_ids, seed)
+    group_to_split = {}
+    for sid, gid in zip(sample_ids, group_ids):
+        if gid in train_groups: group_to_split[sid] = "train"
+        elif gid in val_groups: group_to_split[sid] = "val"
+        else: group_to_split[sid] = "test"
+    train_samples = {sid for sid, s in group_to_split.items() if s == "train"}
+    val_samples   = {sid for sid, s in group_to_split.items() if s == "val"}
+    test_samples  = {sid for sid, s in group_to_split.items() if s == "test"}
 
     hidden_dim = H.shape[1]
     criterion = nn.CrossEntropyLoss()
