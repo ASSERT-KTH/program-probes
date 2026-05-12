@@ -142,6 +142,9 @@ def run_extraction(
                 "n_captured_steps": n_steps,
                 "metadata": {
                     "prompt_token_ids": entry["prompt_token_ids"],
+                    "prompt_text": model_adapter._tokenizer.decode(
+                        entry["prompt_token_ids"], skip_special_tokens=False
+                    ),
                     "raw_text": entry["raw_text"],
                     "task_sample": entry["task_sample"],
                 },

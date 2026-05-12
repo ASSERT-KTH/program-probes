@@ -75,7 +75,7 @@ def export_dashboard(
             samples_by_id[sid] = {
                 "sample_id": sid,
                 "group_id": data["group_id"],
-                "prompt": meta.get("prompt", meta.get("prompt_token_ids", "")),
+                "prompt": meta.get("prompt_text", meta.get("prompt", "")),
                 "generations": [],
             }
 
