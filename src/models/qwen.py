@@ -30,7 +30,10 @@ class QwenAdapter(ModelAdapter):
         self._model.eval()
 
     def build_prompt(self, prompt: ChatPrompt) -> list[int]:
-        messages = [{"role": "user", "content": prompt.user_content}]
+        messages = []
+        if prompt.system_content is not None:
+            messages.append({"role": "system", "content": prompt.system_content})
+        messages.append({"role": "user", "content": prompt.user_content})
         text = self._tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True, enable_thinking=True,
         )

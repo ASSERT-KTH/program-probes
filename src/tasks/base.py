@@ -6,6 +6,7 @@ from src.configs import TaskConfig
 @dataclass
 class ChatPrompt:
     user_content: str
+    system_content: str | None = None
 
 
 class TaskAdapter(ABC):

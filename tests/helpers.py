@@ -13,7 +13,7 @@ class MockModelAdapter(ModelAdapter):
     def load_tokenizer(self, model_config: ModelConfig) -> None:
         pass
 
-    def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int) -> None:
+    def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int = 4096) -> None:
         pass
 
     def load_for_extraction(self, model_config: ModelConfig, gen_config: GenerationConfig) -> None:

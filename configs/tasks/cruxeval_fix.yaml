@@ -1,0 +1,4 @@
+dataset: cruxeval_fix
+adapter: cruxeval_fix
+execution_timeout: 10
+pairs_path: data/cruxeval_fix/pairs.json

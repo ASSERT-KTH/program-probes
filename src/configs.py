@@ -37,6 +37,7 @@ class TaskConfig(BaseModel):
     dataset: str
     adapter: str
     execution_timeout: int = 10
+    pairs_path: str | None = None
 
 
 def load_config(path: str, model: type[BaseModel]) -> BaseModel:

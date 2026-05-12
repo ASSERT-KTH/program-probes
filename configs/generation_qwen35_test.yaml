@@ -9,3 +9,4 @@ repetition_penalty: 1.0
 stride: 5
 seed: 42
 num_gpus: 1
+extraction_batch_size: 1

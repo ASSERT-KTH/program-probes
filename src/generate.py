@@ -27,6 +27,9 @@ def _load_task_adapter(adapter_name: str):
     if adapter_name == "humaneval_fix":
         from src.tasks.humaneval_fix import HumanEvalFixAdapter
         return HumanEvalFixAdapter()
+    if adapter_name == "cruxeval_fix":
+        from src.tasks.cruxeval_fix import CruxEvalFixAdapter
+        return CruxEvalFixAdapter()
     raise ValueError(f"Unknown task adapter: {adapter_name}")
 
 
@@ -80,19 +83,28 @@ def run_generation(
     max_model_len = max_prompt_len + gen_config.max_new_tokens
     model_adapter.load_for_generation(model_config, gen_config, max_model_len)
 
-    all_prompts = [item[2] for item in pending]
-    gen_results = model_adapter.generate(all_prompts, gen_config)
+    # Group pending by sample so we can checkpoint after each one
+    from itertools import groupby
+    pending_by_sample = [
+        list(g) for _, g in groupby(pending, key=lambda x: task_adapter.sample_id(x[0]))
+    ]
 
-    for (sample, gi, _), gen_result in zip(pending, gen_results):
-        results.append({
-            "sample_id": task_adapter.sample_id(sample),
-            "group_id": task_adapter.group_id(sample),
-            "gen_idx": gi,
-            "prompt_token_ids": gen_result.prompt_token_ids,
-            "generated_token_ids": gen_result.generated_token_ids,
-            "raw_text": gen_result.raw_text,
-            "task_sample": sample,
-        })
+    for i, sample_pending in enumerate(pending_by_sample):
+        sample_id = task_adapter.sample_id(sample_pending[0][0])
+        print(f"Generating sample {i + 1}/{len(pending_by_sample)}: {sample_id}", flush=True)
+        sample_prompts = [item[2] for item in sample_pending]
+        sample_results = model_adapter.generate(sample_prompts, gen_config)
 
-    with open(out_path, "w") as f:
-        json.dump(results, f)
+        for (sample, gi, _), gen_result in zip(sample_pending, sample_results):
+            results.append({
+                "sample_id": task_adapter.sample_id(sample),
+                "group_id": task_adapter.group_id(sample),
+                "gen_idx": gi,
+                "prompt_token_ids": gen_result.prompt_token_ids,
+                "generated_token_ids": gen_result.generated_token_ids,
+                "raw_text": gen_result.raw_text,
+                "task_sample": sample,
+            })
+
+        with open(out_path, "w") as f:
+            json.dump(results, f)
