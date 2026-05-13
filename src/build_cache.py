@@ -23,58 +23,51 @@ def build_cache(
         out_dir = Path(cache_dir) / run_id / probe_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        # accumulators: one list per layer, holding (T, hidden_dim) float16 tensors
-        H_acc: dict[int, list[torch.Tensor]] = {l: [] for l in probe_layer_indices}
-        y_acc: dict[int, list] = {l: [] for l in probe_layer_indices}
-        rel_acc: dict[int, list] = {l: [] for l in probe_layer_indices}
-        sid_acc: dict[int, list] = {l: [] for l in probe_layer_indices}
-        gid_acc: dict[int, list] = {l: [] for l in probe_layer_indices}
+        # Process one layer at a time to cap peak memory at ~2x one layer's size
+        for layer_idx in probe_layer_indices:
+            print(f"  [{probe_name}] Building layer {layer_idx}...", flush=True)
+            H_list, y_list, rel_list, sid_list, gid_list = [], [], [], [], []
 
-        for fi, f in enumerate(pt_files):
-            if fi % 500 == 0:
-                print(f"  [{probe_name}] Loading file {fi}/{len(pt_files)}: {f.name}", flush=True)
-            data = torch.load(f, weights_only=False)
-            label = data["labels"].get(probe_name)
-            sample = data["sample_id"]
-            group = data["group_id"]
+            for fi, f in enumerate(pt_files):
+                if fi % 500 == 0:
+                    print(f"    file {fi}/{len(pt_files)}: {f.name}", flush=True)
+                data = torch.load(f, weights_only=False)
+                label = data["labels"].get(probe_name)
+                sample = data["sample_id"]
+                group = data["group_id"]
 
-            for layer_idx in probe_layer_indices:
                 acts = data["activations"][layer_idx]  # [T, hidden_dim] float16
                 T = acts.shape[0]
+                del data
+
                 if T == 0:
                     continue
 
                 rel_pos = torch.arange(T, dtype=torch.float32) / max(T - 1, 1)
 
                 if isinstance(label, list):
-                    y_vals = []
-                    for t in range(T):
-                        lval = label[t] if t < len(label) else None
-                        y_vals.append(-1 if lval is None else (1 if lval else 0))
+                    y_vals = [-1 if (label[t] if t < len(label) else None) is None
+                              else (1 if label[t] else 0) for t in range(T)]
                 else:
                     y_int = -1 if label is None else (1 if label else 0)
                     y_vals = [y_int] * T
 
-                H_acc[layer_idx].append(acts)
-                y_acc[layer_idx].extend(y_vals)
-                rel_acc[layer_idx].extend(rel_pos.tolist())
-                sid_acc[layer_idx].extend([sample] * T)
-                gid_acc[layer_idx].extend([group] * T)
+                H_list.append(acts)
+                y_list.extend(y_vals)
+                rel_list.extend(rel_pos.tolist())
+                sid_list.extend([sample] * T)
+                gid_list.extend([group] * T)
 
-            del data
-
-        for layer_idx in probe_layer_indices:
-            if not H_acc[layer_idx]:
+            if not H_list:
                 continue
-            print(f"  [{probe_name}] Saving layer {layer_idx} ({len(H_acc[layer_idx])} chunks)...", flush=True)
+
+            print(f"  [{probe_name}] Saving layer {layer_idx}...", flush=True)
             cache = {
-                "H": torch.cat(H_acc[layer_idx], dim=0),  # float16
-                "y": torch.tensor(y_acc[layer_idx], dtype=torch.int64),
-                "rel_pos": torch.tensor(rel_acc[layer_idx], dtype=torch.float32),
-                "sample_id": sid_acc[layer_idx],
-                "group_id": gid_acc[layer_idx],
+                "H": torch.cat(H_list, dim=0),  # float16
+                "y": torch.tensor(y_list, dtype=torch.int64),
+                "rel_pos": torch.tensor(rel_list, dtype=torch.float32),
+                "sample_id": sid_list,
+                "group_id": gid_list,
             }
             torch.save(cache, out_dir / f"layer_{layer_idx}.pt")
-            del cache, H_acc[layer_idx], y_acc[layer_idx], rel_acc[layer_idx]
-            del sid_acc[layer_idx], gid_acc[layer_idx]
-            H_acc[layer_idx] = []
+            del cache, H_list, y_list, rel_list, sid_list, gid_list
