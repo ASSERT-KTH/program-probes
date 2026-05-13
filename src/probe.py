@@ -219,6 +219,7 @@ def train_probe_layer(
 def create_sweep(run_id: str, probe_name: str) -> str:
     import wandb
     sweep_config = {
+        "name": f"sweep-{run_id}-{probe_name}",
         "method": "bayes",
         "metric": {"name": "mean_val_f1", "goal": "maximize"},
         "parameters": {
@@ -228,8 +229,7 @@ def create_sweep(run_id: str, probe_name: str) -> str:
             "patience": {"values": [10, 100]},
         },
     }
-    sweep_id = wandb.sweep(sweep_config, project="program-probes",
-                           name=f"sweep-{run_id}-{probe_name}")
+    sweep_id = wandb.sweep(sweep_config, project="program-probes")
     print(f"Created sweep: {sweep_id}", flush=True)
     return sweep_id
 
