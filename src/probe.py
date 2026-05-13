@@ -216,7 +216,7 @@ def train_probe_layer(
     return results
 
 
-def create_sweep() -> str:
+def create_sweep(run_id: str, probe_name: str) -> str:
     import wandb
     sweep_config = {
         "method": "bayes",
@@ -228,7 +228,8 @@ def create_sweep() -> str:
             "patience": {"values": [10, 100]},
         },
     }
-    sweep_id = wandb.sweep(sweep_config, project="program-probes")
+    sweep_id = wandb.sweep(sweep_config, project="program-probes",
+                           name=f"sweep-{run_id}-{probe_name}")
     print(f"Created sweep: {sweep_id}", flush=True)
     return sweep_id
 
@@ -250,10 +251,13 @@ def run_sweep(
     middle_cache = str(cache_base / f"layer_{middle_layer}.pt")
 
     if sweep_id is None:
-        sweep_id = create_sweep()
+        sweep_id = create_sweep(run_id, probe_name)
 
     def sweep_fn():
-        with wandb.init() as run:
+        with wandb.init(
+            group=f"{run_id}/{probe_name}",
+            tags=[run_id, probe_name, "sweep"],
+        ) as run:
             cfg = run.config
 
             def log_fn(metrics: dict) -> None:
@@ -299,7 +303,13 @@ def run_final(
     cache_base = Path(cache_dir) / run_id / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
 
-    with wandb.init(project="program-probes", job_type="final") as run:
+    with wandb.init(
+        project="program-probes",
+        job_type="final",
+        name=f"final-{run_id}-{probe_name}",
+        group=f"{run_id}/{probe_name}",
+        tags=[run_id, probe_name, "final"],
+    ) as run:
         for layer_idx in probe_layers:
             cache_path = str(cache_base / f"layer_{layer_idx}.pt")
 
