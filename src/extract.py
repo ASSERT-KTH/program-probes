@@ -22,6 +22,9 @@ def _load_model_adapter(adapter_name: str):
     if adapter_name == "qwen35":
         from src.models.qwen35 import Qwen35Adapter
         return Qwen35Adapter()
+    if adapter_name == "cwm":
+        from src.models.cwm import CwmAdapter
+        return CwmAdapter()
     raise ValueError(f"Unknown model adapter: {adapter_name}")
 
 
