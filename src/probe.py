@@ -75,7 +75,7 @@ def train_probe_layer(
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
-    H = data["H"].float()
+    H = data["H"]  # keep float16 to halve base memory; convert per-bin below
     y = data["y"]
     rel_pos = data["rel_pos"]
     sample_ids = data["sample_id"]
@@ -103,7 +103,7 @@ def train_probe_layer(
         if bin_mask.sum() == 0:
             continue
 
-        bin_H = H[bin_mask]
+        bin_H = H[bin_mask].float()
         bin_y = y[bin_mask]
         bin_samples = [sample_ids[i] for i in range(len(sample_ids)) if bin_mask[i]]
 
