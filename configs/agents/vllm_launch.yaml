@@ -1,0 +1,10 @@
+host: "127.0.0.1"
+port: 18000
+served_model_name: "qwen3-8b"
+api_key: "EMPTY"
+startup_timeout_s: 900
+healthcheck_interval_s: 2.0
+log_path: "logs/vllm_qwen3_8b.log"
+extra_args:
+  - "--tensor-parallel-size"
+  - "1"

@@ -1,0 +1,8 @@
+step_limit: 5
+cost_limit: 0.0
+cwd: "."
+timeout: 60
+environment_class: local
+action_regex: '```mswea_bash_command\s*\n(.*?)\n```'
+extra_model_kwargs:
+  drop_params: true
