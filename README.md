@@ -73,7 +73,7 @@ credentials automatically when `ModalSandboxEnvironment` creates a sandbox.
 To start vLLM, run mini-SWE-agent locally, and save a formatted trajectory:
 
 ```bash
-uv run python test/run_mini_swe_with_vllm.py \
+uv run python tests/run_mini_swe_with_vllm.py \
   --model-config configs/models/qwen3_8b.yaml \
   --generation-config configs/generation.yaml \
   --vllm-config configs/agents/vllm_launch.yaml \
@@ -84,7 +84,7 @@ uv run python test/run_mini_swe_with_vllm.py \
 To execute mini-SWE-agent bash commands in a Modal sandbox:
 
 ```bash
-uv run python test/run_mini_swe_with_vllm_modal.py \
+uv run python tests/run_mini_swe_with_vllm_modal.py \
   --model-config configs/models/qwen3_8b.yaml \
   --generation-config configs/generation.yaml \
   --vllm-config configs/agents/vllm_launch.yaml \
