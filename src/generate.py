@@ -83,7 +83,7 @@ def run_generation(
                 pending.append((sample, gi, prompt_token_ids))
 
     max_prompt_len = max((len(p[2]) for p in pending), default=0)
-    max_model_len = max_prompt_len + gen_config.max_new_tokens
+    max_model_len = gen_config.max_model_len or (max_prompt_len + gen_config.max_new_tokens)
     model_adapter.load_for_generation(model_config, gen_config, max_model_len)
 
     # Group pending by sample so we can checkpoint after each one

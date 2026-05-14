@@ -18,6 +18,7 @@ class GenerationConfig(BaseModel):
     dtype: Literal["bfloat16", "float16", "float32"] = "bfloat16"
     num_gpus: int = 1
     extraction_batch_size: int = 8
+    max_model_len: int | None = None
 
 
 class ModelConfig(BaseModel):
