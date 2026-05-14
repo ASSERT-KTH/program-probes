@@ -239,3 +239,21 @@ adapter: mbpp
 2. Set `name`, `is_dynamic`, and implement `compute_label`.
 3. Register the probe name in `src/extract._load_probe`.
 4. Pass `--probe myprobe` to any entrypoint.
+
+## Practical problems
+
+### SSL certificate errors on Berzelius
+
+`uv` ships its own Python 3.12 binary linked against an OpenSSL that looks for `/etc/ssl/cert.pem`.
+That path does not exist on RHEL 8 (Berzelius uses `/etc/pki/tls/cert.pem` instead), so Python's ssl
+module finds no CA bundle and any outbound TLS connection — including Modal's gRPC channel — fails with:
+
+```
+ssl.SSLCertVerificationError: certificate verify failed: unable to get local issuer certificate
+```
+
+Fix: add the following to `~/.bashrc` (or `~/.bash_profile`) on Berzelius:
+
+```bash
+export SSL_CERT_FILE=/etc/pki/tls/cert.pem
+```
