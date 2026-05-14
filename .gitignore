@@ -1,7 +1,6 @@
 __pycache__/
 *.py[cod]
 *.pyo
-.python-version
 outputs/
 logs/
 prompt.md

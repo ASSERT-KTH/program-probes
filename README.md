@@ -6,9 +6,94 @@ Pipeline: inference + activation hooks → per-sample `.pt` files → per-(layer
 
 ## Setup
 
+### Berzelius
+
+Use the repo bootstrap script so the CUDA/GCC build module is loaded before
+`uv sync` installs GPU packages such as vLLM:
+
 ```bash
-uv sync
+source scripts/berzelius_env.sh --sync
 ```
+
+For Berzelius users, by default this loads `buildenv-gcccuda/12.4.1-gcc13.3.0` and syncs the repo
+with Python 3.12. To use a different Berzelius module:
+
+```bash
+export BERZELIUS_MODULES="buildenv-gcccuda/12.1.1-gcc12.3.0"
+source scripts/berzelius_env.sh --sync
+```
+
+For a version/module check without installing packages:
+
+```bash
+source scripts/berzelius_env.sh --check-only
+```
+
+### Other Environments
+
+```bash
+uv sync --frozen
+```
+
+### Modal authentication
+
+Modal sandboxes run commands in remote containers, not in the local Python
+virtual environment. Authenticate once with the Modal CLI:
+
+```bash
+uv run modal token new
+```
+
+Verify the active token with:
+
+```bash
+uv run modal token info
+```
+
+For non-interactive jobs, provide credentials through environment variables:
+
+```bash
+export MODAL_TOKEN_ID="..."
+export MODAL_TOKEN_SECRET="..."
+```
+
+If you already have token values, store them for the current Modal profile with:
+
+```bash
+uv run modal token set \
+  --token-id "$MODAL_TOKEN_ID" \
+  --token-secret "$MODAL_TOKEN_SECRET"
+```
+
+Do not commit Modal tokens to repo YAML or scripts. The Modal SDK reads these
+credentials automatically when `ModalSandboxEnvironment` creates a sandbox.
+
+### Agent Trajectory Smoke Tests
+
+To start vLLM, run mini-SWE-agent locally, and save a formatted trajectory:
+
+```bash
+uv run python tests/run_mini_swe_with_vllm.py \
+  --model-config configs/models/qwen3_8b.yaml \
+  --generation-config configs/generation.yaml \
+  --vllm-config configs/agents/vllm_launch.yaml \
+  --mini-swe-config configs/agents/mini_swe_local.yaml \
+  --trajectory-output outputs/agent_trajectories/local_smoke.json
+```
+
+To execute mini-SWE-agent bash commands in a Modal sandbox:
+
+```bash
+uv run python tests/run_mini_swe_with_vllm_modal.py \
+  --model-config configs/models/qwen3_8b.yaml \
+  --generation-config configs/generation.yaml \
+  --vllm-config configs/agents/vllm_launch.yaml \
+  --mini-swe-config configs/agents/mini_swe_local.yaml \
+  --trajectory-output outputs/agent_trajectories/modal_smoke.json
+```
+
+The trajectory JSON contains mini-SWE messages, bash command history, final
+result, and token IDs from the configured model tokenizer.
 
 ## Running locally
 
@@ -154,3 +239,21 @@ adapter: mbpp
 2. Set `name`, `is_dynamic`, and implement `compute_label`.
 3. Register the probe name in `src/extract._load_probe`.
 4. Pass `--probe myprobe` to any entrypoint.
+
+## Practical problems
+
+### SSL certificate errors on Berzelius
+
+`uv` ships its own Python 3.12 binary linked against an OpenSSL that looks for `/etc/ssl/cert.pem`.
+That path does not exist on RHEL 8 (Berzelius uses `/etc/pki/tls/cert.pem` instead), so Python's ssl
+module finds no CA bundle and any outbound TLS connection — including Modal's gRPC channel — fails with:
+
+```
+ssl.SSLCertVerificationError: certificate verify failed: unable to get local issuer certificate
+```
+
+Fix: add the following to `~/.bashrc` (or `~/.bash_profile`) on Berzelius:
+
+```bash
+export SSL_CERT_FILE=/etc/pki/tls/cert.pem
+```
