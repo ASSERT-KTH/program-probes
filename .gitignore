@@ -1,9 +1,9 @@
 __pycache__/
 *.py[cod]
 *.pyo
-.python-version
 outputs/
 logs/
+tests/
 prompt.md
 *.egg-info/
 .venv/
