@@ -3,7 +3,6 @@ __pycache__/
 *.pyo
 outputs/
 logs/
-tests/
 prompt.md
 *.egg-info/
 .venv/
