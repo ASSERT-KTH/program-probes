@@ -17,6 +17,7 @@ dependencies = [
     "mini-swe-agent>=2.2.8",
     "modal>=1.4.2",
     "vllm>=0.21.0",
+    "swebench==4.1.0",
 ]
 
 [build-system]

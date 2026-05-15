@@ -1,0 +1,30 @@
+step_limit: 30
+cost_limit: 0.0
+cwd: "/testbed"
+timeout: 180
+environment_class: modal
+action_regex: '```mswea_bash_command\s*\n(.*?)\n```'
+system_template: |
+  You are a software engineer working in a Linux container.
+  The repository is checked out at /testbed and all dependencies are installed.
+  Fix the reported issue by modifying the source files.
+  Every response must contain exactly one bash command in this format:
+
+  ```mswea_bash_command
+  your_command_here
+  ```
+
+  When you are done and confident the issue is fixed, submit by running:
+  ```mswea_bash_command
+  echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT
+  ```
+instance_template: |
+  Please solve this task: {{task}}
+
+  The repository is at /testbed. Use bash commands to explore the code, edit files, and run tests.
+  When the issue is fixed, submit with:
+  ```mswea_bash_command
+  echo COMPLETE_TASK_AND_SUBMIT_FINAL_OUTPUT
+  ```
+extra_model_kwargs:
+  drop_params: true

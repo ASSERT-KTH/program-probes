@@ -35,6 +35,7 @@ class LoggingEnvironment:
             {
                 "returncode": result.get("returncode"),
                 "output": result.get("output", ""),
+                "diff": result.get("diff", ""),
                 "status": "completed",
             }
         )
