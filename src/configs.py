@@ -23,15 +23,8 @@ class GenerationConfig(BaseModel):
 
 class ModelConfig(BaseModel):
     model_id: str
-    probe_layers: list[int]
-    adapter: str
-
-    @field_validator("probe_layers")
-    @classmethod
-    def probe_layers_nonempty(cls, v):
-        if not v:
-            raise ValueError("probe_layers must not be empty")
-        return v
+    probe_layers: list[int] = []
+    adapter: str = ""
 
 
 class TaskConfig(BaseModel):
