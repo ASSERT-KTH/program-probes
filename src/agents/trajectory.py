@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,15 +18,9 @@ def build_agent_trajectory(
     tokenizer_name: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build a JSON-serializable mini-SWE trajectory artifact.
-
-    The artifact stores the exact mini-SWE messages and bash command history.
-    If tokenizer_name is provided, it also stores token ids for each message
-    content and for the full chat template when the tokenizer supports it.
-    """
     clean_messages = [_clean_message(message) for message in messages]
     artifact = {
-        "schema_version": "program-probes.agent_trajectory.v1",
+        "schema_version": "program-probes.agent_trajectory.v2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": task,
         "result": _jsonable(result),
@@ -41,7 +36,6 @@ def build_agent_trajectory(
 
     if tokenizer_name is not None:
         artifact["tokenization"] = _tokenize_trajectory(clean_messages, tokenizer_name)
-        artifact["flat_token_sequence"] = artifact["tokenization"]["flat"]
 
     return artifact
 
@@ -82,67 +76,78 @@ def _tokenize_trajectory(messages: list[dict[str, Any]], tokenizer_name: str) ->
         {"role": message.get("role", "user"), "content": _content_to_text(message.get("content", ""))}
         for message in messages
     ]
-    message_tokenization = []
-    for idx, message in enumerate(chat_messages):
-        token_ids = tokenizer.encode(message["content"], add_special_tokens=False)
-        message_tokenization.append(
-            {
-                "message_idx": idx,
-                "role": message["role"],
-                "token_ids": token_ids,
-                "n_tokens": len(token_ids),
-            }
-        )
 
     try:
-        chat_text = tokenizer.apply_chat_template(
+        text = tokenizer.apply_chat_template(
             chat_messages,
             tokenize=False,
             add_generation_prompt=False,
         )
     except Exception:
-        chat_text = "\n".join(f"{message['role']}: {message['content']}" for message in chat_messages)
-    chat_token_ids = tokenizer.encode(chat_text, add_special_tokens=False)
+        text = "\n".join(f"{m['role']}: {m['content']}" for m in chat_messages)
+
+    try:
+        enc = tokenizer(text, return_offsets_mapping=True)
+        token_ids = enc["input_ids"]
+        offsets = enc["offset_mapping"]
+        segments = _build_segments(chat_messages, text, offsets)
+    except Exception:
+        token_ids = tokenizer.encode(text, add_special_tokens=False)
+        segments = _build_segments_no_offsets(chat_messages)
 
     return {
-        "tokenizer_name": tokenizer_name,
-        "chat_text": chat_text,
-        "chat_token_ids": chat_token_ids,
-        "n_chat_tokens": len(chat_token_ids),
-        "flat": _build_flat_token_sequence(tokenizer, chat_messages),
-        "messages": message_tokenization,
+        "text": text,
+        "token_ids": token_ids,
+        "segments": segments,
     }
 
 
-def _build_flat_token_sequence(tokenizer: Any, chat_messages: list[dict[str, str]]) -> dict[str, Any]:
-    """Build a simple, continuous token stream without sectioned message arrays."""
-    text_parts = []
-    tokens = []
+def _build_segments(
+    chat_messages: list[dict[str, str]],
+    text: str,
+    offsets: list[tuple[int, int]],
+) -> list[dict[str, Any]]:
+    # Build a sorted list of token start positions for bisect lookups.
+    # offsets[i] = (char_start, char_end) for token i.
+    token_starts = [off[0] for off in offsets]
+    token_ends = [off[1] for off in offsets]
+
+    segments = []
+    search_from = 0  # advance forward so repeated content is found in order
 
     for idx, message in enumerate(chat_messages):
-        role = message["role"]
         content = message["content"]
-        segment_text = f"<|program_probes_message|>{role}\n{content}\n"
-        segment_token_ids = tokenizer.encode(segment_text, add_special_tokens=False)
-        start = len(tokens)
-        tokens.extend(segment_token_ids)
-        text_parts.append(
-            {
-                "message_idx": idx,
-                "role": role,
-                "start_token": start,
-                "end_token": len(tokens),
-                "n_tokens": len(segment_token_ids),
-            }
-        )
+        if not content:
+            continue
 
-    return {
-        "format": "program_probes_flat_messages_v1",
-        "text": "".join(f"<|program_probes_message|>{m['role']}\n{m['content']}\n" for m in chat_messages),
-        "token_ids": tokens,
-        "n_tokens": len(tokens),
-        "segments": text_parts,
-    }
+        char_start = text.find(content, search_from)
+        if char_start == -1:
+            # Content not found verbatim (e.g. template transformed it); skip.
+            continue
+        char_end = char_start + len(content)
+        search_from = char_end
+
+        # First token whose start is >= char_start
+        start_token = bisect.bisect_left(token_starts, char_start)
+        # First token whose end is > char_end — content ends before this token
+        end_token = bisect.bisect_right(token_ends, char_end)
+
+        segments.append({
+            "message_idx": idx,
+            "role": message["role"],
+            "start_token": start_token,
+            "end_token": end_token,
+        })
+
+    return segments
+
+
+def _build_segments_no_offsets(chat_messages: list[dict[str, str]]) -> list[dict[str, Any]]:
+    return [
+        {"message_idx": idx, "role": m["role"], "start_token": None, "end_token": None}
+        for idx, m in enumerate(chat_messages)
+        if m["content"]
+    ]
 
 
 def _clean_message(message: dict[str, Any]) -> dict[str, Any]:
