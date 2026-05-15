@@ -26,6 +26,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+import wandb
+
 from src.agents.mini_swe import MiniSweAgentAdapter
 from src.agents.swe_bench_environment import SWEBenchModalEnvironment
 from src.agents.vllm_server import VllmServer
@@ -177,8 +179,19 @@ def main() -> None:
 
     print(f"[swe-bench] {len(jobs)} jobs, {cfg.n_workers} workers", flush=True)
 
+    run_name = f"{Path(args.run_config).stem}_shard{args.shard_rank}of{args.num_shards}"
+    wandb.init(
+        project="program-probes",
+        name=run_name,
+        config={**cfg.model_dump(), "shard_rank": args.shard_rank, "num_shards": args.num_shards},
+        resume="allow",
+    )
+
     vllm_cfg = cfg.to_vllm_server_config()
     model_cfg = cfg.to_model_config()
+
+    n_total = len(jobs)
+    n_done = n_passed = n_failed = n_errored = 0
 
     with VllmServer(model_cfg, vllm_cfg) as server:
         print(f"[swe-bench] vLLM ready at {server.base_url} ({server.model_name})", flush=True)
@@ -200,9 +213,41 @@ def main() -> None:
             for future in as_completed(futures):
                 instance_id, run_idx = futures[future]
                 try:
-                    future.result()
+                    summary = future.result()
                 except Exception as exc:
                     print(f"[swe-bench] unhandled exception for {instance_id}[run{run_idx}]: {exc}", flush=True)
+                    summary = {"instance_id": instance_id, "run_idx": run_idx, "outcome": None, "patch_len": 0, "error": str(exc)}
+
+                n_done += 1
+                errored = "error" in summary
+                passed = (not errored) and bool(summary.get("outcome"))
+                if errored:
+                    n_errored += 1
+                elif passed:
+                    n_passed += 1
+                else:
+                    n_failed += 1
+
+                wandb.log({
+                    "instance/outcome": 1 if passed else 0,
+                    "instance/patch_len": summary.get("patch_len", 0),
+                    "instance/errored": int(errored),
+                    "progress/completed": n_done,
+                    "progress/passed": n_passed,
+                    "progress/failed": n_failed,
+                    "progress/errored": n_errored,
+                    "progress/pass_rate": n_passed / n_done,
+                    "progress/remaining": n_total - n_done,
+                })
+
+    wandb.summary.update({
+        "total": n_total,
+        "passed": n_passed,
+        "failed": n_failed,
+        "errored": n_errored,
+        "pass_rate": n_passed / n_done if n_done else 0.0,
+    })
+    wandb.finish()
 
     print(f"\n[swe-bench] done. index at {index_path}", flush=True)
 
