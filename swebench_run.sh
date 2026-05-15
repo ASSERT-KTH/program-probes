@@ -1,7 +1,15 @@
 #!/bin/bash
+# SWE-bench Verified agent run — SLURM launcher.
+#
+# Single shard:
+#   sbatch swebench_run.sh --run-config configs/runs/qwen3_8b_swebench_test.yaml
+#
+# Array job (8 shards):
+#   sbatch --array=0-7 swebench_run.sh --run-config configs/runs/qwen3_8b_swebench_test.yaml
+#
 #SBATCH -J pp-swebench
 #SBATCH -p berzelius
-#SBATCH --gpus=1
+#SBATCH --gpus=8
 #SBATCH -t 12:00:00
 #SBATCH -o logs/swebench_%A_%a.out
 #SBATCH -e logs/swebench_%A_%a.err
@@ -19,12 +27,6 @@ RANK=${SLURM_ARRAY_TASK_ID:-0}
 NUM_SHARDS=${SLURM_ARRAY_TASK_COUNT:-1}
 
 uv run python run_swebench_agent.py \
-  --model-config configs/models/qwen3_8b.yaml \
-  --generation-config configs/generation.yaml \
-  --vllm-config configs/agents/vllm_launch.yaml \
-  --agent-config configs/agents/mini_swe_swebench.yaml \
-  --task-config configs/tasks/swe_bench_verified.yaml \
-  --output-dir generations/swebench \
   --shard-rank "$RANK" \
   --num-shards "$NUM_SHARDS" \
   --resume \
