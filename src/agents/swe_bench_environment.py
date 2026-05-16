@@ -49,34 +49,55 @@ class SWEBenchModalEnvironment(ModalSandboxEnvironment):
         return self._capture_diff()
 
     def evaluate(self, eval_script: str) -> bool:
-        """Run the SWE-bench eval script against the current repo state.
+        """Run the SWE-bench eval script and return True iff the instance is fully resolved.
 
-        The eval script is written to /tmp/swe_eval.sh inside the sandbox and
-        executed there.  Return True if all targeted tests pass (exit code 0).
+        Uses swebench's own grading pipeline: parses per-test PASSED/FAILED lines and
+        checks that all FAIL_TO_PASS tests now pass and all PASS_TO_PASS tests still pass.
+        Exit-code alone is not reliable because the eval script's last command is always
+        `git checkout` (resetting test files), which exits 0 regardless of test outcome.
         """
         if not eval_script:
             return False
+        import os
+        import tempfile
+        from swebench.harness.constants import FAIL_TO_PASS, PASS_TO_PASS, ResolvedStatus
+        from swebench.harness.grading import get_eval_tests_report, get_logs_eval, get_resolution_status
+        from swebench.harness.test_spec.test_spec import make_test_spec
         try:
-            import shlex
             upload_cmd = f"cat > /tmp/swe_eval.sh << 'SWE_EVAL_EOF'\n{eval_script}\nSWE_EVAL_EOF"
             process = self.sandbox.exec("bash", "-lc", upload_cmd, timeout=30)
             if hasattr(process, "wait"):
                 process.wait()
 
+            # Merge stderr into stdout: pytest output goes to stderr but the
+            # >>>>> Start/End Test Output markers go to stdout.
             process = self.sandbox.exec(
-                "bash", "-lc", "bash /tmp/swe_eval.sh", timeout=self.timeout
+                "bash", "-lc", "bash /tmp/swe_eval.sh 2>&1", timeout=self.timeout
             )
-            stdout = process.stdout.read()
-            stderr = process.stderr.read() if getattr(process, "stderr", None) is not None else ""
+            output = process.stdout.read()
             if hasattr(process, "wait"):
                 process.wait()
-            returncode = getattr(process, "returncode", 1)
-            print(f"[swe-eval] returncode={returncode}", flush=True)
-            if stdout:
-                print(f"[swe-eval stdout]\n{stdout[-2000:]}", flush=True)
-            if stderr:
-                print(f"[swe-eval stderr]\n{stderr[-500:]}", flush=True)
-            return returncode == 0
+
+            print(f"[swe-eval output]\n{output[-3000:]}", flush=True)
+
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".log", delete=False) as f:
+                f.write(output)
+                log_path = f.name
+
+            try:
+                test_spec = make_test_spec(self.instance)
+                eval_sm, found = get_logs_eval(test_spec, log_path)
+                if not found:
+                    print("[swe-eval] log parser found no test results", flush=True)
+                    return False
+                gold = {FAIL_TO_PASS: test_spec.FAIL_TO_PASS, PASS_TO_PASS: test_spec.PASS_TO_PASS}
+                report = get_eval_tests_report(eval_sm, gold)
+                resolved = get_resolution_status(report) == ResolvedStatus.FULL.value
+                print(f"[swe-eval] resolved={resolved}", flush=True)
+                return resolved
+            finally:
+                os.unlink(log_path)
+
         except Exception as exc:
             print(f"[swe-eval] exception during evaluation: {exc}", flush=True)
             return False
