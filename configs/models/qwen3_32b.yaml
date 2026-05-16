@@ -1,3 +1,0 @@
-model_id: "Qwen/Qwen3-32B"
-probe_layers: [16, 32, 48, 64]
-adapter: qwen
