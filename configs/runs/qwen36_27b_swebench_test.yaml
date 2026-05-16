@@ -34,5 +34,5 @@ n_runs: 1                # one attempt per instance
 n_instances: 16          # stop after 16 unique instances
 n_workers: 8             # 8 parallel agent threads; vLLM batches their requests
 modal_app_name: program-probes-swebench
-modal_timeout: 1800      # seconds for the full sandbox lifecycle
+modal_timeout: 3600      # seconds for the full sandbox lifecycle
 output_dir: generations/swebench/qwen36_27b_test
