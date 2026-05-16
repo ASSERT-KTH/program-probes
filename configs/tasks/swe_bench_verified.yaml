@@ -1,0 +1,3 @@
+dataset: princeton-nlp/SWE-bench_Verified
+adapter: swe_bench_verified
+execution_timeout: 300

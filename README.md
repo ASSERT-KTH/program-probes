@@ -92,8 +92,21 @@ uv run python tests/run_mini_swe_with_vllm_modal.py \
   --trajectory-output outputs/agent_trajectories/modal_smoke.json
 ```
 
-The trajectory JSON contains mini-SWE messages, bash command history, final
-result, and token IDs from the configured model tokenizer.
+To run mini-SWE-agent on a single SWE-bench Verified instance in Modal:
+
+```bash
+uv run python tests/run_swebench_single_instance.py \
+  --model-config configs/models/qwen3_8b.yaml \
+  --generation-config configs/generation.yaml \
+  --vllm-config configs/agents/vllm_launch.yaml \
+  --agent-config configs/agents/mini_swe_swebench.yaml \
+  --trajectory-output outputs/agent_trajectories/swebench_single.json
+```
+
+Pass `--instance-id <id>` to target a specific SWE-bench Verified instance
+(default: `astropy__astropy-12907`). The trajectory JSON contains mini-SWE
+messages, bash command history with per-command git diffs, the final patch,
+and the pass/fail outcome from the SWE-bench eval script.
 
 ## Running locally
 

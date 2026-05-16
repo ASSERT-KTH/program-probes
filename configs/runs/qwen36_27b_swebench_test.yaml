@@ -1,0 +1,38 @@
+# Test run: Qwen3.6-27B on 16 SWE-bench Verified instances, 8xA100 80GB
+#
+# Submit with:
+#   sbatch slurm/swebench_run.sh --run-config configs/runs/qwen36_27b_swebench_test.yaml
+
+# --- Model / vLLM ---
+model_id: Qwen/Qwen3.6-27B
+served_model_name: qwen36-27b
+tensor_parallel_size: 8
+max_model_len: 262144
+dtype: bfloat16
+gpu_memory_utilization: 0.9
+vllm_port: 18000
+vllm_startup_timeout_s: 900
+vllm_log_path: logs/vllm_qwen36_27b_swebench.log
+vllm_extra_args:
+  - "--reasoning-parser"
+  - "qwen3"
+  - "--enable-auto-tool-choice"
+  - "--tool-call-parser"
+  - "qwen3_coder"
+
+# --- Generation ---
+temperature: 1.0
+top_p: 0.95
+# max_new_tokens: not set — no per-call cap, lets thinking models use the full remaining context
+
+# --- Agent ---
+step_limit: 250
+command_timeout: 180     # seconds per bash command in Modal sandbox
+
+# --- Execution ---
+n_runs: 1                # one attempt per instance
+n_instances: 16          # stop after 16 unique instances
+n_workers: 16            # 16 parallel agent threads; vLLM batches their requests
+modal_app_name: program-probes-swebench
+modal_timeout: 1800      # seconds for the full sandbox lifecycle
+output_dir: generations/swebench/qwen36_27b_test

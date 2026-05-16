@@ -35,6 +35,7 @@ class LoggingEnvironment:
             {
                 "returncode": result.get("returncode"),
                 "output": result.get("output", ""),
+                "diff": result.get("diff", ""),
                 "status": "completed",
             }
         )
@@ -64,7 +65,8 @@ def build_litellm_vllm_model_config(
     }
     if generation_config is not None:
         model_kwargs["temperature"] = generation_config.temperature
-        model_kwargs["max_tokens"] = generation_config.max_new_tokens
+        if generation_config.max_new_tokens is not None:
+            model_kwargs["max_tokens"] = generation_config.max_new_tokens
         if generation_config.top_p is not None:
             model_kwargs["top_p"] = generation_config.top_p
     if extra_model_kwargs:
