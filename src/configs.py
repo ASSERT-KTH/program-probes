@@ -101,6 +101,7 @@ class SWEBenchRunConfig(BaseModel):
     vllm_port: int = 18000
     vllm_startup_timeout_s: int = 900
     vllm_log_path: str | None = "logs/vllm.log"
+    vllm_extra_args: list[str] = Field(default_factory=list)
 
     # --- Generation ---
     temperature: float = 0.7
@@ -132,6 +133,7 @@ class SWEBenchRunConfig(BaseModel):
             "--dtype", self.dtype,
             "--max-model-len", str(self.max_model_len),
             "--gpu-memory-utilization", str(self.gpu_memory_utilization),
+            *self.vllm_extra_args,
         ]
         return VllmServerConfig(
             host=self.vllm_host,
