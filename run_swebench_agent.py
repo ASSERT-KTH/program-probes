@@ -22,7 +22,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import threading
+import time
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -49,6 +52,81 @@ def _out_path(output_dir: Path, instance_id: str, run_idx: int) -> Path:
     if run_idx == 0:
         return output_dir / f"{instance_id}.json"
     return output_dir / f"{instance_id}_run{run_idx:02d}.json"
+
+
+def _extract_agent_metrics(agent: MiniSweAgentAdapter) -> dict:
+    """Extract per-trajectory metrics from a completed agent run."""
+    messages = agent.last_messages or []
+    result = agent.last_result or {}
+
+    prompt_tokens = 0
+    completion_tokens = 0
+    n_steps = 0
+    timestamps: list[float] = []
+
+    for msg in messages:
+        extra = msg.get("extra") or {}
+        if "actions" not in extra:
+            continue
+        n_steps += 1
+        usage = (extra.get("response") or {}).get("usage") or {}
+        prompt_tokens += usage.get("prompt_tokens", 0)
+        completion_tokens += usage.get("completion_tokens", 0)
+        ts = extra.get("timestamp")
+        if ts is not None:
+            timestamps.append(ts)
+
+    duration_s = (max(timestamps) - min(timestamps)) if len(timestamps) >= 2 else 0.0
+
+    return {
+        "agent/n_steps": n_steps,
+        "agent/exit_status": result.get("exit_status", "unknown"),
+        "agent/prompt_tokens": prompt_tokens,
+        "agent/completion_tokens": completion_tokens,
+        "agent/total_tokens": prompt_tokens + completion_tokens,
+        "agent/tool_calls": len(agent.command_history),
+        "agent/duration_s": duration_s,
+    }
+
+
+# vLLM Prometheus metrics we care about
+_VLLM_METRICS = {
+    "vllm:num_requests_running": "vllm/requests_running",
+    "vllm:num_requests_waiting": "vllm/requests_waiting",
+    "vllm:gpu_cache_usage_perc": "vllm/gpu_cache_usage_perc",
+    "vllm:prompt_tokens_total": "vllm/prompt_tokens_total",
+    "vllm:generation_tokens_total": "vllm/generation_tokens_total",
+}
+
+
+def _scrape_vllm_metrics(base_url: str) -> dict[str, float]:
+    """Fetch and parse vLLM's Prometheus /metrics endpoint."""
+    try:
+        url = f"{base_url.rstrip('/')}/metrics"
+        with urllib.request.urlopen(url, timeout=5) as resp:
+            text = resp.read().decode()
+    except Exception:
+        return {}
+
+    out: dict[str, float] = {}
+    for line in text.splitlines():
+        if line.startswith("#"):
+            continue
+        m = re.match(r"^([\w:]+)(?:\{[^}]*\})?\s+([\d.e+\-]+)", line)
+        if m and m.group(1) in _VLLM_METRICS:
+            try:
+                out[_VLLM_METRICS[m.group(1)]] = float(m.group(2))
+            except ValueError:
+                pass
+    return out
+
+
+def _vllm_metrics_poller(base_url: str, stop: threading.Event, interval: int = 30) -> None:
+    """Background thread: scrape vLLM metrics and log to wandb every `interval` seconds."""
+    while not stop.wait(interval):
+        metrics = _scrape_vllm_metrics(base_url)
+        if metrics:
+            wandb.log(metrics)
 
 
 def _run_one(
@@ -83,6 +161,7 @@ def _run_one(
     outcome = None
     patch = ""
     error = None
+    agent_metrics: dict = {}
 
     try:
         task = (
@@ -91,10 +170,16 @@ def _run_one(
             "The repository is checked out at /testbed. Fix the issue."
         )
         agent.run_task(task)
+        agent_metrics = _extract_agent_metrics(agent)
         patch = env.get_patch()
         eval_script = instance.get("eval_script", "")
         outcome = env.evaluate(eval_script) if eval_script else None
-        print(f"[{label}] outcome={'PASS' if outcome else 'FAIL'} patch={len(patch)}chars", flush=True)
+        print(
+            f"[{label}] outcome={'PASS' if outcome else 'FAIL'} "
+            f"patch={len(patch)}chars steps={agent_metrics.get('agent/n_steps', '?')} "
+            f"exit={agent_metrics.get('agent/exit_status', '?')}",
+            flush=True,
+        )
     except Exception as exc:
         error = str(exc)
         print(f"[{label}] ERROR: {exc}", flush=True)
@@ -121,6 +206,7 @@ def _run_one(
         "run_idx": run_idx,
         "outcome": outcome,
         "patch_len": len(patch),
+        **agent_metrics,
         **({"error": error} if error else {}),
     }
     with index_lock:
@@ -196,49 +282,71 @@ def main() -> None:
     with VllmServer(model_cfg, vllm_cfg) as server:
         print(f"[swe-bench] vLLM ready at {server.base_url} ({server.model_name})", flush=True)
 
-        with ThreadPoolExecutor(max_workers=cfg.n_workers) as pool:
-            futures = {
-                pool.submit(
-                    _run_one,
-                    inst,
-                    run_idx,
-                    cfg=cfg,
-                    server=server,
-                    output_dir=output_dir,
-                    index_lock=index_lock,
-                    index_path=index_path,
-                ): (inst["instance_id"], run_idx)
-                for inst, run_idx in jobs
-            }
-            for future in as_completed(futures):
-                instance_id, run_idx = futures[future]
-                try:
-                    summary = future.result()
-                except Exception as exc:
-                    print(f"[swe-bench] unhandled exception for {instance_id}[run{run_idx}]: {exc}", flush=True)
-                    summary = {"instance_id": instance_id, "run_idx": run_idx, "outcome": None, "patch_len": 0, "error": str(exc)}
+        stop_poller = threading.Event()
+        poller = threading.Thread(
+            target=_vllm_metrics_poller,
+            args=(server.base_url, stop_poller),
+            daemon=True,
+        )
+        poller.start()
 
-                n_done += 1
-                errored = "error" in summary
-                passed = (not errored) and bool(summary.get("outcome"))
-                if errored:
-                    n_errored += 1
-                elif passed:
-                    n_passed += 1
-                else:
-                    n_failed += 1
+        try:
+            with ThreadPoolExecutor(max_workers=cfg.n_workers) as pool:
+                futures = {
+                    pool.submit(
+                        _run_one,
+                        inst,
+                        run_idx,
+                        cfg=cfg,
+                        server=server,
+                        output_dir=output_dir,
+                        index_lock=index_lock,
+                        index_path=index_path,
+                    ): (inst["instance_id"], run_idx)
+                    for inst, run_idx in jobs
+                }
+                for future in as_completed(futures):
+                    instance_id, run_idx = futures[future]
+                    try:
+                        summary = future.result()
+                    except Exception as exc:
+                        print(f"[swe-bench] unhandled exception for {instance_id}[run{run_idx}]: {exc}", flush=True)
+                        summary = {"instance_id": instance_id, "run_idx": run_idx, "outcome": None, "patch_len": 0, "error": str(exc)}
 
-                wandb.log({
-                    "instance/outcome": 1 if passed else 0,
-                    "instance/patch_len": summary.get("patch_len", 0),
-                    "instance/errored": int(errored),
-                    "progress/completed": n_done,
-                    "progress/passed": n_passed,
-                    "progress/failed": n_failed,
-                    "progress/errored": n_errored,
-                    "progress/pass_rate": n_passed / n_done,
-                    "progress/remaining": n_total - n_done,
-                })
+                    n_done += 1
+                    errored = "error" in summary
+                    passed = (not errored) and bool(summary.get("outcome"))
+                    if errored:
+                        n_errored += 1
+                    elif passed:
+                        n_passed += 1
+                    else:
+                        n_failed += 1
+
+                    wandb.log({
+                        # Outcome
+                        "instance/outcome": 1 if passed else 0,
+                        "instance/patch_len": summary.get("patch_len", 0),
+                        "instance/errored": int(errored),
+                        # Agent metrics
+                        "instance/n_steps": summary.get("agent/n_steps", 0),
+                        "instance/prompt_tokens": summary.get("agent/prompt_tokens", 0),
+                        "instance/completion_tokens": summary.get("agent/completion_tokens", 0),
+                        "instance/total_tokens": summary.get("agent/total_tokens", 0),
+                        "instance/tool_calls": summary.get("agent/tool_calls", 0),
+                        "instance/duration_s": summary.get("agent/duration_s", 0),
+                        "instance/exit_status": summary.get("agent/exit_status", "unknown"),
+                        # Running totals
+                        "progress/completed": n_done,
+                        "progress/passed": n_passed,
+                        "progress/failed": n_failed,
+                        "progress/errored": n_errored,
+                        "progress/pass_rate": n_passed / n_done,
+                        "progress/remaining": n_total - n_done,
+                    })
+        finally:
+            stop_poller.set()
+            poller.join(timeout=5)
 
     wandb.summary.update({
         "total": n_total,
