@@ -21,9 +21,9 @@ vllm_extra_args:
   - "qwen3_coder"
 
 # --- Generation ---
-temperature: 0.7
-max_new_tokens: 4096
+temperature: 1.0
 top_p: 0.95
+# max_new_tokens: not set — no per-call cap, lets thinking models use the full remaining context
 
 # --- Agent ---
 step_limit: 250

@@ -105,7 +105,7 @@ class SWEBenchRunConfig(BaseModel):
 
     # --- Generation ---
     temperature: float = 0.7
-    max_new_tokens: int = 4096
+    max_new_tokens: int | None = None  # None = no per-call token cap (recommended for thinking models)
     top_p: float | None = None
 
     # --- Agent ---
@@ -145,13 +145,15 @@ class SWEBenchRunConfig(BaseModel):
         )
 
     def to_generation_config(self) -> "GenerationConfig":
-        return GenerationConfig(
-            max_new_tokens=self.max_new_tokens,
+        kwargs: dict = dict(
             temperature=self.temperature,
             top_p=self.top_p,
             dtype=self.dtype,
             max_model_len=self.max_model_len,
         )
+        if self.max_new_tokens is not None:
+            kwargs["max_new_tokens"] = self.max_new_tokens
+        return GenerationConfig(**kwargs)
 
     def to_agent_config(self) -> "MiniSweAgentConfig":
         import yaml as _yaml
