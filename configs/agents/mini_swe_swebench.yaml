@@ -1,4 +1,4 @@
-step_limit: 30
+step_limit: 250
 cost_limit: 0.0
 cwd: "/testbed"
 timeout: 180

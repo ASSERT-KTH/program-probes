@@ -1,7 +1,7 @@
-# Test run: Qwen3-8B on 100 SWE-bench Verified instances, 8xA100 80GB
+# Test run: Qwen3-8B on 16 SWE-bench Verified instances, 8xA100 80GB
 #
 # Submit with:
-#   sbatch swebench_run.sh --run-config configs/runs/qwen3_8b_swebench_test.yaml
+#   sbatch slurm/swebench_run.sh --run-config configs/runs/qwen3_8b_swebench_test.yaml
 
 # --- Model / vLLM ---
 model_id: Qwen/Qwen3-8B
@@ -20,13 +20,13 @@ max_new_tokens: 4096
 top_p: 0.95
 
 # --- Agent ---
-step_limit: 30
+step_limit: 250
 command_timeout: 180     # seconds per bash command in Modal sandbox
 
 # --- Execution ---
 n_runs: 1                # one attempt per instance
-n_instances: 100         # stop after 100 unique instances
-n_workers: 8             # 8 parallel agent threads; vLLM batches their requests
+n_instances: 16          # stop after 16 unique instances
+n_workers: 16            # 16 parallel agent threads; vLLM batches their requests
 modal_app_name: program-probes-swebench
-modal_timeout: 300       # seconds for the full sandbox lifecycle
+modal_timeout: 900       # seconds for the full sandbox lifecycle
 output_dir: generations/swebench/qwen3_8b_test
