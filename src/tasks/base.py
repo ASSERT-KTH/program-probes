@@ -6,7 +6,7 @@ from src.configs import TaskConfig
 @dataclass
 class ChatPrompt:
     user_content: str
-    assistant_prefill: str | None = None
+    system_content: str | None = None
 
 
 class TaskAdapter(ABC):

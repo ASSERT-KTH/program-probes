@@ -1,32 +1,53 @@
 import torch
-import torch.nn as nn
 from pathlib import Path
-from src.configs import ModelConfig, HardwareConfig, TaskConfig
-from src.models.base import ModelAdapter
+from src.configs import ModelConfig, GenerationConfig, TaskConfig
+from src.models.base import ModelAdapter, GenerationResult
 from src.tasks.base import TaskAdapter, ChatPrompt
 
 
 class MockModelAdapter(ModelAdapter):
     HIDDEN_DIM = 64
-    FIXED_OUTPUT = "def f(x): return x"
+    FIXED_RAW = "```python\ndef f(x): return x\n```"
     _N_TOKENS = 10
 
-    def load(self, model_config: ModelConfig, hardware_config: HardwareConfig) -> None:
-        self._model_config = model_config
-        self._layers = nn.ModuleList([nn.Linear(self.HIDDEN_DIM, self.HIDDEN_DIM) for _ in range(40)])
+    def load_tokenizer(self, model_config: ModelConfig) -> None:
+        pass
 
-    def get_layer_modules(self) -> list:
-        return list(self._layers)
+    def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int = 4096) -> None:
+        pass
 
-    def get_hidden_dim(self) -> int:
-        return self.HIDDEN_DIM
+    def load_for_extraction(self, model_config: ModelConfig, gen_config: GenerationConfig) -> None:
+        self._hidden_dim = self.HIDDEN_DIM
 
-    def tokenize(self, prompt: ChatPrompt) -> dict:
-        return {"input_ids": torch.zeros(1, 5, dtype=torch.long)}
+    def build_prompt(self, prompt: ChatPrompt) -> list[int]:
+        return list(range(5))
 
-    def generate(self, inputs: dict, max_new_tokens: int, temperature: float, top_p: float | None = None, top_k: int | None = None, min_p: float | None = None) -> tuple[str, list[int], str]:
-        token_ids = list(range(self._N_TOKENS))
-        return self.FIXED_OUTPUT, token_ids, self.FIXED_OUTPUT
+    def generate(
+        self,
+        prompt_token_ids: list[list[int]],
+        gen_config: GenerationConfig,
+    ) -> list[GenerationResult]:
+        return [
+            GenerationResult(
+                prompt_token_ids=ids,
+                generated_token_ids=list(range(self._N_TOKENS)),
+                raw_text=self.FIXED_RAW,
+            )
+            for ids in prompt_token_ids
+        ]
+
+    def extract_hidden_states(
+        self,
+        sequences: list[list[int]],
+        prompt_lengths: list[int],
+        layer_indices: list[int],
+        stride: int,
+    ) -> list[dict[int, torch.Tensor]]:
+        n_steps = max(1, (self._N_TOKENS) // stride)
+        return [
+            {li: torch.randn(n_steps, self.HIDDEN_DIM, dtype=torch.float16) for li in layer_indices}
+            for _ in sequences
+        ]
 
 
 class MockTaskAdapter(TaskAdapter):
@@ -69,8 +90,8 @@ def make_synthetic_pt(
         "generation_idx": gen_idx,
         "n_captured_steps": n_steps,
         "metadata": {
-            "prompt": "prompt",
-            "generated_text": "generated",
+            "prompt_token_ids": [0, 1, 2],
+            "raw_text": "```python\ndef f(x): return x\n```",
             "task_sample": {"task_id": sample_id},
         },
     }

@@ -6,3 +6,4 @@ top_k: 20
 min_p: 0.0
 stride: 5
 seed: 42
+extraction_batch_size: 1

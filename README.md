@@ -32,7 +32,7 @@ source scripts/berzelius_env.sh --check-only
 ### Other Environments
 
 ```bash
-uv sync --frozen --python 3.12
+uv sync --frozen
 ```
 
 ### Modal authentication
@@ -41,13 +41,13 @@ Modal sandboxes run commands in remote containers, not in the local Python
 virtual environment. Authenticate once with the Modal CLI:
 
 ```bash
-uv run --python 3.12 modal token new
+uv run modal token new
 ```
 
 Verify the active token with:
 
 ```bash
-uv run --python 3.12 modal token info
+uv run modal token info
 ```
 
 For non-interactive jobs, provide credentials through environment variables:
@@ -60,7 +60,7 @@ export MODAL_TOKEN_SECRET="..."
 If you already have token values, store them for the current Modal profile with:
 
 ```bash
-uv run --python 3.12 modal token set \
+uv run modal token set \
   --token-id "$MODAL_TOKEN_ID" \
   --token-secret "$MODAL_TOKEN_SECRET"
 ```
@@ -73,7 +73,7 @@ credentials automatically when `ModalSandboxEnvironment` creates a sandbox.
 To start vLLM, run mini-SWE-agent locally, and save a formatted trajectory:
 
 ```bash
-uv run --python 3.12 python test/run_mini_swe_with_vllm.py \
+uv run python tests/run_mini_swe_with_vllm.py \
   --model-config configs/models/qwen3_8b.yaml \
   --generation-config configs/generation.yaml \
   --vllm-config configs/agents/vllm_launch.yaml \
@@ -84,7 +84,7 @@ uv run --python 3.12 python test/run_mini_swe_with_vllm.py \
 To execute mini-SWE-agent bash commands in a Modal sandbox:
 
 ```bash
-uv run --python 3.12 python test/run_mini_swe_with_vllm_modal.py \
+uv run python tests/run_mini_swe_with_vllm_modal.py \
   --model-config configs/models/qwen3_8b.yaml \
   --generation-config configs/generation.yaml \
   --vllm-config configs/agents/vllm_launch.yaml \
@@ -92,8 +92,21 @@ uv run --python 3.12 python test/run_mini_swe_with_vllm_modal.py \
   --trajectory-output outputs/agent_trajectories/modal_smoke.json
 ```
 
-The trajectory JSON contains mini-SWE messages, bash command history, final
-result, and token IDs from the configured model tokenizer.
+To run mini-SWE-agent on a single SWE-bench Verified instance in Modal:
+
+```bash
+uv run python tests/run_swebench_single_instance.py \
+  --model-config configs/models/qwen3_8b.yaml \
+  --generation-config configs/generation.yaml \
+  --vllm-config configs/agents/vllm_launch.yaml \
+  --agent-config configs/agents/mini_swe_swebench.yaml \
+  --trajectory-output outputs/agent_trajectories/swebench_single.json
+```
+
+Pass `--instance-id <id>` to target a specific SWE-bench Verified instance
+(default: `astropy__astropy-12907`). The trajectory JSON contains mini-SWE
+messages, bash command history with per-command git diffs, the final patch,
+and the pass/fail outcome from the SWE-bench eval script.
 
 ## Running locally
 
@@ -239,3 +252,21 @@ adapter: mbpp
 2. Set `name`, `is_dynamic`, and implement `compute_label`.
 3. Register the probe name in `src/extract._load_probe`.
 4. Pass `--probe myprobe` to any entrypoint.
+
+## Practical problems
+
+### SSL certificate errors on Berzelius
+
+`uv` ships its own Python 3.12 binary linked against an OpenSSL that looks for `/etc/ssl/cert.pem`.
+That path does not exist on RHEL 8 (Berzelius uses `/etc/pki/tls/cert.pem` instead), so Python's ssl
+module finds no CA bundle and any outbound TLS connection — including Modal's gRPC channel — fails with:
+
+```
+ssl.SSLCertVerificationError: certificate verify failed: unable to get local issuer certificate
+```
+
+Fix: add the following to `~/.bashrc` (or `~/.bash_profile`) on Berzelius:
+
+```bash
+export SSL_CERT_FILE=/etc/pki/tls/cert.pem
+```

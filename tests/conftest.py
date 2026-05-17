@@ -1,5 +1,5 @@
 import pytest
-from src.configs import ModelConfig, HardwareConfig, TaskConfig, GenerationConfig
+from src.configs import ModelConfig, TaskConfig, GenerationConfig
 from src.probes.base import TrajectoryContext, EditEvent
 from tests.helpers import MockModelAdapter, MockTaskAdapter, make_synthetic_pt
 
@@ -17,11 +17,6 @@ def mock_task_adapter():
 @pytest.fixture
 def model_config():
     return ModelConfig(model_id="mock/model", probe_layers=[0, 1, 2], adapter="mock")
-
-
-@pytest.fixture
-def hardware_config():
-    return HardwareConfig(device_map="cpu", dtype="float32")
 
 
 @pytest.fixture
@@ -48,7 +43,7 @@ def simple_trajectory_ctx(mock_task_adapter):
     sample = {"task_id": "task_0", "idx": 0}
     return TrajectoryContext(
         sample=sample,
-        generated_text=MockModelAdapter.FIXED_OUTPUT,
+        generated_text=MockModelAdapter.FIXED_RAW,
         n_captured_steps=5,
         edit_history=[],
     )

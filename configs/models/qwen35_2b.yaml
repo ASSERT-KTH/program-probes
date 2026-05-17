@@ -1,0 +1,3 @@
+model_id: "Qwen/Qwen3.5-2B"
+probe_layers: [5, 11, 17, 22]
+adapter: qwen35

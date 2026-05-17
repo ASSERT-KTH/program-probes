@@ -21,20 +21,30 @@ async function fetchJSON(path) {
   return res.json();
 }
 
+function setLoading(on) {
+  document.getElementById("loading-overlay").classList.toggle("visible", on);
+}
+
 async function loadRun(runId) {
+  setLoading(true);
+  await new Promise(r => requestAnimationFrame(r));
   state.runId = runId;
-  const [meta, samples, probeResults] = await Promise.all([
-    fetchJSON(`${DATA_ROOT}/${runId}/meta.json`),
-    fetchJSON(`${DATA_ROOT}/${runId}/samples.json`),
-    fetchJSON(`${DATA_ROOT}/${runId}/probe_results.json`),
-  ]);
-  state.meta = meta;
-  state.samples = samples;
-  state.probeResults = probeResults;
-  state.activeProbe = meta.probes[0] ?? null;
-  state.selectedSampleIdx = null;
-  state.selectedGenIdx = 0;
-  renderAll();
+  try {
+    const [meta, samples, probeResults] = await Promise.all([
+      fetchJSON(`${DATA_ROOT}/${runId}/meta.json`),
+      fetchJSON(`${DATA_ROOT}/${runId}/samples.json`),
+      fetchJSON(`${DATA_ROOT}/${runId}/probe_results.json`),
+    ]);
+    state.meta = meta;
+    state.samples = samples;
+    state.probeResults = probeResults;
+    state.activeProbe = meta.probes[0] ?? null;
+    state.selectedSampleIdx = null;
+    state.selectedGenIdx = 0;
+    renderAll();
+  } finally {
+    setLoading(false);
+  }
 }
 
 async function init() {

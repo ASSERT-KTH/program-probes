@@ -36,7 +36,7 @@ class ModalSandboxEnvironment:
             kwargs["image"] = self.image
         if self.env:
             kwargs["environment"] = self.env
-        self._sandbox = modal.Sandbox.create(**kwargs)
+        self._sandbox = modal.Sandbox.create(timeout=self.timeout, **kwargs)
         return self
 
     @property

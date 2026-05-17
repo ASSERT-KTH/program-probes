@@ -1,66 +1,112 @@
 import torch
-from src.models.base import ModelAdapter
-from src.configs import ModelConfig, HardwareConfig
+from src.models.base import ModelAdapter, GenerationResult
+from src.configs import ModelConfig, GenerationConfig
 from src.tasks.base import ChatPrompt
-
-# Token ID for </think> in Qwen3 tokenizer
-_THINK_END_TOKEN_ID = 151668
-_MAGIC_SPLITTER_ = "-[[]]-this-is-really-our-highest-priority-[[]]-"
 
 
 class QwenAdapter(ModelAdapter):
-    def load(self, model_config: ModelConfig, hardware_config: HardwareConfig) -> None:
+    def load_tokenizer(self, model_config: ModelConfig) -> None:
+        from transformers import AutoTokenizer
+        self._tokenizer = AutoTokenizer.from_pretrained(model_config.model_id)
+
+    def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int) -> None:
+        from vllm import LLM
+        self._llm = LLM(
+            model=model_config.model_id,
+            tensor_parallel_size=gen_config.num_gpus,
+            dtype=gen_config.dtype,
+            max_model_len=max_model_len,
+        )
+
+    def load_for_extraction(self, model_config: ModelConfig, gen_config: GenerationConfig) -> None:
         from transformers import AutoTokenizer, AutoModelForCausalLM
         dtype_map = {"bfloat16": torch.bfloat16, "float16": torch.float16, "float32": torch.float32}
-        dtype = dtype_map[hardware_config.dtype]
-        self._model_config = model_config
         self._tokenizer = AutoTokenizer.from_pretrained(model_config.model_id)
         self._model = AutoModelForCausalLM.from_pretrained(
             model_config.model_id,
-            device_map=hardware_config.device_map,
-            dtype=dtype,
+            device_map="auto",
+            torch_dtype=dtype_map[gen_config.dtype],
         )
         self._model.eval()
 
-    def get_layer_modules(self) -> list:
-        return list(self._model.model.layers)
-
-    def get_hidden_dim(self) -> int:
-        return self._model.config.hidden_size
-
-    def tokenize(self, prompt: "ChatPrompt") -> dict:
-        messages = [{"role": "user", "content": prompt.user_content}]
-        if prompt.assistant_prefill is not None:
-            assistant_prefill = prompt.assistant_prefill + _MAGIC_SPLITTER_
-            messages.append({"role": "assistant", "content": assistant_prefill})
-            text = self._tokenizer.apply_chat_template(messages, tokenize=False).split(_MAGIC_SPLITTER_)[0]
-        else:
-            text = self._tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        return self._tokenizer([text], return_tensors="pt").to(self._model.device)
+    def build_prompt(self, prompt: ChatPrompt) -> list[int]:
+        messages = []
+        if prompt.system_content is not None:
+            messages.append({"role": "system", "content": prompt.system_content})
+        messages.append({"role": "user", "content": prompt.user_content})
+        text = self._tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True, enable_thinking=True,
+        )
+        return self._tokenizer.encode(text, add_special_tokens=False)
 
     def generate(
-        self, inputs: dict, max_new_tokens: int, temperature: float,
-        top_p: float | None = None, top_k: int | None = None, min_p: float | None = None,
-    ) -> tuple[str, list[int]]:
-        sampling_kwargs = {k: v for k, v in {"top_p": top_p, "top_k": top_k, "min_p": min_p}.items() if v is not None}
+        self,
+        prompt_token_ids: list[list[int]],
+        gen_config: GenerationConfig,
+    ) -> list[GenerationResult]:
+        from vllm import SamplingParams
+        sampling_kwargs = {}
+        if gen_config.repetition_penalty is not None:
+            sampling_kwargs["repetition_penalty"] = gen_config.repetition_penalty
+        if gen_config.presence_penalty is not None:
+            sampling_kwargs["presence_penalty"] = gen_config.presence_penalty
+        params = SamplingParams(
+            temperature=gen_config.temperature,
+            top_p=gen_config.top_p or 1.0,
+            top_k=gen_config.top_k or -1,
+            min_p=gen_config.min_p or 0.0,
+            max_tokens=gen_config.max_new_tokens,
+            **sampling_kwargs,
+        )
+        prompts = [{"prompt_token_ids": ids} for ids in prompt_token_ids]
+        outputs = self._llm.generate(prompts, sampling_params=params)
+        results = []
+        for prompt_ids, out in zip(prompt_token_ids, outputs):
+            gen_ids = list(out.outputs[0].token_ids)
+            raw_text = self._tokenizer.decode(gen_ids, skip_special_tokens=False)
+            results.append(GenerationResult(
+                prompt_token_ids=prompt_ids,
+                generated_token_ids=gen_ids,
+                raw_text=raw_text,
+            ))
+        return results
+
+    def extract_hidden_states(
+        self,
+        sequences: list[list[int]],
+        prompt_lengths: list[int],
+        layer_indices: list[int],
+        stride: int,
+    ) -> list[dict[int, torch.Tensor]]:
+        dtype_map = {torch.bfloat16: torch.bfloat16, torch.float16: torch.float16}
+        device = next(self._model.parameters()).device
+
+        # Left-pad sequences to the same length
+        max_len = max(len(s) for s in sequences)
+        pad_id = self._tokenizer.pad_token_id or self._tokenizer.eos_token_id
+        input_ids = torch.tensor(
+            [[pad_id] * (max_len - len(s)) + s for s in sequences],
+            dtype=torch.long, device=device,
+        )
+        attention_mask = (input_ids != pad_id).long()
+        padding_lengths = [max_len - len(s) for s in sequences]
+
         with torch.no_grad():
-            output = self._model.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                do_sample=True,
-                temperature=temperature,
-                **sampling_kwargs,
+            out = self._model(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                output_hidden_states=True,
             )
-        input_len = inputs["input_ids"].shape[1]
-        new_tokens = output[0][input_len:].tolist()
 
-        # Split thinking tokens from response tokens at </think>
-        try:
-            think_end = len(new_tokens) - new_tokens[::-1].index(_THINK_END_TOKEN_ID)
-        except ValueError:
-            think_end = 0
-
-        content_tokens = new_tokens[think_end:]
-        decoded = self._tokenizer.decode(content_tokens, skip_special_tokens=True).strip("\n")
-        raw = self._tokenizer.decode(new_tokens, skip_special_tokens=False).strip("\n")
-        return decoded, new_tokens, raw
+        # hidden_states: tuple of (n_layers+1) tensors, each [batch, seq, hidden]
+        results = []
+        for i, (pad_len, prompt_len) in enumerate(zip(padding_lengths, prompt_lengths)):
+            gen_start = pad_len + prompt_len
+            gen_end = max_len
+            per_seq = {}
+            for li in layer_indices:
+                hs = out.hidden_states[li + 1]  # +1 to skip embedding layer
+                gen_hs = hs[i, gen_start:gen_end:stride, :].to(torch.float16).cpu()
+                per_seq[li] = gen_hs
+            results.append(per_seq)
+        return results

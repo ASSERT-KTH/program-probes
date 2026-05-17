@@ -4,10 +4,10 @@ version = "0.1.0"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "torch>=2.3",
-    "transformers>=4.45",
-    "accelerate>=0.30",
+    "transformers>=5.8.1",
+    "accelerate>=1.13.0",
     "evalplus>=0.3",
-    "wandb>=0.17",
+    "wandb>=0.27.0",
     "pyyaml>=6.0",
     "matplotlib>=3.9",
     "pydantic>=2.0",
@@ -16,7 +16,8 @@ dependencies = [
     "litellm>=1.83.14",
     "mini-swe-agent>=2.2.8",
     "modal>=1.4.2",
-    "vllm>=0.20.2",
+    "vllm>=0.21.0",
+    "swebench==4.1.0",
 ]
 
 [build-system]

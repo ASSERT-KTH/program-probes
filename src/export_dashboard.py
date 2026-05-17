@@ -1,21 +1,44 @@
 import json
 import math
+import random
 import torch
 from pathlib import Path
 from datetime import datetime
 
 
-def _majority_baseline(labels: list) -> float:
-    flat = []
-    for lbl in labels:
-        if isinstance(lbl, list):
-            flat.extend(v for v in lbl if v is not None)
-        elif lbl is not None:
-            flat.append(lbl)
-    if not flat:
+def _majority_baseline_from_cache(cache_dir: str, probe_name: str, seed: int = 42) -> float:
+    """Compute majority baseline from the test split of the probe cache.
+
+    Uses per-step labels (matching what the probe is trained/evaluated on) rather
+    than per-sample labels, which can be skewed when correct and incorrect
+    generations differ substantially in length.
+    """
+    probe_dir = Path(cache_dir) / probe_name
+    layer_files = sorted(probe_dir.glob("layer_*.pt"))
+    if not layer_files:
         return 0.5
-    pos = sum(1 for v in flat if v)
-    return max(pos / len(flat), 1 - pos / len(flat))
+    # Labels are identical across layers — load just one
+    data = torch.load(layer_files[0], weights_only=False)
+    y = data["y"]
+    group_ids = data["group_id"]
+
+    # Reproduce the group-level 70/15/15 split from probe.py
+    unique_groups = sorted(set(group_ids))
+    rng = random.Random(seed)
+    rng.shuffle(unique_groups)
+    n = len(unique_groups)
+    test_groups = set(unique_groups[math.floor(0.85 * n):])
+
+    test_mask = torch.tensor([
+        group_ids[i] in test_groups and y[i].item() >= 0
+        for i in range(len(y))
+    ])
+    test_y = y[test_mask]
+    if len(test_y) == 0:
+        return 0.5
+    pos = (test_y == 1).sum().item()
+    total = len(test_y)
+    return max(pos / total, 1 - pos / total)
 
 
 def export_dashboard(
@@ -26,6 +49,7 @@ def export_dashboard(
     model_name: str,
     output_dir: str = "outputs",
     results_dir: str = "results",
+    cache_dir: str = "cache",
     dashboard_dir: str = "dashboard",
     n_bins: int = 10,
 ) -> None:
@@ -51,13 +75,13 @@ def export_dashboard(
             samples_by_id[sid] = {
                 "sample_id": sid,
                 "group_id": data["group_id"],
-                "prompt": meta["prompt"],
+                "prompt": meta.get("prompt_text", meta.get("prompt", "")),
                 "generations": [],
             }
 
         gen_entry = {
             "generation_idx": gen_idx,
-            "generated_text": meta["generated_text"],
+            "generated_text": meta.get("raw_text", meta.get("generated_text", "")),
             "labels": {k: v for k, v in labels.items() if k in probe_names},
         }
         samples_by_id[sid]["generations"].append(gen_entry)
@@ -70,8 +94,11 @@ def export_dashboard(
     for s in samples_list:
         s["generations"].sort(key=lambda g: g["generation_idx"])
 
-    # Compute majority baselines
-    majority_baselines = {p: _majority_baseline(all_labels_by_probe[p]) for p in probe_names}
+    # Compute majority baselines from cache test split (per-step, matching probe evaluation)
+    majority_baselines = {
+        p: _majority_baseline_from_cache(Path(cache_dir) / run_id, p)
+        for p in probe_names
+    }
 
     # Load probe results
     probe_results: dict[str, dict] = {}

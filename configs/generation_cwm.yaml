@@ -1,0 +1,12 @@
+max_new_tokens: 32768
+n_generations: 1
+temperature: 1.0
+top_p: 0.95
+top_k: 20
+min_p: 0.0
+presence_penalty: 1.5
+stride: 5
+seed: 42
+num_gpus: 2
+dtype: bfloat16
+extraction_batch_size: 1

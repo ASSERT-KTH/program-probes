@@ -4,17 +4,16 @@ from src.tasks.base import TaskAdapter, ChatPrompt
 from src.configs import TaskConfig
 
 _INSTRUCTION_PREFIX = (
-    "Please provide a self-contained Python script that solves the following problem "
-    "in a markdown code block. Do not include any explanation or text outside the code block."
+    "Please solve the following programming problem. "
+    "Your response must end with the complete solution in a markdown python code block. "
+    "Do not include any text or code blocks after it."
 )
-_RESPONSE_PREFIX = "Below is a Python script with a self-contained function that solves the problem and passes corresponding tests:\n```python"
-
 
 def _extract_code(generated: str) -> str:
-    # The model is prefilled with ```python\n, so generated begins with code.
-    # Take everything up to the first closing fence.
-    if "```" in generated:
-        return generated[:generated.index("```")].strip()
+    import re
+    blocks = re.findall(r"```(?:python)?\n(.*?)```", generated, re.DOTALL)
+    if blocks:
+        return blocks[-1].strip()
     return generated.strip()
 
 
@@ -25,8 +24,8 @@ class HumanEvalAdapter(TaskAdapter):
         return [{"task_id": k, **v} for k, v in data.items()]
 
     def format_prompt(self, sample: dict) -> ChatPrompt:
-        user_content = f"{_INSTRUCTION_PREFIX}\n```\n{sample['prompt'].strip()}\n```\n"
-        return ChatPrompt(user_content=user_content, assistant_prefill=_RESPONSE_PREFIX)
+        user_content = f"{_INSTRUCTION_PREFIX}\n\n```python\n{sample['prompt'].strip()}\n```\n"
+        return ChatPrompt(user_content=user_content)
 
     def check_correct(self, generated: str, sample: dict) -> bool:
         code = _extract_code(generated)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import bisect
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,15 +18,9 @@ def build_agent_trajectory(
     tokenizer_name: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build a JSON-serializable mini-SWE trajectory artifact.
-
-    The artifact stores the exact mini-SWE messages and bash command history.
-    If tokenizer_name is provided, it also stores token ids for each message
-    content and for the full chat template when the tokenizer supports it.
-    """
     clean_messages = [_clean_message(message) for message in messages]
     artifact = {
-        "schema_version": "program-probes.agent_trajectory.v1",
+        "schema_version": "program-probes.agent_trajectory.v2",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "task": task,
         "result": _jsonable(result),
@@ -41,7 +36,6 @@ def build_agent_trajectory(
 
     if tokenizer_name is not None:
         artifact["tokenization"] = _tokenize_trajectory(clean_messages, tokenizer_name)
-        artifact["flat_token_sequence"] = artifact["tokenization"]["flat"]
 
     return artifact
 
@@ -104,44 +98,46 @@ def _tokenize_trajectory(messages: list[dict[str, Any]], tokenizer_name: str) ->
         chat_text = "\n".join(f"{message['role']}: {message['content']}" for message in chat_messages)
     chat_token_ids = tokenizer.encode(chat_text, add_special_tokens=False)
 
+    token_starts, token_ends = [], []
+    spans = tokenizer(chat_text, return_offsets_mapping=True).offset_mapping
+    for start, end in spans:
+        token_starts.append(start)
+        token_ends.append(end)
+
+    message_spans = []
+    pointer = 0
+    for message in chat_messages:
+        role = message["role"]
+        content = message["content"]
+        raw_offset = chat_text.find(content, pointer)
+        if raw_offset == -1:
+            pointer = 0
+            raw_offset = chat_text.find(content, pointer)
+        if raw_offset >= 0:
+            start_token = bisect.bisect_left(token_starts, raw_offset)
+            end_offset = raw_offset + len(content)
+            end_token = bisect.bisect_right(token_ends, end_offset)
+            if end_token >= len(token_ends):
+                end_token = len(token_ends)
+            pointer = raw_offset + len(content)
+        else:
+            start_token = 0
+            end_token = 0
+        message_spans.append({
+            "message_idx": message_spans.__len__(),
+            "role": role,
+            "start_token": start_token,
+            "end_token": end_token,
+            "n_tokens": max(0, end_token - start_token),
+        })
+
     return {
         "tokenizer_name": tokenizer_name,
         "chat_text": chat_text,
         "chat_token_ids": chat_token_ids,
         "n_chat_tokens": len(chat_token_ids),
-        "flat": _build_flat_token_sequence(tokenizer, chat_messages),
         "messages": message_tokenization,
-    }
-
-
-def _build_flat_token_sequence(tokenizer: Any, chat_messages: list[dict[str, str]]) -> dict[str, Any]:
-    """Build a simple, continuous token stream without sectioned message arrays."""
-    text_parts = []
-    tokens = []
-
-    for idx, message in enumerate(chat_messages):
-        role = message["role"]
-        content = message["content"]
-        segment_text = f"<|program_probes_message|>{role}\n{content}\n"
-        segment_token_ids = tokenizer.encode(segment_text, add_special_tokens=False)
-        start = len(tokens)
-        tokens.extend(segment_token_ids)
-        text_parts.append(
-            {
-                "message_idx": idx,
-                "role": role,
-                "start_token": start,
-                "end_token": len(tokens),
-                "n_tokens": len(segment_token_ids),
-            }
-        )
-
-    return {
-        "format": "program_probes_flat_messages_v1",
-        "text": "".join(f"<|program_probes_message|>{m['role']}\n{m['content']}\n" for m in chat_messages),
-        "token_ids": tokens,
-        "n_tokens": len(tokens),
-        "segments": text_parts,
+        "message_spans": message_spans,
     }
 
 
