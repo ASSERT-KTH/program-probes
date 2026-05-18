@@ -3337,6 +3337,7 @@ test = [
     { name = "pydantic" },
     { name = "pytest" },
     { name = "pyyaml" },
+    { name = "scikit-learn" },
     { name = "torch" },
     { name = "transformers" },
 ]
@@ -3367,6 +3368,7 @@ test = [
     { name = "pydantic", specifier = ">=2.0" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pyyaml", specifier = ">=6.0" },
+    { name = "scikit-learn", specifier = ">=1.8.0" },
     { name = "torch", specifier = ">=2.3" },
     { name = "transformers", specifier = ">=5.0" },
 ]

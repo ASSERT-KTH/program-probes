@@ -11,7 +11,11 @@ class MockModelAdapter(ModelAdapter):
     _N_TOKENS = 10
 
     def load_tokenizer(self, model_config: ModelConfig) -> None:
-        pass
+        class _MockTokenizer:
+            def decode(self, token_ids, **kwargs):
+                return " ".join(str(t) for t in token_ids)
+
+        self._tokenizer = _MockTokenizer()
 
     def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int = 4096) -> None:
         pass
@@ -42,6 +46,7 @@ class MockModelAdapter(ModelAdapter):
         prompt_lengths: list[int],
         layer_indices: list[int],
         stride: int,
+        extraction_masks: list[list[int]] | None = None,
     ) -> list[dict[int, torch.Tensor]]:
         n_steps = max(1, (self._N_TOKENS) // stride)
         return [
