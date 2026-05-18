@@ -77,8 +77,8 @@ class QwenAdapter(ModelAdapter):
         prompt_lengths: list[int],
         layer_indices: list[int],
         stride: int,
+        extraction_masks: list[list[int]] | None = None,
     ) -> list[dict[int, torch.Tensor]]:
-        dtype_map = {torch.bfloat16: torch.bfloat16, torch.float16: torch.float16}
         device = next(self._model.parameters()).device
 
         # Left-pad sequences to the same length
@@ -100,13 +100,26 @@ class QwenAdapter(ModelAdapter):
 
         # hidden_states: tuple of (n_layers+1) tensors, each [batch, seq, hidden]
         results = []
-        for i, (pad_len, prompt_len) in enumerate(zip(padding_lengths, prompt_lengths)):
-            gen_start = pad_len + prompt_len
-            gen_end = max_len
-            per_seq = {}
-            for li in layer_indices:
-                hs = out.hidden_states[li + 1]  # +1 to skip embedding layer
-                gen_hs = hs[i, gen_start:gen_end:stride, :].to(torch.float16).cpu()
-                per_seq[li] = gen_hs
-            results.append(per_seq)
+        if extraction_masks is not None:
+            # Left-pad masks to match sequence padding
+            padded_masks = torch.tensor(
+                [[0] * (max_len - len(m)) + m for m in extraction_masks],
+                dtype=torch.bool, device=device,
+            )
+            for i in range(len(sequences)):
+                positions = padded_masks[i].nonzero(as_tuple=True)[0][::stride]
+                per_seq = {}
+                for li in layer_indices:
+                    hs = out.hidden_states[li + 1]
+                    per_seq[li] = hs[i, positions].to(torch.float16).cpu()
+                results.append(per_seq)
+        else:
+            for i, (pad_len, prompt_len) in enumerate(zip(padding_lengths, prompt_lengths)):
+                gen_start = pad_len + prompt_len
+                per_seq = {}
+                for li in layer_indices:
+                    hs = out.hidden_states[li + 1]
+                    gen_hs = hs[i, gen_start::stride].to(torch.float16).cpu()
+                    per_seq[li] = gen_hs
+                results.append(per_seq)
         return results

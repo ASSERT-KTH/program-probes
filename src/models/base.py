@@ -39,6 +39,12 @@ class ModelAdapter(ABC):
         prompt_lengths: list[int],
         layer_indices: list[int],
         stride: int,
+        extraction_masks: list[list[int]] | None = None,
     ) -> list[dict[int, torch.Tensor]]:
-        """Return one dict per sequence: {layer_idx: Tensor[n_steps, hidden_dim]}."""
+        """Return one dict per sequence: {layer_idx: Tensor[n_steps, hidden_dim]}.
+
+        If extraction_masks is provided (one binary vector per sequence, same length),
+        hidden states are extracted only at positions where mask == 1, then strided.
+        When None, falls back to striding over the generated portion (prompt_lengths).
+        """
         ...
