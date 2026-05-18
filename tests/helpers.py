@@ -10,12 +10,14 @@ class MockModelAdapter(ModelAdapter):
     FIXED_RAW = "```python\ndef f(x): return x\n```"
     _N_TOKENS = 10
 
-    def load_tokenizer(self, model_config: ModelConfig) -> None:
-        class _MockTokenizer:
-            def decode(self, token_ids, **kwargs):
-                return " ".join(str(t) for t in token_ids)
+    class _MockTokenizer:
+        def decode(self, token_ids, **kwargs):
+            return " ".join(str(t) for t in token_ids)
 
-        self._tokenizer = _MockTokenizer()
+    _tokenizer = _MockTokenizer()
+
+    def load_tokenizer(self, model_config: ModelConfig) -> None:
+        pass
 
     def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int = 4096) -> None:
         pass
