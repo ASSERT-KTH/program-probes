@@ -3329,6 +3329,19 @@ dependencies = [
     { name = "wandb" },
 ]
 
+[package.dev-dependencies]
+test = [
+    { name = "matplotlib" },
+    { name = "numpy", version = "2.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "numpy", version = "2.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
+    { name = "pydantic" },
+    { name = "pytest" },
+    { name = "pyyaml" },
+    { name = "scikit-learn" },
+    { name = "torch" },
+    { name = "transformers" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "accelerate", specifier = ">=1.13.0" },
@@ -3346,6 +3359,18 @@ requires-dist = [
     { name = "transformers", specifier = ">=5.8.1" },
     { name = "vllm", specifier = ">=0.21.0" },
     { name = "wandb", specifier = ">=0.27.0" },
+]
+
+[package.metadata.requires-dev]
+test = [
+    { name = "matplotlib", specifier = ">=3.9" },
+    { name = "numpy", specifier = ">=1.0" },
+    { name = "pydantic", specifier = ">=2.0" },
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "scikit-learn", specifier = ">=1.8.0" },
+    { name = "torch", specifier = ">=2.3" },
+    { name = "transformers", specifier = ">=5.0" },
 ]
 
 [[package]]
