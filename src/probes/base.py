@@ -6,14 +6,14 @@ from dataclasses import dataclass, field
 class EditEvent:
     step_idx: int
     code: str
-    test_results: dict
+    test_results: dict | None
+    compiles: bool | None = None
 
 
 @dataclass
 class TrajectoryContext:
     sample: dict
     generated_text: str
-    n_captured_steps: int
     edit_history: list[EditEvent] = field(default_factory=list)
 
 
@@ -27,9 +27,8 @@ class ProbeAdapter(ABC):
     ) -> "bool | None | list[bool | None]":
         """
         Static (is_dynamic=False): return a single bool or None.
-        Dynamic (is_dynamic=True): return a list of length ctx.n_captured_steps.
-          Each entry is the carry-forwarded label from the most recent EditEvent
-          at or before that step, or None if no edit has occurred yet.
+        Dynamic (is_dynamic=True): return a list of length len(ctx.edit_history).
+          Each entry is the label for the corresponding EditEvent in edit_history.
           None values are masked out during probe training.
         """
         ...

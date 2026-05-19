@@ -229,7 +229,6 @@ class MiniSweAgentAdapter(AgentAdapter):
         return TrajectoryContext(
             sample=sample,
             generated_text=generated_text,
-            n_captured_steps=0,
             edit_history=[],
         )
 

@@ -5,19 +5,27 @@ from src.models.base import ModelAdapter, GenerationResult
 from src.tasks.base import TaskAdapter, ChatPrompt
 
 
+class MockTokenizer:
+    """Minimal tokenizer mock — only needs decode()."""
+
+    def decode(self, token_ids: list[int], skip_special_tokens: bool = False) -> str:
+        return "mock decoded text"
+
+
 class MockModelAdapter(ModelAdapter):
     HIDDEN_DIM = 64
     FIXED_RAW = "```python\ndef f(x): return x\n```"
     _N_TOKENS = 10
 
     def load_tokenizer(self, model_config: ModelConfig) -> None:
-        pass
+        self._tokenizer = MockTokenizer()
 
     def load_for_generation(self, model_config: ModelConfig, gen_config: GenerationConfig, max_model_len: int = 4096) -> None:
         pass
 
     def load_for_extraction(self, model_config: ModelConfig, gen_config: GenerationConfig) -> None:
         self._hidden_dim = self.HIDDEN_DIM
+        self._tokenizer = MockTokenizer()
 
     def build_prompt(self, prompt: ChatPrompt) -> list[int]:
         return list(range(5))
@@ -88,7 +96,6 @@ def make_synthetic_pt(
         "sample_id": sample_id,
         "group_id": f"group_{sample_id}",
         "generation_idx": gen_idx,
-        "n_captured_steps": n_steps,
         "metadata": {
             "prompt_token_ids": [0, 1, 2],
             "raw_text": "```python\ndef f(x): return x\n```",

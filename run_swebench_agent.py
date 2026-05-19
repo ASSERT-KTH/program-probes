@@ -173,7 +173,7 @@ def _run_one(
         agent_metrics = _extract_agent_metrics(agent)
         patch = env.get_patch()
         eval_script = instance.get("eval_script", "")
-        outcome = env.evaluate(eval_script) if eval_script else None
+        outcome, eval_log = env.evaluate(eval_script) if eval_script else (None, "")
         print(
             f"[{label}] outcome={'PASS' if outcome else 'FAIL'} "
             f"patch={len(patch)}chars steps={agent_metrics.get('agent/n_steps', '?')} "
@@ -196,6 +196,7 @@ def _run_one(
                 "repo": instance.get("repo", ""),
                 "base_commit": instance.get("base_commit", ""),
                 "outcome": outcome,
+                "eval_log": eval_log[-5000:] if eval_log else "",
                 "patch": patch,
                 "run_config": cfg.model_dump(),
             },

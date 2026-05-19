@@ -109,7 +109,7 @@ def main():
         print(patch[:2000] or "(no changes)")
 
         print("\nRunning SWE-bench evaluation...")
-        outcome = env.evaluate(instance["eval_script"])
+        outcome, eval_log = env.evaluate(instance["eval_script"])
         print(f"Outcome: {'PASS' if outcome else 'FAIL'}")
 
     agent.save_trajectory(

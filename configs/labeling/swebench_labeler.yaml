@@ -1,0 +1,20 @@
+# Labeler config — replays agent trajectories in Modal sandboxes to compute
+# probe labels (compiles + test_results) at every edit step.
+#
+# Usage:
+#   uv run python run_labeler.py --config configs/labeling/swebench_labeler.yaml
+
+# Input / output
+trajectory_dir: generations/swebench/qwen3_8b_test    # directory of agent trajectory JSONs
+output_dir: generations/swebench/qwen3_8b_test/labels  # where _labels.json files are written
+
+# Modal sandbox
+modal_app_name: program-probes-labeler
+sandbox_timeout: 3600     # seconds per sandbox (lifetime, shared by all edits for one instance)
+eval_timeout: 600         # seconds per eval script run inside sandbox
+
+# Resumption
+resume: true              # skip trajectories whose _labels.json already exist
+# single: ""              # process only this one trajectory file (for debugging)
+# instances:              # limit to specific instance IDs
+#   - astropy__astropy-12907
