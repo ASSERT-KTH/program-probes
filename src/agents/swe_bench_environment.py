@@ -48,16 +48,16 @@ class SWEBenchModalEnvironment(ModalSandboxEnvironment):
         """Return the current git diff — the full patch produced by the agent."""
         return self._capture_diff()
 
-    def evaluate(self, eval_script: str) -> bool:
-        """Run the SWE-bench eval script and return True iff the instance is fully resolved.
+    def evaluate(self, eval_script: str) -> tuple[bool, str]:
+        """Run the SWE-bench eval script and return (resolved, eval_log).
 
         Uses swebench's own grading pipeline: parses per-test PASSED/FAILED lines and
         checks that all FAIL_TO_PASS tests now pass and all PASS_TO_PASS tests still pass.
         Exit-code alone is not reliable because the eval script's last command is always
-        `git checkout` (resetting test files), which exits 0 regardless of test outcome.
+        ``git checkout`` (resetting test files), which exits 0 regardless of test outcome.
         """
         if not eval_script:
-            return False
+            return False, ""
         import os
         import tempfile
         from swebench.harness.constants import FAIL_TO_PASS, PASS_TO_PASS, ResolvedStatus
@@ -89,15 +89,15 @@ class SWEBenchModalEnvironment(ModalSandboxEnvironment):
                 eval_sm, found = get_logs_eval(test_spec, log_path)
                 if not found:
                     print("[swe-eval] log parser found no test results", flush=True)
-                    return False
+                    return False, output
                 gold = {FAIL_TO_PASS: test_spec.FAIL_TO_PASS, PASS_TO_PASS: test_spec.PASS_TO_PASS}
                 report = get_eval_tests_report(eval_sm, gold)
                 resolved = get_resolution_status(report) == ResolvedStatus.FULL.value
                 print(f"[swe-eval] resolved={resolved}", flush=True)
-                return resolved
+                return resolved, output
             finally:
                 os.unlink(log_path)
 
         except Exception as exc:
             print(f"[swe-eval] exception during evaluation: {exc}", flush=True)
-            return False
+            return False, ""

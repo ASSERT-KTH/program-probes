@@ -6,3 +6,5 @@ logs/
 prompt.md
 *.egg-info/
 .venv/
+*.orig
+tmp/

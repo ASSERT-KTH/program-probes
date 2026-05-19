@@ -53,7 +53,7 @@ def main() -> None:
         print(smoke["output"])
 
         print("\n--- evaluate BEFORE patch (expect False) ---")
-        result_before = env.evaluate(instance["eval_script"])
+        result_before, _ = env.evaluate(instance["eval_script"])
         print(f"evaluate() = {result_before}")
         assert result_before is False, f"Expected False before patch, got {result_before}"
 
@@ -63,7 +63,7 @@ def main() -> None:
         assert apply["returncode"] == 0, f"Patch did not apply cleanly: {apply['output']}"
 
         print("\n--- evaluate AFTER patch (expect True) ---")
-        result_after = env.evaluate(instance["eval_script"])
+        result_after, _ = env.evaluate(instance["eval_script"])
         print(f"evaluate() = {result_after}")
         assert result_after is True, f"Expected True after patch, got {result_after}"
 
