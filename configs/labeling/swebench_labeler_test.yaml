@@ -7,7 +7,5 @@ output_dir: labels/swebench/qwen36_27b_test
 modal_app_name: program-probes-labeler
 sandbox_timeout: 900
 eval_timeout: 300
-resume: false
-instances:
-  - astropy__astropy-12907
-  - astropy__astropy-13033
+resume: true
+n_workers: 12

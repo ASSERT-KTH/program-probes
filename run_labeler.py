@@ -10,10 +10,29 @@ The config YAML fields are documented in SwebenchLabelerConfig (src/configs.py).
 """
 
 import argparse
+import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from src.configs import SwebenchLabelerConfig, load_config
 from src.labeling.swebench_labeler import label_trajectory, load_instance
+
+
+def _process(tf: Path, iid: str, cfg: SwebenchLabelerConfig, out_dir: Path) -> str:
+    label_path = out_dir / f"{tf.stem}_labels.json"
+    if cfg.resume and label_path.exists():
+        return f"{tf.name}: skipped (labels exist)"
+    instance = load_instance(iid)
+    label_trajectory(
+        tf,
+        instance=instance,
+        eval_script=instance.get("eval_script", ""),
+        output_path=label_path,
+        modal_app_name=cfg.modal_app_name,
+        sandbox_timeout=cfg.sandbox_timeout,
+        eval_timeout=cfg.eval_timeout,
+    )
+    return f"{tf.name}: done"
 
 
 def main() -> None:
@@ -42,41 +61,29 @@ def main() -> None:
             if any(iid in tf.stem for iid in cfg.instances)
         ]
 
-    # Group by instance_id so we create one sandbox per instance
-    by_instance: dict[str, list[Path]] = {}
+    # Map each trajectory file to its instance_id
+    work: list[tuple[Path, str]] = []
     for tf in traj_files:
         with open(tf) as fh:
-            import json
             meta = json.load(fh).get("metadata", {})
         iid = meta.get("instance_id", tf.stem.split("_run")[0])
-        by_instance.setdefault(iid, []).append(tf)
+        work.append((tf, iid))
 
     print(
-        f"[labeler] {len(traj_files)} trajectories across {len(by_instance)} instances",
+        f"[labeler] {len(work)} trajectories, n_workers={cfg.n_workers}",
         flush=True,
     )
 
-    for iid, files in by_instance.items():
-        print(f"[labeler] loading instance {iid} ...", flush=True)
-        instance = load_instance(iid)
-        eval_script = instance.get("eval_script", "")
-
-        for tf in files:
-            label_path = out_dir / f"{tf.stem}_labels.json"
-            if cfg.resume and label_path.exists():
-                print(f"[labeler] {tf.name}: labels exist, skipping", flush=True)
-                continue
-
-            print(f"[labeler] processing {tf.name} ...", flush=True)
-            label_trajectory(
-                tf,
-                instance=instance,
-                eval_script=eval_script,
-                output_path=label_path,
-                modal_app_name=cfg.modal_app_name,
-                sandbox_timeout=cfg.sandbox_timeout,
-                eval_timeout=cfg.eval_timeout,
-            )
+    with ThreadPoolExecutor(max_workers=cfg.n_workers) as pool:
+        futures = {
+            pool.submit(_process, tf, iid, cfg, out_dir): tf.name
+            for tf, iid in work
+        }
+        for fut in as_completed(futures):
+            try:
+                print(f"[labeler] {fut.result()}", flush=True)
+            except Exception as exc:
+                print(f"[labeler] {futures[fut]}: ERROR — {exc}", flush=True)
 
     print("[labeler] done.", flush=True)
 

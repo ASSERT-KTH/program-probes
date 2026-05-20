@@ -63,8 +63,11 @@ def build_label_sequence(
 
     # --- 2. Build cmd_idx -> label value ------------------------------------
     def _label_for_edit(edit: dict) -> bool | None:
+        if edit.get("apply_error"):
+            return None
         if probe == "currently_compiles":
-            return bool(edit["compiles"])
+            c = edit.get("compiles")
+            return bool(c) if c is not None else None
         if probe == "currently_correct":
             tr = edit.get("test_results") or {}
             resolved = tr.get("resolved")
