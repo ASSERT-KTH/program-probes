@@ -122,6 +122,9 @@ def run_extraction(
     layer_indices = model_config.probe_layers
     stride = gen_config.stride
 
+    n_processed = 0
+    n_discarded = 0
+
     for batch_start in range(0, len(entries), batch_size):
         batch = entries[batch_start: batch_start + batch_size]
 
@@ -153,6 +156,16 @@ def run_extraction(
                 edit_history=[],
             )
 
+            bad_edits = [e.step_idx for e in ctx.edit_history if e.test_results is None]
+            if bad_edits:
+                print(
+                    f"[extract] DISCARD {entry['sample_id']} gen{entry['gen_idx']}: "
+                    f"test_results=None at edit step(s) {bad_edits}",
+                    flush=True,
+                )
+                n_discarded += 1
+                continue
+
             labels = {}
             for probe in probes:
                 try:
@@ -181,3 +194,10 @@ def run_extraction(
                 },
             }
             torch.save(out, fname)
+            n_processed += 1
+
+    print(
+        f"[extract] done: {n_processed} saved, {n_discarded} discarded "
+        f"(bad test_results) out of {len(entries)} entries",
+        flush=True,
+    )
