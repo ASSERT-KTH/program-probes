@@ -4,6 +4,60 @@ Measures whether a language model's internal hidden states linearly predict prop
 
 Pipeline: inference + activation hooks → per-sample `.pt` files → per-(layer, probe) cache tensors → linear probe training with W&B sweep → accuracy heatmaps → static dashboard.
 
+## Pipeline overview
+
+There are two pipeline variants depending on whether the generations come from a standard completion model or an agentic loop.
+
+### Standard pipeline (completion model)
+
+```
+run_generate.py          generate token sequences → generations/<run_id>_shard*.json
+        │
+        ▼
+src/extract.py           load shards, extract hidden states, compute probe labels
+run_extract.py           → outputs/<run_id>/<sample_id>_gen<n>.pt
+        │
+        ▼
+run_build_cache.py       concatenate .pt files into per-(layer, probe) tensors
+                         → cache/<run_id>/<probe>_layer<n>.pt
+        │
+        ▼
+run_probe.py sweep       W&B hyperparameter sweep → pick best lr/wd/batch-size
+run_probe.py final       train linear probe on best hparams → W&B run with metrics
+        │
+        ▼
+run_figures.py           accuracy heatmaps per layer × relative-position bin
+run_export_dashboard.py  → dashboard/index.html  (open in browser)
+```
+
+Probe labels for this path are **static** (`will_be_correct`) or computed by the task adapter at label time. No per-edit replay is needed.
+
+### Agentic pipeline (SWE-bench / mini-SWE-agent)
+
+```
+mini-SWE-agent           run agent on SWE-bench instances inside Modal sandboxes
+run_swebench_*.py        → generations/swebench/<run_id>/<instance_id>.json
+        │                  (trajectory JSON: messages, bash history, diffs, outcome)
+        ▼
+run_labeler.py           replay each edit step in a fresh Modal sandbox:
+swebench_labeler.py        git checkout HEAD, apply cumulative diff, py_compile,
+                           run SWE-bench eval script → test_results {passed/failed/resolved}
+                         → generations/swebench/<run_id>/<instance_id>_labels.json
+        │
+        │  trajectories where any edit has test_results=None (patch apply failure
+        │  or unparseable eval output) are discarded with a logged warning
+        ▼
+run_extract_swebench.py  tokenise full conversation, build extraction mask over
+                         assistant turns, extract hidden states, compute probe labels
+                         from _labels.json edit history via carry-forward
+                         → outputs/swebench/<instance_id>.pt
+        │
+        ▼
+run_build_cache.py  →  run_probe.py  →  run_figures.py   (same as standard path)
+```
+
+Dynamic probes (`currently_correct`, `currently_compiles`, `currently_reduces_failing`, `currently_has_regressions`) only make sense in the agentic path because they require `EditEvent` history with per-edit `test_results`. The carry-forward step in `extract.py` expands one label per edit into one label per stride step; steps before the first edit are masked (`None` → `-1` → excluded from training).
+
 ## Setup
 
 ### Berzelius
