@@ -8,9 +8,7 @@
 #   sbatch --array=0-$((N-1)) slurm/swebench_label.sh --config configs/labeling/swebench_labeler.yaml
 #
 #SBATCH -J pp-label
-#SBATCH -p berzelius
-#SBATCH --gpus=0
-#SBATCH -C fat
+#SBATCH -p berzelius-cpu
 #SBATCH -t 12:00:00
 #SBATCH -o logs/labeler_%A_%a.out
 #SBATCH -e logs/labeler_%A_%a.err
