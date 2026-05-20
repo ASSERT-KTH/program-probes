@@ -16,6 +16,7 @@ Example usage:
 from __future__ import annotations
 
 import argparse
+import json
 import random
 from pathlib import Path
 
@@ -25,6 +26,7 @@ import torch
 from src.configs import GenerationConfig, ModelConfig, load_config
 from src.probes.base import TrajectoryContext
 from src.tasks.swe_bench_extract import load_trajectories
+from src.tasks.swe_bench_label_map import build_label_sequence
 
 
 def _set_seeds(seed: int) -> None:
@@ -52,6 +54,12 @@ def _load_probe(probe_name: str):
     if probe_name == "will_resolve":
         from src.probes.will_resolve import WillResolveProbe
         return WillResolveProbe()
+    if probe_name == "currently_compiles_swe":
+        from src.probes.currently_compiles_swe import CurrentlyCompilesSwEProbe
+        return CurrentlyCompilesSwEProbe()
+    if probe_name == "currently_correct_swe":
+        from src.probes.currently_correct_swe import CurrentlyCorrectSweProbe
+        return CurrentlyCorrectSweProbe()
     raise ValueError(f"Unknown probe: {probe_name!r}")
 
 
@@ -66,6 +74,8 @@ def main() -> None:
     parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument("--extraction-batch-size", type=int, default=None,
                         help="Override gen_config.extraction_batch_size")
+    parser.add_argument("--label-dir", default=None,
+                        help="Directory of _labels.json files from run_labeler.py")
     args = parser.parse_args()
 
     model_config: ModelConfig = load_config(args.model_config, ModelConfig)
@@ -114,8 +124,28 @@ def main() -> None:
         for (traj, fname), hs in zip(pending, per_seq_hs):
             n_steps = min(len(v) for v in hs.values()) if hs else 0
 
+            # Load per-edit labels if available and build label sequences
+            label_sequences: dict[str, list] = {}
+            if args.label_dir is not None:
+                label_path = Path(args.label_dir) / f"{traj.instance_id}_labels.json"
+                if label_path.exists():
+                    label_data = json.loads(label_path.read_text())
+                    for probe_key in ("currently_compiles", "currently_correct"):
+                        label_sequences[f"label_sequence_{probe_key}"] = build_label_sequence(
+                            segments=traj.segments,
+                            messages=traj.messages,
+                            edits=label_data.get("edits", []),
+                            extraction_mask=traj.extraction_mask,
+                            stride=stride,
+                            probe=probe_key,
+                        )
+
             ctx = TrajectoryContext(
-                sample={"outcome": traj.outcome, "instance_id": traj.instance_id},
+                sample={
+                    "outcome": traj.outcome,
+                    "instance_id": traj.instance_id,
+                    **label_sequences,
+                },
                 generated_text="",
                 n_captured_steps=n_steps,
             )
