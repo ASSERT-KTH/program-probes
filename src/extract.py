@@ -4,7 +4,32 @@ import numpy as np
 import torch
 from pathlib import Path
 from src.configs import GenerationConfig, ModelConfig, TaskConfig
-from src.probes.base import TrajectoryContext
+from src.probes.base import EditEvent, TrajectoryContext
+
+
+def _carry_forward(
+    edit_labels: list[bool | None],
+    edit_history: list[EditEvent],
+    n_steps: int,
+) -> list[bool | None]:
+    """Expand per-edit labels to per-stride-step labels via carry-forward.
+
+    At each stride step *t*, the label is taken from the most recent EditEvent
+    with ``step_idx <= t``.  Steps before the first edit get *None*.
+    """
+    if not edit_labels:
+        return [None] * n_steps
+
+    result: list[bool | None] = []
+    ei = 0
+    for step in range(n_steps):
+        while ei < len(edit_history) and edit_history[ei].step_idx <= step:
+            ei += 1
+        if ei == 0:
+            result.append(None)
+        else:
+            result.append(edit_labels[ei - 1])
+    return result
 
 
 def _set_seeds(seed: int) -> None:
@@ -97,6 +122,9 @@ def run_extraction(
     layer_indices = model_config.probe_layers
     stride = gen_config.stride
 
+    n_processed = 0
+    n_discarded = 0
+
     for batch_start in range(0, len(entries), batch_size):
         batch = entries[batch_start: batch_start + batch_size]
 
@@ -125,16 +153,30 @@ def run_extraction(
             ctx = TrajectoryContext(
                 sample=entry["task_sample"],
                 generated_text=entry["raw_text"],
-                n_captured_steps=n_steps,
                 edit_history=[],
             )
+
+            bad_edits = [e.step_idx for e in ctx.edit_history if e.test_results is None]
+            if bad_edits:
+                print(
+                    f"[extract] DISCARD {entry['sample_id']} gen{entry['gen_idx']}: "
+                    f"test_results=None at edit step(s) {bad_edits}",
+                    flush=True,
+                )
+                n_discarded += 1
+                continue
 
             labels = {}
             for probe in probes:
                 try:
-                    labels[probe.name] = probe.compute_label(ctx)
+                    raw_label = probe.compute_label(ctx)
                 except NotImplementedError:
-                    labels[probe.name] = [None] * n_steps if probe.is_dynamic else None
+                    raw_label = None
+
+                if probe.is_dynamic and isinstance(raw_label, list):
+                    labels[probe.name] = _carry_forward(raw_label, ctx.edit_history, n_steps)
+                else:
+                    labels[probe.name] = raw_label
 
             out = {
                 "activations": hs,
@@ -142,7 +184,6 @@ def run_extraction(
                 "sample_id": entry["sample_id"],
                 "group_id": entry["group_id"],
                 "generation_idx": entry["gen_idx"],
-                "n_captured_steps": n_steps,
                 "metadata": {
                     "prompt_token_ids": entry["prompt_token_ids"],
                     "prompt_text": model_adapter._tokenizer.decode(
@@ -153,3 +194,10 @@ def run_extraction(
                 },
             }
             torch.save(out, fname)
+            n_processed += 1
+
+    print(
+        f"[extract] done: {n_processed} saved, {n_discarded} discarded "
+        f"(bad test_results) out of {len(entries)} entries",
+        flush=True,
+    )

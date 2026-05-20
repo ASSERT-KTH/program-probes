@@ -44,7 +44,6 @@ def simple_trajectory_ctx(mock_task_adapter):
     return TrajectoryContext(
         sample=sample,
         generated_text=MockModelAdapter.FIXED_RAW,
-        n_captured_steps=5,
         edit_history=[],
     )
 
@@ -59,6 +58,5 @@ def trajectory_ctx_with_edits():
     return TrajectoryContext(
         sample=sample,
         generated_text="def f(x): return x",
-        n_captured_steps=5,
         edit_history=edits,
     )

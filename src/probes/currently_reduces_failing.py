@@ -2,21 +2,29 @@ from src.probes.base import ProbeAdapter, TrajectoryContext
 
 
 class CurrentlyReducesFailingProbe(ProbeAdapter):
-    """
-    Label: whether the current edit reduced the number of failing tests compared to the previous edit.
-    Changes: at each EditEvent where len(test_results["failed"]) < len(previous_edit["failed"]).
-    None: before the first EditEvent (no baseline to compare against).
-    Requires: agent mode with edit_history populated; test_results must include "failed" lists per edit.
+    """Label: whether each edit reduced the number of failing tests.
+
+    At each edit we compare ``len(test_results["failed"])`` with the count at
+    the *previous* edit.  If the count decreased the label is *True*; if it
+    stayed the same or increased the label is *False*.
+
+    The first edit has no baseline and is always *None*.  An edit whose
+    ``test_results`` is *None* also produces *None*.
     """
 
     name = "currently_reduces_failing"
     is_dynamic = True
 
     def compute_label(self, ctx: TrajectoryContext) -> list[bool | None]:
-        if not ctx.edit_history:
-            raise NotImplementedError("requires agent-mode task with edit_history")
-        # TODO: carry-forward the label from the most recent EditEvent at or before each step.
-        # For each step t, find the last EditEvent with step_idx <= t. Compare its
-        # test_results["failed"] count with the prior EditEvent's count. Return True if reduced,
-        # False otherwise. Return None before first edit (no baseline).
-        return [None] * ctx.n_captured_steps
+        labels: list[bool | None] = []
+        prev_failing: int | None = None
+        for edit in ctx.edit_history:
+            tr = edit.test_results
+            if tr is None or prev_failing is None:
+                labels.append(None)
+            else:
+                curr_failing = len(tr.get("failed", []))
+                labels.append(curr_failing < prev_failing)
+            if tr is not None:
+                prev_failing = len(tr.get("failed", []))
+        return labels

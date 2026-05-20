@@ -168,6 +168,24 @@ class SWEBenchRunConfig(BaseModel):
         return MiniSweAgentConfig.model_validate(base)
 
 
+class SwebenchLabelerConfig(BaseModel):
+    """Configuration for labeling SWE-bench agent trajectories.
+
+    Points the labeler at a directory of trajectory JSONs, replays each edit step
+    in a Modal sandbox, and writes _labels.json files with compiles/test_results
+    at each edit point.
+    """
+
+    trajectory_dir: str
+    output_dir: str
+    modal_app_name: str = "program-probes-labeler"
+    sandbox_timeout: int = 3600  # seconds for the Modal sandbox lifecycle
+    eval_timeout: int = 600     # seconds per eval script run inside sandbox
+    resume: bool = True         # skip trajectories that already have labels
+    single: str | None = None   # process only this one trajectory file
+    instances: list[str] | None = None  # limit to specific instance IDs
+
+
 def load_config(path: str, model: type[BaseModel]) -> BaseModel:
     import yaml
     with open(path) as f:

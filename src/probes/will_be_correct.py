@@ -10,4 +10,8 @@ class WillBeCorrectProbe(ProbeAdapter):
         self._task_adapter = task_adapter
 
     def compute_label(self, ctx: TrajectoryContext) -> bool | None:
+        if ctx.edit_history:
+            tr = ctx.edit_history[-1].test_results
+            if tr is not None and "resolved" in tr:
+                return tr["resolved"]
         return self._task_adapter.check_correct(ctx.generated_text, ctx.sample)
