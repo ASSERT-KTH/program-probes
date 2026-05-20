@@ -122,6 +122,15 @@ def test_resume_skips_existing(monkeypatch, tmp_path):
 
     files_first = set(f.name for f in (tmp_path / "outputs" / "test_resume").glob("*.pt"))
 
+    # Second run should produce no new files
+    run_extraction(model_config=model_cfg, task_config=task_cfg, gen_config=gen_cfg,
+                   probe_names=["will_be_correct"], run_id="test_resume",
+                   generations_dir=gens_dir, output_dir=out_dir)
+
+    files_second = set(f.name for f in (tmp_path / "outputs" / "test_resume").glob("*.pt"))
+    assert files_first == files_second
+
+
 def test_hooks_removed_after_run(monkeypatch, tmp_output_dir):
     probe_layers = [0, 1]
     model_cfg = ModelConfig(model_id="mock", probe_layers=probe_layers, adapter="mock")
