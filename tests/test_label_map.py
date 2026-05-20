@@ -159,13 +159,8 @@ class TestStride:
 class TestRealTrajectory:
     """Integration test using actual trajectory and label files."""
 
-    TRAJ = Path("generations/swebench/qwen36_27b_test/astropy__astropy-12907.json")
-    LABELS = Path("labels/swebench/qwen36_27b_test/astropy__astropy-12907_labels.json")
-
-    @pytest.fixture(autouse=True)
-    def _skip_if_missing(self):
-        if not self.TRAJ.exists() or not self.LABELS.exists():
-            pytest.skip("real trajectory/label files not available")
+    TRAJ = Path("tests/resources/swebench/astropy__astropy-12907.json")
+    LABELS = Path("tests/resources/swebench/astropy__astropy-12907_labels.json")
 
     def setup_method(self):
         self.traj = json.loads(self.TRAJ.read_text())
