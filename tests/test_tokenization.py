@@ -173,9 +173,9 @@ def test_think_block_inside_assistant_segment(tokenizer):
 
 def test_unknown_role_does_not_crash(tokenizer):
     result = _tokenize_trajectory(_clean_messages(UNKNOWN_ROLE_MESSAGES), TOKENIZER_NAME)
-    # exit message is included in spans even with empty content (n_tokens=0)
+    # exit message has empty content and is skipped in segments
     roles = [s["role"] for s in result["segments"]]
-    assert "exit" in roles
+    assert "exit" not in roles
     assert "system" in roles
     assert "user" in roles
     assert "assistant" in roles
