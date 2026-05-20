@@ -274,6 +274,9 @@ def main() -> None:
     )
 
     vllm_cfg = cfg.to_vllm_server_config()
+    if vllm_cfg.log_path:
+        stem = vllm_cfg.log_path.replace(".log", "")
+        vllm_cfg = vllm_cfg.model_copy(update={"log_path": f"{stem}_shard{args.shard_rank}.log"})
     model_cfg = cfg.to_model_config()
 
     n_total = len(jobs)
