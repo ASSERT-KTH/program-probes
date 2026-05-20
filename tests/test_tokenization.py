@@ -84,8 +84,8 @@ UNKNOWN_ROLE_MESSAGES = [
 def test_token_ids_match_apply_chat_template(tokenizer, messages):
     result = _tokenize_trajectory(_clean_messages(messages), TOKENIZER_NAME)
     _, expected_ids = _apply_template(tokenizer, messages)
-    assert result["chat_token_ids"] == expected_ids, (
-        f"token_ids mismatch: got {len(result['chat_token_ids'])} tokens, "
+    assert result["token_ids"] == expected_ids, (
+        f"token_ids mismatch: got {len(result['token_ids'])} tokens, "
         f"expected {len(expected_ids)}"
     )
 
@@ -102,10 +102,10 @@ def test_token_ids_match_apply_chat_template(tokenizer, messages):
 ])
 def test_segment_content_matches_messages(tokenizer, messages):
     result = _tokenize_trajectory(_clean_messages(messages), TOKENIZER_NAME)
-    text = result["chat_text"]
-    token_ids = result["chat_token_ids"]
+    text = result["text"]
+    token_ids = result["token_ids"]
 
-    for span in result["message_spans"]:
+    for span in result["segments"]:
         idx = span["message_idx"]
         expected_content = messages[idx]["content"]
         span_tokens = token_ids[span["start_token"]:span["end_token"]]
@@ -129,7 +129,7 @@ def test_segment_content_matches_messages(tokenizer, messages):
 ])
 def test_segments_do_not_overlap(tokenizer, messages):
     result = _tokenize_trajectory(_clean_messages(messages), TOKENIZER_NAME)
-    spans = result["message_spans"]
+    spans = result["segments"]
     for i in range(len(spans) - 1):
         assert spans[i]["end_token"] <= spans[i + 1]["start_token"], (
             f"Spans {i} and {i+1} overlap: "
@@ -144,7 +144,7 @@ def test_segments_do_not_overlap(tokenizer, messages):
 
 def test_repeated_roles_found_in_order(tokenizer):
     result = _tokenize_trajectory(_clean_messages(REPEATED_CONTENT_MESSAGES), TOKENIZER_NAME)
-    spans = result["message_spans"]
+    spans = result["segments"]
     # Both "Do the thing." user turns must be at different token positions
     user_spans = [s for s in spans if s["role"] == "user"]
     assert len(user_spans) == 2
@@ -158,8 +158,8 @@ def test_repeated_roles_found_in_order(tokenizer):
 
 def test_think_block_inside_assistant_segment(tokenizer):
     result = _tokenize_trajectory(_clean_messages(THINK_MESSAGES), TOKENIZER_NAME)
-    token_ids = result["chat_token_ids"]
-    assistant_span = next(s for s in result["message_spans"] if s["role"] == "assistant")
+    token_ids = result["token_ids"]
+    assistant_span = next(s for s in result["segments"] if s["role"] == "assistant")
     span_tokens = token_ids[assistant_span["start_token"]:assistant_span["end_token"]]
     decoded = tokenizer.decode(span_tokens)
     assert "<think>" in decoded
@@ -174,7 +174,7 @@ def test_think_block_inside_assistant_segment(tokenizer):
 def test_unknown_role_does_not_crash(tokenizer):
     result = _tokenize_trajectory(_clean_messages(UNKNOWN_ROLE_MESSAGES), TOKENIZER_NAME)
     # exit message is included in spans even with empty content (n_tokens=0)
-    roles = [s["role"] for s in result["message_spans"]]
+    roles = [s["role"] for s in result["segments"]]
     assert "exit" in roles
     assert "system" in roles
     assert "user" in roles
