@@ -7,7 +7,7 @@
 # --- Model / vLLM ---
 model_id: Qwen/Qwen3.5-2B
 served_model_name: qwen35-2b
-tensor_parallel_size: 4
+tensor_parallel_size: 1
 max_model_len: 262144
 dtype: bfloat16
 gpu_memory_utilization: 0.9
