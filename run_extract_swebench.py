@@ -2,21 +2,20 @@
 
 Each trajectory is a single linearized token sequence.  An extraction_mask marks
 assistant-turn tokens; hidden states are extracted at masked positions strided by
-gen_config.stride.  One .pt file is written per trajectory.
+gen_config.stride.  One .pt file is written per trajectory (activations only — no
+labels).  Use run_attach_labels_swebench.py (CPU-only) to attach probe labels.
 
 Example usage:
     uv run python run_extract_swebench.py \
         --model-config configs/models/qwen36_27b.yaml \
         --generation-config configs/generation.yaml \
         --traj-dir generations/swebench/qwen36_27b_test \
-        --probe will_resolve \
         --output-dir outputs/swebench \
         --shard-rank 0 --num-shards 1
 """
 from __future__ import annotations
 
 import argparse
-import json
 import random
 from pathlib import Path
 
@@ -24,9 +23,7 @@ import numpy as np
 import torch
 
 from src.configs import GenerationConfig, ModelConfig, load_config
-from src.probes.base import EditEvent, TrajectoryContext
 from src.tasks.swe_bench_extract import load_trajectories
-from src.tasks.swe_bench_label_map import map_edit_labels_to_positions
 
 
 def _set_seeds(seed: int) -> None:
@@ -50,48 +47,21 @@ def _load_model_adapter(adapter_name: str):
     raise ValueError(f"Unknown model adapter: {adapter_name!r}")
 
 
-def _load_probe(probe_name: str):
-    if probe_name == "will_resolve":
-        from src.probes.will_resolve import WillResolveProbe
-        return WillResolveProbe()
-    if probe_name == "will_be_correct":
-        from src.probes.will_be_correct import WillBeCorrectProbe
-        return WillBeCorrectProbe()
-    if probe_name == "currently_compiles_swe":
-        from src.probes.currently_compiles_swe import CurrentlyCompilesSwEProbe
-        return CurrentlyCompilesSwEProbe()
-    if probe_name == "currently_correct_swe":
-        from src.probes.currently_correct_swe import CurrentlyCorrectSweProbe
-        return CurrentlyCorrectSweProbe()
-    if probe_name == "currently_has_regressions":
-        from src.probes.currently_has_regressions import CurrentlyHasRegressionsProbe
-        return CurrentlyHasRegressionsProbe()
-    if probe_name == "currently_reduces_failing":
-        from src.probes.currently_reduces_failing import CurrentlyReducesFailingProbe
-        return CurrentlyReducesFailingProbe()
-    raise ValueError(f"Unknown probe: {probe_name!r}")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-config", required=True)
     parser.add_argument("--generation-config", required=True)
     parser.add_argument("--traj-dir", required=True, help="Directory of trajectory JSON files")
-    parser.add_argument("--probe", nargs="+", required=True)
     parser.add_argument("--output-dir", default="outputs/swebench")
     parser.add_argument("--shard-rank", type=int, default=0)
     parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument("--extraction-batch-size", type=int, default=None,
                         help="Override gen_config.extraction_batch_size")
-    parser.add_argument("--label-dir", default=None,
-                        help="Directory of _labels.json files from run_labeler.py")
     args = parser.parse_args()
 
     model_config: ModelConfig = load_config(args.model_config, ModelConfig)
     gen_config: GenerationConfig = load_config(args.generation_config, GenerationConfig)
     _set_seeds(gen_config.seed)
-
-    probes = [_load_probe(name) for name in args.probe]
 
     print(f"Loading trajectories from {args.traj_dir}...")
     all_trajs = load_trajectories(args.traj_dir)
@@ -134,53 +104,8 @@ def main() -> None:
             hs = per_seq_hs[0]
             n_steps = min(len(v) for v in hs.values()) if hs else 0
 
-            # Load per-edit labels and build edit_history
-            sorted_edits: list[dict] = []
-            edit_history: list[EditEvent] = []
-            if args.label_dir is not None:
-                label_path = Path(args.label_dir) / f"{traj.instance_id}_labels.json"
-                if label_path.exists():
-                    label_data = json.loads(label_path.read_text())
-                    sorted_edits = sorted(label_data.get("edits", []), key=lambda e: e["cmd_idx"])
-                    edit_history = [
-                        EditEvent(
-                            step_idx=e["cmd_idx"],
-                            code="",
-                            test_results=e.get("test_results"),
-                            compiles=e.get("compiles"),
-                        )
-                        for e in sorted_edits
-                    ]
-
-            ctx = TrajectoryContext(
-                sample={"outcome": traj.outcome, "instance_id": traj.instance_id},
-                generated_text="",
-                edit_history=edit_history,
-                n_captured_steps=n_steps,
-            )
-
-            labels = {}
-            for probe in probes:
-                try:
-                    raw = probe.compute_label(ctx)
-                except NotImplementedError:
-                    raw = [None] * len(sorted_edits) if probe.is_dynamic else None
-
-                if probe.is_dynamic and isinstance(raw, list):
-                    labels[probe.name] = map_edit_labels_to_positions(
-                        segments=traj.segments,
-                        messages=traj.messages,
-                        sorted_edits=sorted_edits,
-                        extraction_mask=traj.extraction_mask,
-                        stride=stride,
-                        edit_labels=raw,
-                    )
-                else:
-                    labels[probe.name] = raw
-
             out = {
                 "activations": hs,
-                "labels": labels,
                 "instance_id": traj.instance_id,
                 "sample_id": traj.instance_id,
                 "group_id": traj.instance_id,

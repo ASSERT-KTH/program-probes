@@ -1,12 +1,12 @@
 #!/bin/bash
-# Extract hidden states from SWE-bench trajectories for probe training.
+# Extract hidden states from SWE-bench trajectories (activations only, no labels).
+# Use slurm/attach_labels_swebench.sh (CPU) to attach probe labels afterwards.
 #
 # Single shard:
 #   sbatch slurm/extract_swebench.sh \
 #     --model-config configs/models/qwen36_27b.yaml \
 #     --generation-config configs/generation.yaml \
 #     --traj-dir generations/swebench/qwen36_27b_test \
-#     --probe will_resolve \
 #     --output-dir outputs/swebench/qwen36_27b_test
 #
 # Array job (4 shards):
@@ -14,7 +14,6 @@
 #     --model-config configs/models/qwen36_27b.yaml \
 #     --generation-config configs/generation.yaml \
 #     --traj-dir generations/swebench/qwen36_27b_test \
-#     --probe will_resolve \
 #     --output-dir outputs/swebench/qwen36_27b_test
 #
 #SBATCH -J pp-extract-swebench
