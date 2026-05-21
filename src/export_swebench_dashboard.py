@@ -50,22 +50,66 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     return max(pos / total, 1 - pos / total)
 
 
-def _load_traj_messages(traj_dir: Path, instance_id: str) -> tuple[list[dict], int, int]:
-    """Load messages, total token count, and turn count from a trajectory JSON.
+def _per_turn_labels(segments: list[dict], n_tokens: int, label_seq: list) -> list:
+    """Return one label per assistant turn — the value at the last extracted position in that turn.
 
-    Returns (messages, n_tokens, n_turns). messages contains only role+content.
+    Infers stride from total assistant tokens vs label sequence length.
+    """
+    mask = [0] * n_tokens
+    for seg in segments:
+        if seg.get("role") == "assistant":
+            for pos in range(seg["start_token"], min(seg["end_token"], n_tokens)):
+                mask[pos] = 1
+
+    total_asst = sum(mask)
+    n_labels = len(label_seq)
+    if n_labels == 0 or total_asst == 0:
+        asst_count = sum(1 for s in segments if s.get("role") == "assistant")
+        return [None] * asst_count
+
+    stride = max(1, round(total_asst / n_labels))
+
+    # Build list of strided extracted positions with their label index
+    extracted: list[int] = []
+    counter = 0
+    for pos, m in enumerate(mask):
+        if m == 1:
+            if counter % stride == 0:
+                extracted.append(pos)
+            counter += 1
+
+    # For each assistant segment, find the last extracted position and its label
+    result = []
+    for seg in segments:
+        if seg.get("role") != "assistant":
+            continue
+        start, end = seg["start_token"], min(seg["end_token"], n_tokens)
+        # Last extracted position within this segment
+        seg_extracted = [i for i, pos in enumerate(extracted) if start <= pos < end]
+        if seg_extracted:
+            result.append(label_seq[seg_extracted[-1]])
+        else:
+            result.append(None)
+    return result
+
+
+def _load_traj_data(traj_dir: Path, instance_id: str) -> tuple[list[dict], list[dict], int, int]:
+    """Load messages, segments, total token count, and turn count from a trajectory JSON.
+
+    Returns (messages, segments, n_tokens, n_turns). messages contains only role+content.
     """
     fname = traj_dir / f"{instance_id.replace('/', '_')}.json"
     if not fname.exists():
-        return [], 0, 0
+        return [], [], 0, 0
     with open(fname) as f:
         traj = json.load(f)
     messages = [{"role": m["role"], "content": m.get("content", "")}
                 for m in traj.get("messages", [])]
     tok = traj.get("tokenization", {})
+    segments = tok.get("segments", [])
     n_tokens = len(tok.get("token_ids", []))
-    n_turns = sum(1 for s in tok.get("segments", []) if s.get("role") == "assistant")
-    return messages, n_tokens, n_turns
+    n_turns = sum(1 for s in segments if s.get("role") == "assistant")
+    return messages, segments, n_tokens, n_turns
 
 
 def export_swebench_dashboard(
@@ -105,8 +149,9 @@ def export_swebench_dashboard(
 
         # Load messages and accurate token/turn counts from trajectory JSON if available
         messages: list[dict] = []
+        segments: list[dict] = []
         if traj_path:
-            messages, n_tokens, n_turns = _load_traj_messages(traj_path, instance_id)
+            messages, segments, n_tokens, n_turns = _load_traj_data(traj_path, instance_id)
         else:
             n_tokens = data.get("n_tokens", n_captured_steps)
             n_turns = data.get("n_turns", None)
@@ -117,13 +162,15 @@ def export_swebench_dashboard(
         stats_outcomes.append(outcome)
 
         label_entry: dict = {}
+        per_turn_labels: dict[str, list] = {}
         for probe_name in probe_names:
             lbl = labels.get(probe_name)
             if isinstance(lbl, list):
                 label_entry[probe_name] = lbl
                 probe_trans[probe_name].append(_compute_transitions(lbl))
+                if segments:
+                    per_turn_labels[probe_name] = _per_turn_labels(segments, n_tokens, lbl)
             else:
-                # scalar probe — use outcome as trajectory-level label
                 label_entry[probe_name] = outcome
                 probe_trans[probe_name].append({"total": 0, "false_to_true": 0, "true_to_false": 0})
 
@@ -136,6 +183,7 @@ def export_swebench_dashboard(
                 "generation_idx": 0,
                 "outcome": outcome,
                 "labels": label_entry,
+                "per_turn_labels": per_turn_labels,
             }],
         })
 

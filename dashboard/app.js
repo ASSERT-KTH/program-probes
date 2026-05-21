@@ -509,14 +509,36 @@ function renderDetail() {
       historyEl.className = "message-history";
       historyEl.style.display = "none";
 
+      const perTurnLabels = gen?.per_turn_labels ?? {};
+      let assistantTurnIdx = 0;
+
       for (const msg of sample.messages) {
         const bubble = document.createElement("div");
         bubble.className = `message-bubble message-${msg.role}`;
 
-        const roleEl = document.createElement("div");
+        const roleRow = document.createElement("div");
+        roleRow.className = "message-role-row";
+
+        const roleEl = document.createElement("span");
         roleEl.className = "message-role";
         roleEl.textContent = msg.role;
-        bubble.appendChild(roleEl);
+        roleRow.appendChild(roleEl);
+
+        // For assistant turns, show current probe label values
+        if (msg.role === "assistant") {
+          for (const [probeName, turnLabels] of Object.entries(perTurnLabels)) {
+            const val = turnLabels[assistantTurnIdx] ?? null;
+            const badge = document.createElement("span");
+            badge.className = "message-probe-badge " +
+              (val === true ? "label-true" : val === false ? "label-false" : "label-none");
+            badge.textContent = probeName.replace(/_swe$/, "").replace(/_/g, " ") +
+              ": " + (val === null ? "?" : val ? "✓" : "✗");
+            roleRow.appendChild(badge);
+          }
+          assistantTurnIdx++;
+        }
+
+        bubble.appendChild(roleRow);
 
         const contentEl = document.createElement("pre");
         contentEl.className = "message-content";

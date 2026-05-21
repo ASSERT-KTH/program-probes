@@ -328,12 +328,26 @@ header h1 { font-size: 18px; font-weight: 600; }
 .message-user   { background: #eef2ff; border-left: 3px solid #5566cc; }
 .message-assistant { background: #f0faf0; border-left: 3px solid #4caf50; }
 
+.message-role-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .message-role {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #666;
+}
+
+.message-probe-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .message-content {
