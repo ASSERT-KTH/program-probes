@@ -25,6 +25,7 @@ export LIBRARY_PATH="/usr/local/cuda/lib64:${LIBRARY_PATH:-}"
 export CUDA_HOME=/usr/local/cuda
 export PATH="/usr/local/cuda/bin:$PATH"
 export SSL_CERT_FILE=/etc/pki/tls/cert.pem
+export TRITON_CACHE_DIR=/tmp/triton_cache_${SLURM_JOB_ID}
 
 RANK=${SLURM_ARRAY_TASK_ID:-0}
 NUM_SHARDS=${NUM_SHARDS:-${SLURM_ARRAY_TASK_COUNT:-1}}

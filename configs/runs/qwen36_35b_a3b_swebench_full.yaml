@@ -12,7 +12,7 @@ max_model_len: 262144
 dtype: bfloat16
 gpu_memory_utilization: 0.9
 vllm_port: 18000
-vllm_startup_timeout_s: 900
+vllm_startup_timeout_s: 1800
 vllm_log_path: logs/vllm_qwen36_35b_a3b_swebench_full.log
 vllm_extra_args:
   - "--reasoning-parser"
@@ -31,9 +31,9 @@ step_limit: 100
 command_timeout: 180
 
 # --- Execution ---
-n_runs: 1
+n_runs: 10
 n_instances: -1
-n_workers: 16
+n_workers: 25
 modal_app_name: program-probes-swebench
 modal_timeout: 3600
 output_dir: generations/swebench/qwen36_35b_a3b_full
