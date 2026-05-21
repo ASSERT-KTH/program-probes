@@ -509,7 +509,8 @@ function renderDetail() {
       historyEl.className = "message-history";
       historyEl.style.display = "none";
 
-      const perTurnLabels = gen?.per_turn_labels ?? {};
+      const gen0 = sample.generations?.[0];
+      const perTurnLabels = gen0?.per_turn_labels ?? {};
       let assistantTurnIdx = 0;
 
       for (const msg of sample.messages) {
