@@ -24,9 +24,9 @@ import numpy as np
 import torch
 
 from src.configs import GenerationConfig, ModelConfig, load_config
-from src.probes.base import TrajectoryContext
+from src.probes.base import EditEvent, TrajectoryContext
 from src.tasks.swe_bench_extract import load_trajectories
-from src.tasks.swe_bench_label_map import build_label_sequence
+from src.tasks.swe_bench_label_map import map_edit_labels_to_positions
 
 
 def _set_seeds(seed: int) -> None:
@@ -54,12 +54,21 @@ def _load_probe(probe_name: str):
     if probe_name == "will_resolve":
         from src.probes.will_resolve import WillResolveProbe
         return WillResolveProbe()
+    if probe_name == "will_be_correct":
+        from src.probes.will_be_correct import WillBeCorrectProbe
+        return WillBeCorrectProbe()
     if probe_name == "currently_compiles_swe":
         from src.probes.currently_compiles_swe import CurrentlyCompilesSwEProbe
         return CurrentlyCompilesSwEProbe()
     if probe_name == "currently_correct_swe":
         from src.probes.currently_correct_swe import CurrentlyCorrectSweProbe
         return CurrentlyCorrectSweProbe()
+    if probe_name == "currently_has_regressions":
+        from src.probes.currently_has_regressions import CurrentlyHasRegressionsProbe
+        return CurrentlyHasRegressionsProbe()
+    if probe_name == "currently_reduces_failing":
+        from src.probes.currently_reduces_failing import CurrentlyReducesFailingProbe
+        return CurrentlyReducesFailingProbe()
     raise ValueError(f"Unknown probe: {probe_name!r}")
 
 
@@ -125,38 +134,49 @@ def main() -> None:
             hs = per_seq_hs[0]
             n_steps = min(len(v) for v in hs.values()) if hs else 0
 
-            # Load per-edit labels if available and build label sequences
-            label_sequences: dict[str, list] = {}
+            # Load per-edit labels and build edit_history
+            sorted_edits: list[dict] = []
+            edit_history: list[EditEvent] = []
             if args.label_dir is not None:
                 label_path = Path(args.label_dir) / f"{traj.instance_id}_labels.json"
                 if label_path.exists():
                     label_data = json.loads(label_path.read_text())
-                    for probe_key in ("currently_compiles", "currently_correct"):
-                        label_sequences[f"label_sequence_{probe_key}"] = build_label_sequence(
-                            segments=traj.segments,
-                            messages=traj.messages,
-                            edits=label_data.get("edits", []),
-                            extraction_mask=traj.extraction_mask,
-                            stride=stride,
-                            probe=probe_key,
+                    sorted_edits = sorted(label_data.get("edits", []), key=lambda e: e["cmd_idx"])
+                    edit_history = [
+                        EditEvent(
+                            step_idx=e["cmd_idx"],
+                            code="",
+                            test_results=e.get("test_results"),
+                            compiles=e.get("compiles"),
                         )
+                        for e in sorted_edits
+                    ]
 
             ctx = TrajectoryContext(
-                sample={
-                    "outcome": traj.outcome,
-                    "instance_id": traj.instance_id,
-                    **label_sequences,
-                },
+                sample={"outcome": traj.outcome, "instance_id": traj.instance_id},
                 generated_text="",
+                edit_history=edit_history,
                 n_captured_steps=n_steps,
             )
 
             labels = {}
             for probe in probes:
                 try:
-                    labels[probe.name] = probe.compute_label(ctx)
+                    raw = probe.compute_label(ctx)
                 except NotImplementedError:
-                    labels[probe.name] = [None] * n_steps if probe.is_dynamic else None
+                    raw = [None] * len(sorted_edits) if probe.is_dynamic else None
+
+                if probe.is_dynamic and isinstance(raw, list):
+                    labels[probe.name] = map_edit_labels_to_positions(
+                        segments=traj.segments,
+                        messages=traj.messages,
+                        sorted_edits=sorted_edits,
+                        extraction_mask=traj.extraction_mask,
+                        stride=stride,
+                        edit_labels=raw,
+                    )
+                else:
+                    labels[probe.name] = raw
 
             out = {
                 "activations": hs,

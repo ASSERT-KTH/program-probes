@@ -15,6 +15,80 @@ baseline label (cmd_idx=-1).  If no baseline edit exists, those positions get No
 from __future__ import annotations
 
 
+def map_edit_labels_to_positions(
+    segments: list[dict],
+    messages: list[dict],
+    sorted_edits: list[dict],
+    extraction_mask: list[int],
+    stride: int,
+    edit_labels: list[bool | None],
+) -> list[bool | None]:
+    """Map pre-computed per-edit labels to per-extracted-position labels.
+
+    Parameters
+    ----------
+    segments:
+        trajectory['tokenization']['segments'].
+    messages:
+        trajectory['messages'].
+    sorted_edits:
+        labels['edits'] sorted ascending by cmd_idx.
+    extraction_mask:
+        Binary vector (same length as token_ids), 1 at assistant-token positions.
+    stride:
+        Every stride-th masked position is extracted.
+    edit_labels:
+        One label per entry in sorted_edits.
+
+    Returns
+    -------
+    list[bool | None]
+        One entry per extracted position, carry-forwarded from the most recent
+        edit whose effect is visible at that position.
+    """
+    asst_message_indices = [
+        i for i, m in enumerate(messages) if m["role"] == "assistant"
+    ]
+    seg_by_message_idx = {s["message_idx"]: s for s in segments}
+    turn_token_end: list[int] = [
+        (seg_by_message_idx[idx]["end_token"] if idx in seg_by_message_idx else 0)
+        for idx in asst_message_indices
+    ]
+
+    def _turn_for_pos(pos: int) -> int:
+        for t, end in enumerate(turn_token_end):
+            if pos < end:
+                return t
+        return len(turn_token_end) - 1
+
+    extracted_positions: list[int] = []
+    stride_counter = 0
+    for pos, m in enumerate(extraction_mask):
+        if m == 1:
+            if stride_counter % stride == 0:
+                extracted_positions.append(pos)
+            stride_counter += 1
+
+    labels: list[bool | None] = []
+    for pos in extracted_positions:
+        turn = _turn_for_pos(pos)
+        current_label: bool | None = None
+        found_any = False
+        for i, edit in enumerate(sorted_edits):
+            cidx = edit["cmd_idx"]
+            # baseline applies from turn 0; a real edit at cmd_idx N is issued
+            # during turn N, but its effect is only visible from turn N+1 onwards.
+            edit_turn = 0 if cidx == -1 else cidx + 1
+            if edit_turn <= turn:
+                current_label = edit_labels[i]
+                found_any = True
+            else:
+                break
+        labels.append(current_label if found_any else None)
+
+    return labels
+
+
 def build_label_sequence(
     segments: list[dict],
     messages: list[dict],
@@ -23,45 +97,12 @@ def build_label_sequence(
     stride: int,
     probe: str,
 ) -> list[bool | None]:
-    """Return one label per extracted position.
+    """Return one label per extracted position for a named probe.
 
-    Parameters
-    ----------
-    segments:
-        trajectory['tokenization']['segments'] — each has role, message_idx,
-        start_token, end_token.
-    messages:
-        trajectory['messages'] — in order; assistant messages correspond 1:1
-        with command_history entries.
-    edits:
-        labels['edits'] from the labeler — each has cmd_idx, compiles,
-        test_results (with 'resolved' key).
-    extraction_mask:
-        Binary vector (same length as token_ids), 1 at assistant-token positions.
-    stride:
-        Every stride-th masked position is extracted.
-    probe:
-        Which label to extract: 'currently_compiles' or 'currently_correct'.
-
-    Returns
-    -------
-    list[bool | None]
-        One entry per extracted position.  None means no label is available yet
-        (before the baseline edit, if no baseline exists).
+    Convenience wrapper around map_edit_labels_to_positions that derives
+    per-edit labels from the raw edit dicts for 'currently_compiles' and
+    'currently_correct'.
     """
-    # --- 1. Build assistant turn index -> token range -----------------------
-    asst_message_indices = [
-        i for i, m in enumerate(messages) if m["role"] == "assistant"
-    ]
-    seg_by_message_idx = {s["message_idx"]: s for s in segments}
-
-    # turn_token_end[t] = last token index (exclusive) of the t-th assistant turn
-    turn_token_end: list[int] = []
-    for msg_idx in asst_message_indices:
-        seg = seg_by_message_idx.get(msg_idx)
-        turn_token_end.append(seg["end_token"] if seg else 0)
-
-    # --- 2. Build cmd_idx -> label value ------------------------------------
     def _label_for_edit(edit: dict) -> bool | None:
         if edit.get("apply_error"):
             return None
@@ -74,45 +115,6 @@ def build_label_sequence(
             return bool(resolved) if resolved is not None else None
         return None
 
-    # Sort by cmd_idx; baseline (cmd_idx=-1) sorts first naturally
     sorted_edits = sorted(edits, key=lambda e: e["cmd_idx"])
-
-    # --- 3. Compute extracted positions and their turn indices ---------------
-    extracted_positions: list[int] = []
-    stride_counter = 0
-    for pos, m in enumerate(extraction_mask):
-        if m == 1:
-            if stride_counter % stride == 0:
-                extracted_positions.append(pos)
-            stride_counter += 1
-
-    # For each extracted position, find which assistant turn it belongs to.
-    # turn_token_end[t] is the end token of turn t; we find the first t
-    # such that pos < turn_token_end[t].
-    def _turn_for_pos(pos: int) -> int:
-        for t, end in enumerate(turn_token_end):
-            if pos < end:
-                return t
-        return len(turn_token_end) - 1
-
-    # --- 4. Assign carry-forward labels -------------------------------------
-    labels: list[bool | None] = []
-    for pos in extracted_positions:
-        turn = _turn_for_pos(pos)
-        # Find the most recent edit at or before this turn
-        current_label: bool | None = None
-        found_any = False
-        for edit in sorted_edits:
-            cidx = edit["cmd_idx"]
-            # baseline applies from turn 0; a real edit at cmd_idx N is issued
-            # during turn N, but its effect is only visible from turn N+1 onwards
-            # (the model sees the result in the next tool-response message).
-            edit_turn = 0 if cidx == -1 else cidx + 1
-            if edit_turn <= turn:
-                current_label = _label_for_edit(edit)
-                found_any = True
-            else:
-                break
-        labels.append(current_label if found_any else None)
-
-    return labels
+    edit_labels = [_label_for_edit(e) for e in sorted_edits]
+    return map_edit_labels_to_positions(segments, messages, sorted_edits, extraction_mask, stride, edit_labels)
