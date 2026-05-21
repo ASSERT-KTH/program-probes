@@ -10,7 +10,7 @@ Example usage:
         --traj-dir generations/swebench/qwen36_27b_test \
         --label-dir generations/swebench/qwen36_27b_test/labels \
         --output-dir outputs/swebench/qwen36_27b_test_labeled \
-        --probe will_resolve currently_correct_swe \
+        --probe will_resolve currently_correct \
         --generation-config configs/generation.yaml
 """
 from __future__ import annotations
@@ -34,12 +34,12 @@ def _load_probe(probe_name: str):
     if probe_name == "will_be_correct":
         from src.probes.will_be_correct import WillBeCorrectProbe
         return WillBeCorrectProbe()
-    if probe_name == "currently_compiles_swe":
-        from src.probes.currently_compiles_swe import CurrentlyCompilesSwEProbe
-        return CurrentlyCompilesSwEProbe()
-    if probe_name == "currently_correct_swe":
-        from src.probes.currently_correct_swe import CurrentlyCorrectSweProbe
-        return CurrentlyCorrectSweProbe()
+    if probe_name == "currently_compiles":
+        from src.probes.currently_compiles import CurrentlyCompilesProbe
+        return CurrentlyCompilesProbe()
+    if probe_name == "currently_correct":
+        from src.probes.currently_correct import CurrentlyCorrectProbe
+        return CurrentlyCorrectProbe()
     if probe_name == "currently_has_regressions":
         from src.probes.currently_has_regressions import CurrentlyHasRegressionsProbe
         return CurrentlyHasRegressionsProbe()

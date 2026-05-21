@@ -3,7 +3,8 @@
 Usage:
     uv run python run_export_swebench_dashboard.py \\
         --run-id qwen36_27b_full_labeled \\
-        --probe will_resolve currently_compiles_swe currently_correct_swe \\
+        --probe will_resolve currently_compiles currently_correct \
+               currently_has_regressions currently_reduces_failing will_be_correct \\
         --model-config configs/models/qwen36_27b.yaml \\
         --output-dir outputs/swebench \\
         --results-dir results/swebench \\

@@ -7,7 +7,7 @@
 #     --traj-dir generations/swebench/qwen36_27b_test \
 #     --label-dir generations/swebench/qwen36_27b_test/labels \
 #     --output-dir outputs/swebench/qwen36_27b_test_labeled \
-#     --probe will_resolve currently_correct_swe \
+#     --probe will_resolve currently_correct \
 #     --generation-config configs/generation.yaml
 #
 #SBATCH -J pp-attach-labels-swebench
