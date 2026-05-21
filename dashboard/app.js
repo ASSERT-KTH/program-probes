@@ -488,7 +488,7 @@ function renderDetail() {
   const sample = state.samples[state.selectedSampleIdx];
   container.innerHTML = "";
 
-  // For agentic runs show instance metadata instead of prompt
+  // For agentic runs show instance metadata + message history
   if (state.meta?.is_agentic) {
     const meta = document.createElement("div");
     meta.className = "detail-meta";
@@ -498,6 +498,43 @@ function renderDetail() {
       <span class="label-badge ${resolved ? "label-true" : "label-false"}">${resolved ? "resolved" : "unresolved"}</span>
     `;
     container.appendChild(meta);
+
+    if (sample.messages?.length > 0) {
+      const historyToggle = document.createElement("div");
+      historyToggle.className = "prompt-toggle";
+      historyToggle.textContent = `▶ Message history (${sample.messages.length} messages)`;
+      let historyVisible = false;
+
+      const historyEl = document.createElement("div");
+      historyEl.className = "message-history";
+      historyEl.style.display = "none";
+
+      for (const msg of sample.messages) {
+        const bubble = document.createElement("div");
+        bubble.className = `message-bubble message-${msg.role}`;
+
+        const roleEl = document.createElement("div");
+        roleEl.className = "message-role";
+        roleEl.textContent = msg.role;
+        bubble.appendChild(roleEl);
+
+        const contentEl = document.createElement("pre");
+        contentEl.className = "message-content";
+        contentEl.textContent = msg.content ?? "";
+        bubble.appendChild(contentEl);
+
+        historyEl.appendChild(bubble);
+      }
+
+      historyToggle.addEventListener("click", () => {
+        historyVisible = !historyVisible;
+        historyEl.style.display = historyVisible ? "flex" : "none";
+        historyToggle.textContent = `${historyVisible ? "▼" : "▶"} Message history (${sample.messages.length} messages)`;
+      });
+
+      container.appendChild(historyToggle);
+      container.appendChild(historyEl);
+    }
   } else {
     const promptToggle = document.createElement("div");
     promptToggle.className = "prompt-toggle";

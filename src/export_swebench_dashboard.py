@@ -50,6 +50,24 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     return max(pos / total, 1 - pos / total)
 
 
+def _load_traj_messages(traj_dir: Path, instance_id: str) -> tuple[list[dict], int, int]:
+    """Load messages, total token count, and turn count from a trajectory JSON.
+
+    Returns (messages, n_tokens, n_turns). messages contains only role+content.
+    """
+    fname = traj_dir / f"{instance_id.replace('/', '_')}.json"
+    if not fname.exists():
+        return [], 0, 0
+    with open(fname) as f:
+        traj = json.load(f)
+    messages = [{"role": m["role"], "content": m.get("content", "")}
+                for m in traj.get("messages", [])]
+    tok = traj.get("tokenization", {})
+    n_tokens = len(tok.get("token_ids", []))
+    n_turns = sum(1 for s in tok.get("segments", []) if s.get("role") == "assistant")
+    return messages, n_tokens, n_turns
+
+
 def export_swebench_dashboard(
     run_id: str,
     probe_names: list[str],
@@ -59,6 +77,7 @@ def export_swebench_dashboard(
     results_dir: str = "results/swebench",
     cache_dir: str = "cache/swebench",
     dashboard_dir: str = "dashboard",
+    traj_dir: str | None = None,
     n_bins: int = 10,
 ) -> None:
     data_dir = Path(dashboard_dir) / "data"
@@ -68,6 +87,8 @@ def export_swebench_dashboard(
     in_dir = Path(output_dir) / run_id
     pt_files = sorted(in_dir.glob("*.pt"))
     print(f"[export] {len(pt_files)} .pt files in {in_dir}")
+
+    traj_path = Path(traj_dir) if traj_dir else None
 
     samples_list = []
     stats_n_tokens: list[int] = []
@@ -80,12 +101,18 @@ def export_swebench_dashboard(
         instance_id = data["instance_id"]
         outcome = bool(data.get("outcome", False))
         n_captured_steps = data.get("n_captured_steps", 0)
-        n_tokens = data.get("n_tokens", n_captured_steps)
-        n_turns = data.get("n_turns", None)
         labels = data["labels"]
 
+        # Load messages and accurate token/turn counts from trajectory JSON if available
+        messages: list[dict] = []
+        if traj_path:
+            messages, n_tokens, n_turns = _load_traj_messages(traj_path, instance_id)
+        else:
+            n_tokens = data.get("n_tokens", n_captured_steps)
+            n_turns = data.get("n_turns", None)
+
         stats_n_tokens.append(n_tokens)
-        if n_turns is not None:
+        if n_turns:
             stats_n_turns.append(n_turns)
         stats_outcomes.append(outcome)
 
@@ -103,11 +130,10 @@ def export_swebench_dashboard(
         samples_list.append({
             "sample_id": instance_id,
             "group_id": instance_id,
-            "prompt": "",
             "outcome": outcome,
+            "messages": messages,
             "generations": [{
                 "generation_idx": 0,
-                "generated_text": "",
                 "outcome": outcome,
                 "labels": label_entry,
             }],

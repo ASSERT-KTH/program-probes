@@ -23,6 +23,8 @@ def main():
     parser.add_argument("--results-dir", default="results/swebench")
     parser.add_argument("--cache-dir", default="cache/swebench")
     parser.add_argument("--dashboard-dir", default="dashboard")
+    parser.add_argument("--traj-dir", default=None,
+                        help="Directory of trajectory JSONs; if provided, loads messages and accurate token/turn counts")
     parser.add_argument("--n-bins", type=int, default=10)
     args = parser.parse_args()
 
@@ -37,6 +39,7 @@ def main():
         results_dir=args.results_dir,
         cache_dir=args.cache_dir,
         dashboard_dir=args.dashboard_dir,
+        traj_dir=args.traj_dir,
         n_bins=args.n_bins,
     )
 
