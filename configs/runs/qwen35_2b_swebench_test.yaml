@@ -12,7 +12,7 @@ max_model_len: 262144
 dtype: bfloat16
 gpu_memory_utilization: 0.9
 vllm_port: 18000
-vllm_startup_timeout_s: 300
+vllm_startup_timeout_s: 600
 vllm_log_path: logs/vllm_qwen35_2b_swebench_test.log
 vllm_extra_args:
   - "--reasoning-parser"
