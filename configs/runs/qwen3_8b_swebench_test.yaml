@@ -20,7 +20,7 @@ max_new_tokens: 4096
 top_p: 0.95
 
 # --- Agent ---
-step_limit: 250
+step_limit: 100
 command_timeout: 180     # seconds per bash command in Modal sandbox
 
 # --- Execution ---

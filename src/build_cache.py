@@ -9,7 +9,7 @@ def build_cache(
     cache_dir: str = "cache",
 ) -> None:
     in_dir = Path(output_dir) / run_id
-    pt_files = sorted(in_dir.glob("*.pt"))
+    pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
     if not pt_files:
         raise FileNotFoundError(f"No .pt files found in {in_dir}")
 
@@ -32,7 +32,11 @@ def build_cache(
                 if fi % 500 == 0:
                     print(f"    file {fi}/{len(pt_files)}: {f.name}", flush=True)
                 data = torch.load(f, weights_only=False)
-                label = data["labels"].get(probe_name)
+                label_path = f.parent / f"{f.stem}_labels.pt"
+                if label_path.exists():
+                    label = torch.load(label_path, weights_only=False)["labels"].get(probe_name)
+                else:
+                    label = data.get("labels", {}).get(probe_name)
                 sample = data["sample_id"]
                 group = data["group_id"]
 

@@ -1,15 +1,15 @@
 """Attach probe labels to activation .pt files produced by run_extract_swebench.py.
 
 CPU-only step: reads activation .pt files and trajectory JSON files, computes
-probe labels via carry-forward, and writes new .pt files with a `labels` dict
-added.  Re-run this whenever label logic changes — no GPU needed.
+probe labels via carry-forward, and writes a companion `<instance_id>_labels.pt`
+file in the same directory.  Re-run this whenever label logic changes — no GPU
+needed.
 
 Example usage:
     uv run python run_attach_labels_swebench.py \
         --input-dir outputs/swebench/qwen36_27b_test \
         --traj-dir generations/swebench/qwen36_27b_test \
-        --label-dir generations/swebench/qwen36_27b_test/labels \
-        --output-dir outputs/swebench/qwen36_27b_test_labeled \
+        --label-dir labels/swebench/qwen36_27b_test \
         --probe will_resolve currently_correct \
         --generation-config configs/generation.yaml
 """
@@ -57,8 +57,6 @@ def main() -> None:
                         help="Directory of trajectory JSON files")
     parser.add_argument("--label-dir", required=True,
                         help="Directory of _labels.json files from run_labeler.py")
-    parser.add_argument("--output-dir", required=True,
-                        help="Where to write labeled .pt files")
     parser.add_argument("--probe", nargs="+", required=True,
                         help="Probe name(s) to attach")
     parser.add_argument("--generation-config", required=True,
@@ -80,10 +78,8 @@ def main() -> None:
 
     input_dir = Path(args.input_dir)
     label_dir = Path(args.label_dir)
-    out_dir = Path(args.output_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
 
-    pt_files = sorted(input_dir.glob("*.pt"))
+    pt_files = sorted(f for f in input_dir.glob("*.pt") if not f.stem.endswith("_labels"))
     print(f"Found {len(pt_files)} activation files in {input_dir}")
 
     n_ok = 0
@@ -144,11 +140,8 @@ def main() -> None:
             else:
                 labels[probe.name] = raw
 
-        out = dict(data)
-        out["labels"] = labels
-
-        out_path = out_dir / pt_path.name
-        torch.save(out, out_path)
+        out_path = input_dir / f"{instance_id}_labels.pt"
+        torch.save({"labels": labels}, out_path)
         print(f"  Saved {out_path.name}  (n_steps={n_steps}, outcome={traj.outcome})")
         n_ok += 1
 

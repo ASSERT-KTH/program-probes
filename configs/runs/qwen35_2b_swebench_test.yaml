@@ -27,7 +27,7 @@ top_p: 0.95
 top_k: 20
 
 # --- Agent ---
-step_limit: 250
+step_limit: 100
 command_timeout: 180
 
 # --- Execution ---
