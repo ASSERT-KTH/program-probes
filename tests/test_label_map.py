@@ -64,26 +64,26 @@ def _build(n_assistant: int, tokens_per_turn: int = 10):
 class TestCmdIdxToSegment:
     def test_assistant_turn_zero_maps_to_first_assistant_segment(self):
         msgs, segs, mask, _ = _build(n_assistant=3, tokens_per_turn=10)
-        # cmd_idx=0 = first assistant turn; baseline applies before it
+        # cmd_idx=0 is issued during turn 0; effect visible from turn 1 onwards
         edits = [
             {"cmd_idx": -1, "compiles": False, "test_results": {"resolved": False}},
             {"cmd_idx": 0,  "compiles": True,  "test_results": {"resolved": False}},
         ]
         labels = build_label_sequence(segs, msgs, edits, mask, stride=1, probe="currently_compiles")
-        # First assistant segment (turn 0) should get cmd_idx=0's label (True)
-        # because turn 0 >= edit_turn 0
-        assert all(l is True for l in labels[:10]), f"first turn labels: {labels[:10]}"
+        # turn 0 still gets baseline (False); turns 1,2 get cmd_idx=0's label (True)
+        assert labels[:10] == [False] * 10, f"turn 0 should still be False: {labels[:10]}"
+        assert all(l is True for l in labels[10:]), f"turns 1,2 should be True: {labels[10:]}"
 
     def test_token_range_boundaries(self):
-        msgs, segs, mask, _ = _build(n_assistant=2, tokens_per_turn=5)
+        msgs, segs, mask, _ = _build(n_assistant=3, tokens_per_turn=5)
         edits = [
             {"cmd_idx": -1, "compiles": False, "test_results": {"resolved": False}},
             {"cmd_idx": 1,  "compiles": True,  "test_results": {"resolved": False}},
         ]
         labels = build_label_sequence(segs, msgs, edits, mask, stride=1, probe="currently_compiles")
-        # turn 0 assistant: gets baseline (False); turn 1 assistant: gets cmd_idx=1 (True)
-        assert labels[:5] == [False] * 5
-        assert labels[5:] == [True] * 5
+        # turns 0,1 get baseline (False); turn 2 gets cmd_idx=1 effect (True)
+        assert labels[:10] == [False] * 10
+        assert labels[10:] == [True] * 5
 
 
 class TestBaselineEdit:
@@ -108,10 +108,10 @@ class TestCarryForward:
             {"cmd_idx": 2,  "compiles": True,  "test_results": {"resolved": True}},
         ]
         labels = build_label_sequence(segs, msgs, edits, mask, stride=1, probe="currently_compiles")
-        # Turns 0,1 get False (baseline); turns 2,3,4 get True (cmd_idx=2)
+        # cmd_idx=2 effect visible from turn 3; turns 0,1,2 get False, turns 3,4 get True
         n_per_turn = 10
-        assert labels[:n_per_turn * 2] == [False] * (n_per_turn * 2)
-        assert labels[n_per_turn * 2:] == [True] * (n_per_turn * 3)
+        assert labels[:n_per_turn * 3] == [False] * (n_per_turn * 3)
+        assert labels[n_per_turn * 3:] == [True] * (n_per_turn * 2)
 
     def test_multiple_edits_carry_forward(self):
         msgs, segs, mask, _ = _build(n_assistant=6, tokens_per_turn=4)
@@ -121,9 +121,10 @@ class TestCarryForward:
             {"cmd_idx": 4,  "compiles": True,  "test_results": {"resolved": True}},
         ]
         labels = build_label_sequence(segs, msgs, edits, mask, stride=1, probe="currently_correct")
-        assert labels[:4]   == [False] * 4   # turn 0: baseline
-        assert labels[4:16] == [False] * 12  # turns 1,2,3: cmd_idx=1 resolved=False
-        assert labels[16:]  == [True] * 8    # turns 4,5: cmd_idx=4 resolved=True
+        # cmd_idx=1 → edit_turn=2; cmd_idx=4 → edit_turn=5
+        assert labels[:8]   == [False] * 8   # turns 0,1: baseline
+        assert labels[8:20] == [False] * 12  # turns 2,3,4: cmd_idx=1 resolved=False
+        assert labels[20:]  == [True] * 4    # turn 5: cmd_idx=4 resolved=True
 
 
 class TestNoEdits:
@@ -136,8 +137,9 @@ class TestNoEdits:
         msgs, segs, mask, _ = _build(n_assistant=4, tokens_per_turn=5)
         edits = [{"cmd_idx": 2, "compiles": True, "test_results": {"resolved": True}}]
         labels = build_label_sequence(segs, msgs, edits, mask, stride=1, probe="currently_compiles")
-        assert labels[:10] == [None] * 10   # turns 0,1: no label yet
-        assert labels[10:] == [True] * 10   # turns 2,3: cmd_idx=2
+        # cmd_idx=2 → edit_turn=3; turns 0,1,2 get None, turn 3 gets True
+        assert labels[:15] == [None] * 15   # turns 0,1,2: no label yet
+        assert labels[15:] == [True] * 5    # turn 3: cmd_idx=2 effect visible
 
 
 class TestStride:
@@ -227,16 +229,14 @@ class TestRealTrajectory:
         )
         # All labels should be non-None (baseline covers everything before turn 9)
         assert all(l is not None for l in labels)
-        # Labels after turn 9 should be True (resolved)
+        # cmd_idx=9 effect is visible from turn 10 onwards
         segs = self.traj["tokenization"]["segments"]
-        msgs = self.traj["messages"]
         asst_segs = [s for s in segs if s["role"] == "assistant"]
-        # turn 9's end token
-        turn9_end = asst_segs[9]["end_token"]
-        # find indices into labels[] corresponding to token positions >= turn9_end
+        # turn 10's start token (= end token of turn 9)
+        turn10_start = asst_segs[10]["start_token"]
         extracted = [p for p in range(len(mask)) if mask[p] == 1]  # stride=1
-        after_indices = [i for i, p in enumerate(extracted) if p >= turn9_end]
-        assert after_indices, "no extracted positions after turn 9"
+        after_indices = [i for i, p in enumerate(extracted) if p >= turn10_start]
+        assert after_indices, "no extracted positions in turn 10+"
         for idx in after_indices:
             assert labels[idx] is True, f"labels[{idx}] should be True, got {labels[idx]}"
 

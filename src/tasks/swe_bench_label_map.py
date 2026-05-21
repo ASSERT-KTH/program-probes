@@ -104,8 +104,10 @@ def build_label_sequence(
         found_any = False
         for edit in sorted_edits:
             cidx = edit["cmd_idx"]
-            # baseline edit applies from turn 0 onwards
-            edit_turn = 0 if cidx == -1 else cidx
+            # baseline applies from turn 0; a real edit at cmd_idx N is issued
+            # during turn N, but its effect is only visible from turn N+1 onwards
+            # (the model sees the result in the next tool-response message).
+            edit_turn = 0 if cidx == -1 else cidx + 1
             if edit_turn <= turn:
                 current_label = _label_for_edit(edit)
                 found_any = True
