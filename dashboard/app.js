@@ -7,6 +7,7 @@ let state = {
   meta: null,
   samples: [],
   probeResults: {},
+  stats: null,
   activeProbe: null,
   selectedSampleIdx: null,
   selectedGenIdx: 0,
@@ -41,6 +42,11 @@ async function loadRun(runId) {
     state.activeProbe = meta.probes[0] ?? null;
     state.selectedSampleIdx = null;
     state.selectedGenIdx = 0;
+    // stats.json is optional (agentic runs only)
+    state.stats = null;
+    try {
+      state.stats = await fetchJSON(`${DATA_ROOT}/${runId}/stats.json`);
+    } catch { /* non-agentic run */ }
     renderAll();
   } finally {
     setLoading(false);
@@ -74,6 +80,7 @@ async function init() {
 function renderAll() {
   renderProbeTabs();
   renderHeatmap();
+  renderStats();
   renderFilterControls();
   renderSampleList();
   renderDetail();
@@ -238,6 +245,137 @@ function renderHeatmap() {
     .text("Relative position");
 }
 
+// Panel 1: run statistics (agentic + non-agentic)
+
+function _renderHistogram(container, data, xLabel, color) {
+  if (!data || data.length === 0) return;
+  const m = { top: 10, right: 10, bottom: 36, left: 40 };
+  const w = 380 - m.left - m.right;
+  const h = 90 - m.top - m.bottom;
+
+  const thresholds = d3.thresholdSturges(data);
+  const bins = d3.bin().thresholds(thresholds)(data);
+
+  const xS = d3.scaleLinear().domain([bins[0].x0, bins[bins.length - 1].x1]).range([0, w]);
+  const yS = d3.scaleLinear().domain([0, d3.max(bins, d => d.length)]).range([h, 0]).nice();
+
+  const svg = d3.select(container).append("svg")
+    .attr("viewBox", `0 0 ${w + m.left + m.right} ${h + m.top + m.bottom}`)
+    .append("g").attr("transform", `translate(${m.left},${m.top})`);
+
+  svg.selectAll("rect").data(bins).join("rect")
+    .attr("x", d => xS(d.x0) + 1)
+    .attr("width", d => Math.max(0, xS(d.x1) - xS(d.x0) - 1))
+    .attr("y", d => yS(d.length))
+    .attr("height", d => h - yS(d.length))
+    .attr("fill", color);
+
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xS).ticks(5)).selectAll("text").style("font-size", "9px");
+  svg.append("g").call(d3.axisLeft(yS).ticks(3)).selectAll("text").style("font-size", "9px");
+  svg.append("text").attr("x", w / 2).attr("y", h + 30).attr("text-anchor", "middle").style("font-size", "10px").text(xLabel);
+}
+
+function _renderTransitionBar(container, fToT, tToF, probeName) {
+  if (fToT === 0 && tToF === 0) return;
+  const m = { top: 6, right: 10, bottom: 36, left: 90 };
+  const w = 380 - m.left - m.right;
+  const h = 50 - m.top - m.bottom;
+
+  const cats = ["F → T", "T → F"];
+  const vals = [fToT, tToF];
+  const colors = ["#4caf50", "#f44336"];
+
+  const xS = d3.scaleLinear().domain([0, d3.max(vals)]).range([0, w]).nice();
+  const yS = d3.scaleBand().domain(cats).range([0, h]).padding(0.2);
+
+  const svg = d3.select(container).append("svg")
+    .attr("viewBox", `0 0 ${w + m.left + m.right} ${h + m.top + m.bottom}`)
+    .append("g").attr("transform", `translate(${m.left},${m.top})`);
+
+  svg.selectAll("rect").data(vals).join("rect")
+    .attr("y", (_, i) => yS(cats[i]))
+    .attr("width", d => xS(d))
+    .attr("height", yS.bandwidth())
+    .attr("fill", (_, i) => colors[i]);
+
+  svg.selectAll(".val-label").data(vals).join("text")
+    .attr("class", "val-label")
+    .attr("x", d => xS(d) + 4)
+    .attr("y", (_, i) => yS(cats[i]) + yS.bandwidth() / 2 + 4)
+    .style("font-size", "9px")
+    .text(d => d);
+
+  svg.append("g").call(d3.axisLeft(yS)).selectAll("text").style("font-size", "10px");
+  svg.append("g").attr("transform", `translate(0,${h})`).call(d3.axisBottom(xS).ticks(4)).selectAll("text").style("font-size", "9px");
+  svg.append("text").attr("x", w / 2).attr("y", h + 30).attr("text-anchor", "middle").style("font-size", "10px").text("Total transitions");
+}
+
+function renderStats() {
+  const container = document.getElementById("stats-container");
+  container.innerHTML = "";
+
+  const s = state.stats;
+  const isAgentic = s?.is_agentic ?? false;
+
+  // Token size histogram (always shown, use stats if available, else n_captured_steps from samples)
+  let tokenData = s?.n_tokens ?? null;
+  if (!tokenData && state.samples.length > 0) {
+    tokenData = state.samples.map(samp => samp.generations[0]?.n_captured_steps).filter(v => v != null);
+  }
+
+  if (tokenData && tokenData.length > 0) {
+    const sep = document.createElement("div");
+    sep.className = "stats-section";
+    const title = document.createElement("div");
+    title.className = "stats-title";
+    title.textContent = "Run Statistics";
+    sep.appendChild(title);
+
+    const tokenLabel = document.createElement("div");
+    tokenLabel.className = "stats-subtitle";
+    tokenLabel.textContent = isAgentic ? "Token count per trajectory" : "Token count per generation";
+    sep.appendChild(tokenLabel);
+    _renderHistogram(sep, tokenData, "tokens", "#5566cc");
+
+    if (isAgentic && s?.n_turns?.length > 0) {
+      const turnLabel = document.createElement("div");
+      turnLabel.className = "stats-subtitle";
+      turnLabel.textContent = "Assistant turns per trajectory";
+      sep.appendChild(turnLabel);
+      _renderHistogram(sep, s.n_turns, "turns", "#888");
+    }
+
+    container.appendChild(sep);
+  }
+
+  // Per-probe transition stats (dynamic probes only)
+  if (s?.probe_transitions) {
+    for (const [probeName, pt] of Object.entries(s.probe_transitions)) {
+      if (!pt.is_dynamic) continue;
+      if (pt.total_false_to_true === 0 && pt.total_true_to_false === 0) continue;
+
+      const sec = document.createElement("div");
+      sec.className = "stats-section";
+
+      const title = document.createElement("div");
+      title.className = "stats-subtitle";
+      title.textContent = `${probeName} — label changes`;
+      sec.appendChild(title);
+
+      _renderHistogram(sec, pt.changes_per_traj, "changes per trajectory", "#f0a500");
+
+      const transTitle = document.createElement("div");
+      transTitle.className = "stats-subtitle";
+      transTitle.textContent = `${probeName} — transition direction`;
+      sec.appendChild(transTitle);
+
+      _renderTransitionBar(sec, pt.total_false_to_true, pt.total_true_to_false, probeName);
+
+      container.appendChild(sec);
+    }
+  }
+}
+
 // Panel 2: sample browser
 
 function renderFilterControls() {
@@ -256,25 +394,26 @@ function renderFilterControls() {
   });
 }
 
-function _sampleCorrectFraction(sample, probeFilter) {
+function _sampleCorrectFraction(sample) {
+  // For agentic runs, use the trajectory outcome field directly
+  if (state.meta?.is_agentic) {
+    return sample.outcome === true ? 1.0 : 0.0;
+  }
+  const probeFilter = document.getElementById("filter-probe").value || state.meta?.probes?.[0];
   const gens = sample.generations;
   if (gens.length === 0) return 0;
-  const correct = gens.filter(g => {
-    const lbl = g.labels?.[probeFilter];
-    return lbl === true;
-  }).length;
+  const correct = gens.filter(g => g.labels?.[probeFilter] === true).length;
   return correct / gens.length;
 }
 
 function renderSampleList() {
   const container = document.getElementById("sample-list");
   container.innerHTML = "";
-  const probe = document.getElementById("filter-probe").value || state.meta?.probes?.[0];
   const labelFilter = state.filterLabel;
 
   for (let i = 0; i < state.samples.length; i++) {
     const sample = state.samples[i];
-    const frac = _sampleCorrectFraction(sample, probe);
+    const frac = _sampleCorrectFraction(sample);
 
     if (labelFilter === "correct" && frac < 1.0) continue;
     if (labelFilter === "incorrect" && frac > 0.0) continue;
@@ -304,14 +443,22 @@ function renderSampleList() {
       bar.appendChild(b);
     }
 
+    // For agentic: show outcome badge; for non-agentic: show probe fraction badges
     const badges = document.createElement("div");
     badges.className = "probe-badges";
-    for (const p of (state.meta?.probes ?? [])) {
-      const trueFrac = sample.generations.filter(g => g.labels?.[p] === true).length / Math.max(nGen, 1);
+    if (state.meta?.is_agentic) {
       const badge = document.createElement("span");
-      badge.className = "probe-badge";
-      badge.textContent = `${p.replace("_", " ")}: ${(trueFrac * 100).toFixed(0)}%`;
+      badge.className = "probe-badge " + (sample.outcome ? "badge-resolved" : "badge-unresolved");
+      badge.textContent = sample.outcome ? "resolved" : "unresolved";
       badges.appendChild(badge);
+    } else {
+      for (const p of (state.meta?.probes ?? [])) {
+        const trueFrac = sample.generations.filter(g => g.labels?.[p] === true).length / Math.max(nGen, 1);
+        const badge = document.createElement("span");
+        badge.className = "probe-badge";
+        badge.textContent = `${p.replace("_", " ")}: ${(trueFrac * 100).toFixed(0)}%`;
+        badges.appendChild(badge);
+      }
     }
 
     row.appendChild(groupEl);
@@ -341,46 +488,58 @@ function renderDetail() {
   const sample = state.samples[state.selectedSampleIdx];
   container.innerHTML = "";
 
-  // Prompt
-  const promptToggle = document.createElement("div");
-  promptToggle.className = "prompt-toggle";
-  promptToggle.textContent = "▶ Prompt";
-  let promptVisible = false;
-  const promptEl = document.createElement("pre");
-  promptEl.className = "prompt-block";
-  promptEl.style.display = "none";
-  promptEl.textContent = sample.prompt;
-  promptToggle.addEventListener("click", () => {
-    promptVisible = !promptVisible;
-    promptEl.style.display = promptVisible ? "block" : "none";
-    promptToggle.textContent = (promptVisible ? "▼ " : "▶ ") + "Prompt";
-  });
-  container.appendChild(promptToggle);
-  container.appendChild(promptEl);
-
-  // Generation tabs
-  const genTabs = document.createElement("div");
-  genTabs.className = "gen-tabs";
-  for (let gi = 0; gi < sample.generations.length; gi++) {
-    const tab = document.createElement("button");
-    tab.className = "gen-tab" + (gi === state.selectedGenIdx ? " active" : "");
-    tab.textContent = `Gen ${gi}`;
-    tab.addEventListener("click", () => {
-      state.selectedGenIdx = gi;
-      renderDetail();
+  // For agentic runs show instance metadata instead of prompt
+  if (state.meta?.is_agentic) {
+    const meta = document.createElement("div");
+    meta.className = "detail-meta";
+    const resolved = sample.outcome;
+    meta.innerHTML = `
+      <span class="detail-meta-id">${sample.sample_id}</span>
+      <span class="label-badge ${resolved ? "label-true" : "label-false"}">${resolved ? "resolved" : "unresolved"}</span>
+    `;
+    container.appendChild(meta);
+  } else {
+    const promptToggle = document.createElement("div");
+    promptToggle.className = "prompt-toggle";
+    promptToggle.textContent = "▶ Prompt";
+    let promptVisible = false;
+    const promptEl = document.createElement("pre");
+    promptEl.className = "prompt-block";
+    promptEl.style.display = "none";
+    promptEl.textContent = sample.prompt;
+    promptToggle.addEventListener("click", () => {
+      promptVisible = !promptVisible;
+      promptEl.style.display = promptVisible ? "block" : "none";
+      promptToggle.textContent = (promptVisible ? "▼ " : "▶ ") + "Prompt";
     });
-    genTabs.appendChild(tab);
+    container.appendChild(promptToggle);
+    container.appendChild(promptEl);
+
+    const genTabs = document.createElement("div");
+    genTabs.className = "gen-tabs";
+    for (let gi = 0; gi < sample.generations.length; gi++) {
+      const tab = document.createElement("button");
+      tab.className = "gen-tab" + (gi === state.selectedGenIdx ? " active" : "");
+      tab.textContent = `Gen ${gi}`;
+      tab.addEventListener("click", () => {
+        state.selectedGenIdx = gi;
+        renderDetail();
+      });
+      genTabs.appendChild(tab);
+    }
+    container.appendChild(genTabs);
+
+    const gen = sample.generations[state.selectedGenIdx];
+    if (gen) {
+      const textEl = document.createElement("pre");
+      textEl.className = "generated-text";
+      textEl.textContent = gen.generated_text;
+      container.appendChild(textEl);
+    }
   }
-  container.appendChild(genTabs);
 
   const gen = sample.generations[state.selectedGenIdx];
   if (!gen) return;
-
-  // Generated text
-  const textEl = document.createElement("pre");
-  textEl.className = "generated-text";
-  textEl.textContent = gen.generated_text;
-  container.appendChild(textEl);
 
   // Probe labels
   const probesEl = document.createElement("div");
@@ -396,7 +555,6 @@ function renderDetail() {
     row.appendChild(nameEl);
 
     if (Array.isArray(lbl)) {
-      // dynamic probe: timeline
       const bar = document.createElement("div");
       bar.className = "timeline-bar";
       for (const val of lbl) {
@@ -409,7 +567,7 @@ function renderDetail() {
     } else if (lbl === null || lbl === undefined) {
       const badge = document.createElement("span");
       badge.className = "label-badge label-none";
-      badge.textContent = "n/a (agent-mode only)";
+      badge.textContent = "n/a";
       row.appendChild(badge);
     } else {
       const badge = document.createElement("span");

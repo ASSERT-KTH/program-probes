@@ -263,3 +263,45 @@ header h1 { font-size: 18px; font-weight: 600; }
 .timeline-true { background: #4caf50; }
 .timeline-false { background: #f44336; }
 .timeline-none { background: #ddd; }
+
+/* Stats section */
+.stats-section {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stats-subtitle {
+  font-size: 11px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.stats-section svg { width: 100%; }
+
+/* Agentic sample browser badges */
+.badge-resolved { background: #c8f5c8; color: #1a6e1a; }
+.badge-unresolved { background: #fdd; color: #9b1a1a; }
+
+/* Agentic detail view */
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.detail-meta-id {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}

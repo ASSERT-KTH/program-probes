@@ -166,6 +166,8 @@ def main() -> None:
                 "group_id": traj.instance_id,
                 "outcome": traj.outcome,
                 "n_captured_steps": n_steps,
+                "n_tokens": len(traj.token_ids),
+                "n_turns": len(traj.step_segment_indices),
             }
             torch.save(out, fname)
             print(f"    Saved {fname.name}  (n_steps={n_steps}, outcome={traj.outcome})")
