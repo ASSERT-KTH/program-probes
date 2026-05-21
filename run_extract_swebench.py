@@ -110,18 +110,19 @@ def main() -> None:
         if not pending:
             continue
 
-        sequences = [t.token_ids for t, _ in pending]
-        masks = [t.extraction_mask for t, _ in pending]
-        # prompt_lengths unused when extraction_masks is provided
-        prompt_lengths = [0] * len(sequences)
-
         print(f"  Extracting batch {batch_start}–{batch_start + len(pending) - 1}...")
-        per_seq_hs = model_adapter.extract_hidden_states(
-            sequences, prompt_lengths, layer_indices, stride,
-            extraction_masks=masks,
-        )
+        for traj, fname in pending:
+            try:
+                per_seq_hs = model_adapter.extract_hidden_states(
+                    [traj.token_ids], [0], layer_indices, stride,
+                    extraction_masks=[traj.extraction_mask],
+                )
+            except torch.cuda.OutOfMemoryError:
+                torch.cuda.empty_cache()
+                print(f"    OOM — skipping {fname.name} (n_tokens={len(traj.token_ids)})")
+                continue
 
-        for (traj, fname), hs in zip(pending, per_seq_hs):
+            hs = per_seq_hs[0]
             n_steps = min(len(v) for v in hs.values()) if hs else 0
 
             # Load per-edit labels if available and build label sequences

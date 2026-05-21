@@ -19,7 +19,7 @@
 #
 #SBATCH -J pp-extract-swebench
 #SBATCH -p berzelius
-#SBATCH --gpus=2
+#SBATCH --gpus=8
 #SBATCH -C fat
 #SBATCH -t 12:00:00
 #SBATCH -o logs/extract_swebench_%A_%a.out
