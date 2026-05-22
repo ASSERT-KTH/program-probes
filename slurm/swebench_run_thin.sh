@@ -28,6 +28,8 @@ export SSL_CERT_FILE=/etc/pki/tls/cert.pem
 export TRITON_CACHE_DIR=/tmp/triton_cache_${SLURM_JOB_ID}
 
 RANK=${SLURM_ARRAY_TASK_ID:-0}
+# NUM_SHARDS must be set explicitly when resubmitting a subset of array tasks
+# (SLURM_ARRAY_TASK_COUNT reflects the subset size, not the total).
 NUM_SHARDS=${NUM_SHARDS:-${SLURM_ARRAY_TASK_COUNT:-1}}
 
 uv run python run_swebench_agent.py \
