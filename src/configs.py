@@ -184,6 +184,7 @@ class SwebenchLabelerConfig(BaseModel):
     resume: bool = True         # skip trajectories that already have labels
     single: str | None = None   # process only this one trajectory file
     instances: list[str] | None = None  # limit to specific instance IDs
+    n_workers: int = 1          # parallel Modal sandboxes
 
 
 def load_config(path: str, model: type[BaseModel]) -> BaseModel:

@@ -26,7 +26,7 @@ top_p: 0.95
 # max_new_tokens: not set — no per-call cap, lets thinking models use the full remaining context
 
 # --- Agent ---
-step_limit: 250
+step_limit: 100
 command_timeout: 180     # seconds per bash command in Modal sandbox
 
 # --- Execution ---

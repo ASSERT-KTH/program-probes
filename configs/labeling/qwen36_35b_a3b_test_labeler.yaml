@@ -1,0 +1,11 @@
+# Label 16 test trajectories from Qwen3.6-35B-A3B
+# Usage:
+#   uv run python run_labeler.py --config configs/labeling/qwen36_35b_a3b_test_labeler.yaml
+
+trajectory_dir: generations/swebench/qwen36_35b_a3b_test
+output_dir: labels/swebench/qwen36_35b_a3b_test
+modal_app_name: program-probes-labeler
+sandbox_timeout: 900
+eval_timeout: 300
+resume: true
+n_workers: 16

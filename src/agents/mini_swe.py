@@ -69,6 +69,8 @@ def build_litellm_vllm_model_config(
             model_kwargs["max_tokens"] = generation_config.max_new_tokens
         if generation_config.top_p is not None:
             model_kwargs["top_p"] = generation_config.top_p
+        if generation_config.top_k is not None:
+            model_kwargs["top_k"] = generation_config.top_k
     if extra_model_kwargs:
         model_kwargs.update(extra_model_kwargs)
 

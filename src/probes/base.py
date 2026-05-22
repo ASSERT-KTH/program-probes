@@ -15,6 +15,7 @@ class TrajectoryContext:
     sample: dict
     generated_text: str
     edit_history: list[EditEvent] = field(default_factory=list)
+    n_captured_steps: int = 0
 
 
 class ProbeAdapter(ABC):

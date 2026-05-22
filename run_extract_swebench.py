@@ -2,14 +2,14 @@
 
 Each trajectory is a single linearized token sequence.  An extraction_mask marks
 assistant-turn tokens; hidden states are extracted at masked positions strided by
-gen_config.stride.  One .pt file is written per trajectory.
+gen_config.stride.  One .pt file is written per trajectory (activations only — no
+labels).  Use run_attach_labels_swebench.py (CPU-only) to attach probe labels.
 
 Example usage:
     uv run python run_extract_swebench.py \
         --model-config configs/models/qwen36_27b.yaml \
         --generation-config configs/generation.yaml \
         --traj-dir generations/swebench/qwen36_27b_test \
-        --probe will_resolve \
         --output-dir outputs/swebench \
         --shard-rank 0 --num-shards 1
 """
@@ -23,7 +23,6 @@ import numpy as np
 import torch
 
 from src.configs import GenerationConfig, ModelConfig, load_config
-from src.probes.base import TrajectoryContext
 from src.tasks.swe_bench_extract import load_trajectories
 
 
@@ -48,19 +47,11 @@ def _load_model_adapter(adapter_name: str):
     raise ValueError(f"Unknown model adapter: {adapter_name!r}")
 
 
-def _load_probe(probe_name: str):
-    if probe_name == "will_resolve":
-        from src.probes.will_resolve import WillResolveProbe
-        return WillResolveProbe()
-    raise ValueError(f"Unknown probe: {probe_name!r}")
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-config", required=True)
     parser.add_argument("--generation-config", required=True)
     parser.add_argument("--traj-dir", required=True, help="Directory of trajectory JSON files")
-    parser.add_argument("--probe", nargs="+", required=True)
     parser.add_argument("--output-dir", default="outputs/swebench")
     parser.add_argument("--shard-rank", type=int, default=0)
     parser.add_argument("--num-shards", type=int, default=1)
@@ -71,8 +62,6 @@ def main() -> None:
     model_config: ModelConfig = load_config(args.model_config, ModelConfig)
     gen_config: GenerationConfig = load_config(args.generation_config, GenerationConfig)
     _set_seeds(gen_config.seed)
-
-    probes = [_load_probe(name) for name in args.probe]
 
     print(f"Loading trajectories from {args.traj_dir}...")
     all_trajs = load_trajectories(args.traj_dir)
@@ -100,41 +89,30 @@ def main() -> None:
         if not pending:
             continue
 
-        sequences = [t.token_ids for t, _ in pending]
-        masks = [t.extraction_mask for t, _ in pending]
-        # prompt_lengths unused when extraction_masks is provided
-        prompt_lengths = [0] * len(sequences)
-
         print(f"  Extracting batch {batch_start}–{batch_start + len(pending) - 1}...")
-        per_seq_hs = model_adapter.extract_hidden_states(
-            sequences, prompt_lengths, layer_indices, stride,
-            extraction_masks=masks,
-        )
+        for traj, fname in pending:
+            try:
+                per_seq_hs = model_adapter.extract_hidden_states(
+                    [traj.token_ids], [0], layer_indices, stride,
+                    extraction_masks=[traj.extraction_mask],
+                )
+            except torch.cuda.OutOfMemoryError:
+                torch.cuda.empty_cache()
+                print(f"    OOM — skipping {fname.name} (n_tokens={len(traj.token_ids)})")
+                continue
 
-        for (traj, fname), hs in zip(pending, per_seq_hs):
+            hs = per_seq_hs[0]
             n_steps = min(len(v) for v in hs.values()) if hs else 0
-
-            ctx = TrajectoryContext(
-                sample={"outcome": traj.outcome, "instance_id": traj.instance_id},
-                generated_text="",
-                n_captured_steps=n_steps,
-            )
-
-            labels = {}
-            for probe in probes:
-                try:
-                    labels[probe.name] = probe.compute_label(ctx)
-                except NotImplementedError:
-                    labels[probe.name] = [None] * n_steps if probe.is_dynamic else None
 
             out = {
                 "activations": hs,
-                "labels": labels,
                 "instance_id": traj.instance_id,
                 "sample_id": traj.instance_id,
                 "group_id": traj.instance_id,
                 "outcome": traj.outcome,
                 "n_captured_steps": n_steps,
+                "n_tokens": len(traj.token_ids),
+                "n_turns": len(traj.step_segment_indices),
             }
             torch.save(out, fname)
             print(f"    Saved {fname.name}  (n_steps={n_steps}, outcome={traj.outcome})")

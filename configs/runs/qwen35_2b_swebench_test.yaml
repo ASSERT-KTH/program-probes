@@ -1,0 +1,39 @@
+# Test run: Qwen3.5-2B on 16 SWE-bench Verified instances, 4xA100 thin
+#
+# Submit:
+#   sbatch slurm/swebench_run_thin.sh \
+#     --run-config configs/runs/qwen35_2b_swebench_test.yaml
+
+# --- Model / vLLM ---
+model_id: Qwen/Qwen3.5-2B
+served_model_name: qwen35-2b
+tensor_parallel_size: 1
+max_model_len: 262144
+dtype: bfloat16
+gpu_memory_utilization: 0.9
+vllm_port: 18000
+vllm_startup_timeout_s: 600
+vllm_log_path: logs/vllm_qwen35_2b_swebench_test.log
+vllm_extra_args:
+  - "--reasoning-parser"
+  - "qwen3"
+  - "--enable-auto-tool-choice"
+  - "--tool-call-parser"
+  - "qwen3_coder"
+
+# --- Generation (thinking mode, per HF recommendations) ---
+temperature: 0.6
+top_p: 0.95
+top_k: 20
+
+# --- Agent ---
+step_limit: 100
+command_timeout: 180
+
+# --- Execution ---
+n_runs: 1
+n_instances: 16
+n_workers: 16
+modal_app_name: program-probes-swebench
+modal_timeout: 3600
+output_dir: generations/swebench/qwen35_2b_test

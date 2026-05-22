@@ -263,3 +263,100 @@ header h1 { font-size: 18px; font-weight: 600; }
 .timeline-true { background: #4caf50; }
 .timeline-false { background: #f44336; }
 .timeline-none { background: #ddd; }
+
+/* Stats section */
+.stats-section {
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stats-subtitle {
+  font-size: 11px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.stats-section svg { width: 100%; }
+
+/* Agentic sample browser badges */
+.badge-resolved { background: #c8f5c8; color: #1a6e1a; }
+.badge-unresolved { background: #fdd; color: #9b1a1a; }
+
+/* Agentic detail view */
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.detail-meta-id {
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Message history chat view */
+.message-history {
+  flex-direction: column;
+  gap: 6px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.message-system { background: #f0f0f0; border-left: 3px solid #aaa; }
+.message-user   { background: #eef2ff; border-left: 3px solid #5566cc; }
+.message-assistant { background: #f0faf0; border-left: 3px solid #4caf50; }
+
+.message-role-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.message-role {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #666;
+}
+
+.message-probe-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.message-content {
+  font-family: monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  margin: 0;
+  color: #222;
+}

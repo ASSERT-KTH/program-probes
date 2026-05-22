@@ -12,8 +12,9 @@ class SWEBenchTrajectory:
     outcome: bool
     token_ids: list[int]
     extraction_mask: list[int]   # 1 at assistant-token positions, 0 elsewhere
-    # Maps captured-step index → assistant segment index (for future use)
     step_segment_indices: list[int]
+    segments: list[dict]         # tokenization.segments, needed for label mapping
+    messages: list[dict]         # trajectory messages[], needed for label mapping
 
 
 def load_trajectories(traj_dir: str | Path) -> list[SWEBenchTrajectory]:
@@ -55,6 +56,8 @@ def load_trajectories(traj_dir: str | Path) -> list[SWEBenchTrajectory]:
             token_ids=token_ids,
             extraction_mask=mask,
             step_segment_indices=step_segment_indices,
+            segments=segments,
+            messages=data.get("messages", []),
         ))
 
     return trajs

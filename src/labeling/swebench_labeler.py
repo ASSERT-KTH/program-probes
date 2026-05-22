@@ -14,18 +14,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
-def _changed_python_files(diff: str) -> List[str]:
-    """Extract unique .py file paths from a unified diff header."""
-    files: List[str] = []
-    for line in diff.splitlines():
-        if line.startswith("--- a/") or line.startswith("+++ b/"):
-            fname = line[6:]
-            if "\t" in fname:
-                fname = fname.split("\t")[0]
-            if fname.endswith(".py") and fname not in files:
-                files.append(fname)
-    return files
-
 
 def _parse_test_results(eval_log: str, instance: Dict) -> Optional[Dict]:
     """Run the swebench grading pipeline on *eval_log*.
@@ -71,24 +59,25 @@ def _parse_test_results(eval_log: str, instance: Dict) -> Optional[Dict]:
         os.unlink(log_path)
 
 
-def _check_compiles(sandbox: Any, diff: str) -> bool:
-    """Return *True* iff every ``.py`` file touched by *diff* compiles cleanly.
+_COMPILE_ERROR_PATTERNS = (
+    "SyntaxError",
+    "ImportError",
+    "ModuleNotFoundError",
+    "ERROR collecting",
+    "import file mismatch",
+)
 
-    If *diff* is empty or touches no ``.py`` files the result is *True*.
+
+def _compiles_from_log(eval_output: Optional[str]) -> Optional[bool]:
+    """Infer whether the codebase compiles from the pytest eval log.
+
+    Returns *None* if the log is unavailable, *False* if any import/collection
+    error pattern is detected, and *True* otherwise.
     """
-    py_files = _changed_python_files(diff)
-    if not py_files:
-        return True
-
-    for fname in py_files:
-        process = sandbox.exec(
-            "bash", "-lc", f"cd /testbed && python -m py_compile {fname}", timeout=30
-        )
-        stderr = process.stderr.read() if getattr(process, "stderr", None) is not None else ""
-        if hasattr(process, "wait"):
-            process.wait()
-        returncode = getattr(process, "returncode", 0)
-        if returncode != 0 or "Error" in stderr or "SyntaxError" in stderr:
+    if eval_output is None:
+        return None
+    for pattern in _COMPILE_ERROR_PATTERNS:
+        if pattern in eval_output:
             return False
     return True
 
@@ -171,8 +160,8 @@ def label_trajectory(
     1. Load the trajectory JSON and identify edit commands (unique cumulative diffs).
     2. Create a Modal sandbox from the instance's Docker image.
     3. For each edit, reset to clean HEAD, apply the cumulative diff, then:
-       - run ``py_compile`` on changed ``.py`` files → ``compiles``
        - run the SWE-bench eval script → ``test_results``
+       - infer ``compiles`` from the eval log (import/collection errors → False)
     4. Write ``_labels.json`` alongside the trajectory.
     """
     with open(trajectory_path) as f:
@@ -254,8 +243,8 @@ def label_trajectory(
                     print(f"[labeler]   cmd[{cmd_idx}]: git apply failed", flush=True)
                     continue
 
-            compiles = _check_compiles(sandbox, cumulative_diff)
             eval_output = _run_eval_in_sandbox(sandbox, eval_script, timeout=eval_timeout)
+            compiles = _compiles_from_log(eval_output)
             test_results = _parse_test_results(eval_output, instance)
 
             edits.append({

@@ -40,23 +40,31 @@ run_swebench_*.py        → generations/swebench/<run_id>/<instance_id>.json
         │                  (trajectory JSON: messages, bash history, diffs, outcome)
         ▼
 run_labeler.py           replay each edit step in a fresh Modal sandbox:
-swebench_labeler.py        git checkout HEAD, apply cumulative diff, py_compile,
-                           run SWE-bench eval script → test_results {passed/failed/resolved}
+swebench_labeler.py        git checkout HEAD, apply cumulative diff, infer compiles
+                           from the pytest eval log, run SWE-bench eval script
+                           → test_results {passed/failed/resolved}
                          → generations/swebench/<run_id>/<instance_id>_labels.json
         │
         │  trajectories where any edit has test_results=None (patch apply failure
         │  or unparseable eval output) are discarded with a logged warning
         ▼
 run_extract_swebench.py  tokenise full conversation, build extraction mask over
-                         assistant turns, extract hidden states, compute probe labels
-                         from _labels.json edit history via carry-forward
-                         → outputs/swebench/<instance_id>.pt
+                         assistant turns, extract hidden states only (GPU, expensive)
+                         → outputs/swebench/<run_id>/<instance_id>.pt  (activations only)
+        │
+        ▼
+run_attach_labels_swebench.py  load activations + trajectory + _labels.json,
+                               compute probe labels via carry-forward (CPU, fast)
+                               Labels take effect from turn N+1 after the command at
+                               turn N (off-by-one: the edit at step N is not visible
+                               to the model until the next assistant turn).
+                               → outputs/swebench/<run_id>_labeled/<instance_id>.pt
         │
         ▼
 run_build_cache.py  →  run_probe.py  →  run_figures.py   (same as standard path)
 ```
 
-Dynamic probes (`currently_correct`, `currently_compiles`, `currently_reduces_failing`, `currently_has_regressions`) only make sense in the agentic path because they require `EditEvent` history with per-edit `test_results`. The carry-forward step in `extract.py` expands one label per edit into one label per stride step; steps before the first edit are masked (`None` → `-1` → excluded from training).
+Dynamic probes (`currently_correct`, `currently_compiles`, `currently_reduces_failing`, `currently_has_regressions`) only make sense in the agentic path because they require `EditEvent` history with per-edit `test_results`. The carry-forward step in `run_attach_labels_swebench.py` expands one label per edit into one label per stride step; steps before the first edit are masked (`None` → `-1` → excluded from training).
 
 ## Setup
 
@@ -278,8 +286,9 @@ by replaying each edit step to compute per-step probe labels (compiles, test res
 resolution status).
 
 The labeler replays each edit step of an agent trajectory in a fresh Modal sandbox:
-reset to clean HEAD, apply the cumulative diff, `py_compile` changed files, and run the
-SWE-bench eval script. Labels are written alongside trajectories as `_labels.json` files.
+reset to clean HEAD, apply the cumulative diff, infer `compiles` from the pytest eval
+log, and run the SWE-bench eval script. Labels are written alongside trajectories as
+`_labels.json` files.
 
 ```bash
 # Full run (CPU-only — no GPU needed):
