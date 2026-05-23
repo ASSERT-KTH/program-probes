@@ -263,11 +263,12 @@ def run_sweep(
     sweep_id: str | None = None,
     count: int | None = None,
     cache_dir: str = "cache",
+    cache_run_id: str | None = None,
     n_bins: int = 10,
     probe_arch: str = "linear",
 ) -> None:
     import wandb
-    cache_base = Path(cache_dir) / run_id / probe_name
+    cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
 
     middle_layer = probe_layers[len(probe_layers) // 2]
     middle_cache = str(cache_base / f"layer_{middle_layer}.pt")
@@ -318,12 +319,13 @@ def run_final(
     patience: int,
     seed: int,
     cache_dir: str = "cache",
+    cache_run_id: str | None = None,
     results_dir: str = "results",
     n_bins: int = 10,
     probe_arch: str = "linear",
 ) -> dict:
     import wandb
-    cache_base = Path(cache_dir) / run_id / probe_name
+    cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
 
     with wandb.init(
