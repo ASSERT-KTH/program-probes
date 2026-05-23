@@ -12,6 +12,7 @@ def main():
     parser.add_argument("--results-dir", default="results")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
+    parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -38,6 +39,7 @@ def main():
             count=args.count,
             cache_dir=args.cache_dir,
             n_bins=args.n_bins,
+            probe_arch=args.probe_arch,
         )
     else:
         run_final(
@@ -52,6 +54,7 @@ def main():
             cache_dir=args.cache_dir,
             results_dir=args.results_dir,
             n_bins=args.n_bins,
+            probe_arch=args.probe_arch,
         )
 
 
