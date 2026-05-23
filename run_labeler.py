@@ -11,6 +11,8 @@ The config YAML fields are documented in SwebenchLabelerConfig (src/configs.py).
 
 import argparse
 import json
+import random
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -18,10 +20,12 @@ from src.configs import SwebenchLabelerConfig, load_config
 from src.labeling.swebench_labeler import label_trajectory, load_instance
 
 
-def _process(tf: Path, iid: str, cfg: SwebenchLabelerConfig, out_dir: Path) -> str:
+def _process(tf: Path, iid: str, cfg: SwebenchLabelerConfig, out_dir: Path, jitter: float = 0.0) -> str:
     label_path = out_dir / f"{tf.stem}_labels.json"
     if cfg.resume and label_path.exists():
         return f"{tf.name}: skipped (labels exist)"
+    if jitter > 0:
+        time.sleep(random.uniform(0, jitter))
     instance = load_instance(iid)
     label_trajectory(
         tf,
@@ -74,9 +78,12 @@ def main() -> None:
         flush=True,
     )
 
+    # Jitter spreads initial sandbox creation over time, avoiding the sawtooth
+    # pattern where all workers start/finish in lockstep.
+    jitter = cfg.n_workers * 1.2  # seconds — ~1.2s per worker slot
     with ThreadPoolExecutor(max_workers=cfg.n_workers) as pool:
         futures = {
-            pool.submit(_process, tf, iid, cfg, out_dir): tf.name
+            pool.submit(_process, tf, iid, cfg, out_dir, jitter): tf.name
             for tf, iid in work
         }
         for fut in as_completed(futures):

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 @dataclass
 class SWEBenchTrajectory:
     instance_id: str
+    sample_id: str               # filename stem, unique per run (e.g. astropy__astropy-12907_run03)
     outcome: bool
     token_ids: list[int]
     extraction_mask: list[int]   # 1 at assistant-token positions, 0 elsewhere
@@ -38,6 +39,7 @@ def load_trajectories(traj_dir: str | Path) -> list[SWEBenchTrajectory]:
 
         outcome: bool = bool(data.get("metadata", {}).get("outcome", False))
         instance_id: str = data.get("metadata", {}).get("instance_id", path.stem)
+        sample_id: str = path.stem
 
         # Build extraction mask: 1 for every token that belongs to an assistant segment
         mask = [0] * len(token_ids)
@@ -52,6 +54,7 @@ def load_trajectories(traj_dir: str | Path) -> list[SWEBenchTrajectory]:
 
         trajs.append(SWEBenchTrajectory(
             instance_id=instance_id,
+            sample_id=sample_id,
             outcome=outcome,
             token_ids=token_ids,
             extraction_mask=mask,
