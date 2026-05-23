@@ -21,6 +21,8 @@ def main():
     parser.add_argument("--probe", nargs="+", required=True)
     parser.add_argument("--model-config", required=True)
     parser.add_argument("--output-dir", default="outputs/swebench")
+    parser.add_argument("--output-run-id", default=None,
+                        help="Run ID for activation lookup (defaults to --run-id)")
     parser.add_argument("--results-dir", default="results/swebench")
     parser.add_argument("--cache-dir", default="cache/swebench")
     parser.add_argument("--dashboard-dir", default="dashboard")
@@ -30,6 +32,7 @@ def main():
     args = parser.parse_args()
 
     model_cfg = load_config(args.model_config, ModelConfig)
+    output_run_id = args.output_run_id or args.run_id
 
     export_swebench_dashboard(
         run_id=args.run_id,
@@ -37,6 +40,7 @@ def main():
         probe_layers=model_cfg.probe_layers,
         model_name=model_cfg.model_id,
         output_dir=args.output_dir,
+        output_run_id=output_run_id,
         results_dir=args.results_dir,
         cache_dir=args.cache_dir,
         dashboard_dir=args.dashboard_dir,
