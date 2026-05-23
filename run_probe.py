@@ -9,6 +9,8 @@ def main():
     parser.add_argument("--probe", required=True)
     parser.add_argument("--model-config", required=True)
     parser.add_argument("--cache-dir", default="cache")
+    parser.add_argument("--cache-run-id", default=None,
+                        help="Run ID to use for cache lookup (defaults to --run-id)")
     parser.add_argument("--results-dir", default="results")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
@@ -28,6 +30,7 @@ def main():
 
     args = parser.parse_args()
     model_cfg = load_config(args.model_config, ModelConfig)
+    cache_run_id = args.cache_run_id or args.run_id
 
     if args.mode == "sweep":
         run_sweep(
@@ -38,6 +41,7 @@ def main():
             sweep_id=args.sweep_id,
             count=args.count,
             cache_dir=args.cache_dir,
+            cache_run_id=cache_run_id,
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
         )
@@ -52,6 +56,7 @@ def main():
             patience=args.patience,
             seed=args.seed,
             cache_dir=args.cache_dir,
+            cache_run_id=cache_run_id,
             results_dir=args.results_dir,
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
