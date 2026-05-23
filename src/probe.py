@@ -62,6 +62,26 @@ def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> di
     }
 
 
+def _build_probe(arch: str, hidden_dim: int) -> nn.Module:
+    if arch == "mlp":
+        return nn.Sequential(
+            nn.Linear(hidden_dim, hidden_dim // 2),
+            nn.ReLU(),
+            nn.Linear(hidden_dim // 2, 2),
+        )
+    return nn.Linear(hidden_dim, 2)
+
+
+def _grad_norm(model: nn.Module) -> float:
+    norms = [p.grad.norm().item() for p in model.parameters() if p.grad is not None]
+    return float(np.mean(norms)) if norms else 0.0
+
+
+def _weight_norm(model: nn.Module) -> float:
+    norms = [p.norm().item() for p in model.parameters()]
+    return float(np.mean(norms)) if norms else 0.0
+
+
 def train_probe_layer(
     cache_path: str,
     layer_idx: int,
@@ -71,6 +91,7 @@ def train_probe_layer(
     patience: int,
     seed: int,
     n_bins: int = 10,
+    probe_arch: str = "linear",
     log_fn: Callable[[dict], None] | None = None,
 ) -> list[ProbeResult]:
     _set_seeds(seed)
@@ -123,7 +144,7 @@ def train_probe_layer(
         H_val = H_val - mean
         H_test = H_test - mean
 
-        model = nn.Linear(hidden_dim, 2)
+        model = _build_probe(probe_arch, hidden_dim)
         optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
         best_val_loss = float("inf")
@@ -142,7 +163,7 @@ def train_probe_layer(
                 loss = criterion(logits, y_train[idx])
                 optimizer.zero_grad()
                 loss.backward()
-                epoch_grad_norms.append(model.weight.grad.norm().item())
+                epoch_grad_norms.append(_grad_norm(model))
                 optimizer.step()
 
             model.eval()
@@ -152,7 +173,7 @@ def train_probe_layer(
                 train_loss = criterion(model(H_train), y_train).item()
                 val_preds = val_logits.argmax(dim=1)
                 val_acc = (val_preds == y_val).float().mean().item()
-                weight_norm = model.weight.norm().item()
+                weight_norm = _weight_norm(model)
 
             n_epochs = epoch + 1
 
@@ -243,6 +264,7 @@ def run_sweep(
     count: int | None = None,
     cache_dir: str = "cache",
     n_bins: int = 10,
+    probe_arch: str = "linear",
 ) -> None:
     import wandb
     cache_base = Path(cache_dir) / run_id / probe_name
@@ -274,7 +296,7 @@ def run_sweep(
                 middle_cache, middle_layer,
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
-                seed=seed, n_bins=n_bins,
+                seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 log_fn=log_fn,
             )
             wandb.log({
@@ -298,6 +320,7 @@ def run_final(
     cache_dir: str = "cache",
     results_dir: str = "results",
     n_bins: int = 10,
+    probe_arch: str = "linear",
 ) -> dict:
     import wandb
     cache_base = Path(cache_dir) / run_id / probe_name
@@ -306,9 +329,9 @@ def run_final(
     with wandb.init(
         project="program-probes",
         job_type="final",
-        name=f"final-{run_id}-{probe_name}",
+        name=f"final-{run_id}-{probe_name}-{probe_arch}",
         group=f"{run_id}/{probe_name}",
-        tags=[run_id, probe_name, "final"],
+        tags=[run_id, probe_name, "final", probe_arch],
     ) as run:
         for layer_idx in probe_layers:
             cache_path = str(cache_base / f"layer_{layer_idx}.pt")
@@ -329,7 +352,7 @@ def run_final(
                 cache_path, layer_idx,
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
-                seed=seed, n_bins=n_bins,
+                seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 log_fn=make_log_fn(layer_idx),
             )
             all_results[layer_idx] = results
