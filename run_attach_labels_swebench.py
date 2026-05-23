@@ -141,7 +141,7 @@ def main() -> None:
             else:
                 labels[probe.name] = raw
 
-        out_path = input_dir / f"{instance_id}_labels.pt"
+        out_path = input_dir / f"{sample_id}_labels.pt"
         torch.save({"labels": labels}, out_path)
         print(f"  Saved {out_path.name}  (n_steps={n_steps}, outcome={traj.outcome})")
         n_ok += 1

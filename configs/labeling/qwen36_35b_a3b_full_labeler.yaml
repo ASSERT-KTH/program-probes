@@ -1,0 +1,11 @@
+# Label full Qwen3.6-35B-A3B run (all available trajectories, resume-safe)
+# Usage:
+#   uv run python run_labeler.py --config configs/labeling/qwen36_35b_a3b_full_labeler.yaml
+
+trajectory_dir: generations/swebench/qwen36_35b_a3b_full
+output_dir: labels/swebench/qwen36_35b_a3b_full
+modal_app_name: program-probes-labeler
+sandbox_timeout: 3600
+eval_timeout: 600
+resume: true
+n_workers: 50
