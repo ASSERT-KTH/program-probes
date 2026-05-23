@@ -70,10 +70,10 @@ def main() -> None:
 
     probes = [_load_probe(name) for name in args.probe]
 
-    # Index trajectories by instance_id for fast lookup
+    # Index trajectories by sample_id (filename stem) for fast lookup
     print(f"Loading trajectories from {args.traj_dir}...")
     all_trajs = load_trajectories(args.traj_dir)
-    traj_by_id = {t.instance_id: t for t in all_trajs}
+    traj_by_id = {t.sample_id: t for t in all_trajs}
     print(f"  {len(traj_by_id)} trajectories loaded")
 
     input_dir = Path(args.input_dir)
@@ -87,15 +87,16 @@ def main() -> None:
     for pt_path in pt_files:
         data = torch.load(pt_path, map_location="cpu", weights_only=False)
         instance_id: str = data["instance_id"]
+        sample_id: str = data.get("sample_id", pt_path.stem)
 
-        traj = traj_by_id.get(instance_id)
+        traj = traj_by_id.get(sample_id)
         if traj is None:
-            print(f"  SKIP {pt_path.name}: no matching trajectory for {instance_id!r}")
+            print(f"  SKIP {pt_path.name}: no matching trajectory for {sample_id!r}")
             n_skip += 1
             continue
 
-        # Load _labels.json
-        label_path = label_dir / f"{instance_id}_labels.json"
+        # Load _labels.json — keyed by sample_id (filename stem)
+        label_path = label_dir / f"{sample_id}_labels.json"
         sorted_edits: list[dict] = []
         edit_history: list[EditEvent] = []
         if label_path.exists():

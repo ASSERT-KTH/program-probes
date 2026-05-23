@@ -87,7 +87,8 @@ def _per_turn_labels(segments: list[dict], n_tokens: int, label_seq: list) -> li
         # Last extracted position within this segment
         seg_extracted = [i for i, pos in enumerate(extracted) if start <= pos < end]
         if seg_extracted:
-            result.append(label_seq[seg_extracted[-1]])
+            idx = min(seg_extracted[-1], len(label_seq) - 1)
+            result.append(label_seq[idx])
         else:
             result.append(None)
     return result
@@ -129,7 +130,7 @@ def export_swebench_dashboard(
     run_dir.mkdir(parents=True, exist_ok=True)
 
     in_dir = Path(output_dir) / run_id
-    pt_files = sorted(in_dir.glob("*.pt"))
+    pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
     print(f"[export] {len(pt_files)} .pt files in {in_dir}")
 
     traj_path = Path(traj_dir) if traj_dir else None
@@ -145,7 +146,11 @@ def export_swebench_dashboard(
         instance_id = data["instance_id"]
         outcome = bool(data.get("outcome", False))
         n_captured_steps = data.get("n_captured_steps", 0)
-        labels = data["labels"]
+        label_file = pt_file.parent / f"{pt_file.stem}_labels.pt"
+        if label_file.exists():
+            labels = torch.load(label_file, weights_only=False)["labels"]
+        else:
+            labels = data.get("labels", {})
 
         # Load messages and accurate token/turn counts from trajectory JSON if available
         messages: list[dict] = []
@@ -191,8 +196,12 @@ def export_swebench_dashboard(
     probe_stats: dict = {}
     for probe_name in probe_names:
         trans_list = probe_trans[probe_name]
-        has_dynamic = any(isinstance(labels.get(probe_name), list)
-                         for labels in (torch.load(f, weights_only=False)["labels"] for f in pt_files[:1]))
+        def _load_labels_for(f: Path) -> dict:
+            lf = f.parent / f"{f.stem}_labels.pt"
+            if lf.exists():
+                return torch.load(lf, weights_only=False)["labels"]
+            return torch.load(f, weights_only=False).get("labels", {})
+        has_dynamic = any(isinstance(_load_labels_for(f).get(probe_name), list) for f in pt_files[:1])
         probe_stats[probe_name] = {
             "is_dynamic": has_dynamic,
             "changes_per_traj": [t["total"] for t in trans_list],
