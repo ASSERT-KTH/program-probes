@@ -119,6 +119,7 @@ def export_swebench_dashboard(
     probe_layers: list[int],
     model_name: str,
     output_dir: str = "outputs/swebench",
+    output_run_id: str | None = None,
     results_dir: str = "results/swebench",
     cache_dir: str = "cache/swebench",
     dashboard_dir: str = "dashboard",
@@ -129,7 +130,7 @@ def export_swebench_dashboard(
     run_dir = data_dir / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    in_dir = Path(output_dir) / run_id
+    in_dir = Path(output_dir) / (output_run_id or run_id)
     pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
     print(f"[export] {len(pt_files)} .pt files in {in_dir}")
 
