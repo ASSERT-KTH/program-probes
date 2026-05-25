@@ -22,9 +22,10 @@ class CurrentlyReducesFailingProbe(ProbeAdapter):
             if tr is None:
                 labels.append(None)
             elif baseline_failing is None:
-                # This is the baseline edit — store its count, no label yet.
+                # This is the baseline edit — store its count.
+                # No edit has been made yet, so no failing tests have been reduced.
                 baseline_failing = len(tr.get("failed", []))
-                labels.append(None)
+                labels.append(False)
             else:
                 curr_failing = len(tr.get("failed", []))
                 labels.append(curr_failing < baseline_failing)

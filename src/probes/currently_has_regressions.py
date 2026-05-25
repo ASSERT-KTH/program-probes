@@ -22,9 +22,10 @@ class CurrentlyHasRegressionsProbe(ProbeAdapter):
             if tr is None:
                 labels.append(None)
             elif baseline_passed is None:
-                # This is the baseline edit — store passing tests, no label yet.
+                # This is the baseline edit — store passing tests.
+                # No edit has been made yet, so no regressions are possible.
                 baseline_passed = set(tr.get("passed", []))
-                labels.append(None)
+                labels.append(False)
             else:
                 curr_failed = set(tr.get("failed", []))
                 labels.append(not curr_failed.isdisjoint(baseline_passed))
