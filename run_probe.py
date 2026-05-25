@@ -14,6 +14,8 @@ def main():
     parser.add_argument("--results-dir", default="results")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
+    parser.add_argument("--n-eval-bins", type=int, default=None,
+                        help="If set, train on all tokens pooled (n_bins=1) but evaluate per bin at this granularity")
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
@@ -44,6 +46,7 @@ def main():
             cache_run_id=cache_run_id,
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
+            n_eval_bins=args.n_eval_bins,
         )
     else:
         run_final(
@@ -60,6 +63,7 @@ def main():
             results_dir=args.results_dir,
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
+            n_eval_bins=args.n_eval_bins,
         )
 
 

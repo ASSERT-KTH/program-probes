@@ -93,6 +93,7 @@ def train_probe_layer(
     n_bins: int = 10,
     probe_arch: str = "linear",
     log_fn: Callable[[dict], None] | None = None,
+    n_eval_bins: int | None = None,
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -116,9 +117,11 @@ def train_probe_layer(
     criterion = nn.CrossEntropyLoss()
     results = []
 
-    for bin_idx in range(n_bins):
+    train_n_bins = 1 if n_eval_bins is not None else n_bins
+
+    for bin_idx in range(train_n_bins):
         bin_mask = torch.tensor([
-            _bin_index(rel_pos[i].item(), n_bins) == bin_idx and y[i].item() >= 0
+            _bin_index(rel_pos[i].item(), train_n_bins) == bin_idx and y[i].item() >= 0
             for i in range(len(y))
         ])
         if bin_mask.sum() == 0:
@@ -127,6 +130,7 @@ def train_probe_layer(
         bin_H = H[bin_mask].float()
         bin_y = y[bin_mask]
         bin_samples = [sample_ids[i] for i in range(len(sample_ids)) if bin_mask[i]]
+        bin_rel_pos = rel_pos[bin_mask]
 
         train_mask = torch.tensor([s in train_samples for s in bin_samples])
         val_mask = torch.tensor([s in val_samples for s in bin_samples])
@@ -138,6 +142,8 @@ def train_probe_layer(
         H_train, y_train = bin_H[train_mask], bin_y[train_mask]
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
+        rel_pos_val  = bin_rel_pos[val_mask]
+        rel_pos_test = bin_rel_pos[test_mask]
 
         mean = H_train.mean(dim=0)
         H_train = H_train - mean
@@ -200,39 +206,51 @@ def train_probe_layer(
 
         model.load_state_dict(best_weights)
         model.eval()
-        with torch.no_grad():
-            val_probs = torch.softmax(model(H_val), dim=1)[:, 1].numpy()
-            val_preds_np = (val_probs >= 0.5).astype(int)
-            val_labels_np = y_val.numpy()
 
-            test_logits = model(H_test)
-            test_probs = torch.softmax(test_logits, dim=1)[:, 1].numpy()
-            test_preds_np = (test_probs >= 0.5).astype(int)
-            test_labels_np = y_test.numpy()
+        for eval_bin_idx in range(n_eval_bins if n_eval_bins is not None else 1):
+            if n_eval_bins is not None:
+                eb = eval_bin_idx
+                eval_val_mask  = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_val])
+                eval_test_mask = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_test])
+                if eval_val_mask.sum() == 0 or eval_test_mask.sum() == 0:
+                    continue
+                H_val_e,  y_val_e  = H_val[eval_val_mask],   y_val[eval_val_mask]
+                H_test_e, y_test_e = H_test[eval_test_mask], y_test[eval_test_mask]
+                result_bin_idx = eb
+            else:
+                H_val_e,  y_val_e  = H_val,  y_val
+                H_test_e, y_test_e = H_test, y_test
+                result_bin_idx = bin_idx
 
-        val_m = _clf_metrics(val_probs, val_preds_np, val_labels_np)
-        test_m = _clf_metrics(test_probs, test_preds_np, test_labels_np)
-        val_acc = (val_preds_np == val_labels_np).mean()
-        test_acc = (test_preds_np == test_labels_np).mean()
+            with torch.no_grad():
+                val_probs = torch.softmax(model(H_val_e), dim=1)[:, 1].numpy()
+                val_preds_np = (val_probs >= 0.5).astype(int)
+                val_labels_np = y_val_e.numpy()
+                test_probs = torch.softmax(model(H_test_e), dim=1)[:, 1].numpy()
+                test_preds_np = (test_probs >= 0.5).astype(int)
+                test_labels_np = y_test_e.numpy()
 
-        results.append(ProbeResult(
-            layer=layer_idx,
-            bin_idx=bin_idx,
-            val_acc=float(val_acc),
-            val_f1=val_m["f1"],
-            val_precision=val_m["precision"],
-            val_recall=val_m["recall"],
-            val_auc=val_m["auc"],
-            test_acc=float(test_acc),
-            test_f1=test_m["f1"],
-            test_precision=test_m["precision"],
-            test_recall=test_m["recall"],
-            test_auc=test_m["auc"],
-            n_train=H_train.shape[0],
-            n_val=H_val.shape[0],
-            n_test=H_test.shape[0],
-            n_epochs=n_epochs,
-        ))
+            val_m  = _clf_metrics(val_probs,  val_preds_np,  val_labels_np)
+            test_m = _clf_metrics(test_probs, test_preds_np, test_labels_np)
+
+            results.append(ProbeResult(
+                layer=layer_idx,
+                bin_idx=result_bin_idx,
+                val_acc=float((val_preds_np == val_labels_np).mean()),
+                val_f1=val_m["f1"],
+                val_precision=val_m["precision"],
+                val_recall=val_m["recall"],
+                val_auc=val_m["auc"],
+                test_acc=float((test_preds_np == test_labels_np).mean()),
+                test_f1=test_m["f1"],
+                test_precision=test_m["precision"],
+                test_recall=test_m["recall"],
+                test_auc=test_m["auc"],
+                n_train=H_train.shape[0],
+                n_val=H_val_e.shape[0],
+                n_test=H_test_e.shape[0],
+                n_epochs=n_epochs,
+            ))
 
     return results
 
@@ -266,6 +284,7 @@ def run_sweep(
     cache_run_id: str | None = None,
     n_bins: int = 10,
     probe_arch: str = "linear",
+    n_eval_bins: int | None = None,
 ) -> None:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -298,7 +317,7 @@ def run_sweep(
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
-                log_fn=log_fn,
+                log_fn=log_fn, n_eval_bins=n_eval_bins,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
@@ -323,6 +342,7 @@ def run_final(
     results_dir: str = "results",
     n_bins: int = 10,
     probe_arch: str = "linear",
+    n_eval_bins: int | None = None,
 ) -> dict:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -355,7 +375,7 @@ def run_final(
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
-                log_fn=make_log_fn(layer_idx),
+                log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins,
             )
             all_results[layer_idx] = results
             for r in results:
