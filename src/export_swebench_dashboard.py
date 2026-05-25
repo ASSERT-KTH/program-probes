@@ -1,10 +1,10 @@
 """Export SWE-bench probe results to dashboard format."""
 import json
-import math
-import random
 import torch
 from datetime import datetime
 from pathlib import Path
+
+from src.probe import _split_groups, _bin_index
 
 
 def _compute_transitions(labels: list) -> dict:
@@ -33,11 +33,7 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     data = torch.load(layer_files[0], weights_only=False)
     y = data["y"]
     group_ids = data["group_id"]
-    unique_groups = sorted(set(group_ids))
-    rng = random.Random(seed)
-    rng.shuffle(unique_groups)
-    n = len(unique_groups)
-    test_groups = set(unique_groups[math.floor(0.85 * n):])
+    _, _, test_groups = _split_groups(group_ids, seed)
     test_mask = torch.tensor([
         group_ids[i] in test_groups and y[i].item() >= 0
         for i in range(len(y))
@@ -48,6 +44,37 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     pos = (test_y == 1).sum().item()
     total = len(test_y)
     return max(pos / total, 1 - pos / total)
+
+
+def _per_bin_majority_baseline_from_cache(
+    cache_dir: Path, probe_name: str, n_bins: int = 10, seed: int = 42
+) -> dict[str, float]:
+    """Compute per-bin majority baseline from the test split of the probe cache."""
+    probe_dir = cache_dir / probe_name
+    layer_files = sorted(probe_dir.glob("layer_*.pt"))
+    if not layer_files:
+        return {str(b): 0.5 for b in range(n_bins)}
+    data = torch.load(layer_files[0], weights_only=False)
+    y = data["y"]
+    rel_pos = data["rel_pos"]
+    group_ids = data["group_id"]
+    _, _, test_groups = _split_groups(group_ids, seed)
+    result = {}
+    for b in range(n_bins):
+        bin_mask = torch.tensor([
+            group_ids[i] in test_groups
+            and y[i].item() >= 0
+            and _bin_index(rel_pos[i].item(), n_bins) == b
+            for i in range(len(y))
+        ])
+        bin_y = y[bin_mask]
+        if len(bin_y) == 0:
+            result[str(b)] = 0.5
+        else:
+            pos = (bin_y == 1).sum().item()
+            total = len(bin_y)
+            result[str(b)] = max(pos / total, 1 - pos / total)
+    return result
 
 
 def _per_turn_labels(segments: list[dict], n_tokens: int, label_seq: list) -> list:
@@ -226,6 +253,10 @@ def export_swebench_dashboard(
         p: _majority_baseline_from_cache(Path(cache_dir) / run_id, p)
         for p in probe_names
     }
+    majority_baselines_per_bin = {
+        p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / run_id, p, n_bins)
+        for p in probe_names
+    }
 
     # Probe results
     probe_results: dict = {}
@@ -256,6 +287,7 @@ def export_swebench_dashboard(
         "n_samples": len(samples_list),
         "n_generations": 1,
         "majority_baseline": majority_baselines,
+        "majority_baseline_per_bin": majority_baselines_per_bin,
         "is_agentic": True,
     }
     (run_dir / "meta.json").write_text(json.dumps(meta_out, indent=2))
