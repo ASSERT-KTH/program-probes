@@ -29,7 +29,7 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     probe_dir = cache_dir / probe_name
     layer_files = sorted(probe_dir.glob("layer_*.pt"))
     if not layer_files:
-        return 0.5
+        raise FileNotFoundError(f"No cache files found for probe '{probe_name}' in {probe_dir}")
     data = torch.load(layer_files[0], weights_only=False)
     y = data["y"]
     group_ids = data["group_id"]
@@ -40,7 +40,7 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
     ])
     test_y = y[test_mask]
     if len(test_y) == 0:
-        return 0.5
+        raise ValueError(f"No test samples found in cache for probe '{probe_name}' in {probe_dir}")
     pos = (test_y == 1).sum().item()
     total = len(test_y)
     return max(pos / total, 1 - pos / total)
@@ -53,7 +53,7 @@ def _per_bin_majority_baseline_from_cache(
     probe_dir = cache_dir / probe_name
     layer_files = sorted(probe_dir.glob("layer_*.pt"))
     if not layer_files:
-        return {str(b): 0.5 for b in range(n_bins)}
+        raise FileNotFoundError(f"No cache files found for probe '{probe_name}' in {probe_dir}")
     data = torch.load(layer_files[0], weights_only=False)
     y = data["y"]
     rel_pos = data["rel_pos"]
@@ -69,11 +69,10 @@ def _per_bin_majority_baseline_from_cache(
         ])
         bin_y = y[bin_mask]
         if len(bin_y) == 0:
-            result[str(b)] = 0.5
-        else:
-            pos = (bin_y == 1).sum().item()
-            total = len(bin_y)
-            result[str(b)] = max(pos / total, 1 - pos / total)
+            raise ValueError(f"No test samples in bin {b} for probe '{probe_name}' in {probe_dir}")
+        pos = (bin_y == 1).sum().item()
+        total = len(bin_y)
+        result[str(b)] = max(pos / total, 1 - pos / total)
     return result
 
 
@@ -249,12 +248,13 @@ def export_swebench_dashboard(
     (run_dir / "stats.json").write_text(json.dumps(stats_out))
 
     # Majority baselines
+    cache_run = output_run_id or run_id
     majority_baselines = {
-        p: _majority_baseline_from_cache(Path(cache_dir) / run_id, p)
+        p: _majority_baseline_from_cache(Path(cache_dir) / cache_run, p)
         for p in probe_names
     }
     majority_baselines_per_bin = {
-        p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / run_id, p, n_bins)
+        p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins)
         for p in probe_names
     }
 
