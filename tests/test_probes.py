@@ -134,17 +134,17 @@ def test_currently_reduces_failing_per_edit():
         sample={},
         generated_text="x",
         edit_history=[
-            # First edit: 3 failing, no baseline → None
+            # Baseline (first edit): 3 failing, no prior state → False
             EditEvent(step_idx=0, code="a", test_results={"passed": ["t1"], "failed": ["t2", "t3", "t4"]}),
-            # Second edit: 2 failing (< 3) → True
+            # Second edit: 2 failing < 3 (baseline) → True
             EditEvent(step_idx=2, code="b", test_results={"passed": ["t1", "t2"], "failed": ["t3", "t4"]}),
-            # Third edit: 2 failing (same) → False
+            # Third edit: still 2 failing < 3 (baseline) → True (baseline comparison, not prev-to-prev)
             EditEvent(step_idx=4, code="c", test_results={"passed": ["t1", "t2"], "failed": ["t3", "t4"]}),
         ],
     )
     probe = CurrentlyReducesFailingProbe()
     result = probe.compute_label(ctx)
-    assert result == [None, True, False]
+    assert result == [False, True, True]
 
 
 def test_currently_has_regressions_per_edit():
