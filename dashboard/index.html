@@ -23,6 +23,11 @@
     <section id="panel-heatmap" class="panel">
       <h2>Probe Heatmap</h2>
       <div id="probe-tabs"></div>
+      <div id="baseline-toggle" style="margin: 6px 0 2px; font-size: 11px;">
+        Baseline:
+        <button id="btn-baseline-global" class="baseline-btn active" onclick="setBaselineMode('global')">Global</button>
+        <button id="btn-baseline-per-bin" class="baseline-btn" onclick="setBaselineMode('per-bin')">Per-bin</button>
+      </div>
       <div id="heatmap-container"></div>
       <div id="linechart-container"></div>
       <div id="stats-container"></div>
