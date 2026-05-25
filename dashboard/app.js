@@ -12,6 +12,7 @@ let state = {
   selectedSampleIdx: null,
   selectedGenIdx: 0,
   filterLabel: "all",
+  baselineMode: "global",
 };
 
 // ── Data loading ──────────────────────────────────────────────────────────────
@@ -104,6 +105,13 @@ function renderProbeTabs() {
   }
 }
 
+function setBaselineMode(mode) {
+  state.baselineMode = mode;
+  document.getElementById("btn-baseline-global").classList.toggle("active", mode === "global");
+  document.getElementById("btn-baseline-per-bin").classList.toggle("active", mode === "per-bin");
+  renderHeatmap();
+}
+
 function renderHeatmap() {
   const heatContainer = document.getElementById("heatmap-container");
   const lineContainer = document.getElementById("linechart-container");
@@ -117,6 +125,8 @@ function renderHeatmap() {
   const layers = state.meta.probe_layers ?? Object.keys(probeData).map(Number).sort((a, b) => a - b);
   const nBins = 10;
   const majority = state.meta.majority_baseline?.[state.activeProbe] ?? 0.5;
+  const majorityPerBin = state.meta.majority_baseline_per_bin?.[state.activeProbe] ?? null;
+  const perBin = state.baselineMode === "per-bin" && majorityPerBin !== null;
 
   const margin = { top: 20, right: 60, bottom: 50, left: 70 };
   const width = 420 - margin.left - margin.right;
@@ -129,9 +139,19 @@ function renderHeatmap() {
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const colorScale = d3.scaleSequential()
-    .domain([majority, 1.0])
-    .interpolator(d3.interpolateBlues);
+  // Diverging scale: red (0) → white (baseline) → green (1.0), centered at baseline.
+  const diverging = t => d3.interpolateRgbBasis(["#d73027", "#ffffff", "#1a9850"])(t);
+  const makeColorScale = (baseline) =>
+    d3.scaleDiverging(diverging).domain([0, baseline, 1.0]);
+
+  const colorScaleForBin = perBin
+    ? d3.range(nBins).map(b => makeColorScale(majorityPerBin[String(b)]))
+    : null;
+  const globalColorScale = makeColorScale(majority);
+  const getColor = (acc, bin) => acc !== null
+    ? (perBin ? colorScaleForBin[bin](acc) : globalColorScale(acc))
+    : "#eee";
+  const getBaseline = (bin) => perBin ? majorityPerBin[String(bin)] : majority;
 
   const xScale = d3.scaleBand().domain(d3.range(nBins)).range([0, width]).padding(0.04);
   const yScale = d3.scaleBand().domain(layers).range([0, height]).padding(0.04);
@@ -156,14 +176,19 @@ function renderHeatmap() {
         .attr("y", yScale(layer))
         .attr("width", xScale.bandwidth())
         .attr("height", yScale.bandwidth())
-        .attr("fill", acc !== null ? colorScale(acc) : "#eee")
+        .attr("fill", getColor(acc, bin))
         .on("mousemove", (event) => {
           tooltip.style.display = "block";
           tooltip.style.left = (event.pageX + 12) + "px";
           tooltip.style.top = (event.pageY - 20) + "px";
-          tooltip.innerHTML = acc !== null
-            ? `Layer ${layer} | Bin ${bin}<br>test: ${(acc * 100).toFixed(1)}%<br>val: ${(cell.val_acc * 100).toFixed(1)}%<br>n_test: ${cell.n_test}`
-            : `Layer ${layer} | Bin ${bin}<br>No data`;
+          if (acc !== null) {
+            const bl = getBaseline(bin);
+            const diff = acc - bl;
+            const diffStr = (diff >= 0 ? "+" : "") + (diff * 100).toFixed(1) + "%";
+            tooltip.innerHTML = `Layer ${layer} | Bin ${bin}<br>test: ${(acc * 100).toFixed(1)}%<br>baseline: ${(bl * 100).toFixed(1)}%<br>diff: ${diffStr}<br>val: ${(cell.val_acc * 100).toFixed(1)}%<br>n_test: ${cell.n_test}`;
+          } else {
+            tooltip.innerHTML = `Layer ${layer} | Bin ${bin}<br>No data`;
+          }
         })
         .on("mouseleave", () => { tooltip.style.display = "none"; });
     }
@@ -182,17 +207,24 @@ function renderHeatmap() {
     .attr("text-anchor", "middle").style("font-size", "11px")
     .text("Relative position bin");
 
-  // Colour bar
+  // Colour bar: green at top (1.0), white at baseline, red at bottom (0).
+  const colorBarBaseline = perBin
+    ? (d3.range(nBins).reduce((s, b) => s + majorityPerBin[String(b)], 0) / nBins)
+    : majority;
+  const baselineOffsetPct = ((1.0 - colorBarBaseline) * 100).toFixed(1) + "%";
   const defs = svg.append("defs");
   const lgId = "hm-lg";
   const lg = defs.append("linearGradient").attr("id", lgId).attr("x1", "0%").attr("y1", "0%").attr("x2", "0%").attr("y2", "100%");
-  lg.append("stop").attr("offset", "0%").attr("stop-color", colorScale(1.0));
-  lg.append("stop").attr("offset", "100%").attr("stop-color", colorScale(majority));
+  lg.append("stop").attr("offset", "0%").attr("stop-color", "#1a9850");
+  lg.append("stop").attr("offset", baselineOffsetPct).attr("stop-color", "#ffffff");
+  lg.append("stop").attr("offset", "100%").attr("stop-color", "#d73027");
   svg.append("rect")
     .attr("x", width + 8).attr("y", 0).attr("width", 12).attr("height", height)
     .attr("fill", `url(#${lgId})`);
   svg.append("text").attr("x", width + 22).attr("y", 6).style("font-size", "10px").text("1.0");
-  svg.append("text").attr("x", width + 22).attr("y", height).style("font-size", "10px").text(majority.toFixed(2));
+  svg.append("text").attr("x", width + 22).attr("y", height * (1 - colorBarBaseline))
+    .style("font-size", "10px").text(perBin ? `~${colorBarBaseline.toFixed(2)}` : majority.toFixed(2));
+  svg.append("text").attr("x", width + 22).attr("y", height).style("font-size", "10px").text("0.0");
 
   // Line chart
   const lm = { top: 10, right: 20, bottom: 40, left: 50 };
@@ -232,9 +264,21 @@ function renderHeatmap() {
       .text(`L${layer}`);
   });
 
-  lsvg.append("line")
-    .attr("x1", 0).attr("x2", lw).attr("y1", yL(majority)).attr("y2", yL(majority))
-    .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
+  if (perBin) {
+    // Step function: one horizontal segment per bin at its own baseline
+    for (let b = 0; b < nBins; b++) {
+      const x0 = xL(b / nBins);
+      const x1 = xL((b + 1) / nBins);
+      const y = yL(majorityPerBin[String(b)]);
+      lsvg.append("line")
+        .attr("x1", x0).attr("x2", x1).attr("y1", y).attr("y2", y)
+        .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
+    }
+  } else {
+    lsvg.append("line")
+      .attr("x1", 0).attr("x2", lw).attr("y1", yL(majority)).attr("y2", yL(majority))
+      .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
+  }
 
   lsvg.append("g").attr("transform", `translate(0,${lh})`).call(d3.axisBottom(xL).ticks(5));
   lsvg.append("g").call(d3.axisLeft(yL).ticks(4));

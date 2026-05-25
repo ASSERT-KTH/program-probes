@@ -83,7 +83,7 @@ def main() -> None:
 
         pending = []
         for traj in batch:
-            fname = out_dir / f"{traj.instance_id.replace('/', '_')}.pt"
+            fname = out_dir / f"{traj.sample_id}.pt"
             if not fname.exists():
                 pending.append((traj, fname))
         if not pending:
@@ -107,7 +107,7 @@ def main() -> None:
             out = {
                 "activations": hs,
                 "instance_id": traj.instance_id,
-                "sample_id": traj.instance_id,
+                "sample_id": traj.sample_id,
                 "group_id": traj.instance_id,
                 "outcome": traj.outcome,
                 "n_captured_steps": n_steps,

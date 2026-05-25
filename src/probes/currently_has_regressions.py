@@ -2,14 +2,13 @@ from src.probes.base import ProbeAdapter, TrajectoryContext
 
 
 class CurrentlyHasRegressionsProbe(ProbeAdapter):
-    """Label: whether each edit introduced regressions.
+    """Label: whether each edit introduced regressions vs. the original baseline.
 
-    At each edit we check whether any test name appearing in
-    ``test_results["failed"]`` was in the *previous* edit's
-    ``test_results["passed"]``.  If so, the label is *True*.
-
-    The first edit has no baseline and is always *False*.  An edit whose
-    ``test_results`` is *None* produces *None*.
+    The baseline edit (cmd_idx=-1) represents the repository state before any
+    agent edit; it receives *None* because there is no prior state to compare
+    against.  Every subsequent edit receives *True* if any test that was
+    passing at baseline is now failing, *False* otherwise.  An edit whose
+    ``test_results`` is *None* also produces *None*.
     """
 
     name = "currently_has_regressions"
@@ -17,16 +16,17 @@ class CurrentlyHasRegressionsProbe(ProbeAdapter):
 
     def compute_label(self, ctx: TrajectoryContext) -> list[bool | None]:
         labels: list[bool | None] = []
-        prev_passed: set[str] = set()
+        baseline_passed: set[str] | None = None
         for edit in ctx.edit_history:
             tr = edit.test_results
             if tr is None:
                 labels.append(None)
-            elif not prev_passed:
+            elif baseline_passed is None:
+                # This is the baseline edit — store passing tests.
+                # No edit has been made yet, so no regressions are possible.
+                baseline_passed = set(tr.get("passed", []))
                 labels.append(False)
             else:
                 curr_failed = set(tr.get("failed", []))
-                labels.append(not curr_failed.isdisjoint(prev_passed))
-            if tr is not None:
-                prev_passed = set(tr.get("passed", []))
+                labels.append(not curr_failed.isdisjoint(baseline_passed))
         return labels
