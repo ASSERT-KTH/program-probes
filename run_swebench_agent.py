@@ -21,7 +21,6 @@ Usage (array job — driven by swebench_run.sh):
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import threading
 import time
@@ -136,8 +135,6 @@ def _run_one(
     cfg: SWEBenchRunConfig,
     server: VllmServer,
     output_dir: Path,
-    index_lock: threading.Lock,
-    index_path: Path,
 ) -> dict:
     """Run one (instance, run_idx) job. Called from a worker thread."""
     instance_id = instance["instance_id"]
@@ -210,10 +207,6 @@ def _run_one(
         **agent_metrics,
         **({"error": error} if error else {}),
     }
-    with index_lock:
-        with index_path.open("a") as f:
-            f.write(json.dumps(summary) + "\n")
-
     return summary
 
 
@@ -223,8 +216,6 @@ def main() -> None:
 
     output_dir = Path(cfg.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    index_path = output_dir / "index.jsonl"
-    index_lock = threading.Lock()
 
     # Load and shard instances
     from src.configs import TaskConfig
@@ -304,8 +295,6 @@ def main() -> None:
                         cfg=cfg,
                         server=server,
                         output_dir=output_dir,
-                        index_lock=index_lock,
-                        index_path=index_path,
                     ): (inst["instance_id"], run_idx)
                     for inst, run_idx in jobs
                 }
@@ -361,7 +350,7 @@ def main() -> None:
     })
     wandb.finish()
 
-    print(f"\n[swe-bench] done. index at {index_path}", flush=True)
+    print(f"\n[swe-bench] done.", flush=True)
 
 
 if __name__ == "__main__":
