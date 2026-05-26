@@ -29,6 +29,8 @@ def main():
     parser.add_argument("--traj-dir", default=None,
                         help="Directory of trajectory JSONs; if provided, loads messages and accurate token/turn counts")
     parser.add_argument("--n-bins", type=int, default=10)
+    parser.add_argument("--eval-bin-axis", choices=["position", "step_relative", "step_absolute"],
+                        default="position")
     args = parser.parse_args()
 
     model_cfg = load_config(args.model_config, ModelConfig)
@@ -46,6 +48,7 @@ def main():
         dashboard_dir=args.dashboard_dir,
         traj_dir=args.traj_dir,
         n_bins=args.n_bins,
+        eval_bin_axis=args.eval_bin_axis,
     )
 
 

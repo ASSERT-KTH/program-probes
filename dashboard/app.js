@@ -123,10 +123,16 @@ function renderHeatmap() {
   if (!probeData) return;
 
   const layers = state.meta.probe_layers ?? Object.keys(probeData).map(Number).sort((a, b) => a - b);
+  const evalBinAxis = state.meta.eval_bin_axis ?? "position";
   const nBins = 10;
   const majority = state.meta.majority_baseline?.[state.activeProbe] ?? 0.5;
   const majorityPerBin = state.meta.majority_baseline_per_bin?.[state.activeProbe] ?? null;
   const perBin = state.baselineMode === "per-bin" && majorityPerBin !== null;
+
+  if (evalBinAxis === "step_absolute") {
+    renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majority, majorityPerBin);
+    return;
+  }
 
   const margin = { top: 20, right: 60, bottom: 50, left: 70 };
   const width = 420 - margin.left - margin.right;
@@ -205,7 +211,7 @@ function renderHeatmap() {
   svg.append("text")
     .attr("x", width / 2).attr("y", height + margin.bottom - 4)
     .attr("text-anchor", "middle").style("font-size", "11px")
-    .text("Relative position bin");
+    .text(evalBinAxis === "step_relative" ? "Relative step bin" : "Relative position bin");
 
   // Colour bar: green at top (1.0), white at baseline, red at bottom (0).
   const colorBarBaseline = perBin
@@ -286,7 +292,95 @@ function renderHeatmap() {
   lsvg.append("text")
     .attr("x", lw / 2).attr("y", lh + 32)
     .attr("text-anchor", "middle").style("font-size", "10px")
-    .text("Relative position");
+    .text(evalBinAxis === "step_relative" ? "Relative step" : "Relative position");
+}
+
+function renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majority, majorityPerBin) {
+  // Collect all step keys across all layers
+  const allSteps = new Set();
+  layers.forEach(layer => {
+    Object.keys(probeData[String(layer)] ?? {}).forEach(k => allSteps.add(Number(k)));
+  });
+  const steps = Array.from(allSteps).sort((a, b) => a - b);
+  if (steps.length === 0) return;
+
+  const colours = d3.schemeCategory10;
+  const lm = { top: 10, right: 20, bottom: 40, left: 50 };
+  const lw = 420 - lm.left - lm.right;
+  const lh = 140 - lm.top - lm.bottom;
+
+  // Summary line chart (always visible)
+  const xL = d3.scaleLinear().domain([steps[0], steps[steps.length - 1]]).range([0, lw]);
+  const yL = d3.scaleLinear().domain([0, 1]).range([lh, 0]);
+  const lsvg = d3.select(lineContainer)
+    .append("svg")
+    .attr("viewBox", `0 0 ${lw + lm.left + lm.right} ${lh + lm.top + lm.bottom}`)
+    .append("g").attr("transform", `translate(${lm.left},${lm.top})`);
+
+  layers.forEach((layer, li) => {
+    const layerData = probeData[String(layer)] ?? {};
+    const pts = steps.map(s => [s, layerData[String(s)]?.test_acc]).filter(d => d[1] !== undefined);
+    if (pts.length === 0) return;
+    lsvg.append("path").datum(pts)
+      .attr("fill", "none").attr("stroke", colours[li % 10]).attr("stroke-width", 1.5)
+      .attr("d", d3.line().x(d => xL(d[0])).y(d => yL(d[1])));
+    lsvg.append("text")
+      .attr("x", xL(pts[pts.length - 1][0]) + 4).attr("y", yL(pts[pts.length - 1][1]))
+      .style("font-size", "9px").style("fill", colours[li % 10]).text(`L${layer}`);
+  });
+
+  // Majority baseline line (global or per-step)
+  const perBin = majorityPerBin !== null;
+  if (perBin) {
+    steps.forEach(s => {
+      const bl = majorityPerBin[String(s)];
+      if (bl === undefined) return;
+      lsvg.append("line")
+        .attr("x1", xL(s) - 4).attr("x2", xL(s) + 4)
+        .attr("y1", yL(bl)).attr("y2", yL(bl))
+        .attr("stroke", "#999").attr("stroke-dasharray", "2,2").attr("stroke-width", 1);
+    });
+  } else {
+    lsvg.append("line")
+      .attr("x1", 0).attr("x2", lw).attr("y1", yL(majority)).attr("y2", yL(majority))
+      .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
+  }
+
+  lsvg.append("g").attr("transform", `translate(0,${lh})`).call(d3.axisBottom(xL).ticks(Math.min(steps.length, 10)).tickFormat(d3.format("d")));
+  lsvg.append("g").call(d3.axisLeft(yL).ticks(4));
+  lsvg.append("text").attr("x", lw / 2).attr("y", lh + 32)
+    .attr("text-anchor", "middle").style("font-size", "10px").text("Step number");
+
+  // Collapsible full table
+  const details = document.createElement("details");
+  details.style.marginTop = "8px";
+  const summary = document.createElement("summary");
+  summary.textContent = `Per-step breakdown (${steps.length} steps)`;
+  summary.style.cssText = "cursor:pointer;font-size:11px;color:#555;user-select:none";
+  details.appendChild(summary);
+
+  const table = document.createElement("table");
+  table.style.cssText = "font-size:10px;border-collapse:collapse;margin-top:6px;width:100%";
+  const header = table.insertRow();
+  ["Step", ...layers.map(l => `L${l} test_acc`)].forEach(h => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    th.style.cssText = "padding:2px 6px;border-bottom:1px solid #ddd;text-align:right";
+    header.appendChild(th);
+  });
+  steps.forEach(s => {
+    const row = table.insertRow();
+    [String(s), ...layers.map(layer => {
+      const cell = probeData[String(layer)]?.[String(s)];
+      return cell ? (cell.test_acc * 100).toFixed(1) + "%" : "—";
+    })].forEach((val, ci) => {
+      const td = row.insertCell();
+      td.textContent = val;
+      td.style.cssText = "padding:2px 6px;border-bottom:1px solid #f0f0f0;text-align:right" + (ci === 0 ? ";font-weight:600" : "");
+    });
+  });
+  details.appendChild(table);
+  heatContainer.appendChild(details);
 }
 
 // Panel 1: run statistics (agentic + non-agentic)

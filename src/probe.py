@@ -94,12 +94,14 @@ def train_probe_layer(
     probe_arch: str = "linear",
     log_fn: Callable[[dict], None] | None = None,
     n_eval_bins: int | None = None,
+    eval_bin_axis: str = "position",
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
     H = data["H"]  # keep float16 to halve base memory; convert per-bin below
     y = data["y"]
     rel_pos = data["rel_pos"]
+    step_idx = data.get("step_idx")
     sample_ids = data["sample_id"]
     group_ids = data["group_id"]
 
@@ -131,6 +133,14 @@ def train_probe_layer(
         bin_y = y[bin_mask]
         bin_samples = [sample_ids[i] for i in range(len(sample_ids)) if bin_mask[i]]
         bin_rel_pos = rel_pos[bin_mask]
+        bin_step_idx = step_idx[bin_mask] if step_idx is not None else None
+
+        # Per-trajectory max step for per-trajectory relative step normalisation
+        if bin_step_idx is not None:
+            sample_max_step: dict[str, int] = {}
+            for s_id, s in zip(bin_samples, bin_step_idx.tolist()):
+                if s > sample_max_step.get(s_id, 0):
+                    sample_max_step[s_id] = s
 
         train_mask = torch.tensor([s in train_samples for s in bin_samples])
         val_mask = torch.tensor([s in val_samples for s in bin_samples])
@@ -144,6 +154,10 @@ def train_probe_layer(
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
         rel_pos_val  = bin_rel_pos[val_mask]
         rel_pos_test = bin_rel_pos[test_mask]
+        step_idx_val  = bin_step_idx[val_mask]  if bin_step_idx is not None else None
+        step_idx_test = bin_step_idx[test_mask] if bin_step_idx is not None else None
+        val_sample_ids  = [s for s, m in zip(bin_samples, val_mask.tolist())  if m]
+        test_sample_ids = [s for s, m in zip(bin_samples, test_mask.tolist()) if m]
 
         mean = H_train.mean(dim=0)
         H_train = H_train - mean
@@ -207,17 +221,45 @@ def train_probe_layer(
         model.load_state_dict(best_weights)
         model.eval()
 
-        for eval_bin_idx in range(n_eval_bins if n_eval_bins is not None else 1):
-            if n_eval_bins is not None:
-                eb = eval_bin_idx
-                eval_val_mask  = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_val])
-                eval_test_mask = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_test])
+        if eval_bin_axis == "step_absolute":
+            unique_steps = sorted(step_idx_val.unique().tolist() + step_idx_test.unique().tolist())
+            unique_steps = sorted(set(unique_steps))
+            eval_bins = [("step", s) for s in unique_steps]
+        elif n_eval_bins is not None:
+            eval_bins = [("range", eb) for eb in range(n_eval_bins)]
+        else:
+            eval_bins = [("all", bin_idx)]
+
+        for bin_type, eb in eval_bins:
+            if bin_type == "range":
+                if eval_bin_axis == "step_relative":
+                    if step_idx_val is None or step_idx_test is None:
+                        raise ValueError("eval_bin_axis='step_relative' requires step_idx in cache")
+                    eval_val_mask  = torch.tensor([
+                        _bin_index(s.item() / max(sample_max_step.get(sid, 1), 1), n_eval_bins) == eb
+                        for sid, s in zip(val_sample_ids, step_idx_val)
+                    ])
+                    eval_test_mask = torch.tensor([
+                        _bin_index(s.item() / max(sample_max_step.get(sid, 1), 1), n_eval_bins) == eb
+                        for sid, s in zip(test_sample_ids, step_idx_test)
+                    ])
+                else:  # position
+                    eval_val_mask  = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_val])
+                    eval_test_mask = torch.tensor([_bin_index(p.item(), n_eval_bins) == eb for p in rel_pos_test])
                 if eval_val_mask.sum() == 0 or eval_test_mask.sum() == 0:
                     continue
                 H_val_e,  y_val_e  = H_val[eval_val_mask],   y_val[eval_val_mask]
                 H_test_e, y_test_e = H_test[eval_test_mask], y_test[eval_test_mask]
                 result_bin_idx = eb
-            else:
+            elif bin_type == "step":
+                eval_val_mask  = step_idx_val  == eb
+                eval_test_mask = step_idx_test == eb
+                if eval_val_mask.sum() == 0 or eval_test_mask.sum() == 0:
+                    continue
+                H_val_e,  y_val_e  = H_val[eval_val_mask],   y_val[eval_val_mask]
+                H_test_e, y_test_e = H_test[eval_test_mask], y_test[eval_test_mask]
+                result_bin_idx = eb
+            else:  # all
                 H_val_e,  y_val_e  = H_val,  y_val
                 H_test_e, y_test_e = H_test, y_test
                 result_bin_idx = bin_idx
@@ -285,6 +327,7 @@ def run_sweep(
     n_bins: int = 10,
     probe_arch: str = "linear",
     n_eval_bins: int | None = None,
+    eval_bin_axis: str = "position",
 ) -> None:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -317,7 +360,7 @@ def run_sweep(
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
-                log_fn=log_fn, n_eval_bins=n_eval_bins,
+                log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
@@ -343,6 +386,7 @@ def run_final(
     n_bins: int = 10,
     probe_arch: str = "linear",
     n_eval_bins: int | None = None,
+    eval_bin_axis: str = "position",
 ) -> dict:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -375,7 +419,7 @@ def run_final(
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
-                log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins,
+                log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
             )
             all_results[layer_idx] = results
             for r in results:

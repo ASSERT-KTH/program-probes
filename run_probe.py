@@ -16,6 +16,9 @@ def main():
     parser.add_argument("--n-bins", type=int, default=10)
     parser.add_argument("--n-eval-bins", type=int, default=None,
                         help="If set, train on all tokens pooled (n_bins=1) but evaluate per bin at this granularity")
+    parser.add_argument("--eval-bin-axis", choices=["position", "step_relative", "step_absolute"],
+                        default="position",
+                        help="Axis to bin on during evaluation: token position, relative step, or exact step number")
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
@@ -47,6 +50,7 @@ def main():
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins,
+            eval_bin_axis=args.eval_bin_axis,
         )
     else:
         run_final(
@@ -64,6 +68,7 @@ def main():
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins,
+            eval_bin_axis=args.eval_bin_axis,
         )
 
 

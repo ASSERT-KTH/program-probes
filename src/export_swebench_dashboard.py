@@ -47,7 +47,8 @@ def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 
 
 
 def _per_bin_majority_baseline_from_cache(
-    cache_dir: Path, probe_name: str, n_bins: int = 10, seed: int = 42
+    cache_dir: Path, probe_name: str, n_bins: int = 10, seed: int = 42,
+    eval_bin_axis: str = "position",
 ) -> dict[str, float]:
     """Compute per-bin majority baseline from the test split of the probe cache."""
     probe_dir = cache_dir / probe_name
@@ -57,22 +58,59 @@ def _per_bin_majority_baseline_from_cache(
     data = torch.load(layer_files[0], weights_only=False)
     y = data["y"]
     rel_pos = data["rel_pos"]
+    step_idx = data.get("step_idx")
     group_ids = data["group_id"]
     _, _, test_groups = _split_groups(group_ids, seed)
     result = {}
-    for b in range(n_bins):
-        bin_mask = torch.tensor([
-            group_ids[i] in test_groups
-            and y[i].item() >= 0
-            and _bin_index(rel_pos[i].item(), n_bins) == b
-            for i in range(len(y))
-        ])
-        bin_y = y[bin_mask]
-        if len(bin_y) == 0:
-            raise ValueError(f"No test samples in bin {b} for probe '{probe_name}' in {probe_dir}")
-        pos = (bin_y == 1).sum().item()
-        total = len(bin_y)
-        result[str(b)] = max(pos / total, 1 - pos / total)
+
+    if eval_bin_axis == "step_absolute":
+        if step_idx is None:
+            raise ValueError(f"eval_bin_axis='step_absolute' requires step_idx in cache for probe '{probe_name}'")
+        test_mask = torch.tensor([group_ids[i] in test_groups and y[i].item() >= 0 for i in range(len(y))])
+        unique_steps = sorted(step_idx[test_mask].unique().tolist())
+        for s in unique_steps:
+            bin_mask = test_mask & (step_idx == s)
+            bin_y = y[bin_mask]
+            if len(bin_y) == 0:
+                continue
+            pos = (bin_y == 1).sum().item()
+            total = len(bin_y)
+            result[str(s)] = max(pos / total, 1 - pos / total)
+    elif eval_bin_axis == "step_relative":
+        if step_idx is None:
+            raise ValueError(f"eval_bin_axis='step_relative' requires step_idx in cache for probe '{probe_name}'")
+        # Per-trajectory max step for normalization
+        sample_max_step: dict[str, int] = {}
+        for sid, s in zip(group_ids, step_idx.tolist()):
+            if s > sample_max_step.get(sid, 0):
+                sample_max_step[sid] = s
+        for b in range(n_bins):
+            bin_mask = torch.tensor([
+                group_ids[i] in test_groups
+                and y[i].item() >= 0
+                and _bin_index(step_idx[i].item() / max(sample_max_step.get(group_ids[i], 1), 1), n_bins) == b
+                for i in range(len(y))
+            ])
+            bin_y = y[bin_mask]
+            if len(bin_y) == 0:
+                continue  # static probes only have data at step 0; skip empty bins
+            pos = (bin_y == 1).sum().item()
+            total = len(bin_y)
+            result[str(b)] = max(pos / total, 1 - pos / total)
+    else:  # position
+        for b in range(n_bins):
+            bin_mask = torch.tensor([
+                group_ids[i] in test_groups
+                and y[i].item() >= 0
+                and _bin_index(rel_pos[i].item(), n_bins) == b
+                for i in range(len(y))
+            ])
+            bin_y = y[bin_mask]
+            if len(bin_y) == 0:
+                raise ValueError(f"No test samples in bin {b} for probe '{probe_name}' in {probe_dir}")
+            pos = (bin_y == 1).sum().item()
+            total = len(bin_y)
+            result[str(b)] = max(pos / total, 1 - pos / total)
     return result
 
 
@@ -151,6 +189,7 @@ def export_swebench_dashboard(
     dashboard_dir: str = "dashboard",
     traj_dir: str | None = None,
     n_bins: int = 10,
+    eval_bin_axis: str = "position",
 ) -> None:
     data_dir = Path(dashboard_dir) / "data"
     run_dir = data_dir / run_id
@@ -254,7 +293,7 @@ def export_swebench_dashboard(
         for p in probe_names
     }
     majority_baselines_per_bin = {
-        p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins)
+        p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins, eval_bin_axis=eval_bin_axis)
         for p in probe_names
     }
 
@@ -288,6 +327,7 @@ def export_swebench_dashboard(
         "n_generations": 1,
         "majority_baseline": majority_baselines,
         "majority_baseline_per_bin": majority_baselines_per_bin,
+        "eval_bin_axis": eval_bin_axis,
         "is_agentic": True,
     }
     (run_dir / "meta.json").write_text(json.dumps(meta_out, indent=2))
