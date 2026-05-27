@@ -22,8 +22,9 @@ run_build_cache.py       concatenate .pt files into per-(layer, probe) tensors
                          → cache/<run_id>/<probe>_layer<n>.pt
         │
         ▼
-run_probe.py sweep       W&B hyperparameter sweep → pick best lr/wd/batch-size
+run_probe.py sweep       W&B hyperparameter sweep → pick best lr/wd/batch-size/loss
 run_probe.py final       train linear probe on best hparams → W&B run with metrics
+                          (or pass --from-sweep to auto-load best HPs from a sweep)
         │
         ▼
 run_figures.py           accuracy heatmaps per layer × relative-position bin
@@ -192,29 +193,69 @@ uv run python run_build_cache.py \
   --probe will_be_correct
 ```
 
-### 3. Probe sweep (W&B)
+### 3. Probe training
+
+Probe training has three modes: **manual**, **sweep-only**, and **sweep→final** (one-shot).
+
+#### Loss function
+
+The `--loss` flag selects the objective:
+
+| `--loss` | Behavior |
+|---|---|
+| `cross_entropy` (default) | Standard `CrossEntropyLoss` — no class weighting |
+| `weighted_cross_entropy` | `CrossEntropyLoss(weight=[1.0, λ · n_neg/n_pos])` — adaptive per-bin class balancing |
+
+When using `weighted_cross_entropy`, the `--pos-weight` λ parameter (default 1.0) multiplies the inverse class ratio:
+- λ = 1.0 → exactly balanced classes per bin
+- λ > 1.0 → penalize false negatives more (up-weight positives)
+- λ < 1.0 → penalize false positives more (down-weight positives)
+
+#### Mode A: Manual (specify all HPs)
 
 ```bash
-uv run python run_probe.py sweep \
-  --run-id my_run \
-  --probe will_be_correct \
-  --model-config configs/models/qwen3_8b.yaml
-```
-
-### 4. Probe final run
-
-```bash
-uv run python run_probe.py final \
-  --run-id my_run \
-  --probe will_be_correct \
+uv run python run_probe.py \
+  --run-id my_run --probe will_be_correct \
   --model-config configs/models/qwen3_8b.yaml \
-  --lr 1e-3 \
-  --weight-decay 1e-4 \
-  --batch-size 512 \
-  --patience 10
+  final \
+  --lr 1e-3 --weight-decay 1e-4 --batch-size 512 --patience 10 \
+  --loss weighted_cross_entropy --pos-weight 1.0
 ```
 
-### 5. Figures
+#### Mode B: Sweep only
+
+```bash
+uv run python run_probe.py \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  sweep --count 50
+```
+
+The sweep explores `lr`, `weight_decay`, `batch_size`, `patience`, `loss` (cross_entropy vs weighted_cross_entropy), and `pos_weight` (log-uniform in [0.1, 10.0]) via Bayesian optimisation. Copy the best HPs from the W&B dashboard.
+
+#### Mode C: Sweep → final (fully automatic)
+
+```bash
+uv run python run_probe.py \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  sweep --count 50 --then-final
+```
+
+Runs the sweep, waits for completion, fetches the best config from W&B via `fetch_best_sweep_config()`, and trains on all probe layers — no manual copy-paste.
+
+#### Mode D: Final from an existing sweep
+
+```bash
+uv run python run_probe.py \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  final --from-sweep abc123xyz
+```
+
+Queries `sweep.best_run()` via the W&B API to auto-populate `lr`, `weight_decay`, `batch_size`, `patience`, `loss`, and `pos_weight`.
+
+### 4. Figures
 
 ```bash
 uv run python run_figures.py \
@@ -223,7 +264,7 @@ uv run python run_figures.py \
   --model-config configs/models/qwen3_8b.yaml
 ```
 
-### 6. Export dashboard
+### 5. Export dashboard
 
 ```bash
 uv run python run_export_dashboard.py \
@@ -257,10 +298,18 @@ sbatch --array=0-29 slurm/probe_sweep.sh \
   --run-id my_run --probe will_be_correct \
   --model-config configs/models/qwen3_8b.yaml
 
+# Final with manual HPs:
 sbatch slurm/probe_final.sh \
   --run-id my_run --probe will_be_correct \
   --model-config configs/models/qwen3_8b.yaml \
-  --lr 1e-3 --weight-decay 1e-4 --batch-size 512 --patience 10
+  --lr 1e-3 --weight-decay 1e-4 --batch-size 512 --patience 10 \
+  --loss weighted_cross_entropy --pos-weight 1.0
+
+# Final auto-loaded from sweep:
+sbatch slurm/probe_final.sh \
+  --run-id my_run --probe will_be_correct \
+  --model-config configs/models/qwen3_8b.yaml \
+  --from-sweep abc123xyz
 
 sbatch slurm/figures.sh --run-id my_run --probe will_be_correct \
   --model-config configs/models/qwen3_8b.yaml
