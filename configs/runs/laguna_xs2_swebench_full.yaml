@@ -24,7 +24,7 @@ vllm_extra_args:
   - '{"enable_thinking": true}'
 
 # --- Generation (thinking mode, coding) ---
-temperature: 0.6
+temperature: 0.7
 top_p: 0.95
 top_k: 20
 
