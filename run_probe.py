@@ -26,12 +26,20 @@ def main():
     sweep_p = subparsers.add_parser("sweep")
     sweep_p.add_argument("--sweep-id", default=None, help="Join an existing W&B sweep instead of creating a new one")
     sweep_p.add_argument("--count", type=int, default=None, help="Max number of runs this agent will execute")
+    sweep_p.add_argument("--then-final", action="store_true",
+                        help="After sweep, automatically train on all layers with best HPs")
 
     final_p = subparsers.add_parser("final")
-    final_p.add_argument("--lr", type=float, required=True)
-    final_p.add_argument("--weight-decay", type=float, required=True)
-    final_p.add_argument("--batch-size", type=int, required=True)
-    final_p.add_argument("--patience", type=int, required=True)
+    final_p.add_argument("--lr", type=float, default=None)
+    final_p.add_argument("--weight-decay", type=float, default=None)
+    final_p.add_argument("--batch-size", type=int, default=None)
+    final_p.add_argument("--patience", type=int, default=None)
+    final_p.add_argument("--from-sweep", default=None,
+                        help="Sweep ID to load best hyperparameters from")
+    final_p.add_argument("--loss", choices=["cross_entropy", "weighted_cross_entropy"],
+                        default="cross_entropy")
+    final_p.add_argument("--pos-weight", type=float, default=1.0,
+                        help="Positive class weight multiplier (only used with --loss weighted_cross_entropy)")
 
     args = parser.parse_args()
     model_cfg = load_config(args.model_config, ModelConfig)
@@ -51,6 +59,8 @@ def main():
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
+            then_final=args.then_final,
+            results_dir=args.results_dir,
         )
     else:
         run_final(
@@ -62,11 +72,14 @@ def main():
             batch_size=args.batch_size,
             patience=args.patience,
             seed=args.seed,
+            sweep_id=args.from_sweep,
             cache_dir=args.cache_dir,
             cache_run_id=cache_run_id,
             results_dir=args.results_dir,
             n_bins=args.n_bins,
             probe_arch=args.probe_arch,
+            loss=args.loss,
+            pos_weight=args.pos_weight,
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
         )

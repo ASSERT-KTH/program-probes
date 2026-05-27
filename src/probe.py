@@ -92,6 +92,8 @@ def train_probe_layer(
     seed: int,
     n_bins: int = 10,
     probe_arch: str = "linear",
+    loss: str = "cross_entropy",
+    pos_weight: float = 1.0,
     log_fn: Callable[[dict], None] | None = None,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
@@ -116,22 +118,21 @@ def train_probe_layer(
     test_samples  = {sid for sid, s in group_to_split.items() if s == "test"}
 
     hidden_dim = H.shape[1]
-    criterion = nn.CrossEntropyLoss()
     results = []
 
     train_n_bins = 1 if n_eval_bins is not None else n_bins
+    bin_ids = (rel_pos * train_n_bins).floor().long().clamp(0, train_n_bins - 1)
+    valid = y >= 0
 
     for bin_idx in range(train_n_bins):
-        bin_mask = torch.tensor([
-            _bin_index(rel_pos[i].item(), train_n_bins) == bin_idx and y[i].item() >= 0
-            for i in range(len(y))
-        ])
-        if bin_mask.sum() == 0:
+        bin_mask = (bin_ids == bin_idx) & valid
+        if not bin_mask.any():
             continue
 
+        mask_idx = bin_mask.nonzero(as_tuple=True)[0]
         bin_H = H[bin_mask].float()
         bin_y = y[bin_mask]
-        bin_samples = [sample_ids[i] for i in range(len(sample_ids)) if bin_mask[i]]
+        bin_samples = [sample_ids[i] for i in mask_idx.tolist()]
         bin_rel_pos = rel_pos[bin_mask]
         bin_step_idx = step_idx[bin_mask] if step_idx is not None else None
 
@@ -158,6 +159,14 @@ def train_probe_layer(
         step_idx_test = bin_step_idx[test_mask] if bin_step_idx is not None else None
         val_sample_ids  = [s for s, m in zip(bin_samples, val_mask.tolist())  if m]
         test_sample_ids = [s for s, m in zip(bin_samples, test_mask.tolist()) if m]
+
+        n_pos = (y_train == 1).sum().item()
+        n_neg = (y_train == 0).sum().item()
+        if loss == "weighted_cross_entropy":
+            w_pos = pos_weight * (n_neg / n_pos) if n_pos > 0 else 1.0
+            criterion = nn.CrossEntropyLoss(weight=torch.tensor([1.0, w_pos]))
+        else:
+            criterion = nn.CrossEntropyLoss()
 
         mean = H_train.mean(dim=0)
         H_train = H_train - mean
@@ -308,11 +317,28 @@ def create_sweep(run_id: str, probe_name: str) -> str:
             "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
             "batch_size": {"values": [256, 512, 1024]},
             "patience": {"values": [10, 100]},
+            "loss": {"values": ["cross_entropy", "weighted_cross_entropy"]},
+            "pos_weight": {"distribution": "log_uniform_values", "min": 0.1, "max": 10.0},
         },
     }
     sweep_id = wandb.sweep(sweep_config, project="program-probes")
     print(f"Created sweep: {sweep_id}", flush=True)
     return sweep_id
+
+
+def fetch_best_sweep_config(sweep_id: str) -> dict:
+    """Query W&B for the best run in a sweep and return its hyperparameters."""
+    import wandb
+    api = wandb.Api()
+    sweep = api.sweep(f"tux-tu-kth-royal-institute-of-technology/program-probes/{sweep_id}")
+    best_run = sweep.best_run()
+    if best_run is None:
+        raise ValueError(f"No completed runs found for sweep {sweep_id}")
+    cfg = dict(best_run.config)
+    print(f"Best sweep run: {best_run.name}  mean_val_f1={best_run.summary.get('mean_val_f1', 'N/A')}")
+    for k, v in cfg.items():
+        print(f"  {k}: {v}")
+    return cfg
 
 
 def run_sweep(
@@ -328,7 +354,15 @@ def run_sweep(
     probe_arch: str = "linear",
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
-) -> None:
+    then_final: bool = False,
+    results_dir: str = "results",
+) -> str:
+    """Run hyperparameter sweep, optionally followed by final training.
+
+    Returns the *sweep_id* so callers can reference it later.
+    When *then_final* is True, the best config is automatically fetched and
+    used for a full ``run_final`` on all probe layers.
+    """
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
 
@@ -360,6 +394,7 @@ def run_sweep(
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
+                loss=cfg.loss, pos_weight=cfg.pos_weight,
                 log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
             )
             wandb.log({
@@ -370,24 +405,61 @@ def run_sweep(
 
     wandb.agent(sweep_id, sweep_fn, project="program-probes", count=count)
 
+    if then_final:
+        print(f"\n--- Sweep complete. Starting final training with best config ---\n")
+        run_final(
+            run_id=run_id,
+            probe_name=probe_name,
+            probe_layers=probe_layers,
+            seed=seed,
+            sweep_id=sweep_id,
+            cache_dir=cache_dir,
+            cache_run_id=cache_run_id,
+            results_dir=results_dir,
+            n_bins=n_bins,
+            probe_arch=probe_arch,
+            n_eval_bins=n_eval_bins,
+            eval_bin_axis=eval_bin_axis,
+        )
+
+    return sweep_id
+
 
 def run_final(
     run_id: str,
     probe_name: str,
     probe_layers: list[int],
-    lr: float,
-    weight_decay: float,
-    batch_size: int,
-    patience: int,
-    seed: int,
+    lr: float | None = None,
+    weight_decay: float | None = None,
+    batch_size: int | None = None,
+    patience: int | None = None,
+    seed: int = 42,
+    sweep_id: str | None = None,
     cache_dir: str = "cache",
     cache_run_id: str | None = None,
     results_dir: str = "results",
     n_bins: int = 10,
     probe_arch: str = "linear",
+    loss: str = "cross_entropy",
+    pos_weight: float = 1.0,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
 ) -> dict:
+    if sweep_id is not None:
+        best = fetch_best_sweep_config(sweep_id)
+        lr = lr if lr is not None else best["lr"]
+        weight_decay = weight_decay if weight_decay is not None else best["weight_decay"]
+        batch_size = batch_size if batch_size is not None else best["batch_size"]
+        patience = patience if patience is not None else best["patience"]
+        loss = best["loss"]
+        if loss == "weighted_cross_entropy":
+            pos_weight = best["pos_weight"]
+    if lr is None or weight_decay is None or batch_size is None or patience is None:
+        raise ValueError(
+            "lr, weight_decay, batch_size, patience are required "
+            "(either explicitly or via --from-sweep)"
+        )
+
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
@@ -419,6 +491,7 @@ def run_final(
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
+                loss=loss, pos_weight=pos_weight,
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
             )
             all_results[layer_idx] = results
