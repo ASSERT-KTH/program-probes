@@ -1,0 +1,11 @@
+# Label 16 test trajectories from Laguna-XS.2
+# Usage:
+#   uv run python run_labeler.py --config configs/labeling/laguna_xs2_test_labeler.yaml
+
+trajectory_dir: generations/swebench/laguna_xs2_test
+output_dir: labels/swebench/laguna_xs2_test
+modal_app_name: program-probes-labeler
+sandbox_timeout: 3600
+eval_timeout: 600
+resume: true
+n_workers: 16
