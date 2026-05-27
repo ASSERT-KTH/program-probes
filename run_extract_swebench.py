@@ -44,6 +44,9 @@ def _load_model_adapter(adapter_name: str):
     if adapter_name == "cwm":
         from src.models.cwm import CwmAdapter
         return CwmAdapter()
+    if adapter_name == "laguna":
+        from src.models.laguna import LagunaAdapter
+        return LagunaAdapter()
     raise ValueError(f"Unknown model adapter: {adapter_name!r}")
 
 

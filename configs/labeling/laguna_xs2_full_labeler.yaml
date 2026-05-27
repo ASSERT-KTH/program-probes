@@ -1,0 +1,11 @@
+# Label full Laguna-XS.2 run (all available trajectories, resume-safe)
+# Usage:
+#   uv run python run_labeler.py --config configs/labeling/laguna_xs2_full_labeler.yaml
+
+trajectory_dir: generations/swebench/laguna_xs2_full
+output_dir: labels/swebench/laguna_xs2_full
+modal_app_name: program-probes-labeler
+sandbox_timeout: 3600
+eval_timeout: 600
+resume: true
+n_workers: 50

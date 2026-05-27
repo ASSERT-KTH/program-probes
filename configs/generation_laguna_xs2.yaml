@@ -1,0 +1,7 @@
+temperature: 0.6
+top_p: 0.95
+top_k: 20
+stride: 5
+dtype: bfloat16
+num_gpus: 4
+extraction_batch_size: 1

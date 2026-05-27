@@ -1,0 +1,41 @@
+# Test run: Laguna-XS.2 on 16 SWE-bench Verified instances, 4xA100 thin
+#
+# Submit with:
+#   sbatch --gpus=4 slurm/swebench_run_thin.sh \
+#     --run-config configs/runs/laguna_xs2_swebench_test.yaml
+
+# --- Model / vLLM ---
+model_id: poolside/Laguna-XS.2
+served_model_name: laguna-xs2
+tensor_parallel_size: 4
+max_model_len: 262144
+dtype: bfloat16
+gpu_memory_utilization: 0.9
+vllm_port: 18000
+vllm_startup_timeout_s: 900
+vllm_log_path: logs/vllm_laguna_xs2_swebench_test.log
+vllm_extra_args:
+  - "--reasoning-parser"
+  - "poolside_v1"
+  - "--enable-auto-tool-choice"
+  - "--tool-call-parser"
+  - "poolside_v1"
+  - "--default-chat-template-kwargs"
+  - '{"enable_thinking": true}'
+
+# --- Generation (thinking mode, coding) ---
+temperature: 0.6
+top_p: 0.95
+top_k: 20
+
+# --- Agent ---
+step_limit: 100
+command_timeout: 180
+
+# --- Execution ---
+n_runs: 1
+n_instances: 16
+n_workers: 16
+modal_app_name: program-probes-swebench
+modal_timeout: 3600
+output_dir: generations/swebench/laguna_xs2_test
