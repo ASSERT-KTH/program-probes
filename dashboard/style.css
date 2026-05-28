@@ -376,3 +376,30 @@ header h1 { font-size: 18px; font-weight: 600; }
   margin: 0;
   color: #222;
 }
+
+/* Tab navigation */
+#tab-nav {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 16px;
+}
+
+.tab-btn {
+  font-size: 12px;
+  padding: 3px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+  color: #444;
+}
+
+.tab-btn.active {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #1a1a2e;
+}
+
+.tab-panel {
+  padding: 16px;
+}

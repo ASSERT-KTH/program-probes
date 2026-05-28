@@ -346,4 +346,35 @@ def export_swebench_dashboard(
         "timestamp": datetime.utcnow().isoformat() + "Z",
     })
     manifest_path.write_text(json.dumps(manifest, indent=2))
+
+    # Copy any figures for this run into dashboard/data/figures/ and update figures manifest
+    _export_figures(run_id=run_id, figures_src_dir="figures", data_dir=data_dir)
+
     print(f"[export] wrote dashboard data to {run_dir}")
+
+
+def _export_figures(run_id: str, figures_src_dir: str, data_dir: Path) -> None:
+    import shutil
+    figures_src = Path(figures_src_dir) / run_id
+    if not figures_src.exists():
+        return
+
+    figures_dst = data_dir / "figures" / run_id
+    figures_dst.mkdir(parents=True, exist_ok=True)
+
+    figures_manifest_path = data_dir / "figures" / "manifest.json"
+    figures_manifest = json.loads(figures_manifest_path.read_text()) if figures_manifest_path.exists() else []
+    # Remove stale entries for this run
+    figures_manifest = [e for e in figures_manifest if e.get("run_id") != run_id]
+
+    for png in sorted(figures_src.glob("*.png")):
+        shutil.copy2(png, figures_dst / png.name)
+        stem = png.stem  # e.g. "will_resolve_heatmap" or "will_resolve_lookahead"
+        figures_manifest.append({
+            "run_id": run_id,
+            "path": f"{run_id}/{png.name}",
+            "title": f"{run_id} / {stem.replace('_', ' ')}",
+        })
+        print(f"[export] copied figure {png.name}")
+
+    figures_manifest_path.write_text(json.dumps(figures_manifest, indent=2))

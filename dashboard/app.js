@@ -779,6 +779,103 @@ function renderDetail() {
   container.appendChild(probesEl);
 }
 
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.getElementById("panels").style.display = name === "probes" ? "" : "none";
+  document.getElementById("tab-figures").style.display = name === "figures" ? "" : "none";
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+  if (name === "figures") renderGallery();
+}
+
+// ── Figures gallery ───────────────────────────────────────────────────────────
+
+async function loadFiguresManifest() {
+  try {
+    return await fetchJSON(`${DATA_ROOT}/figures/manifest.json`);
+  } catch {
+    return [];
+  }
+}
+
+function renderGallery() {
+  const container = document.getElementById("figures-gallery");
+  const search = document.getElementById("figures-search").value.toLowerCase();
+  container.innerHTML = "";
+
+  loadFiguresManifest().then(figures => {
+    const filtered = figures.filter(f =>
+      !search || f.path.toLowerCase().includes(search) || (f.title || "").toLowerCase().includes(search)
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<p style="color:#888;font-size:13px;">No figures found. Run run_figures.py and re-export the dashboard.</p>';
+      return;
+    }
+
+    // Group by run_id
+    const byRun = {};
+    for (const fig of filtered) {
+      const run = fig.run_id || "other";
+      if (!byRun[run]) byRun[run] = [];
+      byRun[run].push(fig);
+    }
+
+    for (const [runId, figs] of Object.entries(byRun)) {
+      const section = document.createElement("div");
+      section.style.cssText = "margin-bottom:24px;";
+
+      const heading = document.createElement("h3");
+      heading.textContent = runId;
+      heading.style.cssText = "font-size:13px;color:#444;margin:0 0 10px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;";
+      section.appendChild(heading);
+
+      const grid = document.createElement("div");
+      grid.style.cssText = "display:flex;flex-wrap:wrap;gap:12px;";
+
+      for (const fig of figs) {
+        const card = document.createElement("div");
+        card.style.cssText = "cursor:pointer;border:1px solid #ddd;border-radius:6px;overflow:hidden;width:200px;background:#fafafa;";
+        card.title = fig.title || fig.path;
+
+        const img = document.createElement("img");
+        img.src = `${DATA_ROOT}/figures/${fig.path}`;
+        img.style.cssText = "width:200px;height:130px;object-fit:contain;background:#fff;";
+        img.loading = "lazy";
+
+        const caption = document.createElement("div");
+        caption.textContent = fig.title || fig.path.split("/").pop().replace(".png", "");
+        caption.style.cssText = "font-size:10px;color:#555;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+
+        card.appendChild(img);
+        card.appendChild(caption);
+        card.addEventListener("click", () => openLightbox(`${DATA_ROOT}/figures/${fig.path}`, fig.title || fig.path));
+        grid.appendChild(card);
+      }
+
+      section.appendChild(grid);
+      container.appendChild(section);
+    }
+  });
+}
+
+function openLightbox(src, caption) {
+  const lb = document.getElementById("lightbox");
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox-caption").textContent = caption;
+  lb.style.display = "flex";
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+}
+
+document.getElementById("figures-search").addEventListener("input", renderGallery);
+document.getElementById("lightbox").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeLightbox();
+});
+
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 init().catch(err => {
   document.getElementById("panels").innerHTML = `<p style="padding:20px;color:red">Failed to load data: ${err.message}. Make sure to run run_export_dashboard.py first.</p>`;

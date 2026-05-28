@@ -60,3 +60,98 @@ def plot_probe_heatmap(
     plt.tight_layout()
     plt.savefig(out_dir / f"{probe_name}_heatmap.png", dpi=150)
     plt.close()
+
+
+def plot_lookahead_horizon(
+    base_run_id: str,
+    shift_run_ids: list[str],
+    k_values: list[int],
+    probe_name: str,
+    probe_layers: list[int],
+    results_dir: str = "results",
+    figures_dir: str = "figures",
+) -> None:
+    """Plot probe lift and AUC vs lookahead horizon k (in assistant turns).
+
+    X-axis is inverted: k=0 (at the label flip) is on the right; larger k
+    (earlier prediction) is on the left — matching trajectory time direction.
+    """
+    colours = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+
+    # Collect per-k, per-layer metrics
+    # all_run_ids[0] is k=0 (base run), rest are shift runs
+    all_k = [0] + list(k_values)
+    all_run_ids = [base_run_id] + list(shift_run_ids)
+
+    # layer → list of (k, lift, auc, n_test) across k values
+    data: dict[int, list[tuple]] = {li: [] for li in probe_layers}
+
+    for k, run_id in zip(all_k, all_run_ids):
+        results_path = Path(results_dir) / run_id / probe_name / "results.pt"
+        if not results_path.exists():
+            print(f"  [lookahead] missing {results_path}, skipping k={k}")
+            continue
+        all_results = torch.load(results_path, weights_only=False)
+
+        for layer_idx in probe_layers:
+            results = all_results.get(layer_idx, [])
+            if not results:
+                continue
+            # Aggregate across bins weighted by n_test
+            total_n, total_correct, total_pos, total_auc_w = 0, 0, 0, 0.0
+            for r in results:
+                n = r.n_test if hasattr(r, "n_test") else r["n_test"]
+                acc = r.test_acc if hasattr(r, "test_acc") else r["test_acc"]
+                auc = r.test_auc if hasattr(r, "test_auc") else r["test_auc"]
+                n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else r.get("n_pos_test", n // 2)
+                total_correct += acc * n
+                total_pos += n_pos
+                total_auc_w += auc * n
+                total_n += n
+            if total_n == 0:
+                continue
+            agg_acc = total_correct / total_n
+            agg_auc = total_auc_w / total_n
+            majority = max(total_pos, total_n - total_pos) / total_n
+            lift = agg_acc - majority
+            data[layer_idx].append((k, lift, agg_auc, total_n))
+
+    out_dir = Path(figures_dir) / base_run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    fig, (ax_lift, ax_auc) = plt.subplots(2, 1, figsize=(8, 7), sharex=True)
+
+    for li, layer_idx in enumerate(probe_layers):
+        pts = sorted(data[layer_idx], key=lambda x: x[0])
+        if not pts:
+            continue
+        ks = [p[0] for p in pts]
+        lifts = [p[1] for p in pts]
+        aucs = [p[2] for p in pts]
+        ns = [p[3] for p in pts]
+        col = colours[li % len(colours)]
+        label = f"Layer {layer_idx}"
+
+        ax_lift.plot(ks, lifts, marker="o", color=col, label=label)
+        ax_auc.plot(ks, aucs, marker="o", color=col, label=label)
+
+        # Annotate sample sizes at largest k only
+        ax_lift.annotate(f"n={ns[-1]:,}", (ks[-1], lifts[-1]),
+                         textcoords="offset points", xytext=(-4, 6), fontsize=7, color=col)
+
+    ax_lift.axhline(0.0, linestyle="--", color="#aaa", linewidth=1)
+    ax_lift.set_ylabel("Accuracy − majority baseline")
+    ax_lift.set_title(f"{probe_name} — lookahead horizon ({base_run_id})")
+    ax_lift.legend(fontsize=8, loc="upper left")
+
+    ax_auc.axhline(0.5, linestyle="--", color="#aaa", linewidth=1)
+    ax_auc.set_ylabel("AUC")
+    ax_auc.set_xlabel("Turns ahead (k)  ←earlier prediction    at flip→")
+
+    # Invert x-axis: k=0 (at flip) on the right, larger k (earlier) on the left
+    ax_lift.invert_xaxis()
+    ax_auc.set_xticks(all_k)
+
+    plt.tight_layout()
+    plt.savefig(out_dir / f"{probe_name}_lookahead.png", dpi=150)
+    plt.close()

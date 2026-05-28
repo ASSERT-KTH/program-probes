@@ -26,6 +26,7 @@ class ProbeResult:
     n_train: int
     n_val: int
     n_test: int
+    n_pos_test: int
     n_epochs: int
 
 
@@ -294,6 +295,7 @@ def train_probe_layer(
                 n_train=H_train.shape[0],
                 n_val=H_val_e.shape[0],
                 n_test=H_test_e.shape[0],
+                n_pos_test=int((test_labels_np == 1).sum()),
                 n_epochs=n_epochs,
             ))
 
@@ -438,6 +440,7 @@ def run_final(
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_train": r.n_train,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_val": r.n_val,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_test": r.n_test,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_pos_test": r.n_pos_test,
                 })
 
     out = Path(results_dir) / run_id / probe_name
