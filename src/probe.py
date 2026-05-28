@@ -18,11 +18,13 @@ class ProbeResult:
     val_precision: float
     val_recall: float
     val_auc: float
+    val_ece: float
     test_acc: float
     test_f1: float
     test_precision: float
     test_recall: float
     test_auc: float
+    test_ece: float
     n_train: int
     n_val: int
     n_test: int
@@ -52,6 +54,20 @@ def _bin_index(rel_pos: float, n_bins: int = 10) -> int:
     return min(int(math.floor(rel_pos * n_bins)), n_bins - 1)
 
 
+def _compute_ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> float:
+    """Expected Calibration Error — weighted average of |acc - conf| across bins."""
+    bin_boundaries = np.linspace(0, 1, n_bins + 1)
+    ece = 0.0
+    for i in range(n_bins):
+        in_bin = (probs > bin_boundaries[i]) & (probs <= bin_boundaries[i + 1])
+        if i == 0:
+            in_bin = in_bin | (probs == 0)
+        n_b = in_bin.sum()
+        if n_b > 0:
+            ece += (n_b / len(labels)) * abs(labels[in_bin].mean() - probs[in_bin].mean())
+    return float(ece)
+
+
 def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> dict:
     from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
     return {
@@ -59,6 +75,7 @@ def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> di
         "precision": precision_score(labels, preds, zero_division=0.0),
         "recall": recall_score(labels, preds, zero_division=0.0),
         "auc": roc_auc_score(labels, probs) if len(np.unique(labels)) > 1 else 0.5,
+        "ece": _compute_ece(probs, labels),
     }
 
 
@@ -292,11 +309,13 @@ def train_probe_layer(
                 val_precision=val_m["precision"],
                 val_recall=val_m["recall"],
                 val_auc=val_m["auc"],
+                val_ece=val_m["ece"],
                 test_acc=float((test_preds_np == test_labels_np).mean()),
                 test_f1=test_m["f1"],
                 test_precision=test_m["precision"],
                 test_recall=test_m["recall"],
                 test_auc=test_m["auc"],
+                test_ece=test_m["ece"],
                 n_train=H_train.shape[0],
                 n_val=H_val_e.shape[0],
                 n_test=H_test_e.shape[0],
@@ -306,7 +325,7 @@ def train_probe_layer(
     return results
 
 
-def create_sweep(run_id: str, probe_name: str) -> str:
+def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None) -> str:
     import wandb
     sweep_config = {
         "name": f"sweep-{run_id}-{probe_name}",
@@ -321,6 +340,9 @@ def create_sweep(run_id: str, probe_name: str) -> str:
             "pos_weight": {"distribution": "log_uniform_values", "min": 0.1, "max": 10.0},
         },
     }
+    if fixed_params:
+        for k, v in fixed_params.items():
+            sweep_config["parameters"][k] = {"value": v}
     sweep_id = wandb.sweep(sweep_config, project="program-probes")
     print(f"Created sweep: {sweep_id}", flush=True)
     return sweep_id
@@ -356,6 +378,7 @@ def run_sweep(
     eval_bin_axis: str = "position",
     then_final: bool = False,
     results_dir: str = "results",
+    fixed_params: dict | None = None,
 ) -> str:
     """Run hyperparameter sweep, optionally followed by final training.
 
@@ -370,7 +393,7 @@ def run_sweep(
     middle_cache = str(cache_base / f"layer_{middle_layer}.pt")
 
     if sweep_id is None:
-        sweep_id = create_sweep(run_id, probe_name)
+        sweep_id = create_sweep(run_id, probe_name, fixed_params=fixed_params)
 
     def sweep_fn():
         with wandb.init(
@@ -401,6 +424,7 @@ def run_sweep(
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
                 "mean_val_acc": np.mean([r.val_acc for r in results]) if results else 0.0,
                 "mean_val_auc": np.mean([r.val_auc for r in results]) if results else 0.5,
+                "mean_val_ece": np.mean([r.val_ece for r in results]) if results else 1.0,
             })
 
     wandb.agent(sweep_id, sweep_fn, project="program-probes", count=count)
@@ -502,8 +526,10 @@ def run_final(
                     f"layer_{layer_idx}/bin_{r.bin_idx}/test_precision": r.test_precision,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/test_recall": r.test_recall,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/test_auc": r.test_auc,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/test_ece": r.test_ece,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/val_f1": r.val_f1,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/val_auc": r.val_auc,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/val_ece": r.val_ece,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_epochs": r.n_epochs,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_train": r.n_train,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_val": r.n_val,

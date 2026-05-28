@@ -1,4 +1,5 @@
 import argparse
+import json
 from src.configs import ModelConfig, load_config
 from src.probe import run_sweep, run_final
 
@@ -28,6 +29,8 @@ def main():
     sweep_p.add_argument("--count", type=int, default=None, help="Max number of runs this agent will execute")
     sweep_p.add_argument("--then-final", action="store_true",
                         help="After sweep, automatically train on all layers with best HPs")
+    sweep_p.add_argument("--fixed", type=json.loads, default=None,
+                        help='JSON dict of fixed HP values, e.g. \'{"lr": 0.001, "loss": "weighted_cross_entropy"}\'')
 
     final_p = subparsers.add_parser("final")
     final_p.add_argument("--lr", type=float, default=None)
@@ -61,6 +64,7 @@ def main():
             eval_bin_axis=args.eval_bin_axis,
             then_final=args.then_final,
             results_dir=args.results_dir,
+            fixed_params=args.fixed,
         )
     else:
         run_final(

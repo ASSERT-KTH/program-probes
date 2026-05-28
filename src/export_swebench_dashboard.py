@@ -312,6 +312,10 @@ def export_swebench_dashboard(
                 probe_results[probe_name][str(layer_idx)][str(bin_idx)] = {
                     "test_acc": r.test_acc if hasattr(r, "test_acc") else r["test_acc"],
                     "val_acc": r.val_acc if hasattr(r, "val_acc") else r["val_acc"],
+                    "test_auc": r.test_auc if hasattr(r, "test_auc") else r.get("test_auc", None),
+                    "val_auc": r.val_auc if hasattr(r, "val_auc") else r.get("val_auc", None),
+                    "test_ece": r.test_ece if hasattr(r, "test_ece") else r.get("test_ece", None),
+                    "val_ece": r.val_ece if hasattr(r, "val_ece") else r.get("val_ece", None),
                     "n_train": r.n_train if hasattr(r, "n_train") else r["n_train"],
                     "n_val": r.n_val if hasattr(r, "n_val") else r["n_val"],
                     "n_test": r.n_test if hasattr(r, "n_test") else r["n_test"],
