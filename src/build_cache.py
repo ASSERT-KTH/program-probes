@@ -8,6 +8,7 @@ def build_cache(
     output_dir: str = "outputs",
     cache_dir: str = "cache",
     label_shift: int = 0,
+    cache_run_id: str | None = None,
 ) -> None:
     in_dir = Path(output_dir) / run_id
     pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
@@ -21,7 +22,7 @@ def build_cache(
     print(f"Probe layers: {probe_layer_indices}", flush=True)
 
     for probe_name in probe_names:
-        out_dir = Path(cache_dir) / run_id / probe_name
+        out_dir = Path(cache_dir) / (cache_run_id or run_id) / probe_name
         out_dir.mkdir(parents=True, exist_ok=True)
 
         # Process one layer at a time to cap peak memory at ~2x one layer's size
