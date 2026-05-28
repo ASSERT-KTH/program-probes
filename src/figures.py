@@ -103,7 +103,7 @@ def plot_lookahead_horizon(
                 n = r.n_test if hasattr(r, "n_test") else r["n_test"]
                 acc = r.test_acc if hasattr(r, "test_acc") else r["test_acc"]
                 auc = r.test_auc if hasattr(r, "test_auc") else r["test_auc"]
-                n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else r.get("n_pos_test", n // 2)
+                n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else (r["n_pos_test"] if isinstance(r, dict) and "n_pos_test" in r else n // 2)
                 total_correct += acc * n
                 total_pos += n_pos
                 total_auc_w += auc * n
