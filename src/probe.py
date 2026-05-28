@@ -119,7 +119,10 @@ def train_probe_layer(
     criterion = nn.CrossEntropyLoss()
     results = []
 
-    train_n_bins = 1 if n_eval_bins is not None else n_bins
+    if n_eval_bins is not None and (n_eval_bins != n_bins and n_bins != 1):
+        raise ValueError("n_eval_bins is set but incompatible with n_bins. Set n_bins=1 to train on all tokens pooled, or set n_eval_bins=None to evaluate on the same bins as training.") 
+
+    train_n_bins = n_bins
 
     for bin_idx in range(train_n_bins):
         bin_mask = torch.tensor([

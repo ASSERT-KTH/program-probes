@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
     parser.add_argument("--n-eval-bins", type=int, default=None,
-                        help="If set, train on all tokens pooled (n_bins=1) but evaluate per bin at this granularity")
+                        help="Evaluate at this bin granularity; requires --n-bins 1 or --n-eval-bins equal to --n-bins")
     parser.add_argument("--eval-bin-axis", choices=["position", "step_relative", "step_absolute"],
                         default="position",
                         help="Axis to bin on during evaluation: token position, relative step, or exact step number")
@@ -34,6 +34,8 @@ def main():
     final_p.add_argument("--patience", type=int, required=True)
 
     args = parser.parse_args()
+    if args.n_eval_bins is not None and args.n_eval_bins != args.n_bins and args.n_bins != 1:
+        parser.error("--n-eval-bins requires --n-bins 1 or --n-eval-bins equal to --n-bins")
     model_cfg = load_config(args.model_config, ModelConfig)
     cache_run_id = args.cache_run_id or args.run_id
 
