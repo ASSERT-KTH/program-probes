@@ -85,7 +85,7 @@ class QwenAdapter(ModelAdapter):
         # Use chunked extraction to bound peak GPU memory
         if chunk_size is not None and extraction_masks is not None:
             return [
-                {li: hs for li, hs in
+                {li: hs.to(torch.float16) for li, hs in
                  hf_extract_hidden_states_chunked(
                      self._model, seq, layer_indices, mask, stride, chunk_size, device
                  ).items()}
@@ -122,7 +122,7 @@ class QwenAdapter(ModelAdapter):
                 per_seq = {}
                 for li in layer_indices:
                     hs = out.hidden_states[li + 1]
-                    per_seq[li] = hs[i, positions].cpu()
+                    per_seq[li] = hs[i, positions].to(torch.float16).cpu()
                 results.append(per_seq)
         else:
             for i, (pad_len, prompt_len) in enumerate(zip(padding_lengths, prompt_lengths)):
@@ -130,7 +130,7 @@ class QwenAdapter(ModelAdapter):
                 per_seq = {}
                 for li in layer_indices:
                     hs = out.hidden_states[li + 1]
-                    gen_hs = hs[i, gen_start::stride].cpu()
+                    gen_hs = hs[i, gen_start::stride].to(torch.float16).cpu()
                     per_seq[li] = gen_hs
                 results.append(per_seq)
         return results
