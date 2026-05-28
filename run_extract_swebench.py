@@ -60,6 +60,9 @@ def main() -> None:
     parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument("--extraction-batch-size", type=int, default=None,
                         help="Override gen_config.extraction_batch_size")
+    parser.add_argument("--chunk-size", type=int, default=None,
+                        help="Process sequences in chunks of this many tokens using KV cache "
+                             "to bound peak GPU memory. If unset, uses a single full-sequence forward pass.")
     args = parser.parse_args()
 
     model_config: ModelConfig = load_config(args.model_config, ModelConfig)
@@ -98,6 +101,7 @@ def main() -> None:
                 per_seq_hs = model_adapter.extract_hidden_states(
                     [traj.token_ids], [0], layer_indices, stride,
                     extraction_masks=[traj.extraction_mask],
+                    chunk_size=args.chunk_size,
                 )
             except torch.cuda.OutOfMemoryError:
                 torch.cuda.empty_cache()
