@@ -25,26 +25,6 @@ def _compute_transitions(labels: list) -> dict:
     return {"total": changes, "false_to_true": false_to_true, "true_to_false": true_to_false}
 
 
-def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 42) -> float:
-    probe_dir = cache_dir / probe_name
-    layer_files = sorted(probe_dir.glob("layer_*.pt"))
-    if not layer_files:
-        raise FileNotFoundError(f"No cache files found for probe '{probe_name}' in {probe_dir}")
-    data = torch.load(layer_files[0], weights_only=False)
-    y = data["y"]
-    group_ids = data["group_id"]
-    _, _, test_groups = _split_groups(group_ids, seed)
-    test_mask = torch.tensor([
-        group_ids[i] in test_groups and y[i].item() >= 0
-        for i in range(len(y))
-    ])
-    test_y = y[test_mask]
-    if len(test_y) == 0:
-        raise ValueError(f"No test samples found in cache for probe '{probe_name}' in {probe_dir}")
-    pos = (test_y == 1).sum().item()
-    total = len(test_y)
-    return max(pos / total, 1 - pos / total)
-
 
 def _per_bin_majority_baseline_from_cache(
     cache_dir: Path, probe_name: str, n_bins: int = 10, seed: int = 42,
@@ -286,12 +266,8 @@ def export_swebench_dashboard(
     }
     (run_dir / "stats.json").write_text(json.dumps(stats_out))
 
-    # Majority baselines
+    # Per-bin majority baselines
     cache_run = output_run_id or run_id
-    majority_baselines = {
-        p: _majority_baseline_from_cache(Path(cache_dir) / cache_run, p)
-        for p in probe_names
-    }
     majority_baselines_per_bin = {
         p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins, eval_bin_axis=eval_bin_axis)
         for p in probe_names
@@ -325,7 +301,6 @@ def export_swebench_dashboard(
         "probe_layers": probe_layers,
         "n_samples": len(samples_list),
         "n_generations": 1,
-        "majority_baseline": majority_baselines,
         "majority_baseline_per_bin": majority_baselines_per_bin,
         "eval_bin_axis": eval_bin_axis,
         "is_agentic": True,

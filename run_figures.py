@@ -17,6 +17,9 @@ def main():
                              "Must match --lookahead-k-values in order.")
     parser.add_argument("--lookahead-k-values", nargs="+", type=int, default=None,
                         help="k values corresponding to --lookahead-shift-run-ids.")
+    parser.add_argument("--lookahead-probes", nargs="+", default=None,
+                        help="Subset of --probe to generate lookahead figures for. "
+                             "Defaults to all probes. Exclude static-label probes (e.g. will_resolve).")
     args = parser.parse_args()
 
     model_cfg = load_config(args.model_config, ModelConfig)
@@ -31,7 +34,8 @@ def main():
             n_bins=args.n_bins,
         )
 
-        if args.lookahead_shift_run_ids and args.lookahead_k_values:
+        lookahead_probes = args.lookahead_probes or args.probe
+        if args.lookahead_shift_run_ids and args.lookahead_k_values and probe_name in lookahead_probes:
             if len(args.lookahead_shift_run_ids) != len(args.lookahead_k_values):
                 raise ValueError("--lookahead-shift-run-ids and --lookahead-k-values must have the same length")
             plot_lookahead_horizon(

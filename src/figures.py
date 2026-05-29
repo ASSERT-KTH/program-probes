@@ -19,7 +19,8 @@ def plot_probe_heatmap(
 
     n_layers = len(probe_layers)
     acc_grid = np.full((n_layers, n_bins), np.nan)
-    majority_baseline = 0.5
+    # Per-bin majority baseline: max(pos, neg) / n per bin, averaged across layers
+    per_bin_majority = np.full(n_bins, np.nan)
 
     for li, layer_idx in enumerate(probe_layers):
         results = all_results.get(layer_idx, [])
@@ -27,13 +28,18 @@ def plot_probe_heatmap(
             bin_idx = r.bin_idx if hasattr(r, "bin_idx") else r["bin_idx"]
             test_acc = r.test_acc if hasattr(r, "test_acc") else r["test_acc"]
             acc_grid[li, bin_idx] = test_acc
+            if np.isnan(per_bin_majority[bin_idx]):
+                n = r.n_test if hasattr(r, "n_test") else r["n_test"]
+                n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else n // 2
+                per_bin_majority[bin_idx] = max(n_pos, n - n_pos) / n if n > 0 else 0.5
 
     out_dir = Path(figures_dir) / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fig, (ax_heat, ax_line) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={"height_ratios": [3, 2]})
 
-    norm = mcolors.Normalize(vmin=majority_baseline, vmax=1.0)
+    avg_majority = float(np.nanmean(per_bin_majority))
+    norm = mcolors.Normalize(vmin=avg_majority, vmax=1.0)
     im = ax_heat.imshow(acc_grid, aspect="auto", cmap="Blues", norm=norm, origin="lower")
     ax_heat.set_xticks(range(n_bins))
     ax_heat.set_xticklabels([f"{i/n_bins:.1f}–{(i+1)/n_bins:.1f}" for i in range(n_bins)], rotation=45, ha="right")
@@ -50,7 +56,12 @@ def plot_probe_heatmap(
         valid = ~np.isnan(accs)
         if valid.any():
             ax_line.plot(np.array(bin_centers)[valid], accs[valid], marker="o", label=f"Layer {layer_idx}")
-    ax_line.axhline(majority_baseline, linestyle="--", color="gray", label="Majority baseline")
+    # Per-bin majority baseline as step function
+    for b in range(n_bins):
+        if not np.isnan(per_bin_majority[b]):
+            ax_line.hlines(per_bin_majority[b], b / n_bins, (b + 1) / n_bins,
+                           colors="gray", linestyles="--", linewidth=1,
+                           label="Per-bin majority" if b == 0 else None)
     ax_line.set_xlim(0, 1)
     ax_line.set_ylim(0, 1)
     ax_line.set_xlabel("Relative position")
@@ -98,26 +109,34 @@ def plot_lookahead_horizon(
             if not results:
                 continue
             # Aggregate across bins weighted by n_test
-            total_n, total_correct, total_pos, total_auc_w = 0, 0, 0, 0.0
+            # majority baseline = weighted average of per-bin majority baselines
+            total_n, total_correct, total_majority_w, total_auc_w = 0, 0, 0, 0.0
             for r in results:
                 n = r.n_test if hasattr(r, "n_test") else r["n_test"]
                 acc = r.test_acc if hasattr(r, "test_acc") else r["test_acc"]
                 auc = r.test_auc if hasattr(r, "test_auc") else r["test_auc"]
                 n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else (r["n_pos_test"] if isinstance(r, dict) and "n_pos_test" in r else n // 2)
                 total_correct += acc * n
-                total_pos += n_pos
+                total_majority_w += max(n_pos, n - n_pos)  # per-bin majority
                 total_auc_w += auc * n
                 total_n += n
             if total_n == 0:
                 continue
             agg_acc = total_correct / total_n
             agg_auc = total_auc_w / total_n
-            majority = max(total_pos, total_n - total_pos) / total_n
+            majority = total_majority_w / total_n  # weighted avg per-bin majority baseline
             lift = agg_acc - majority
             data[layer_idx].append((k, lift, agg_auc, total_n))
 
     out_dir = Path(figures_dir) / base_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Collect per-k n_test (same across layers; use first available layer)
+    k_to_n: dict[int, int] = {}
+    for layer_idx in probe_layers:
+        for k, _lift, _auc, n in data[layer_idx]:
+            if k not in k_to_n:
+                k_to_n[k] = n
 
     fig, (ax_lift, ax_auc) = plt.subplots(2, 1, figsize=(8, 7), sharex=True)
 
@@ -128,30 +147,41 @@ def plot_lookahead_horizon(
         ks = [p[0] for p in pts]
         lifts = [p[1] for p in pts]
         aucs = [p[2] for p in pts]
-        ns = [p[3] for p in pts]
         col = colours[li % len(colours)]
         label = f"Layer {layer_idx}"
 
         ax_lift.plot(ks, lifts, marker="o", color=col, label=label)
         ax_auc.plot(ks, aucs, marker="o", color=col, label=label)
 
-        # Annotate sample sizes at largest k only
-        ax_lift.annotate(f"n={ns[-1]:,}", (ks[-1], lifts[-1]),
-                         textcoords="offset points", xytext=(-4, 6), fontsize=7, color=col)
-
     ax_lift.axhline(0.0, linestyle="--", color="#aaa", linewidth=1)
-    ax_lift.set_ylabel("Accuracy − majority baseline")
+    ax_lift.set_ylabel("Accuracy − per-bin majority baseline")
     ax_lift.set_title(f"{probe_name} — lookahead horizon ({base_run_id})")
     ax_lift.legend(fontsize=8, loc="upper left")
 
     ax_auc.axhline(0.5, linestyle="--", color="#aaa", linewidth=1)
-    ax_auc.set_ylabel("AUC")
+    ax_auc.set_ylabel("AUC  (random = 0.5)")
+    ax_auc.set_ylim(bottom=0.48)  # anchor near random so drop-off is visible
     ax_auc.set_xlabel("Turns ahead (k)  ←earlier prediction    at flip→")
 
     # Invert x-axis: k=0 (at flip) on the right, larger k (earlier) on the left
     ax_lift.invert_xaxis()
-    ax_auc.set_xticks(all_k)
+    ks_present = sorted(k_to_n.keys())
+    ax_auc.set_xticks(ks_present)
+    ax_auc.set_xticklabels([])  # replaced by staggered annotations below
+
+    # Staggered tick labels: alternate between two vertical offsets to avoid overlap
+    for i, k in enumerate(ks_present):
+        pad = 18 if i % 2 == 0 else 34
+        ax_auc.annotate(
+            f"{k}\n(n={k_to_n[k]:,})",
+            xy=(k, ax_auc.get_ylim()[0]),
+            xytext=(0, -pad),
+            textcoords="offset points",
+            ha="center", va="top", fontsize=7,
+            annotation_clip=False,
+        )
 
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.18)
     plt.savefig(out_dir / f"{probe_name}_lookahead.png", dpi=150)
     plt.close()
