@@ -138,7 +138,10 @@ def train_probe_layer(
     results = []
     weights: dict[int, dict] = {}
 
-    train_n_bins = 1 if n_eval_bins is not None else n_bins
+    if n_eval_bins is not None and (n_eval_bins != n_bins and n_bins != 1):
+        raise ValueError("n_eval_bins is set but incompatible with n_bins. Set n_bins=1 to train on all tokens pooled, or set n_eval_bins=None to evaluate on the same bins as training.") 
+
+    train_n_bins = n_bins
     bin_ids = (rel_pos * train_n_bins).floor().long().clamp(0, train_n_bins - 1)
     valid = y >= 0
 

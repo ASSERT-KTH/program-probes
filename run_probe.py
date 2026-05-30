@@ -16,7 +16,8 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
     parser.add_argument("--n-eval-bins", type=int, default=None,
-                        help="If set, train on all tokens pooled (n_bins=1) but evaluate per bin at this granularity")
+                        help="If set, evaluate per bin at this granularity. "
+                             "Must equal --n-bins or --n-bins must be 1 (pooled training).")
     parser.add_argument("--eval-bin-axis", choices=["position", "step_relative", "step_absolute"],
                         default="position",
                         help="Axis to bin on during evaluation: token position, relative step, or exact step number")
