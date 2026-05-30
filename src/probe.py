@@ -114,7 +114,7 @@ def train_probe_layer(
     log_fn: Callable[[dict], None] | None = None,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
-) -> list[ProbeResult]:
+) -> tuple[list[ProbeResult], dict[int, dict]]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
     H = data["H"]  # keep float16 to halve base memory; convert per-bin below
@@ -136,6 +136,7 @@ def train_probe_layer(
 
     hidden_dim = H.shape[1]
     results = []
+    weights: dict[int, dict] = {}
 
     train_n_bins = 1 if n_eval_bins is not None else n_bins
     bin_ids = (rel_pos * train_n_bins).floor().long().clamp(0, train_n_bins - 1)
@@ -322,7 +323,12 @@ def train_probe_layer(
                 n_epochs=n_epochs,
             ))
 
-    return results
+            weights[bin_idx] = {
+                "state_dict": copy.deepcopy(best_weights),
+                "mean": mean.clone(),
+            }
+
+    return results, weights
 
 
 def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None) -> str:
@@ -412,7 +418,7 @@ def run_sweep(
                     f"bin_{b}/weight_norm": metrics["weight_norm"],
                 })
 
-            results = train_probe_layer(
+            results, _ = train_probe_layer(
                 middle_cache, middle_layer,
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
@@ -487,6 +493,7 @@ def run_final(
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
+    all_weights: dict[int, dict] = {}
 
     with wandb.init(
         project="program-probes",
@@ -510,7 +517,7 @@ def run_final(
                     })
                 return log_fn
 
-            results = train_probe_layer(
+            results, weights = train_probe_layer(
                 cache_path, layer_idx,
                 lr=lr, weight_decay=weight_decay,
                 batch_size=batch_size, patience=patience,
@@ -519,6 +526,7 @@ def run_final(
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
             )
             all_results[layer_idx] = results
+            all_weights[layer_idx] = weights
             for r in results:
                 wandb.log({
                     f"layer_{layer_idx}/bin_{r.bin_idx}/test_acc": r.test_acc,
@@ -539,4 +547,5 @@ def run_final(
     out = Path(results_dir) / run_id / probe_name
     out.mkdir(parents=True, exist_ok=True)
     torch.save(all_results, out / "results.pt")
+    torch.save(all_weights, out / "weights.pt")
     return {layer: [vars(r) for r in rs] for layer, rs in all_results.items()}

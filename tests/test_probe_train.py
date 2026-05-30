@@ -46,7 +46,7 @@ def test_group_split_ratios():
 
 def test_masked_positions_excluded(tmp_path):
     cache_path = _make_cache(tmp_path)
-    results = train_probe_layer(
+    results, _ = train_probe_layer(
         cache_path, LAYER_IDX,
         lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS
     )
@@ -59,7 +59,7 @@ def test_masked_positions_excluded(tmp_path):
 def test_early_stopping_restores_best_weights(tmp_path):
     # This verifies training completes and best weights are used (test_acc reported once per bin)
     cache_path = _make_cache(tmp_path)
-    results = train_probe_layer(
+    results, _ = train_probe_layer(
         cache_path, LAYER_IDX,
         lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS
     )
@@ -71,7 +71,7 @@ def test_early_stopping_restores_best_weights(tmp_path):
 
 def test_test_accuracy_reported_once_per_cell(tmp_path):
     cache_path = _make_cache(tmp_path)
-    results = train_probe_layer(
+    results, _ = train_probe_layer(
         cache_path, LAYER_IDX,
         lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS
     )
@@ -94,29 +94,31 @@ def test_mean_centering_uses_train_stats(tmp_path):
     cache = {"H": H, "y": y, "rel_pos": rel_pos, "sample_id": [f"s{i // 10}" for i in range(200)], "group_id": [f"g{i // 10}" for i in range(200)]}
     path = tmp_path / "layer_0.pt"
     torch.save(cache, path)
-    results = train_probe_layer(str(path), 0, lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS)
+    results, _ = train_probe_layer(str(path), 0, lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS)
     # Should complete without error
     assert isinstance(results, list)
 
 
 def test_probe_result_has_extended_metrics(tmp_path):
     cache_path = _make_cache(tmp_path)
-    results = train_probe_layer(
+    results, _ = train_probe_layer(
         cache_path, LAYER_IDX,
         lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS
     )
     for r in results:
         assert 0.0 <= r.val_f1 <= 1.0
         assert 0.0 <= r.val_auc <= 1.0
+        assert 0.0 <= r.val_ece <= 1.0
         assert 0.0 <= r.test_f1 <= 1.0
         assert 0.0 <= r.test_auc <= 1.0
+        assert 0.0 <= r.test_ece <= 1.0
         assert r.n_epochs >= 1
 
 
 def test_log_fn_called_per_epoch(tmp_path):
     cache_path = _make_cache(tmp_path)
     log_calls = []
-    results = train_probe_layer(
+    results, _ = train_probe_layer(
         cache_path, LAYER_IDX,
         lr=1e-3, weight_decay=1e-4, batch_size=64, patience=3, seed=42, n_bins=N_BINS,
         log_fn=log_calls.append,
