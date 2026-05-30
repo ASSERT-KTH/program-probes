@@ -12,7 +12,6 @@ let state = {
   selectedSampleIdx: null,
   selectedGenIdx: 0,
   filterLabel: "all",
-  baselineMode: "global",
 };
 
 // ── Data loading ──────────────────────────────────────────────────────────────
@@ -105,13 +104,6 @@ function renderProbeTabs() {
   }
 }
 
-function setBaselineMode(mode) {
-  state.baselineMode = mode;
-  document.getElementById("btn-baseline-global").classList.toggle("active", mode === "global");
-  document.getElementById("btn-baseline-per-bin").classList.toggle("active", mode === "per-bin");
-  renderHeatmap();
-}
-
 function renderHeatmap() {
   const heatContainer = document.getElementById("heatmap-container");
   const lineContainer = document.getElementById("linechart-container");
@@ -125,12 +117,10 @@ function renderHeatmap() {
   const layers = state.meta.probe_layers ?? Object.keys(probeData).map(Number).sort((a, b) => a - b);
   const evalBinAxis = state.meta.eval_bin_axis ?? "position";
   const nBins = 10;
-  const majority = state.meta.majority_baseline?.[state.activeProbe] ?? 0.5;
   const majorityPerBin = state.meta.majority_baseline_per_bin?.[state.activeProbe] ?? null;
-  const perBin = state.baselineMode === "per-bin" && majorityPerBin !== null;
 
   if (evalBinAxis === "step_absolute") {
-    renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majority, majorityPerBin);
+    renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majorityPerBin);
     return;
   }
 
@@ -150,14 +140,11 @@ function renderHeatmap() {
   const makeColorScale = (baseline) =>
     d3.scaleDiverging(diverging).domain([0, baseline, 1.0]);
 
-  const colorScaleForBin = perBin
-    ? d3.range(nBins).map(b => makeColorScale(majorityPerBin[String(b)]))
-    : null;
-  const globalColorScale = makeColorScale(majority);
-  const getColor = (acc, bin) => acc !== null
-    ? (perBin ? colorScaleForBin[bin](acc) : globalColorScale(acc))
-    : "#eee";
-  const getBaseline = (bin) => perBin ? majorityPerBin[String(bin)] : majority;
+  const colorScaleForBin = majorityPerBin
+    ? d3.range(nBins).map(b => makeColorScale(majorityPerBin[String(b)] ?? 0.5))
+    : d3.range(nBins).map(() => makeColorScale(0.5));
+  const getColor = (acc, bin) => acc !== null ? colorScaleForBin[bin](acc) : "#eee";
+  const getBaseline = (bin) => majorityPerBin?.[String(bin)] ?? 0.5;
 
   const xScale = d3.scaleBand().domain(d3.range(nBins)).range([0, width]).padding(0.04);
   const yScale = d3.scaleBand().domain(layers).range([0, height]).padding(0.04);
@@ -214,9 +201,9 @@ function renderHeatmap() {
     .text(evalBinAxis === "step_relative" ? "Relative step bin" : "Relative position bin");
 
   // Colour bar: green at top (1.0), white at baseline, red at bottom (0).
-  const colorBarBaseline = perBin
-    ? (d3.range(nBins).reduce((s, b) => s + majorityPerBin[String(b)], 0) / nBins)
-    : majority;
+  const colorBarBaseline = majorityPerBin
+    ? (d3.range(nBins).reduce((s, b) => s + (majorityPerBin[String(b)] ?? 0.5), 0) / nBins)
+    : 0.5;
   const baselineOffsetPct = ((1.0 - colorBarBaseline) * 100).toFixed(1) + "%";
   const defs = svg.append("defs");
   const lgId = "hm-lg";
@@ -229,7 +216,7 @@ function renderHeatmap() {
     .attr("fill", `url(#${lgId})`);
   svg.append("text").attr("x", width + 22).attr("y", 6).style("font-size", "10px").text("1.0");
   svg.append("text").attr("x", width + 22).attr("y", height * (1 - colorBarBaseline))
-    .style("font-size", "10px").text(perBin ? `~${colorBarBaseline.toFixed(2)}` : majority.toFixed(2));
+    .style("font-size", "10px").text(`~${colorBarBaseline.toFixed(2)}`);
   svg.append("text").attr("x", width + 22).attr("y", height).style("font-size", "10px").text("0.0");
 
   // Line chart
@@ -270,19 +257,14 @@ function renderHeatmap() {
       .text(`L${layer}`);
   });
 
-  if (perBin) {
-    // Step function: one horizontal segment per bin at its own baseline
-    for (let b = 0; b < nBins; b++) {
-      const x0 = xL(b / nBins);
-      const x1 = xL((b + 1) / nBins);
-      const y = yL(majorityPerBin[String(b)]);
-      lsvg.append("line")
-        .attr("x1", x0).attr("x2", x1).attr("y1", y).attr("y2", y)
-        .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
-    }
-  } else {
+  // Per-bin majority baseline as step function
+  for (let b = 0; b < nBins; b++) {
+    const bl = majorityPerBin?.[String(b)] ?? 0.5;
+    const x0 = xL(b / nBins);
+    const x1 = xL((b + 1) / nBins);
+    const y = yL(bl);
     lsvg.append("line")
-      .attr("x1", 0).attr("x2", lw).attr("y1", yL(majority)).attr("y2", yL(majority))
+      .attr("x1", x0).attr("x2", x1).attr("y1", y).attr("y2", y)
       .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
   }
 
@@ -295,7 +277,7 @@ function renderHeatmap() {
     .text(evalBinAxis === "step_relative" ? "Relative step" : "Relative position");
 }
 
-function renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majority, majorityPerBin) {
+function renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majorityPerBin) {
   // Collect all step keys across all layers
   const allSteps = new Set();
   layers.forEach(layer => {
@@ -329,22 +311,15 @@ function renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers
       .style("font-size", "9px").style("fill", colours[li % 10]).text(`L${layer}`);
   });
 
-  // Majority baseline line (global or per-step)
-  const perBin = majorityPerBin !== null;
-  if (perBin) {
-    steps.forEach(s => {
-      const bl = majorityPerBin[String(s)];
-      if (bl === undefined) return;
-      lsvg.append("line")
-        .attr("x1", xL(s) - 4).attr("x2", xL(s) + 4)
-        .attr("y1", yL(bl)).attr("y2", yL(bl))
-        .attr("stroke", "#999").attr("stroke-dasharray", "2,2").attr("stroke-width", 1);
-    });
-  } else {
+  // Per-step majority baseline
+  steps.forEach(s => {
+    const bl = majorityPerBin?.[String(s)];
+    if (bl === undefined) return;
     lsvg.append("line")
-      .attr("x1", 0).attr("x2", lw).attr("y1", yL(majority)).attr("y2", yL(majority))
-      .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
-  }
+      .attr("x1", xL(s) - 4).attr("x2", xL(s) + 4)
+      .attr("y1", yL(bl)).attr("y2", yL(bl))
+      .attr("stroke", "#999").attr("stroke-dasharray", "2,2").attr("stroke-width", 1);
+  });
 
   lsvg.append("g").attr("transform", `translate(0,${lh})`).call(d3.axisBottom(xL).ticks(Math.min(steps.length, 10)).tickFormat(d3.format("d")));
   lsvg.append("g").call(d3.axisLeft(yL).ticks(4));
@@ -778,6 +753,104 @@ function renderDetail() {
   }
   container.appendChild(probesEl);
 }
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.getElementById("panels").style.display = name === "probes" ? "" : "none";
+  document.getElementById("tab-figures").style.display = name === "figures" ? "" : "none";
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+  if (name === "figures") renderGallery();
+}
+
+// ── Figures gallery ───────────────────────────────────────────────────────────
+
+async function loadFiguresManifest() {
+  try {
+    return await fetchJSON(`${DATA_ROOT}/figures/manifest.json`);
+  } catch {
+    return [];
+  }
+}
+
+function renderGallery() {
+  const container = document.getElementById("figures-gallery");
+  const search = document.getElementById("figures-search").value.toLowerCase();
+  container.innerHTML = "";
+
+  loadFiguresManifest().then(figures => {
+    const filtered = figures.filter(f =>
+      !search || f.path.toLowerCase().includes(search) || (f.title || "").toLowerCase().includes(search)
+    );
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<p style="color:#888;font-size:13px;">No figures found. Run run_figures.py and re-export the dashboard.</p>';
+      return;
+    }
+
+    // Group by run_id
+    const byRun = {};
+    for (const fig of filtered) {
+      const run = fig.run_id || "other";
+      if (!byRun[run]) byRun[run] = [];
+      byRun[run].push(fig);
+    }
+
+    for (const [runId, figs] of Object.entries(byRun)) {
+      const section = document.createElement("div");
+      section.style.cssText = "margin-bottom:24px;";
+
+      const heading = document.createElement("h3");
+      heading.textContent = runId;
+      heading.style.cssText = "font-size:13px;color:#444;margin:0 0 10px;border-bottom:1px solid #e0e0e0;padding-bottom:4px;";
+      section.appendChild(heading);
+
+      const grid = document.createElement("div");
+      grid.style.cssText = "display:flex;flex-wrap:wrap;gap:12px;";
+
+      for (const fig of figs) {
+        const card = document.createElement("div");
+        card.style.cssText = "cursor:pointer;border:1px solid #ddd;border-radius:6px;overflow:hidden;width:200px;background:#fafafa;";
+        card.title = fig.title || fig.path;
+
+        const img = document.createElement("img");
+        const cacheBust = `?v=${Date.now()}`;
+        img.src = `${DATA_ROOT}/figures/${fig.path}${cacheBust}`;
+        img.style.cssText = "width:200px;height:130px;object-fit:contain;background:#fff;";
+        img.loading = "lazy";
+
+        const caption = document.createElement("div");
+        caption.textContent = fig.title || fig.path.split("/").pop().replace(".png", "");
+        caption.style.cssText = "font-size:10px;color:#555;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
+
+        card.appendChild(img);
+        card.appendChild(caption);
+        card.addEventListener("click", () => openLightbox(`${DATA_ROOT}/figures/${fig.path}${cacheBust}`, fig.title || fig.path));
+        grid.appendChild(card);
+      }
+
+      section.appendChild(grid);
+      container.appendChild(section);
+    }
+  });
+}
+
+function openLightbox(src, caption) {
+  const lb = document.getElementById("lightbox");
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox-caption").textContent = caption;
+  lb.style.display = "flex";
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+}
+
+document.getElementById("figures-search").addEventListener("input", renderGallery);
+document.getElementById("lightbox").addEventListener("click", e => {
+  if (e.target === e.currentTarget) closeLightbox();
+});
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 init().catch(err => {

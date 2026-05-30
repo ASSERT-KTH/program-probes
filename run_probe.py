@@ -46,6 +46,8 @@ def main():
                         help="Positive class weight multiplier (only used with --loss weighted_cross_entropy)")
 
     args = parser.parse_args()
+    if args.n_eval_bins is not None and args.n_eval_bins != args.n_bins and args.n_bins != 1:
+        parser.error("--n-eval-bins requires --n-bins 1 or --n-eval-bins equal to --n-bins")
     model_cfg = load_config(args.model_config, ModelConfig)
     cache_run_id = args.cache_run_id or args.run_id
 

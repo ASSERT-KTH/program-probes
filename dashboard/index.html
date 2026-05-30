@@ -12,6 +12,10 @@
     <h1>Program Probes</h1>
     <div id="controls">
       <label>Run: <select id="run-selector"></select></label>
+      <nav id="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('probes')">Probes</button>
+        <button class="tab-btn" onclick="switchTab('figures')">Figures</button>
+      </nav>
     </div>
   </header>
 
@@ -23,12 +27,7 @@
     <section id="panel-heatmap" class="panel">
       <h2>Probe Heatmap</h2>
       <div id="probe-tabs"></div>
-      <div id="baseline-toggle" style="margin: 6px 0 2px; font-size: 11px;">
-        Baseline:
-        <button id="btn-baseline-global" class="baseline-btn active" onclick="setBaselineMode('global')">Global</button>
-        <button id="btn-baseline-per-bin" class="baseline-btn" onclick="setBaselineMode('per-bin')">Per-bin</button>
-      </div>
-      <div id="heatmap-container"></div>
+<div id="heatmap-container"></div>
       <div id="linechart-container"></div>
       <div id="stats-container"></div>
     </section>
@@ -56,6 +55,21 @@
       </div>
     </section>
   </main>
+
+  <!-- Figures gallery tab -->
+  <div id="tab-figures" class="tab-panel" style="display:none; padding: 16px;">
+    <div id="figures-filter" style="margin-bottom:12px; font-size:12px; color:#555;">
+      Filter: <input id="figures-search" type="text" placeholder="e.g. will_resolve, lookahead" style="font-size:12px; padding:3px 6px; width:220px;">
+    </div>
+    <div id="figures-gallery"></div>
+  </div>
+
+  <!-- Lightbox overlay -->
+  <div id="lightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; flex-direction:column;">
+    <img id="lightbox-img" style="max-width:92vw; max-height:88vh; border-radius:4px; box-shadow:0 4px 24px rgba(0,0,0,0.5);">
+    <div id="lightbox-caption" style="color:#eee; font-size:12px; margin-top:10px;"></div>
+    <button onclick="closeLightbox()" style="position:absolute;top:16px;right:22px;font-size:24px;background:none;border:none;color:#fff;cursor:pointer;">✕</button>
+  </div>
 
   <script src="app.js"></script>
 </body>
