@@ -362,6 +362,30 @@ header h1 { font-size: 18px; font-weight: 600; }
   color: #222;
 }
 
+/* Metric toggle */
+#metric-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.metric-btn {
+  font-size: 12px;
+  padding: 3px 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.metric-btn.active {
+  background: #fff;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
 /* Tab navigation */
 #tab-nav {
   display: inline-flex;

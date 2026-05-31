@@ -12,6 +12,10 @@
     <h1>Program Probes</h1>
     <div id="controls">
       <label>Run: <select id="run-selector"></select></label>
+      <div id="metric-toggle">
+        <button class="metric-btn active" data-metric="auc" onclick="setMetric('auc')">AUROC</button>
+        <button class="metric-btn" data-metric="accuracy" onclick="setMetric('accuracy')">Accuracy</button>
+      </div>
       <nav id="tab-nav">
         <button class="tab-btn active" onclick="switchTab('probes')">Probes</button>
         <button class="tab-btn" onclick="switchTab('figures')">Figures</button>
