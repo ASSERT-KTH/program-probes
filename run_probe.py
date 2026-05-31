@@ -20,6 +20,8 @@ def main():
                         default="position",
                         help="Axis to bin on during evaluation: token position, relative step, or exact step number")
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
+    parser.add_argument("--shuffle-labels", action="store_true",
+                        help="Randomly permute labels within each split before training (sanity-check baseline).")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -53,6 +55,7 @@ def main():
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
+            shuffle_labels=args.shuffle_labels,
         )
     else:
         run_final(
@@ -71,6 +74,7 @@ def main():
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
+            shuffle_labels=args.shuffle_labels,
         )
 
 

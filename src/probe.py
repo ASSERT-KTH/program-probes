@@ -96,6 +96,7 @@ def train_probe_layer(
     log_fn: Callable[[dict], None] | None = None,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
+    shuffle_labels: bool = False,
 ) -> list[ProbeResult]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -156,6 +157,11 @@ def train_probe_layer(
         H_train, y_train = bin_H[train_mask], bin_y[train_mask]
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
+
+        if shuffle_labels:
+            y_train = y_train[torch.randperm(len(y_train))]
+            y_val   = y_val[torch.randperm(len(y_val))]
+            y_test  = y_test[torch.randperm(len(y_test))]
         rel_pos_val  = bin_rel_pos[val_mask]
         rel_pos_test = bin_rel_pos[test_mask]
         step_idx_val  = bin_step_idx[val_mask]  if bin_step_idx is not None else None
@@ -333,6 +339,7 @@ def run_sweep(
     probe_arch: str = "linear",
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
+    shuffle_labels: bool = False,
 ) -> None:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -366,6 +373,7 @@ def run_sweep(
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
+                shuffle_labels=shuffle_labels,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
@@ -392,6 +400,7 @@ def run_final(
     probe_arch: str = "linear",
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
+    shuffle_labels: bool = False,
 ) -> dict:
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -425,6 +434,7 @@ def run_final(
                 batch_size=batch_size, patience=patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
+                shuffle_labels=shuffle_labels,
             )
             all_results[layer_idx] = results
             for r in results:
