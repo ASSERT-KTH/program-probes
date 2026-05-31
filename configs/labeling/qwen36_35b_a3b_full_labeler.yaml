@@ -8,4 +8,4 @@ modal_app_name: program-probes-labeler
 sandbox_timeout: 3600
 eval_timeout: 600
 resume: true
-n_workers: 50
+n_workers: 100
