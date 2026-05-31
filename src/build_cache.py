@@ -8,7 +8,9 @@ def build_cache(
     output_dir: str = "outputs",
     cache_dir: str = "cache",
     label_shift: int = 0,
+    max_label_shift: int | None = None,
     cache_run_id: str | None = None,
+    group_by: str = "instance",
 ) -> None:
     in_dir = Path(output_dir) / run_id
     pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
@@ -41,7 +43,8 @@ def build_cache(
                 else:
                     label = data.get("labels", {}).get(probe_name)
                 sample = data["sample_id"]
-                group = data["group_id"]
+                raw_group = data["group_id"]
+                group = raw_group.rsplit('-', 1)[0] if group_by == "project" else raw_group
                 n_turns = data.get("n_turns") or 1
 
                 acts = data["activations"][layer_idx]  # [T, hidden_dim] float16
@@ -63,7 +66,10 @@ def build_cache(
                     y_vals = [y_int] * T
                     step_idx_vals = [0] * T
 
-                if label_shift > 0 and isinstance(label, list):
+                # window_shift determines which tokens are kept (max_label_shift if set,
+                # else label_shift) — ensures same token set across all k when max_label_shift is fixed
+                window_shift = max_label_shift if max_label_shift is not None else label_shift
+                if window_shift > 0 and isinstance(label, list):
                     # Build per-turn label: for each turn index, its label value
                     turn_label: dict[int, int] = {}
                     for t in range(T):
@@ -72,8 +78,8 @@ def build_cache(
                             raw = label[t] if t < len(label) else None
                             turn_label[turn] = -1 if raw is None else (1 if raw else 0)
 
-                    # Keep only tokens where the future turn exists; shift y to future turn's label
-                    valid = [t for t in range(T) if step_idx_vals[t] + label_shift < n_turns]
+                    # Keep tokens within the fixed window (window_shift), label from label_shift ahead
+                    valid = [t for t in range(T) if step_idx_vals[t] + window_shift < n_turns]
                     if not valid:
                         continue
                     valid_t = torch.tensor(valid)
