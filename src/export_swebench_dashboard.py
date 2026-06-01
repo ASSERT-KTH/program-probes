@@ -25,26 +25,6 @@ def _compute_transitions(labels: list) -> dict:
     return {"total": changes, "false_to_true": false_to_true, "true_to_false": true_to_false}
 
 
-def _majority_baseline_from_cache(cache_dir: Path, probe_name: str, seed: int = 42) -> float:
-    probe_dir = cache_dir / probe_name
-    layer_files = sorted(probe_dir.glob("layer_*.pt"))
-    if not layer_files:
-        raise FileNotFoundError(f"No cache files found for probe '{probe_name}' in {probe_dir}")
-    data = torch.load(layer_files[0], weights_only=False)
-    y = data["y"]
-    group_ids = data["group_id"]
-    _, _, test_groups = _split_groups(group_ids, seed)
-    test_mask = torch.tensor([
-        group_ids[i] in test_groups and y[i].item() >= 0
-        for i in range(len(y))
-    ])
-    test_y = y[test_mask]
-    if len(test_y) == 0:
-        raise ValueError(f"No test samples found in cache for probe '{probe_name}' in {probe_dir}")
-    pos = (test_y == 1).sum().item()
-    total = len(test_y)
-    return max(pos / total, 1 - pos / total)
-
 
 def _per_bin_majority_baseline_from_cache(
     cache_dir: Path, probe_name: str, n_bins: int = 10, seed: int = 42,
@@ -286,12 +266,8 @@ def export_swebench_dashboard(
     }
     (run_dir / "stats.json").write_text(json.dumps(stats_out))
 
-    # Majority baselines
+    # Per-bin majority baselines
     cache_run = output_run_id or run_id
-    majority_baselines = {
-        p: _majority_baseline_from_cache(Path(cache_dir) / cache_run, p)
-        for p in probe_names
-    }
     majority_baselines_per_bin = {
         p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins, eval_bin_axis=eval_bin_axis)
         for p in probe_names
@@ -312,10 +288,10 @@ def export_swebench_dashboard(
                 probe_results[probe_name][str(layer_idx)][str(bin_idx)] = {
                     "test_acc": r.test_acc if hasattr(r, "test_acc") else r["test_acc"],
                     "val_acc": r.val_acc if hasattr(r, "val_acc") else r["val_acc"],
-                    "test_auc": r.test_auc if hasattr(r, "test_auc") else r.get("test_auc", None),
-                    "val_auc": r.val_auc if hasattr(r, "val_auc") else r.get("val_auc", None),
-                    "test_ece": r.test_ece if hasattr(r, "test_ece") else r.get("test_ece", None),
-                    "val_ece": r.val_ece if hasattr(r, "val_ece") else r.get("val_ece", None),
+                    "test_auc": r.test_auc if hasattr(r, "test_auc") else r.get("test_auc"),
+                    "val_auc": r.val_auc if hasattr(r, "val_auc") else r.get("val_auc"),
+                    "test_ece": r.test_ece if hasattr(r, "test_ece") else r.get("test_ece"),
+                    "val_ece": r.val_ece if hasattr(r, "val_ece") else r.get("val_ece"),
                     "n_train": r.n_train if hasattr(r, "n_train") else r["n_train"],
                     "n_val": r.n_val if hasattr(r, "n_val") else r["n_val"],
                     "n_test": r.n_test if hasattr(r, "n_test") else r["n_test"],
@@ -329,7 +305,6 @@ def export_swebench_dashboard(
         "probe_layers": probe_layers,
         "n_samples": len(samples_list),
         "n_generations": 1,
-        "majority_baseline": majority_baselines,
         "majority_baseline_per_bin": majority_baselines_per_bin,
         "eval_bin_axis": eval_bin_axis,
         "is_agentic": True,
@@ -350,4 +325,35 @@ def export_swebench_dashboard(
         "timestamp": datetime.utcnow().isoformat() + "Z",
     })
     manifest_path.write_text(json.dumps(manifest, indent=2))
+
+    # Copy any figures for this run into dashboard/data/figures/ and update figures manifest
+    _export_figures(run_id=run_id, figures_src_dir="figures", data_dir=data_dir)
+
     print(f"[export] wrote dashboard data to {run_dir}")
+
+
+def _export_figures(run_id: str, figures_src_dir: str, data_dir: Path) -> None:
+    import shutil
+    figures_src = Path(figures_src_dir) / run_id
+    if not figures_src.exists():
+        return
+
+    figures_dst = data_dir / "figures" / run_id
+    figures_dst.mkdir(parents=True, exist_ok=True)
+
+    figures_manifest_path = data_dir / "figures" / "manifest.json"
+    figures_manifest = json.loads(figures_manifest_path.read_text()) if figures_manifest_path.exists() else []
+    # Remove stale entries for this run
+    figures_manifest = [e for e in figures_manifest if e.get("run_id") != run_id]
+
+    for png in sorted(figures_src.glob("*.png")):
+        shutil.copy2(png, figures_dst / png.name)
+        stem = png.stem  # e.g. "will_resolve_heatmap" or "will_resolve_lookahead"
+        figures_manifest.append({
+            "run_id": run_id,
+            "path": f"{run_id}/{png.name}",
+            "title": f"{run_id} / {stem.replace('_', ' ')}",
+        })
+        print(f"[export] copied figure {png.name}")
+
+    figures_manifest_path.write_text(json.dumps(figures_manifest, indent=2))

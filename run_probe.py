@@ -16,12 +16,13 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--n-bins", type=int, default=10)
     parser.add_argument("--n-eval-bins", type=int, default=None,
-                        help="If set, evaluate per bin at this granularity. "
-                             "Must equal --n-bins or --n-bins must be 1 (pooled training).")
+                        help="Evaluate at this bin granularity; requires --n-bins 1 or --n-eval-bins equal to --n-bins")
     parser.add_argument("--eval-bin-axis", choices=["position", "step_relative", "step_absolute"],
                         default="position",
                         help="Axis to bin on during evaluation: token position, relative step, or exact step number")
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
+    parser.add_argument("--shuffle-labels", action="store_true",
+                        help="Randomly permute labels within each split before training (sanity-check baseline).")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -46,6 +47,8 @@ def main():
                         help="Positive class weight multiplier (only used with --loss weighted_cross_entropy)")
 
     args = parser.parse_args()
+    if args.n_eval_bins is not None and args.n_eval_bins != args.n_bins and args.n_bins != 1:
+        parser.error("--n-eval-bins requires --n-bins 1 or --n-eval-bins equal to --n-bins")
     model_cfg = load_config(args.model_config, ModelConfig)
     cache_run_id = args.cache_run_id or args.run_id
 
@@ -66,6 +69,7 @@ def main():
             then_final=args.then_final,
             results_dir=args.results_dir,
             fixed_params=args.fixed,
+            shuffle_labels=args.shuffle_labels,
         )
     else:
         run_final(
@@ -87,6 +91,7 @@ def main():
             pos_weight=args.pos_weight,
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
+            shuffle_labels=args.shuffle_labels,
         )
 
 

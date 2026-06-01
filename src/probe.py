@@ -28,6 +28,7 @@ class ProbeResult:
     n_train: int
     n_val: int
     n_test: int
+    n_pos_test: int
     n_epochs: int
 
 
@@ -114,6 +115,7 @@ def train_probe_layer(
     log_fn: Callable[[dict], None] | None = None,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
+    shuffle_labels: bool = False,
 ) -> tuple[list[ProbeResult], dict[int, dict]]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -174,6 +176,11 @@ def train_probe_layer(
         H_train, y_train = bin_H[train_mask], bin_y[train_mask]
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
+
+        if shuffle_labels:
+            y_train = y_train[torch.randperm(len(y_train))]
+            y_val   = y_val[torch.randperm(len(y_val))]
+            y_test  = y_test[torch.randperm(len(y_test))]
         rel_pos_val  = bin_rel_pos[val_mask]
         rel_pos_test = bin_rel_pos[test_mask]
         step_idx_val  = bin_step_idx[val_mask]  if bin_step_idx is not None else None
@@ -323,6 +330,7 @@ def train_probe_layer(
                 n_train=H_train.shape[0],
                 n_val=H_val_e.shape[0],
                 n_test=H_test_e.shape[0],
+                n_pos_test=int((test_labels_np == 1).sum()),
                 n_epochs=n_epochs,
             ))
 
@@ -388,6 +396,7 @@ def run_sweep(
     then_final: bool = False,
     results_dir: str = "results",
     fixed_params: dict | None = None,
+    shuffle_labels: bool = False,
 ) -> str:
     """Run hyperparameter sweep, optionally followed by final training.
 
@@ -428,6 +437,7 @@ def run_sweep(
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 loss=cfg.loss, pos_weight=cfg.pos_weight,
                 log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
+                shuffle_labels=shuffle_labels,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
@@ -477,6 +487,7 @@ def run_final(
     pos_weight: float = 1.0,
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
+    shuffle_labels: bool = False,
 ) -> dict:
     if sweep_id is not None:
         best = fetch_best_sweep_config(sweep_id)
@@ -527,6 +538,7 @@ def run_final(
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 loss=loss, pos_weight=pos_weight,
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
+                shuffle_labels=shuffle_labels,
             )
             all_results[layer_idx] = results
             all_weights[layer_idx] = weights
@@ -545,6 +557,7 @@ def run_final(
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_train": r.n_train,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_val": r.n_val,
                     f"layer_{layer_idx}/bin_{r.bin_idx}/n_test": r.n_test,
+                    f"layer_{layer_idx}/bin_{r.bin_idx}/n_pos_test": r.n_pos_test,
                 })
 
     out = Path(results_dir) / run_id / probe_name

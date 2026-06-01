@@ -4,7 +4,7 @@ from src.configs import ModelConfig, GenerationConfig
 from src.tasks.base import ChatPrompt
 
 
-class QwenAdapter(ModelAdapter):
+class LagunaAdapter(ModelAdapter):
     def load_tokenizer(self, model_config: ModelConfig) -> None:
         from transformers import AutoTokenizer
         self._tokenizer = AutoTokenizer.from_pretrained(model_config.model_id)
@@ -82,7 +82,6 @@ class QwenAdapter(ModelAdapter):
     ) -> list[dict[int, torch.Tensor]]:
         device = next(self._model.parameters()).device
 
-        # Use chunked extraction to bound peak GPU memory
         if chunk_size is not None and extraction_masks is not None:
             return [
                 {li: hs.to(torch.float16) for li, hs in
@@ -92,7 +91,6 @@ class QwenAdapter(ModelAdapter):
                 for seq, mask in zip(sequences, extraction_masks)
             ]
 
-        # Left-pad sequences to the same length
         max_len = max(len(s) for s in sequences)
         pad_id = self._tokenizer.pad_token_id or self._tokenizer.eos_token_id
         input_ids = torch.tensor(
@@ -109,10 +107,8 @@ class QwenAdapter(ModelAdapter):
                 output_hidden_states=True,
             )
 
-        # hidden_states: tuple of (n_layers+1) tensors, each [batch, seq, hidden]
         results = []
         if extraction_masks is not None:
-            # Left-pad masks to match sequence padding
             padded_masks = torch.tensor(
                 [[0] * (max_len - len(m)) + m for m in extraction_masks],
                 dtype=torch.bool, device=device,

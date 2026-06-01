@@ -72,10 +72,15 @@ def _tokenize_trajectory(messages: list[dict[str, Any]], tokenizer_name: str) ->
     from transformers import AutoTokenizer
 
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
-    chat_messages = [
-        {"role": message.get("role", "user"), "content": _content_to_text(message.get("content", ""))}
-        for message in messages
-    ]
+    chat_messages = []
+    for message in messages:
+        msg: dict[str, Any] = {
+            "role": message.get("role", "user"),
+            "content": _content_to_text(message.get("content", "")),
+        }
+        if message.get("reasoning_content"):
+            msg["reasoning_content"] = message["reasoning_content"]
+        chat_messages.append(msg)
 
     try:
         text = tokenizer.apply_chat_template(
@@ -151,11 +156,17 @@ def _build_segments_no_offsets(chat_messages: list[dict[str, str]]) -> list[dict
 
 
 def _clean_message(message: dict[str, Any]) -> dict[str, Any]:
-    return {
+    cleaned = {
         "role": message.get("role"),
         "content": _jsonable(message.get("content", "")),
         "extra": _jsonable(message.get("extra", {})),
     }
+    # Preserve reasoning_content so tokenization can faithfully reconstruct the
+    # prompt that the model actually saw (some templates, e.g. Laguna, embed
+    # thinking blocks from previous turns into the context).
+    if message.get("reasoning_content"):
+        cleaned["reasoning_content"] = _jsonable(message["reasoning_content"])
+    return cleaned
 
 
 def _content_to_text(content: Any) -> str:

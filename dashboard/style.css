@@ -103,21 +103,6 @@ header h1 { font-size: 18px; font-weight: 600; }
   border-color: #1a1a2e;
 }
 
-.baseline-btn {
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  font-size: 11px;
-  background: #f5f5f5;
-  margin-left: 4px;
-}
-
-.baseline-btn.active {
-  background: #1a1a2e;
-  color: #fff;
-  border-color: #1a1a2e;
-}
 
 /* Heatmap */
 #heatmap-container svg, #linechart-container svg { width: 100%; }
@@ -375,4 +360,55 @@ header h1 { font-size: 18px; font-weight: 600; }
   overflow-y: auto;
   margin: 0;
   color: #222;
+}
+
+/* Metric toggle */
+#metric-toggle {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.metric-btn {
+  font-size: 12px;
+  padding: 3px 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.metric-btn.active {
+  background: #fff;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+/* Tab navigation */
+#tab-nav {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 16px;
+}
+
+.tab-btn {
+  font-size: 12px;
+  padding: 3px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+  color: #444;
+}
+
+.tab-btn.active {
+  background: #1a1a2e;
+  color: #fff;
+  border-color: #1a1a2e;
+}
+
+.tab-panel {
+  padding: 16px;
 }

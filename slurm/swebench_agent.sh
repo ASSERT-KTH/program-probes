@@ -2,7 +2,7 @@
 #SBATCH -J pp-swebench
 #SBATCH -p berzelius
 #SBATCH --gpus=1
-#SBATCH -t 12:00:00
+#SBATCH -t 20:00:00
 #SBATCH -o logs/swebench_%A_%a.out
 #SBATCH -e logs/swebench_%A_%a.err
 
