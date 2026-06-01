@@ -137,33 +137,25 @@ def plot_lookahead_horizon(
             if k not in k_to_n:
                 k_to_n[k] = n
 
-    fig, (ax_lift, ax_auc) = plt.subplots(2, 1, figsize=(8, 7), sharex=True)
+    fig, ax_auc = plt.subplots(1, 1, figsize=(8, 4))
 
     for li, layer_idx in enumerate(probe_layers):
         pts = sorted(data[layer_idx], key=lambda x: x[0])
         if not pts:
             continue
         ks = [p[0] for p in pts]
-        lifts = [p[1] for p in pts]
         aucs = [p[2] for p in pts]
         col = colours[li % len(colours)]
-        label = f"Layer {layer_idx}"
-
-        ax_lift.plot(ks, lifts, marker="o", color=col, label=label)
-        ax_auc.plot(ks, aucs, marker="o", color=col, label=label)
-
-    ax_lift.axhline(0.0, linestyle="--", color="#aaa", linewidth=1)
-    ax_lift.set_ylabel("Accuracy − per-bin majority baseline")
-    ax_lift.set_title(f"{probe_name} — lookahead horizon ({base_run_id})")
-    ax_lift.legend(fontsize=8, loc="upper left")
+        ax_auc.plot(ks, aucs, marker="o", color=col, label=f"Layer {layer_idx}")
 
     ax_auc.axhline(0.5, linestyle="--", color="#aaa", linewidth=1)
     ax_auc.set_ylabel("AUC  (random = 0.5)")
-    ax_auc.set_ylim(bottom=0.48)  # anchor near random so drop-off is visible
+    ax_auc.set_ylim(bottom=0.48)
     ax_auc.set_xlabel("Turns ahead (k)  ←earlier prediction    at flip→")
+    ax_auc.set_title(f"{probe_name} — lookahead horizon ({base_run_id})")
+    ax_auc.legend(fontsize=8, loc="upper left")
+    ax_auc.invert_xaxis()
 
-    # Invert x-axis: k=0 (at flip) on the right, larger k (earlier) on the left
-    ax_lift.invert_xaxis()
     ks_present = sorted(k_to_n.keys())
     ax_auc.set_xticks(ks_present)
     ax_auc.set_xticklabels([])  # replaced by staggered annotations below
