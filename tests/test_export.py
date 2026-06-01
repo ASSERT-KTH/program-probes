@@ -73,8 +73,8 @@ def test_probe_results_structure(tmp_path):
     results_dir = tmp_path / "results" / RUN_ID / "will_be_correct"
     results_dir.mkdir(parents=True)
     fake_results = {
-        0: [ProbeResult(layer=0, bin_idx=i, val_acc=0.7, val_f1=0.6, val_precision=0.6, val_recall=0.6, val_auc=0.7, test_acc=0.65, test_f1=0.55, test_precision=0.55, test_recall=0.55, test_auc=0.65, n_train=50, n_val=10, n_test=10, n_pos_test=5, n_epochs=5) for i in range(3)],
-        1: [ProbeResult(layer=1, bin_idx=i, val_acc=0.8, val_f1=0.7, val_precision=0.7, val_recall=0.7, val_auc=0.8, test_acc=0.75, test_f1=0.65, test_precision=0.65, test_recall=0.65, test_auc=0.75, n_train=50, n_val=10, n_test=10, n_pos_test=5, n_epochs=8) for i in range(3)],
+        0: [ProbeResult(layer=0, bin_idx=i, val_acc=0.7, val_f1=0.6, val_precision=0.6, val_recall=0.6, val_auc=0.7, val_ece=0.1, test_acc=0.65, test_f1=0.55, test_precision=0.55, test_recall=0.55, test_auc=0.65, test_ece=0.15, n_train=50, n_val=10, n_test=10, n_pos_test=5, n_epochs=5) for i in range(3)],
+        1: [ProbeResult(layer=1, bin_idx=i, val_acc=0.8, val_f1=0.7, val_precision=0.7, val_recall=0.7, val_auc=0.8, val_ece=0.1, test_acc=0.75, test_f1=0.65, test_precision=0.65, test_recall=0.65, test_auc=0.75, test_ece=0.12, n_train=50, n_val=10, n_test=10, n_pos_test=5,n_epochs=8) for i in range(3)],
     }
     torch.save(fake_results, results_dir / "results.pt")
 
