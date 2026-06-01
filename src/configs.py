@@ -120,6 +120,9 @@ class SWEBenchRunConfig(BaseModel):
     modal_timeout: int = 300    # seconds for the Modal sandbox lifecycle
     output_dir: str = "generations/swebench"
 
+    # SWE-bench Pro only: path to a local clone of github.com/scaleapi/SWE-bench_Pro-os
+    swe_bench_pro_scripts_dir: str = "SWE-bench_Pro-os"
+
     def to_model_config(self) -> "ModelConfig":
         return ModelConfig(
             model_id=self.model_id,

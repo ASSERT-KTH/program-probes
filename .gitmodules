@@ -1,0 +1,3 @@
+[submodule "SWE-bench_Pro-os"]
+	path = SWE-bench_Pro-os
+	url = https://github.com/scaleapi/SWE-bench_Pro-os

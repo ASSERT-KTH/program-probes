@@ -1,0 +1,3 @@
+dataset: ScaleAI/SWE-bench_Pro
+adapter: swe_bench_pro
+execution_timeout: 300
