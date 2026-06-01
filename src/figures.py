@@ -90,9 +90,8 @@ def plot_lookahead_horizon(
     colours = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
     # Collect per-k, per-layer metrics
-    # all_run_ids[0] is k=0 (base run), rest are shift runs
-    all_k = [0] + list(k_values)
-    all_run_ids = [base_run_id] + list(shift_run_ids)
+    all_k = list(k_values)
+    all_run_ids = list(shift_run_ids)
 
     # layer → list of (k, lift, auc, n_test) across k values
     data: dict[int, list[tuple]] = {li: [] for li in probe_layers}
