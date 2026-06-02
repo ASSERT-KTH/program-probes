@@ -506,9 +506,9 @@ def run_final(
         weight_decay = weight_decay if weight_decay is not None else best["weight_decay"]
         batch_size = batch_size if batch_size is not None else best["batch_size"]
         patience = patience if patience is not None else best["patience"]
-        loss = best["loss"]
+        loss = best.get("loss", loss)
         if loss == "weighted_cross_entropy":
-            pos_weight = best["pos_weight"]
+            pos_weight = best.get("pos_weight", pos_weight)
     if lr is None or weight_decay is None or batch_size is None or patience is None:
         raise ValueError(
             "lr, weight_decay, batch_size, patience are required "
