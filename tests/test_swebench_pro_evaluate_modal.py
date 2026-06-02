@@ -13,7 +13,7 @@ Run from the project root:
 import argparse
 
 # Python instance with a relatively fast test suite.
-DEFAULT_INSTANCE_ID = "instance_ansible__ansible-c9a09b1b05-v3bfb2be"
+DEFAULT_INSTANCE_ID = "instance_ansible__ansible-0ea40e09d1b35bcb69ff4d9cecf3d0defa4b36e8-v30a923fb5c164d6cd18280c02422f75e611e8fb2"
 
 
 def _load_instance(instance_id: str) -> dict:
