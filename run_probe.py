@@ -1,7 +1,7 @@
 import argparse
 import json
 from src.configs import ModelConfig, load_config
-from src.probe import run_sweep, run_final
+from src.probe import run_sweep, run_final, create_sweep
 
 
 def main():
@@ -25,6 +25,10 @@ def main():
                         help="Randomly permute labels within each split before training (sanity-check baseline).")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
+
+    create_p = subparsers.add_parser("create-sweep", help="Create a W&B sweep and print its ID (no training)")
+    create_p.add_argument("--fixed", type=json.loads, default=None,
+                          help='JSON dict of fixed HP values')
 
     sweep_p = subparsers.add_parser("sweep")
     sweep_p.add_argument("--sweep-id", default=None, help="Join an existing W&B sweep instead of creating a new one")
@@ -52,7 +56,13 @@ def main():
     model_cfg = load_config(args.model_config, ModelConfig)
     cache_run_id = args.cache_run_id or args.run_id
 
-    if args.mode == "sweep":
+    if args.mode == "create-sweep":
+        create_sweep(
+            run_id=args.run_id,
+            probe_name=args.probe,
+            fixed_params=args.fixed,
+        )
+    elif args.mode == "sweep":
         run_sweep(
             run_id=args.run_id,
             probe_name=args.probe,

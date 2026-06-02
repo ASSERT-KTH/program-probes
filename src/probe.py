@@ -355,22 +355,20 @@ def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None)
     import wandb
     sweep_config = {
         "name": f"sweep-{run_id}-{probe_name}",
-        "method": "bayes",
-        "metric": {"name": "mean_val_f1", "goal": "maximize"},
+        "method": "random",
+        "metric": {"name": "mean_val_auc", "goal": "maximize"},
         "parameters": {
             "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-1},
-            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
+            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-2},
             "batch_size": {"values": [256, 512, 1024]},
-            "patience": {"values": [10, 100]},
-            "loss": {"values": ["cross_entropy", "weighted_cross_entropy"]},
-            "pos_weight": {"distribution": "log_uniform_values", "min": 0.1, "max": 10.0},
+            "patience": {"values": [10, 50]},
         },
     }
     if fixed_params:
         for k, v in fixed_params.items():
             sweep_config["parameters"][k] = {"value": v}
     sweep_id = wandb.sweep(sweep_config, project="program-probes")
-    print(f"Created sweep: {sweep_id}", flush=True)
+    print(sweep_id, flush=True)
     return sweep_id
 
 
@@ -383,7 +381,7 @@ def fetch_best_sweep_config(sweep_id: str) -> dict:
     if best_run is None:
         raise ValueError(f"No completed runs found for sweep {sweep_id}")
     cfg = dict(best_run.config)
-    print(f"Best sweep run: {best_run.name}  mean_val_f1={best_run.summary.get('mean_val_f1', 'N/A')}")
+    print(f"Best sweep run: {best_run.name}  mean_val_auc={best_run.summary.get('mean_val_auc', 'N/A')}")
     for k, v in cfg.items():
         print(f"  {k}: {v}")
     return cfg
