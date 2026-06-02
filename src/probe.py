@@ -359,9 +359,9 @@ def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None)
         "metric": {"name": "mean_val_auc", "goal": "maximize"},
         "parameters": {
             "lr": {"distribution": "log_uniform_values", "min": 1e-4, "max": 1e-1},
-            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-2},
+            "weight_decay": {"distribution": "log_uniform_values", "min": 1e-5, "max": 1e-1},
             "batch_size": {"values": [256, 512, 1024]},
-            "patience": {"values": [10, 50]},
+            "patience": {"values": [10, 25, 50]},
         },
     }
     if fixed_params:
