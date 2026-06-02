@@ -380,7 +380,7 @@ def fetch_best_sweep_config(sweep_id: str) -> dict:
     """Query W&B for the best run in a sweep and return its hyperparameters."""
     import wandb
     api = wandb.Api()
-    sweep = api.sweep(f"tux-tu-kth-royal-institute-of-technology/program-probes/{sweep_id}")
+    sweep = api.sweep(f"assert-kth/program-probes/{sweep_id}")
     best_run = sweep.best_run()
     if best_run is None:
         raise ValueError(f"No completed runs found for sweep {sweep_id}")
