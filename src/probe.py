@@ -19,12 +19,14 @@ class ProbeResult:
     val_recall: float
     val_auc: float
     val_ece: float
+    val_brier: float
     test_acc: float
     test_f1: float
     test_precision: float
     test_recall: float
     test_auc: float
     test_ece: float
+    test_brier: float
     n_train: int
     n_val: int
     n_test: int
@@ -69,6 +71,10 @@ def _compute_ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> flo
     return float(ece)
 
 
+def _compute_brier(probs: np.ndarray, labels: np.ndarray) -> float:
+    return float(np.mean((probs - labels) ** 2))
+
+
 def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> dict:
     from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
     return {
@@ -77,6 +83,7 @@ def _clf_metrics(probs: np.ndarray, preds: np.ndarray, labels: np.ndarray) -> di
         "recall": recall_score(labels, preds, zero_division=0.0),
         "auc": roc_auc_score(labels, probs) if len(np.unique(labels)) > 1 else 0.5,
         "ece": _compute_ece(probs, labels),
+        "brier": _compute_brier(probs, labels),
     }
 
 
@@ -321,12 +328,14 @@ def train_probe_layer(
                 val_recall=val_m["recall"],
                 val_auc=val_m["auc"],
                 val_ece=val_m["ece"],
+                val_brier=val_m["brier"],
                 test_acc=float((test_preds_np == test_labels_np).mean()),
                 test_f1=test_m["f1"],
                 test_precision=test_m["precision"],
                 test_recall=test_m["recall"],
                 test_auc=test_m["auc"],
                 test_ece=test_m["ece"],
+                test_brier=test_m["brier"],
                 n_train=H_train.shape[0],
                 n_val=H_val_e.shape[0],
                 n_test=H_test_e.shape[0],

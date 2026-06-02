@@ -14,7 +14,9 @@
       <label>Run: <select id="run-selector"></select></label>
       <div id="metric-toggle">
         <button class="metric-btn active" data-metric="auc" onclick="setMetric('auc')">AUROC</button>
-        <button class="metric-btn" data-metric="accuracy" onclick="setMetric('accuracy')">Accuracy</button>
+        <button class="metric-btn" data-metric="ece" onclick="setMetric('ece')">ECE</button>
+        <button class="metric-btn" data-metric="brier" onclick="setMetric('brier')">Brier</button>
+        <button class="metric-btn" data-metric="accuracy" onclick="setMetric('accuracy')">Acc</button>
       </div>
       <nav id="tab-nav">
         <button class="tab-btn active" onclick="switchTab('probes')">Probes</button>

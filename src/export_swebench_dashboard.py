@@ -292,6 +292,8 @@ def export_swebench_dashboard(
                     "val_auc": r.val_auc if hasattr(r, "val_auc") else None,
                     "test_ece": r.test_ece if hasattr(r, "test_ece") else None,
                     "val_ece": r.val_ece if hasattr(r, "val_ece") else None,
+                    "test_brier": r.test_brier if hasattr(r, "test_brier") else None,
+                    "val_brier": r.val_brier if hasattr(r, "val_brier") else None,
                     "n_train": r.n_train if hasattr(r, "n_train") else r["n_train"],
                     "n_val": r.n_val if hasattr(r, "n_val") else r["n_val"],
                     "n_test": r.n_test if hasattr(r, "n_test") else r["n_test"],

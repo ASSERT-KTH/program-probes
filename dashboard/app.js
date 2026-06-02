@@ -127,9 +127,13 @@ function renderHeatmap() {
   const evalBinAxis = state.meta.eval_bin_axis ?? "position";
   const nBins = 10;
   const majorityPerBin = state.meta.majority_baseline_per_bin?.[state.activeProbe] ?? null;
-  const isAuc = state.metricMode === "auc";
-  const metricField = isAuc ? "test_auc" : "test_acc";
-  const valField = isAuc ? "val_auc" : "val_acc";
+  const mode = state.metricMode;
+  const metricField = mode === "auc" ? "test_auc" : mode === "ece" ? "test_ece" : mode === "brier" ? "test_brier" : "test_acc";
+  const valField   = mode === "auc" ? "val_auc"  : mode === "ece" ? "val_ece"  : mode === "brier" ? "val_brier"  : "val_acc";
+  // ECE and Brier: lower is better; invert colour scale (red=high=bad, green=low=good)
+  const lowerIsBetter = mode === "ece" || mode === "brier";
+  const fixedBaseline = mode === "auc" ? 0.5 : mode === "brier" ? 0.25 : mode === "ece" ? null : null;
+  const metricLabel = mode === "auc" ? "AUROC" : mode === "ece" ? "ECE" : mode === "brier" ? "Brier" : "Accuracy";
 
   if (evalBinAxis === "step_absolute") {
     renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers, majorityPerBin);
@@ -147,18 +151,20 @@ function renderHeatmap() {
     .append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  const diverging = t => d3.interpolateRgbBasis(["#d73027", "#ffffff", "#1a9850"])(t);
+  // For lower-is-better metrics invert the colour ramp so green=low, red=high
+  const diverging = lowerIsBetter
+    ? t => d3.interpolateRgbBasis(["#1a9850", "#ffffff", "#d73027"])(t)
+    : t => d3.interpolateRgbBasis(["#d73027", "#ffffff", "#1a9850"])(t);
   const makeColorScale = (baseline) =>
-    d3.scaleDiverging(diverging).domain([0, baseline, 1.0]);
+    d3.scaleDiverging(diverging).domain([0, baseline, lowerIsBetter ? baseline * 2 : 1.0]);
 
-  // AUC: center color scale at 0.5; Accuracy: center at per-bin majority baseline
-  const colorScaleForBin = isAuc
-    ? d3.range(nBins).map(() => makeColorScale(0.5))
-    : (majorityPerBin
-        ? d3.range(nBins).map(b => makeColorScale(majorityPerBin[String(b)] ?? 0.5))
-        : d3.range(nBins).map(() => makeColorScale(0.5)));
+  const getBaseline = (bin) => {
+    if (fixedBaseline !== null) return fixedBaseline;
+    if (mode === "accuracy") return majorityPerBin?.[String(bin)] ?? 0.5;
+    return 0.5;
+  };
+  const colorScaleForBin = d3.range(nBins).map(b => makeColorScale(getBaseline(b)));
   const getColor = (val, bin) => val !== null ? colorScaleForBin[bin](val) : "#eee";
-  const getBaseline = (bin) => isAuc ? 0.5 : (majorityPerBin?.[String(bin)] ?? 0.5);
 
   const xScale = d3.scaleBand().domain(d3.range(nBins)).range([0, width]).padding(0.04);
   const yScale = d3.scaleBand().domain(layers).range([0, height]).padding(0.04);
@@ -191,12 +197,9 @@ function renderHeatmap() {
           if (val !== null) {
             const bl = getBaseline(bin);
             const diff = val - bl;
-            const diffStr = (diff >= 0 ? "+" : "") + (diff * 100).toFixed(1) + "%";
-            const secField = isAuc ? "test_acc" : "test_auc";
-            const secVal = cell?.[secField];
-            const secLabel = isAuc ? `acc: ${(cell.test_acc * 100).toFixed(1)}%` : `auc: ${(cell.test_auc * 100).toFixed(1)}%`;
-            const baselineLabel = isAuc ? "random (0.5)" : `majority: ${(bl * 100).toFixed(1)}%`;
-            tooltip.innerHTML = `Layer ${layer} | Bin ${bin}<br>${isAuc ? "AUROC" : "Accuracy"}: ${(val * 100).toFixed(1)}%<br>${baselineLabel}<br>diff: ${diffStr}<br>val: ${(cell[valField] * 100).toFixed(1)}%<br>${secLabel}<br>n_test: ${cell.n_test}`;
+            const diffStr = (diff >= 0 ? "+" : "") + (diff * 100).toFixed(2) + "%";
+            const baselineLabel = fixedBaseline !== null ? `random (${bl.toFixed(2)})` : `majority: ${(bl * 100).toFixed(1)}%`;
+            tooltip.innerHTML = `Layer ${layer} | Bin ${bin}<br>${metricLabel}: ${(val * 100).toFixed(2)}%<br>${baselineLabel}<br>diff: ${diffStr}<br>val ${metricLabel}: ${(cell[valField] * 100).toFixed(2)}%<br>auc: ${(cell.test_auc * 100).toFixed(1)}%  acc: ${(cell.test_acc * 100).toFixed(1)}%<br>n_test: ${cell.n_test}`;
           } else {
             tooltip.innerHTML = `Layer ${layer} | Bin ${bin}<br>No data`;
           }
@@ -219,23 +222,24 @@ function renderHeatmap() {
     .text(evalBinAxis === "step_relative" ? "Relative step bin" : "Relative position bin");
 
   // Colour bar
-  const colorBarBaseline = isAuc ? 0.5 : (majorityPerBin
+  const colorBarBaseline = fixedBaseline !== null ? fixedBaseline : (majorityPerBin
     ? (d3.range(nBins).reduce((s, b) => s + (majorityPerBin[String(b)] ?? 0.5), 0) / nBins)
     : 0.5);
-  const baselineOffsetPct = ((1.0 - colorBarBaseline) * 100).toFixed(1) + "%";
+  const colorBarMax = lowerIsBetter ? colorBarBaseline * 2 : 1.0;
+  const baselineOffsetPct = ((1.0 - colorBarBaseline / colorBarMax) * 100).toFixed(1) + "%";
   const defs = svg.append("defs");
   const lgId = "hm-lg";
   const lg = defs.append("linearGradient").attr("id", lgId).attr("x1", "0%").attr("y1", "0%").attr("x2", "0%").attr("y2", "100%");
-  lg.append("stop").attr("offset", "0%").attr("stop-color", "#1a9850");
+  lg.append("stop").attr("offset", "0%").attr("stop-color", lowerIsBetter ? "#1a9850" : "#1a9850");
   lg.append("stop").attr("offset", baselineOffsetPct).attr("stop-color", "#ffffff");
-  lg.append("stop").attr("offset", "100%").attr("stop-color", "#d73027");
+  lg.append("stop").attr("offset", "100%").attr("stop-color", lowerIsBetter ? "#d73027" : "#d73027");
   svg.append("rect")
     .attr("x", width + 8).attr("y", 0).attr("width", 12).attr("height", height)
     .attr("fill", `url(#${lgId})`);
-  svg.append("text").attr("x", width + 22).attr("y", 6).style("font-size", "10px").text("1.0");
-  svg.append("text").attr("x", width + 22).attr("y", height * (1 - colorBarBaseline))
-    .style("font-size", "10px").text(isAuc ? "0.5 ←" : `~${colorBarBaseline.toFixed(2)}`);
-  svg.append("text").attr("x", width + 22).attr("y", height).style("font-size", "10px").text("0.0");
+  svg.append("text").attr("x", width + 22).attr("y", 6).style("font-size", "10px").text(lowerIsBetter ? "0" : "1.0");
+  svg.append("text").attr("x", width + 22).attr("y", height * (colorBarBaseline / colorBarMax))
+    .style("font-size", "10px").text(`${colorBarBaseline.toFixed(2)} ←`);
+  svg.append("text").attr("x", width + 22).attr("y", height).style("font-size", "10px").text(lowerIsBetter ? colorBarMax.toFixed(2) : "0.0");
 
   // Line chart
   const lm = { top: 10, right: 20, bottom: 40, left: 50 };
@@ -248,8 +252,9 @@ function renderHeatmap() {
     .attr("transform", `translate(${lm.left},${lm.top})`);
 
   const xL = d3.scaleLinear().domain([0, 1]).range([0, lw]);
-  const yDomainMin = isAuc ? 0.45 : 0;
-  const yL = d3.scaleLinear().domain([yDomainMin, 1]).range([lh, 0]);
+  const yDomainMin = mode === "auc" ? 0.45 : 0;
+  const yDomainMax = lowerIsBetter ? colorBarBaseline * 2 : 1.0;
+  const yL = d3.scaleLinear().domain([yDomainMin, yDomainMax]).range([lh, 0]);
   const colours = d3.schemeCategory10;
 
   layers.forEach((layer, li) => {
@@ -277,20 +282,18 @@ function renderHeatmap() {
   });
 
   // Baseline line(s)
-  if (isAuc) {
-    // Single constant 0.5 line
+  if (fixedBaseline !== null) {
     lsvg.append("line")
       .attr("x1", xL(0)).attr("x2", xL(1))
-      .attr("y1", yL(0.5)).attr("y2", yL(0.5))
+      .attr("y1", yL(fixedBaseline)).attr("y2", yL(fixedBaseline))
       .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
-  } else {
+  } else if (mode === "accuracy" && majorityPerBin) {
     for (let b = 0; b < nBins; b++) {
       const bl = majorityPerBin?.[String(b)] ?? 0.5;
       const x0 = xL(b / nBins);
       const x1 = xL((b + 1) / nBins);
-      const y = yL(bl);
       lsvg.append("line")
-        .attr("x1", x0).attr("x2", x1).attr("y1", y).attr("y2", y)
+        .attr("x1", x0).attr("x2", x1).attr("y1", yL(bl)).attr("y2", yL(bl))
         .attr("stroke", "#999").attr("stroke-dasharray", "4,2").attr("stroke-width", 1);
     }
   }
@@ -298,11 +301,12 @@ function renderHeatmap() {
   lsvg.append("g").attr("transform", `translate(0,${lh})`).call(d3.axisBottom(xL).ticks(5));
   lsvg.append("g").call(d3.axisLeft(yL).ticks(4));
 
+  const baselineNote = fixedBaseline !== null ? ` (random = ${fixedBaseline})` : "";
   lsvg.append("text")
     .attr("transform", "rotate(-90)")
     .attr("x", -lh / 2).attr("y", -38)
     .attr("text-anchor", "middle").style("font-size", "9px")
-    .text(isAuc ? "AUROC (random = 0.5)" : "Accuracy");
+    .text(`${metricLabel}${baselineNote}`);
 
   lsvg.append("text")
     .attr("x", lw / 2).attr("y", lh + 32)
@@ -332,7 +336,8 @@ function renderStepAbsoluteChart(heatContainer, lineContainer, probeData, layers
     .attr("viewBox", `0 0 ${lw + lm.left + lm.right} ${lh + lm.top + lm.bottom}`)
     .append("g").attr("transform", `translate(${lm.left},${lm.top})`);
 
-  const stepMetricField = state.metricMode === "auc" ? "test_auc" : "test_acc";
+  const _m = state.metricMode;
+  const stepMetricField = _m === "auc" ? "test_auc" : _m === "ece" ? "test_ece" : _m === "brier" ? "test_brier" : "test_acc";
   layers.forEach((layer, li) => {
     const layerData = probeData[String(layer)] ?? {};
     const pts = steps.map(s => [s, layerData[String(s)]?.[stepMetricField]]).filter(d => d[1] !== undefined && d[1] !== null);
