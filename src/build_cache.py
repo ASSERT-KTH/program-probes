@@ -10,7 +10,7 @@ def build_cache(
     label_shift: int = 0,
     max_label_shift: int | None = None,
     cache_run_id: str | None = None,
-    group_by: str = "instance",
+    group_by: str = "project",
 ) -> None:
     in_dir = Path(output_dir) / run_id
     pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))

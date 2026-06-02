@@ -17,7 +17,7 @@ def main():
                         help="Fix the evaluation window to turns where turn + max_label_shift < n_turns. "
                              "Use this to ensure all k values are evaluated on the same token set. "
                              "Must be >= --label-shift.")
-    parser.add_argument("--group-by", choices=["instance", "project"], default="instance",
+    parser.add_argument("--group-by", choices=["instance", "project"], default="project",
                         help="Grouping unit for train/val/test splits. "
                              "'instance' (default) splits by individual trajectory; "
                              "'project' groups all instances from the same repo together.")
