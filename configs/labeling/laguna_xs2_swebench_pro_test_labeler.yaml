@@ -1,0 +1,12 @@
+# Label 16 test trajectories from Laguna-XS.2 on SWE-bench Pro
+# Usage:
+#   sbatch slurm/swebench_pro_label.sh --config configs/labeling/laguna_xs2_swebench_pro_test_labeler.yaml
+
+trajectory_dir: generations/swebench_pro/laguna_xs2_test
+output_dir: labels/swebench_pro/laguna_xs2_test
+scripts_dir: SWE-bench_Pro-os
+modal_app_name: program-probes-labeler-pro
+sandbox_timeout: 3600
+eval_timeout: 600
+resume: true
+n_workers: 16

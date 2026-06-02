@@ -159,13 +159,16 @@ class SWEBenchRunConfig(BaseModel):
         return GenerationConfig(**kwargs)
 
     def to_agent_config(self) -> "MiniSweAgentConfig":
+        return self._load_agent_config("configs/agents/mini_swe_swebench.yaml")
+
+    def to_pro_agent_config(self) -> "MiniSweAgentConfig":
+        return self._load_agent_config("configs/agents/mini_swe_swebench_pro.yaml")
+
+    def _load_agent_config(self, config_path: str) -> "MiniSweAgentConfig":
         import yaml as _yaml
         from pathlib import Path as _Path
-        _swe_cfg_path = _Path(__file__).parent.parent / "configs/agents/mini_swe_swebench.yaml"
-        if _swe_cfg_path.exists():
-            base = _yaml.safe_load(_swe_cfg_path.read_text())
-        else:
-            base = {}
+        _cfg_path = _Path(__file__).parent.parent / config_path
+        base = _yaml.safe_load(_cfg_path.read_text()) if _cfg_path.exists() else {}
         base["step_limit"] = self.step_limit
         base["timeout"] = self.command_timeout
         return MiniSweAgentConfig.model_validate(base)
@@ -188,6 +191,12 @@ class SwebenchLabelerConfig(BaseModel):
     single: str | None = None   # process only this one trajectory file
     instances: list[str] | None = None  # limit to specific instance IDs
     n_workers: int = 1          # parallel Modal sandboxes
+
+
+class SwebenchProLabelerConfig(SwebenchLabelerConfig):
+    """Extends SwebenchLabelerConfig with the SWE-bench Pro scripts directory."""
+
+    scripts_dir: str = "SWE-bench_Pro-os"
 
 
 def load_config(path: str, model: type[BaseModel]) -> BaseModel:

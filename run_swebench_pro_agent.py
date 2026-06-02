@@ -148,7 +148,7 @@ def _run_one(
         model_name=server.model_name,
         base_url=server.base_url,
         api_key="EMPTY",
-        agent_config=cfg.to_agent_config(),
+        agent_config=cfg.to_pro_agent_config(),
         generation_config=cfg.to_generation_config(),
         environment=env,
     )
@@ -162,8 +162,7 @@ def _run_one(
     try:
         task = (
             f"Repository: {instance.get('repo', '')}\n\n"
-            f"Issue:\n{instance['problem_statement']}\n\n"
-            "The repository is checked out at /app. Fix the issue."
+            f"Issue:\n{instance['problem_statement']}"
         )
         agent.run_task(task)
         agent_metrics = _extract_agent_metrics(agent)
