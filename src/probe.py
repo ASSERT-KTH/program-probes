@@ -367,7 +367,11 @@ def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None)
     if fixed_params:
         for k, v in fixed_params.items():
             sweep_config["parameters"][k] = {"value": v}
+    import sys
+    old_stdout = sys.stdout
+    sys.stdout = sys.stderr
     sweep_id = wandb.sweep(sweep_config, project="program-probes")
+    sys.stdout = old_stdout
     print(sweep_id, flush=True)
     return sweep_id
 
@@ -442,7 +446,7 @@ def run_sweep(
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
-                loss=cfg.loss, pos_weight=cfg.pos_weight,
+                loss="cross_entropy", pos_weight=1.0,
                 log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
                 shuffle_labels=shuffle_labels,
             )
