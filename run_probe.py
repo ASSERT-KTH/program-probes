@@ -1,7 +1,7 @@
 import argparse
 import json
 from src.configs import ModelConfig, load_config
-from src.probe import run_sweep, run_final, create_sweep
+from src.probe import run_sweep, run_final, run_eval, create_sweep
 
 
 def main():
@@ -50,6 +50,12 @@ def main():
     final_p.add_argument("--pos-weight", type=float, default=1.0,
                         help="Positive class weight multiplier (only used with --loss weighted_cross_entropy)")
 
+    eval_p = subparsers.add_parser("eval", help="Evaluate pre-trained weights on n_eval_bins bins (no retraining)")
+    eval_p.add_argument("--weights-run-id", default=None,
+                        help="Run ID whose weights.pt to load (defaults to --run-id)")
+    eval_p.add_argument("--output-run-id", required=True,
+                        help="Run ID under which to save results.pt")
+
     args = parser.parse_args()
     if args.n_eval_bins is not None and args.n_eval_bins != args.n_bins and args.n_bins != 1:
         parser.error("--n-eval-bins requires --n-bins 1 or --n-eval-bins equal to --n-bins")
@@ -80,6 +86,20 @@ def main():
             results_dir=args.results_dir,
             fixed_params=args.fixed,
             shuffle_labels=args.shuffle_labels,
+        )
+    elif args.mode == "eval":
+        run_eval(
+            weights_run_id=args.weights_run_id or args.run_id,
+            output_run_id=args.output_run_id,
+            probe_name=args.probe,
+            probe_layers=model_cfg.probe_layers,
+            seed=args.seed,
+            cache_dir=args.cache_dir,
+            cache_run_id=cache_run_id,
+            results_dir=args.results_dir,
+            probe_arch=args.probe_arch,
+            n_eval_bins=args.n_eval_bins or 10,
+            eval_bin_axis=args.eval_bin_axis,
         )
     else:
         run_final(

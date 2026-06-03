@@ -267,7 +267,7 @@ def export_swebench_dashboard(
     (run_dir / "stats.json").write_text(json.dumps(stats_out))
 
     # Per-bin majority baselines
-    cache_run = output_run_id or run_id
+    cache_run = run_id
     majority_baselines_per_bin = {
         p: _per_bin_majority_baseline_from_cache(Path(cache_dir) / cache_run, p, n_bins, eval_bin_axis=eval_bin_axis)
         for p in probe_names
