@@ -576,3 +576,136 @@ def run_final(
     torch.save(all_results, out / "results.pt")
     torch.save(all_weights, out / "weights.pt")
     return {layer: [vars(r) for r in rs] for layer, rs in all_results.items()}
+
+
+def run_eval(
+    weights_run_id: str,
+    output_run_id: str,
+    probe_name: str,
+    probe_layers: list[int],
+    seed: int = 42,
+    cache_dir: str = "cache",
+    cache_run_id: str | None = None,
+    results_dir: str = "results",
+    probe_arch: str = "linear",
+    n_eval_bins: int = 10,
+    eval_bin_axis: str = "position",
+) -> None:
+    """Evaluate pre-trained probe weights on n_eval_bins bins without retraining.
+
+    Loads weights from results/<weights_run_id>/<probe>/weights.pt, runs forward
+    passes on the test split of the cache, and saves results to
+    results/<output_run_id>/<probe>/results.pt.
+    """
+    weights_path = Path(results_dir) / weights_run_id / probe_name / "weights.pt"
+    all_weights = torch.load(weights_path, weights_only=False)
+
+    cache_base = Path(cache_dir) / (cache_run_id or weights_run_id) / probe_name
+    all_results: dict[int, list[ProbeResult]] = {}
+
+    for layer_idx in probe_layers:
+        cache_path = cache_base / f"layer_{layer_idx}.pt"
+        data = torch.load(str(cache_path), weights_only=False)
+        H = data["H"]
+        y = data["y"]
+        rel_pos = data["rel_pos"]
+        step_idx = data.get("step_idx")
+        sample_ids = data["sample_id"]
+        group_ids = data["group_id"]
+
+        train_groups, val_groups, test_groups = _split_groups(group_ids, seed)
+        test_samples = {sid for sid, gid in zip(sample_ids, group_ids) if gid in test_groups}
+        val_samples  = {sid for sid, gid in zip(sample_ids, group_ids) if gid in val_groups}
+
+        layer_weights = all_weights[layer_idx]
+        # pooled probe: single entry at bin 0
+        bin0 = layer_weights[0]
+        mean = bin0["mean"]
+        hidden_dim = H.shape[1]
+        model = _build_probe(probe_arch, hidden_dim)
+        model.load_state_dict(bin0["state_dict"])
+        model.eval()
+
+        # Per-trajectory max step for step_relative binning
+        sample_max_step: dict[str, int] = {}
+        if step_idx is not None:
+            for sid, s in zip(sample_ids, step_idx.tolist()):
+                if s > sample_max_step.get(sid, 0):
+                    sample_max_step[sid] = s
+
+        valid = y >= 0
+        results = []
+
+        for eb in range(n_eval_bins):
+            if eval_bin_axis == "step_relative":
+                if step_idx is None:
+                    raise ValueError("eval_bin_axis='step_relative' requires step_idx in cache")
+                bin_mask = torch.tensor([
+                    valid[i].item()
+                    and _bin_index(step_idx[i].item() / max(sample_max_step.get(sample_ids[i], 1), 1), n_eval_bins) == eb
+                    for i in range(len(y))
+                ])
+            else:  # position
+                bin_mask = torch.tensor([
+                    valid[i].item()
+                    and _bin_index(rel_pos[i].item(), n_eval_bins) == eb
+                    for i in range(len(y))
+                ])
+
+            if not bin_mask.any():
+                continue
+
+            mask_idx = bin_mask.nonzero(as_tuple=True)[0]
+            bin_samples = [sample_ids[i] for i in mask_idx.tolist()]
+            bin_H = H[bin_mask].float() - mean
+            bin_y = y[bin_mask]
+
+            val_mask  = torch.tensor([s in val_samples  for s in bin_samples])
+            test_mask = torch.tensor([s in test_samples for s in bin_samples])
+            if val_mask.sum() == 0 or test_mask.sum() == 0:
+                continue
+
+            H_val_e,  y_val_e  = bin_H[val_mask],  bin_y[val_mask]
+            H_test_e, y_test_e = bin_H[test_mask], bin_y[test_mask]
+
+            with torch.no_grad():
+                val_probs  = torch.softmax(model(H_val_e),  dim=1)[:, 1].numpy()
+                test_probs = torch.softmax(model(H_test_e), dim=1)[:, 1].numpy()
+
+            val_preds_np  = (val_probs  >= 0.5).astype(int)
+            test_preds_np = (test_probs >= 0.5).astype(int)
+            val_labels_np  = y_val_e.numpy()
+            test_labels_np = y_test_e.numpy()
+
+            val_m  = _clf_metrics(val_probs,  val_preds_np,  val_labels_np)
+            test_m = _clf_metrics(test_probs, test_preds_np, test_labels_np)
+
+            n_test = H_test_e.shape[0]
+            n_val  = H_val_e.shape[0]
+            # n_train: total train tokens in this eval bin (informational)
+            train_mask = torch.tensor([s not in val_samples and s not in test_samples for s in bin_samples])
+            n_train = int(train_mask.sum().item())
+
+            results.append(ProbeResult(
+                layer=layer_idx,
+                bin_idx=eb,
+                val_acc=float((val_preds_np == val_labels_np).mean()),
+                val_f1=val_m["f1"], val_precision=val_m["precision"],
+                val_recall=val_m["recall"], val_auc=val_m["auc"],
+                val_ece=val_m["ece"], val_brier=val_m["brier"],
+                test_acc=float((test_preds_np == test_labels_np).mean()),
+                test_f1=test_m["f1"], test_precision=test_m["precision"],
+                test_recall=test_m["recall"], test_auc=test_m["auc"],
+                test_ece=test_m["ece"], test_brier=test_m["brier"],
+                n_train=n_train, n_val=n_val, n_test=n_test,
+                n_pos_test=int((test_labels_np == 1).sum()),
+                n_epochs=0,
+            ))
+
+        all_results[layer_idx] = results
+        print(f"  [eval] layer {layer_idx}: {len(results)} bins")
+
+    out = Path(results_dir) / output_run_id / probe_name
+    out.mkdir(parents=True, exist_ok=True)
+    torch.save(all_results, out / "results.pt")
+    print(f"[eval] saved to {out / 'results.pt'}")
