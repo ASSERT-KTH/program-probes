@@ -20,6 +20,8 @@ def main():
     parser.add_argument("--lookahead-probes", nargs="+", default=None,
                         help="Subset of --probe to generate lookahead figures for. "
                              "Defaults to all probes. Exclude static-label probes (e.g. will_resolve).")
+    parser.add_argument("--lookahead-filename-suffix", default="",
+                        help="Suffix appended to the output filename, e.g. 'max50' → probe_lookahead_max50.png")
     args = parser.parse_args()
 
     model_cfg = load_config(args.model_config, ModelConfig)
@@ -46,6 +48,7 @@ def main():
                 probe_layers=model_cfg.probe_layers,
                 results_dir=args.results_dir,
                 figures_dir=args.figures_dir,
+                filename_suffix=args.lookahead_filename_suffix,
             )
 
 

@@ -73,6 +73,15 @@ def plot_probe_heatmap(
     plt.close()
 
 
+_PROBE_DISPLAY_NAME = {
+    "currently_compiles": "Syntactic Correctness",
+    "currently_correct": "Semantic Correctness",
+    "currently_reduces_failing": "Reduced Failing Tests",
+    "currently_has_regressions": "Introduced Regressions",
+    "will_resolve": "Will Resolve",
+}
+
+
 def plot_lookahead_horizon(
     base_run_id: str,
     shift_run_ids: list[str],
@@ -81,15 +90,9 @@ def plot_lookahead_horizon(
     probe_layers: list[int],
     results_dir: str = "results",
     figures_dir: str = "figures",
+    filename_suffix: str = "",
 ) -> None:
-    """Plot probe lift and AUC vs lookahead horizon k (in assistant turns).
-
-    X-axis is inverted: k=0 (at the label flip) is on the right; larger k
-    (earlier prediction) is on the left — matching trajectory time direction.
-    """
-    colours = plt.rcParams["axes.prop_cycle"].by_key()["color"]
-
-    # Collect per-k, per-layer metrics
+    """Plot AUC vs lookahead horizon k (in assistant turns), k=0 on left."""
     all_k = list(k_values)
     all_run_ids = list(shift_run_ids)
 
@@ -107,8 +110,6 @@ def plot_lookahead_horizon(
             results = all_results.get(layer_idx, [])
             if not results:
                 continue
-            # Aggregate across bins weighted by n_test
-            # majority baseline = weighted average of per-bin majority baselines
             total_n, total_correct, total_majority_w, total_auc_w = 0, 0, 0, 0.0
             for r in results:
                 n = r.n_test if hasattr(r, "n_test") else r["n_test"]
@@ -116,63 +117,85 @@ def plot_lookahead_horizon(
                 auc = r.test_auc if hasattr(r, "test_auc") else r["test_auc"]
                 n_pos = r.n_pos_test if hasattr(r, "n_pos_test") else (r["n_pos_test"] if isinstance(r, dict) and "n_pos_test" in r else n // 2)
                 total_correct += acc * n
-                total_majority_w += max(n_pos, n - n_pos)  # per-bin majority
+                total_majority_w += max(n_pos, n - n_pos)
                 total_auc_w += auc * n
                 total_n += n
             if total_n == 0:
                 continue
             agg_acc = total_correct / total_n
             agg_auc = total_auc_w / total_n
-            majority = total_majority_w / total_n  # weighted avg per-bin majority baseline
+            majority = total_majority_w / total_n
             lift = agg_acc - majority
             data[layer_idx].append((k, lift, agg_auc, total_n))
 
     out_dir = Path(figures_dir) / base_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Collect per-k n_test (same across layers; use first available layer)
     k_to_n: dict[int, int] = {}
     for layer_idx in probe_layers:
         for k, _lift, _auc, n in data[layer_idx]:
             if k not in k_to_n:
                 k_to_n[k] = n
 
-    fig, ax_auc = plt.subplots(1, 1, figsize=(8, 4))
-
-    for li, layer_idx in enumerate(probe_layers):
-        pts = sorted(data[layer_idx], key=lambda x: x[0])
-        if not pts:
-            continue
-        ks = [p[0] for p in pts]
-        aucs = [p[2] for p in pts]
-        col = colours[li % len(colours)]
-        ax_auc.plot(ks, aucs, marker="o", color=col, label=f"Layer {layer_idx}")
-
-    ax_auc.axhline(0.5, linestyle="--", color="#aaa", linewidth=1)
-    ax_auc.set_ylabel("AUC  (random = 0.5)")
-    ax_auc.set_ylim(bottom=0.48)
-    ax_auc.set_xlabel("Turns ahead (k)  ←earlier prediction    at flip→")
-    ax_auc.set_title(f"{probe_name} — lookahead horizon ({base_run_id})")
-    ax_auc.legend(fontsize=8, loc="upper left")
-    ax_auc.invert_xaxis()
-
     ks_present = sorted(k_to_n.keys())
-    ax_auc.set_xticks(ks_present)
-    ax_auc.set_xticklabels([])  # replaced by staggered annotations below
+    n_k = len(ks_present)
+    fig_width = max(9, 9 + (n_k - 16) * 0.12)  # wider for max50
 
-    # Staggered tick labels: alternate between two vertical offsets to avoid overlap
-    for i, k in enumerate(ks_present):
-        pad = 18 if i % 2 == 0 else 34
-        ax_auc.annotate(
-            f"{k}\n(n={k_to_n[k]:,})",
-            xy=(k, ax_auc.get_ylim()[0]),
-            xytext=(0, -pad),
-            textcoords="offset points",
-            ha="center", va="top", fontsize=7,
-            annotation_clip=False,
+    _MARKERS = ["o", "s", "^", "D"]
+    # Sequential blues: sample 4 points from dark→light so layer ordering is visible
+    _cmap = plt.get_cmap("Blues")
+    _seq_colours = [_cmap(v) for v in [0.85, 0.65, 0.45, 0.30]]
+
+    with plt.style.context("seaborn-v0_8-white"):
+        fig, ax_auc = plt.subplots(1, 1, figsize=(fig_width, 4.5))
+
+        for li, layer_idx in enumerate(probe_layers):
+            pts = sorted(data[layer_idx], key=lambda x: x[0])
+            if not pts:
+                continue
+            ks = [p[0] for p in pts]
+            aucs = [p[2] for p in pts]
+            col = _seq_colours[li % len(_seq_colours)]
+            marker = _MARKERS[li % len(_MARKERS)]
+            ax_auc.plot(ks, aucs, marker=marker, markersize=5, linewidth=2,
+                        color=col, label=f"Layer {layer_idx}", zorder=3)
+            ax_auc.annotate(
+                f"L{layer_idx}",
+                xy=(ks[-1], aucs[-1]),
+                xytext=(5, 0),
+                textcoords="offset points",
+                ha="left", va="center", fontsize=8, color=col,
+            )
+
+        # Baseline with direct label
+        ax_auc.axhline(0.5, linestyle="--", color="#bbb", linewidth=1, zorder=1)
+        ax_auc.text(
+            ks_present[-1], 0.5, " random",
+            va="top", ha="left", fontsize=7, color="#999",
+            transform=ax_auc.transData,
         )
 
-    plt.tight_layout()
-    plt.subplots_adjust(bottom=0.18)
-    plt.savefig(out_dir / f"{probe_name}_lookahead.png", dpi=150)
-    plt.close()
+        ax_auc.set_ylabel("AUC-ROC", fontsize=11)
+        ax_auc.set_ylim(bottom=0.48)
+
+        n_vals = [k_to_n[k] for k in ks_present if k in k_to_n]
+        n_str = f"  (n = {n_vals[0]:,})" if n_vals else ""
+        ax_auc.set_xlabel(f"Horizon k (turns){n_str}", fontsize=10)
+
+        title = _PROBE_DISPLAY_NAME.get(probe_name, probe_name)
+        ax_auc.set_title(title, fontsize=13, fontweight="bold")
+
+        # Auto-select ~10 clean tick positions
+        from matplotlib.ticker import MaxNLocator
+        ax_auc.xaxis.set_major_locator(MaxNLocator(nbins=10, integer=True))
+        ax_auc.tick_params(axis="both", labelsize=9)
+        ax_auc.margins(x=0.06)
+
+        # Despine
+        ax_auc.spines["top"].set_visible(False)
+        ax_auc.spines["right"].set_visible(False)
+
+        plt.tight_layout()
+        suffix = f"_{filename_suffix}" if filename_suffix else ""
+        plt.savefig(out_dir / f"{probe_name}_lookahead{suffix}.png", dpi=150, bbox_inches="tight")
+        plt.close()
