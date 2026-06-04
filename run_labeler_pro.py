@@ -18,12 +18,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 from src.configs import SwebenchProLabelerConfig, load_config
-from src.labeling.swebench_pro_labeler import label_pro_trajectory, load_pro_instance
+from src.labeling.swebench_pro_labeler import label_pro_trajectory
 
 
 def _process(
     tf: Path,
-    iid: str,
+    instance: dict,
     cfg: SwebenchProLabelerConfig,
     out_dir: Path,
     scripts_dir: Path,
@@ -34,7 +34,6 @@ def _process(
         return f"{tf.name}: skipped (labels exist)"
     if jitter > 0:
         time.sleep(random.uniform(0, jitter))
-    instance = load_pro_instance(iid)
     label_pro_trajectory(
         tf,
         instance=instance,
@@ -82,17 +81,28 @@ def main() -> None:
 
     print(f"Labeling {len(traj_files)} trajectories from {traj_dir} → {out_dir}", flush=True)
 
+    # Pre-load dataset once to avoid N concurrent load_dataset() calls in threads
+    print("Loading SWE-bench Pro dataset ...", flush=True)
+    from datasets import load_dataset as _hf_load
+    _data = _hf_load("ScaleAI/SWE-bench_Pro", split="test")
+    instances: dict[str, dict] = {inst["instance_id"]: dict(inst) for inst in _data}
+    print(f"Loaded {len(instances)} instances.", flush=True)
+
+    def _get_instance(iid: str) -> dict:
+        if iid not in instances:
+            raise ValueError(f"Instance {iid!r} not found in SWE-bench Pro")
+        return instances[iid]
+
     jitter = 2.0 if cfg.n_workers > 1 else 0.0
 
     if cfg.n_workers == 1:
         for tf in traj_files:
-            iid = _iid(tf)
-            result = _process(tf, iid, cfg, out_dir, scripts_dir, jitter=0.0)
+            result = _process(tf, _get_instance(_iid(tf)), cfg, out_dir, scripts_dir, jitter=0.0)
             print(result, flush=True)
     else:
         with ThreadPoolExecutor(max_workers=cfg.n_workers) as pool:
             futures = {
-                pool.submit(_process, tf, _iid(tf), cfg, out_dir, scripts_dir, jitter): tf.name
+                pool.submit(_process, tf, _get_instance(_iid(tf)), cfg, out_dir, scripts_dir, jitter): tf.name
                 for tf in traj_files
             }
             for fut in as_completed(futures):

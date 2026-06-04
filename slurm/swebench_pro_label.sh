@@ -6,7 +6,8 @@
 #
 #SBATCH -J pp-pro-label
 #SBATCH -p berzelius-cpu
-#SBATCH -t 12:00:00
+#SBATCH --mem=128G
+#SBATCH -t 48:00:00
 #SBATCH -o logs/pro_labeler_%A_%a.out
 #SBATCH -e logs/pro_labeler_%A_%a.err
 
