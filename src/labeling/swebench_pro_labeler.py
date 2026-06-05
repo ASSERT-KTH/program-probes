@@ -10,8 +10,6 @@ Use ``run_labeler_pro.py`` as the CLI entry point.
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -75,21 +73,9 @@ def _apply_patch_in_sandbox(sandbox: Any, patch: str, base_commit: str) -> bool:
     if not patch.strip():
         return True
 
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".patch", delete=False) as f:
-        f.write(patch)
-        patch_local = f.name
-
-    try:
-        with open(patch_local) as pf:
-            content = pf.read()
-        upload = f"cat > /tmp/edit.patch << 'PATCHEOF'\n{content}\nPATCHEOF"
-        r = _exec_in_sandbox(sandbox, upload, timeout=30)
-        if r["returncode"] != 0:
-            return False
-        r = _exec_in_sandbox(sandbox, "cd /app && git apply /tmp/edit.patch", timeout=30)
-        return r["returncode"] == 0
-    finally:
-        os.unlink(patch_local)
+    _write_sandbox_file(sandbox, "/tmp/edit.patch", patch)
+    r = _exec_in_sandbox(sandbox, "cd /app && git apply /tmp/edit.patch", timeout=30)
+    return r["returncode"] == 0
 
 
 def _run_pro_eval(
