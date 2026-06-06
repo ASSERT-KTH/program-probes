@@ -1,0 +1,42 @@
+# Full run: Qwen3.6-35B-A3B on all 731 SWE-bench Pro instances, 10 runs each, 4xA100 thin
+#
+# Submit as 5-shard array job:
+#   sbatch --array=0-4 slurm/swebench_pro_run_thin.sh \
+#     --run-config configs/runs/qwen36_35b_a3b_swebench_pro_full.yaml
+
+# --- Model / vLLM ---
+model_id: Qwen/Qwen3.6-35B-A3B
+served_model_name: qwen36-35b-a3b
+tensor_parallel_size: 4
+max_model_len: 262144
+dtype: bfloat16
+gpu_memory_utilization: 0.9
+vllm_port: 18000
+vllm_startup_timeout_s: 3600
+vllm_log_path: logs/vllm_qwen36_35b_a3b_swebench_pro_full.log
+vllm_extra_args:
+  - "--reasoning-parser"
+  - "qwen3"
+  - "--enable-auto-tool-choice"
+  - "--tool-call-parser"
+  - "qwen3_coder"
+
+# --- Generation (thinking mode, coding) ---
+temperature: 0.6
+top_p: 0.95
+top_k: 20
+
+# --- Agent ---
+step_limit: 100
+command_timeout: 180
+
+# --- Execution ---
+n_runs: 10               # 10 trajectories per instance (pass@10)
+n_instances: -1          # all instances in this shard
+n_workers: 20            # 20 parallel Modal containers per shard (5 shards × 20 = 100 total)
+modal_app_name: program-probes-swebench-pro
+modal_timeout: 3600
+output_dir: generations/swebench_pro/qwen36_35b_a3b_full
+
+# --- SWE-bench Pro ---
+swe_bench_pro_scripts_dir: SWE-bench_Pro-os
