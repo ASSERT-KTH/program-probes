@@ -123,6 +123,8 @@ def train_probe_layer(
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
     shuffle_labels: bool = False,
+    after_edit_only: bool = False,
+    edit_step_index: dict | None = None,
 ) -> tuple[list[ProbeResult], dict[int, dict]]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -153,6 +155,13 @@ def train_probe_layer(
     train_n_bins = n_bins
     bin_ids = (rel_pos * train_n_bins).floor().long().clamp(0, train_n_bins - 1)
     valid = y >= 0
+    if after_edit_only and edit_step_index is not None and step_idx is not None:
+        edit_sets = {sid: set(steps) for sid, steps in edit_step_index.items()}
+        after_edit = torch.tensor(
+            [step_idx[i].item() in edit_sets.get(sample_ids[i], set()) for i in range(len(sample_ids))],
+            dtype=torch.bool,
+        )
+        valid = valid & after_edit
 
     for bin_idx in range(train_n_bins):
         bin_mask = (bin_ids == bin_idx) & valid
@@ -499,6 +508,8 @@ def run_final(
     n_eval_bins: int | None = None,
     eval_bin_axis: str = "position",
     shuffle_labels: bool = False,
+    after_edit_only: bool = False,
+    edit_index_run_id: str | None = None,
 ) -> dict:
     if sweep_id is not None:
         best = fetch_best_sweep_config(sweep_id)
@@ -514,6 +525,18 @@ def run_final(
             "lr, weight_decay, batch_size, patience are required "
             "(either explicitly or via --from-sweep)"
         )
+
+    edit_step_index = None
+    if after_edit_only:
+        idx_dir = Path(cache_dir) / (edit_index_run_id or cache_run_id or run_id)
+        idx_path = idx_dir / "edit_step_index.pt"
+        if not idx_path.exists():
+            raise FileNotFoundError(
+                f"--after-edit-only requires edit_step_index.pt at {idx_path}. "
+                "Run build_edit_step_index.py first."
+            )
+        edit_step_index = torch.load(str(idx_path), weights_only=False)
+        print(f"[after_edit] loaded index with {len(edit_step_index)} samples from {idx_path}")
 
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
@@ -550,6 +573,7 @@ def run_final(
                 loss=loss, pos_weight=pos_weight,
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
                 shuffle_labels=shuffle_labels,
+                after_edit_only=after_edit_only, edit_step_index=edit_step_index,
             )
             all_results[layer_idx] = results
             all_weights[layer_idx] = weights
@@ -590,6 +614,8 @@ def run_eval(
     probe_arch: str = "linear",
     n_eval_bins: int = 10,
     eval_bin_axis: str = "position",
+    after_edit_only: bool = False,
+    edit_index_run_id: str | None = None,
 ) -> None:
     """Evaluate pre-trained probe weights on n_eval_bins bins without retraining.
 
@@ -599,6 +625,18 @@ def run_eval(
     """
     weights_path = Path(results_dir) / weights_run_id / probe_name / "weights.pt"
     all_weights = torch.load(weights_path, weights_only=False)
+
+    edit_step_index = None
+    if after_edit_only:
+        idx_dir = Path(cache_dir) / (edit_index_run_id or cache_run_id or weights_run_id)
+        idx_path = idx_dir / "edit_step_index.pt"
+        if not idx_path.exists():
+            raise FileNotFoundError(
+                f"--after-edit-only requires edit_step_index.pt at {idx_path}. "
+                "Run build_edit_step_index.py first."
+            )
+        edit_step_index = torch.load(str(idx_path), weights_only=False)
+        print(f"[after_edit] loaded index with {len(edit_step_index)} samples from {idx_path}")
 
     cache_base = Path(cache_dir) / (cache_run_id or weights_run_id) / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
@@ -634,6 +672,13 @@ def run_eval(
                     sample_max_step[sid] = s
 
         valid = y >= 0
+        if after_edit_only and edit_step_index is not None and step_idx is not None:
+            edit_sets = {sid: set(steps) for sid, steps in edit_step_index.items()}
+            after_edit = torch.tensor(
+                [step_idx[i].item() in edit_sets.get(sample_ids[i], set()) for i in range(len(sample_ids))],
+                dtype=torch.bool,
+            )
+            valid = valid & after_edit
         results = []
 
         for eb in range(n_eval_bins):

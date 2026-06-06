@@ -23,6 +23,10 @@ def main():
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
     parser.add_argument("--shuffle-labels", action="store_true",
                         help="Randomly permute labels within each split before training (sanity-check baseline).")
+    parser.add_argument("--after-edit-only", action="store_true",
+                        help="Restrict eval (and training) to tokens on the first turn after a code edit.")
+    parser.add_argument("--edit-index-run-id", default=None,
+                        help="Run ID whose edit_step_index.pt to load (defaults to cache-run-id or run-id).")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -100,6 +104,8 @@ def main():
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins or 10,
             eval_bin_axis=args.eval_bin_axis,
+            after_edit_only=args.after_edit_only,
+            edit_index_run_id=args.edit_index_run_id,
         )
     else:
         run_final(
@@ -122,6 +128,8 @@ def main():
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
             shuffle_labels=args.shuffle_labels,
+            after_edit_only=args.after_edit_only,
+            edit_index_run_id=args.edit_index_run_id,
         )
 
 
