@@ -27,6 +27,8 @@ def main():
                         help="Restrict eval (and training) to tokens on the first turn after a code edit.")
     parser.add_argument("--edit-index-run-id", default=None,
                         help="Run ID whose edit_step_index.pt to load (defaults to cache-run-id or run-id).")
+    parser.add_argument("--tool-nll-run-id", default=None,
+                        help="Run ID whose tool_nll_index.pt to load from cache dir for NLL correlation analysis.")
 
     subparsers = parser.add_subparsers(dest="mode", required=True)
 
@@ -106,6 +108,7 @@ def main():
             eval_bin_axis=args.eval_bin_axis,
             after_edit_only=args.after_edit_only,
             edit_index_run_id=args.edit_index_run_id,
+            tool_nll_run_id=args.tool_nll_run_id,
         )
     else:
         run_final(

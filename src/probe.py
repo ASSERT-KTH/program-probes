@@ -602,6 +602,62 @@ def run_final(
     return {layer: [vars(r) for r in rs] for layer, rs in all_results.items()}
 
 
+def _compute_nll_correlation(
+    H: torch.Tensor,
+    y: torch.Tensor,
+    step_idx: torch.Tensor,
+    sample_ids: list[str],
+    test_samples: set,
+    valid: torch.Tensor,
+    mean: torch.Tensor,
+    model: "nn.Module",
+    tool_nll_index: dict,
+) -> dict:
+    """Compute Spearman correlation between tool output NLL and per-step Brier score.
+
+    Returns a dict with arrays (tool_nll, brier) for all test positions and the
+    scalar Spearman correlation coefficient.
+    """
+    from scipy.stats import spearmanr
+
+    test_mask = valid & torch.tensor(
+        [s in test_samples for s in sample_ids], dtype=torch.bool
+    )
+    if not test_mask.any():
+        return {"tool_nll": np.array([]), "brier": np.array([]),
+                "spearman_nll_brier": float("nan"), "spearman_pvalue": float("nan"),
+                "n_with_nll": 0, "n_total": 0}
+
+    idxs = test_mask.nonzero(as_tuple=True)[0]
+    test_H = H[test_mask].float() - mean
+    test_y = y[test_mask].numpy()
+    test_sids = [sample_ids[i] for i in idxs.tolist()]
+    test_steps = step_idx[test_mask].tolist()
+
+    with torch.no_grad():
+        test_probs = torch.softmax(model(test_H), dim=1)[:, 1].numpy()
+
+    brier = (test_probs - test_y) ** 2
+    nll = np.array([
+        tool_nll_index.get(sid, {}).get(int(si), float("nan"))
+        for sid, si in zip(test_sids, test_steps)
+    ])
+
+    valid_mask = ~np.isnan(nll)
+    rho = pval = float("nan")
+    if valid_mask.sum() > 1:
+        rho, pval = spearmanr(nll[valid_mask], brier[valid_mask])
+
+    return {
+        "tool_nll": nll,
+        "brier": brier,
+        "spearman_nll_brier": float(rho),
+        "spearman_pvalue": float(pval),
+        "n_with_nll": int(valid_mask.sum()),
+        "n_total": int(test_mask.sum()),
+    }
+
+
 def run_eval(
     weights_run_id: str,
     output_run_id: str,
@@ -616,12 +672,16 @@ def run_eval(
     eval_bin_axis: str = "position",
     after_edit_only: bool = False,
     edit_index_run_id: str | None = None,
+    tool_nll_run_id: str | None = None,
 ) -> None:
     """Evaluate pre-trained probe weights on n_eval_bins bins without retraining.
 
     Loads weights from results/<weights_run_id>/<probe>/weights.pt, runs forward
     passes on the test split of the cache, and saves results to
     results/<output_run_id>/<probe>/results.pt.
+
+    If tool_nll_run_id is given, also computes per-step Spearman correlation between
+    tool output NLL and Brier score, saved to results/<output_run_id>/<probe>/nll_corr.pt.
     """
     weights_path = Path(results_dir) / weights_run_id / probe_name / "weights.pt"
     all_weights = torch.load(weights_path, weights_only=False)
@@ -638,8 +698,20 @@ def run_eval(
         edit_step_index = torch.load(str(idx_path), weights_only=False)
         print(f"[after_edit] loaded index with {len(edit_step_index)} samples from {idx_path}")
 
+    tool_nll_index = None
+    if tool_nll_run_id is not None:
+        nll_path = Path(cache_dir) / tool_nll_run_id / "tool_nll_index.pt"
+        if not nll_path.exists():
+            raise FileNotFoundError(
+                f"--tool-nll-run-id requires tool_nll_index.pt at {nll_path}. "
+                "Run build_tool_nll_index.py first."
+            )
+        tool_nll_index = torch.load(str(nll_path), weights_only=False)
+        print(f"[tool_nll] loaded index with {len(tool_nll_index)} samples from {nll_path}")
+
     cache_base = Path(cache_dir) / (cache_run_id or weights_run_id) / probe_name
     all_results: dict[int, list[ProbeResult]] = {}
+    nll_corr_results: dict[int, dict] = {}
 
     for layer_idx in probe_layers:
         cache_path = cache_base / f"layer_{layer_idx}.pt"
@@ -750,7 +822,20 @@ def run_eval(
         all_results[layer_idx] = results
         print(f"  [eval] layer {layer_idx}: {len(results)} bins")
 
+        if tool_nll_index is not None and step_idx is not None:
+            nll_corr_results[layer_idx] = _compute_nll_correlation(
+                H=H, y=y, step_idx=step_idx, sample_ids=sample_ids,
+                test_samples=test_samples, valid=valid, mean=mean,
+                model=model, tool_nll_index=tool_nll_index,
+            )
+            rho = nll_corr_results[layer_idx]["spearman_nll_brier"]
+            n_nll = nll_corr_results[layer_idx]["n_with_nll"]
+            print(f"  [nll_corr] layer {layer_idx}: spearman ρ={rho:.3f} over {n_nll} positions")
+
     out = Path(results_dir) / output_run_id / probe_name
     out.mkdir(parents=True, exist_ok=True)
     torch.save(all_results, out / "results.pt")
     print(f"[eval] saved to {out / 'results.pt'}")
+    if nll_corr_results:
+        torch.save(nll_corr_results, out / "nll_corr.pt")
+        print(f"[eval] saved NLL correlations to {out / 'nll_corr.pt'}")

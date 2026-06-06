@@ -1,6 +1,6 @@
 import argparse
 from src.configs import ModelConfig, load_config
-from src.figures import plot_probe_heatmap, plot_lookahead_horizon
+from src.figures import plot_probe_heatmap, plot_lookahead_horizon, plot_tool_nll_correlation
 
 
 def main():
@@ -22,6 +22,10 @@ def main():
                              "Defaults to all probes. Exclude static-label probes (e.g. will_resolve).")
     parser.add_argument("--lookahead-filename-suffix", default="",
                         help="Suffix appended to the output filename, e.g. 'max50' → probe_lookahead_max50.png")
+    parser.add_argument("--tool-nll-run-id", default=None,
+                        help="Run ID whose nll_corr.pt to load for the tool NLL correlation figure.")
+    parser.add_argument("--tool-nll-filename-suffix", default="",
+                        help="Suffix for the tool NLL figure filename.")
     args = parser.parse_args()
 
     model_cfg = load_config(args.model_config, ModelConfig)
@@ -37,6 +41,16 @@ def main():
         )
 
         lookahead_probes = args.lookahead_probes or args.probe
+        if args.tool_nll_run_id:
+            plot_tool_nll_correlation(
+                run_id=args.tool_nll_run_id,
+                probe_name=probe_name,
+                probe_layers=model_cfg.probe_layers,
+                results_dir=args.results_dir,
+                figures_dir=args.figures_dir,
+                filename_suffix=args.tool_nll_filename_suffix,
+            )
+
         if args.lookahead_shift_run_ids and args.lookahead_k_values and probe_name in lookahead_probes:
             if len(args.lookahead_shift_run_ids) != len(args.lookahead_k_values):
                 raise ValueError("--lookahead-shift-run-ids and --lookahead-k-values must have the same length")

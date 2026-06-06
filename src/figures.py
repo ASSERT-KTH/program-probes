@@ -199,3 +199,93 @@ def plot_lookahead_horizon(
         suffix = f"_{filename_suffix}" if filename_suffix else ""
         plt.savefig(out_dir / f"{probe_name}_lookahead{suffix}.png", dpi=150, bbox_inches="tight")
         plt.close()
+
+
+def plot_tool_nll_correlation(
+    run_id: str,
+    probe_name: str,
+    probe_layers: list[int],
+    results_dir: str = "results",
+    figures_dir: str = "figures",
+    filename_suffix: str = "",
+) -> None:
+    """Scatter plot of tool output NLL vs per-step Brier score with LOWESS trend.
+
+    Reads <results_dir>/<run_id>/<probe>/nll_corr.pt and produces one figure
+    per layer showing the correlation. Spearman ρ is annotated on the plot.
+    """
+    import matplotlib.pyplot as plt
+    from pathlib import Path
+
+    nll_path = Path(results_dir) / run_id / probe_name / "nll_corr.pt"
+    if not nll_path.exists():
+        print(f"[figures] nll_corr.pt not found at {nll_path}, skipping")
+        return
+    nll_corr = torch.load(nll_path, weights_only=False)
+
+    out_dir = Path(figures_dir) / run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    title = _PROBE_DISPLAY_NAME.get(probe_name, probe_name)
+    suffix = f"_{filename_suffix}" if filename_suffix else ""
+
+    for layer_idx in probe_layers:
+        if layer_idx not in nll_corr:
+            continue
+        d = nll_corr[layer_idx]
+        nll_vals = d["tool_nll"]
+        brier_vals = d["brier"]
+        rho = d["spearman_nll_brier"]
+        n_with = d["n_with_nll"]
+
+        valid = ~np.isnan(nll_vals)
+        if valid.sum() < 2:
+            continue
+
+        x = nll_vals[valid]
+        y = brier_vals[valid]
+
+        plt.style.use("seaborn-v0_8-white")
+        fig, ax = plt.subplots(figsize=(6, 5))
+
+        # Scatter (subsampled for readability if very large)
+        max_points = 5000
+        if len(x) > max_points:
+            rng = np.random.default_rng(42)
+            idx = rng.choice(len(x), max_points, replace=False)
+            xs, ys = x[idx], y[idx]
+        else:
+            xs, ys = x, y
+
+        ax.scatter(xs, ys, alpha=0.15, s=8, color="#3a7fc1", linewidths=0)
+
+        # LOWESS smoothed trend line
+        try:
+            from statsmodels.nonparametric.smoothers_lowess import lowess
+            order = np.argsort(x)
+            smoothed = lowess(y[order], x[order], frac=0.3, return_sorted=True)
+            ax.plot(smoothed[:, 0], smoothed[:, 1], color="#c0392b", lw=2, label=f"LOWESS")
+        except ImportError:
+            # Fallback: binned means
+            n_bins = 20
+            edges = np.percentile(x, np.linspace(0, 100, n_bins + 1))
+            bin_x, bin_y = [], []
+            for i in range(n_bins):
+                m = (x >= edges[i]) & (x < edges[i + 1])
+                if m.sum() > 0:
+                    bin_x.append(x[m].mean())
+                    bin_y.append(y[m].mean())
+            ax.plot(bin_x, bin_y, color="#c0392b", lw=2, marker="o", ms=4)
+
+        rho_str = f"ρ = {rho:.3f}" if not np.isnan(rho) else "ρ = n/a"
+        ax.set_xlabel("Tool output NLL (model surprise)", fontsize=11)
+        ax.set_ylabel("Brier score (per step)", fontsize=11)
+        ax.set_title(f"{title} — layer {layer_idx}\n{rho_str}  (n = {n_with:,})", fontsize=12)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+
+        plt.tight_layout()
+        fname = f"{probe_name}_tool_nll_layer{layer_idx}{suffix}.png"
+        plt.savefig(out_dir / fname, dpi=150, bbox_inches="tight")
+        plt.close()
+        print(f"[figures] saved {out_dir / fname}")
