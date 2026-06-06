@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from build_tool_nll_index import compute_trajectory_nll
+from build_tool_nll_index import compute_trajectory_nll, compute_trajectory_nll_chunked
 
 
 # ---------------------------------------------------------------------------
@@ -156,6 +156,67 @@ def test_nll_multiple_turns():
     result = compute_trajectory_nll(token_ids, segments, step_segs, logits)
 
     assert set(result.keys()) == {1, 2, 3}
+
+
+def test_chunked_matches_full_pass():
+    """compute_trajectory_nll_chunked must give the same result as the full-pass version."""
+    vocab_size = 8
+    seq_len = 40
+    turns = [
+        ("system",    0,  3),
+        ("user",      3,  7),
+        ("assistant", 7,  12),  # turn 0
+        ("user",      12, 18),  # tool output → turn 1 (6 tokens)
+        ("assistant", 18, 22),  # turn 1
+        ("user",      22, 30),  # tool output → turn 2 (8 tokens)
+        ("assistant", 30, 35),  # turn 2
+        ("user",      35, 40),  # tool output → turn 3 (5 tokens) — no following turn
+    ]
+    # Add a turn 3 so the last tool output gets included
+    turns.append(("assistant", 40, 40))  # dummy empty turn 3
+
+    token_ids = [i % vocab_size for i in range(seq_len)]  # IDs within vocab
+    segments, step_segs = _make_segments_and_steps(turns)
+
+    # Random logits — deterministic via seed
+    torch.manual_seed(7)
+    logits = torch.randn(seq_len, vocab_size)
+
+    # Full-pass reference
+    expected = compute_trajectory_nll(token_ids, segments, step_segs, logits)
+
+    # Build a tiny fake model that returns pre-set logits
+    class _FakeModel(torch.nn.Module):
+        def __init__(self, full_logits):
+            super().__init__()
+            self._logits = full_logits  # [seq_len, vocab]
+
+        def forward(self, input_ids, attention_mask=None, past_key_values=None,
+                    use_cache=False, output_hidden_states=False):
+            start = 0 if past_key_values is None else past_key_values
+            end = start + input_ids.shape[1]
+            chunk_logits = self._logits[start:end].unsqueeze(0)  # [1, chunk, vocab]
+
+            class _Out:
+                pass
+            o = _Out()
+            o.logits = chunk_logits
+            o.past_key_values = end  # reuse as a simple int offset
+            return o
+
+    model = _FakeModel(logits)
+    device = torch.device("cpu")
+
+    # chunk_size=5 forces multiple chunks over the 40-token sequence
+    chunked = compute_trajectory_nll_chunked(
+        token_ids, segments, step_segs, model, device, chunk_size=5
+    )
+
+    assert set(chunked.keys()) == set(expected.keys()), \
+        f"Turn keys differ: chunked={set(chunked.keys())} expected={set(expected.keys())}"
+    for k in expected:
+        assert abs(chunked[k] - expected[k]) < 1e-4, \
+            f"Turn {k}: chunked={chunked[k]:.6f} vs full={expected[k]:.6f}"
 
 
 # ---------------------------------------------------------------------------

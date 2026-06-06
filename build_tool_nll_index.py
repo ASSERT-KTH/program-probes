@@ -71,6 +71,94 @@ def compute_trajectory_nll(
     return turn_nll
 
 
+def _tool_output_ranges(
+    segments: list[dict],
+    step_segment_indices: list[int],
+) -> dict[int, tuple[int, int]]:
+    """Return {turn_k: (start_token, end_token)} for each tool output segment."""
+    ranges: dict[int, tuple[int, int]] = {}
+    for k, asst_seg_idx in enumerate(step_segment_indices):
+        if k == 0 or asst_seg_idx == 0:
+            continue
+        tool_seg = segments[asst_seg_idx - 1]
+        if tool_seg.get("role") != "user":
+            continue
+        start, end = tool_seg["start_token"], tool_seg["end_token"]
+        if end > start and start > 0:
+            ranges[k] = (start, end)
+    return ranges
+
+
+def compute_trajectory_nll_chunked(
+    token_ids: list[int],
+    segments: list[dict],
+    step_segment_indices: list[int],
+    model,
+    device,
+    chunk_size: int,
+) -> dict[int, float]:
+    """KV-cache chunked version of compute_trajectory_nll.
+
+    Identical semantics to compute_trajectory_nll but processes the sequence in
+    chunks of chunk_size tokens (with accumulated KV cache), so peak GPU memory is
+    O(chunk_size × vocab_size) rather than O(seq_len × vocab_size). Handles
+    arbitrarily long sequences without OOM.
+    """
+    turn_ranges = _tool_output_ranges(segments, step_segment_indices)
+    if not turn_ranges:
+        return {}
+
+    seq_len = len(token_ids)
+    input_ids = torch.tensor([token_ids], dtype=torch.long, device=device)
+    # Accumulate per-token NLL values keyed by turn
+    turn_nll_values: dict[int, list[float]] = {k: [] for k in turn_ranges}
+    past_kv = None
+
+    for chunk_start in range(0, seq_len, chunk_size):
+        chunk_end = min(chunk_start + chunk_size, seq_len)
+        chunk_input = input_ids[:, chunk_start:chunk_end]
+        # Attention mask must span past (cached) + current tokens
+        chunk_attn = torch.ones(1, chunk_end, dtype=torch.long, device=device)
+
+        with torch.no_grad():
+            out = model(
+                input_ids=chunk_input,
+                attention_mask=chunk_attn,
+                past_key_values=past_kv,
+                use_cache=True,
+                output_hidden_states=False,
+            )
+
+        chunk_logits = out.logits[0]  # [chunk_len, vocab_size], on GPU
+
+        for k, (tok_start, tok_end) in turn_ranges.items():
+            # logits[j-1] predicts token[j]: need logit positions [tok_start-1, tok_end-1)
+            logit_start = tok_start - 1
+            logit_end = tok_end - 1
+            # Intersect with the current chunk's logit positions [chunk_start, chunk_end)
+            overlap_start = max(logit_start, chunk_start)
+            overlap_end = min(logit_end, chunk_end)
+            if overlap_start >= overlap_end:
+                continue
+            local_start = overlap_start - chunk_start
+            local_end = overlap_end - chunk_start
+            logit_slice = chunk_logits[local_start:local_end]  # [n, vocab]
+            # Tokens predicted: token positions [overlap_start+1, overlap_end+1)
+            actual = torch.tensor(
+                token_ids[overlap_start + 1 : overlap_end + 1],
+                dtype=torch.long, device=device,
+            )
+            n = actual.shape[0]
+            log_probs = torch.log_softmax(logit_slice.float(), dim=-1)
+            nll_vals = -log_probs[torch.arange(n, device=device), actual]
+            turn_nll_values[k].extend(nll_vals.tolist())
+
+        past_kv = out.past_key_values
+        del out, chunk_logits
+
+    return {k: sum(v) / len(v) for k, v in turn_nll_values.items() if v}
+
+
 def _load_model_adapter(adapter_name: str):
     if adapter_name == "laguna":
         from src.models.laguna import LagunaAdapter
@@ -93,6 +181,9 @@ def main() -> None:
     parser.add_argument("--generation-config", required=True)
     parser.add_argument("--traj-dir", required=True, help="Directory of trajectory JSON files")
     parser.add_argument("--output", required=True, help="Output .pt path")
+    parser.add_argument("--chunk-size", type=int, default=4096,
+                        help="Tokens per forward-pass chunk (KV-cache chunking); "
+                             "bounds peak GPU memory to O(chunk_size × vocab_size)")
     parser.add_argument("--shard-rank", type=int, default=0)
     parser.add_argument("--num-shards", type=int, default=1)
     args = parser.parse_args()
@@ -101,15 +192,14 @@ def main() -> None:
     gen_config: GenerationConfig = load_config(args.generation_config, GenerationConfig)
 
     out_path = Path(args.output)
-    # If sharded, accumulate into a shard-specific temp file; merge manually afterwards.
-    # For simplicity we write the whole shard's results to the output path (caller merges).
     if args.num_shards > 1:
         out_path = out_path.with_suffix(f".shard{args.shard_rank}.pt")
 
     print(f"Loading trajectories from {args.traj_dir}...")
     all_trajs = load_trajectories(args.traj_dir)
     trajs = all_trajs[args.shard_rank::args.num_shards]
-    print(f"  {len(trajs)} trajectories (shard {args.shard_rank}/{args.num_shards})")
+    print(f"  {len(trajs)} trajectories (shard {args.shard_rank}/{args.num_shards}), "
+          f"chunk_size={args.chunk_size}")
 
     model_adapter = _load_model_adapter(model_config.adapter)
     model_adapter.load_for_extraction(model_config, gen_config)
@@ -118,25 +208,16 @@ def main() -> None:
     index: dict[str, dict[int, float]] = {}
 
     for i, traj in enumerate(trajs):
-        print(f"  [{i + 1}/{len(trajs)}] {traj.sample_id} ({len(traj.token_ids)} tokens)...", flush=True)
-        input_ids = torch.tensor([traj.token_ids], dtype=torch.long, device=device)
-        try:
-            with torch.no_grad():
-                out = model_adapter._model(input_ids=input_ids, output_hidden_states=False)
-            logits = out.logits[0].cpu()  # [seq_len, vocab_size] — move to CPU immediately
-            del out
-            torch.cuda.empty_cache()
-        except torch.cuda.OutOfMemoryError:
-            torch.cuda.empty_cache()
-            print(f"    OOM — skipping {traj.sample_id}")
-            continue
-
-        turn_nll = compute_trajectory_nll(
-            traj.token_ids, traj.segments, traj.step_segment_indices, logits
+        n_chunks = (len(traj.token_ids) + args.chunk_size - 1) // args.chunk_size
+        print(f"  [{i + 1}/{len(trajs)}] {traj.sample_id} "
+              f"({len(traj.token_ids)} tokens, {n_chunks} chunks)...", flush=True)
+        turn_nll = compute_trajectory_nll_chunked(
+            traj.token_ids, traj.segments, traj.step_segment_indices,
+            model_adapter._model, device, args.chunk_size,
         )
-        del logits
         index[traj.sample_id] = turn_nll
-        print(f"    {len(turn_nll)} turns with tool NLL (out of {len(traj.step_segment_indices)} total turns)")
+        print(f"    {len(turn_nll)} turns with NLL "
+              f"(out of {len(traj.step_segment_indices)} total turns)")
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     torch.save(index, out_path)

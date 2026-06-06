@@ -51,4 +51,5 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 uv run python build_tool_nll_index.py \
   --shard-rank "$RANK" \
   --num-shards "$NUM_SHARDS" \
+  --chunk-size 4096 \
   "$@"
