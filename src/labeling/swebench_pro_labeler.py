@@ -16,22 +16,62 @@ from typing import Any, Dict, List, Optional
 from src.agents.swe_bench_pro_environment import _build_entry_script, _grade, _get_image_uri
 
 
-_COMPILE_ERROR_PATTERNS = (
+# Language detection from repo field (e.g. "gravitational/teleport")
+_GO_ORGS = frozenset({"gravitational", "flipt-io", "future-architect", "navidrome"})
+_TS_JS_ORGS = frozenset({"NodeBB", "protonmail", "element-hq", "tutao"})
+
+_PYTHON_COMPILE_PATTERNS = (
     "SyntaxError",
+    "IndentationError",
     "ImportError",
     "ModuleNotFoundError",
     "ERROR collecting",
     "import file mismatch",
 )
+_GO_COMPILE_PATTERNS = (
+    "[build failed]",
+    "build failed",
+    "undefined:",
+    "cannot use ",
+    "declared and not used",
+    "imported and not used",
+    "has no field or method",
+    "does not implement",
+    "cannot convert",
+)
+_TS_JS_COMPILE_PATTERNS = (
+    "SyntaxError:",
+    "error TS",
+    "Cannot find module",
+    "Module not found:",
+    "Cannot find name",
+    "is not assignable to",
+    "has no exported member",
+)
 
 
-def _compiles_from_log(log: Optional[str]) -> Optional[bool]:
-    if log is None:
-        return None
-    for pattern in _COMPILE_ERROR_PATTERNS:
-        if pattern in log:
-            return False
-    return True
+def _get_language(instance: Dict) -> str:
+    org = instance.get("repo", "").split("/")[0]
+    if org in _GO_ORGS:
+        return "go"
+    if org in _TS_JS_ORGS:
+        return "ts_js"
+    return "python"
+
+
+def _compiles_from_test_output(
+    test_stdout: str, test_stderr: str, instance: Dict
+) -> bool:
+    """Detect compile/build failures from the actual test runner output (stdout.log + stderr.log)."""
+    combined = (test_stdout or "") + "\n" + (test_stderr or "")
+    lang = _get_language(instance)
+    if lang == "go":
+        patterns = _GO_COMPILE_PATTERNS
+    elif lang == "ts_js":
+        patterns = _TS_JS_COMPILE_PATTERNS
+    else:
+        patterns = _PYTHON_COMPILE_PATTERNS
+    return not any(p in combined for p in patterns)
 
 
 def _create_pro_sandbox(instance: Dict, app_name: str, timeout: int) -> Any:
@@ -116,18 +156,35 @@ def _run_pro_eval(
         _write_sandbox_file(sandbox, "/workspace/entryscript.sh", entry_script)
 
         process = sandbox.exec("bash", "/workspace/entryscript.sh", timeout=eval_timeout)
-        stdout = process.stdout.read()
-        stderr = process.stderr.read() if getattr(process, "stderr", None) else ""
+        process.stdout.read()  # drain to unblock
+        if getattr(process, "stderr", None):
+            process.stderr.read()
         if hasattr(process, "wait"):
             process.wait()
-        log = f"{stdout}\n{stderr}".strip()
-        print(f"[pro-labeler] eval output (last 1000 chars):\n{log[-1000:]}", flush=True)
+
+        # Read the actual test runner output (stdout/stderr were redirected to files
+        # inside the sandbox by entryscript.sh — this is the canonical source for
+        # compile/build error detection, mirroring collect_outputs_modal() in the
+        # official swe_bench_pro_eval.py).
+        try:
+            with sandbox.open("/workspace/stdout.log", "r") as f:
+                test_stdout = f.read() or ""
+        except Exception:
+            test_stdout = ""
+        try:
+            with sandbox.open("/workspace/stderr.log", "r") as f:
+                test_stderr = f.read() or ""
+        except Exception:
+            test_stderr = ""
+
+        combined_preview = (test_stdout + "\n" + test_stderr).strip()
+        print(f"[pro-labeler] test output (last 500 chars):\n{combined_preview[-500:]}", flush=True)
 
         with sandbox.open("/workspace/output.json", "r") as f:
             output_json = json.load(f)
 
         resolved = _grade(output_json, instance)
-        compiles = _compiles_from_log(log)
+        compiles = _compiles_from_test_output(test_stdout, test_stderr, instance)
         return resolved, compiles, output_json
 
     except Exception as exc:
