@@ -331,14 +331,6 @@ def plot_layer_auc(
 # Transfer table (cross-dataset generalisation)
 # ---------------------------------------------------------------------------
 
-TRANSFER_ROW_LABELS = {
-    "in_dist_verified": "In-distribution (Verified)",
-    "in_dist_pro":      "In-distribution (Pro)",
-    "verified_to_pro":  "Verified $\\rightarrow$ Pro",
-    "pro_to_verified":  "Pro $\\rightarrow$ Verified",
-}
-
-
 def build_transfer_table(
     verified_results_dir: Path,
     pro_results_dir: Path,
@@ -351,26 +343,35 @@ def build_transfer_table(
 ) -> str:
     """Return a LaTeX table comparing in-distribution vs cross-dataset transfer AUC.
 
-    Rows: in-dist Verified, in-dist Pro, Verified→Pro, Pro→Verified.
-    Columns: probe × layer.
+    Layout per probe:
+      - Two compact gray reference rows: in-dist Verified / in-dist Pro
+      - Two main rows showing transfer AUC and delta vs. the corresponding in-dist
+        baseline (same evaluation set):
+          Verified→Pro  value  (±Δ vs. Pro in-dist)
+          Pro→Verified  value  (±Δ vs. Verified in-dist)
     """
     n_layer_cols = len(layers)
     col_spec = "l" + "c" * n_layer_cols
     layer_header = " & ".join(f"Layer {l}" for l in layers)
 
-    rows = [
-        ("in_dist_verified", verified_results_dir, verified_pooled_run_id),
-        ("in_dist_pro",      pro_results_dir,      pro_pooled_run_id),
-        ("verified_to_pro",  pro_results_dir,      verified_to_pro_run_id),
-        ("pro_to_verified",  verified_results_dir, pro_to_verified_run_id),
-    ]
+    def _fmt_delta(delta: float) -> str:
+        sign = "+" if delta >= 0 else "−"
+        return rf"{{\scriptsize {sign}{abs(delta):.3f}}}"
+
+    def _get_aucs(res_dir, run_id, probe):
+        res = _load(res_dir, run_id, probe)
+        if res is None:
+            return {l: float("nan") for l in layers}
+        return {l: _weighted_mean(res.get(l, []), "test_auc") for l in layers}
 
     lines = [
         r"\begin{table*}[h]",
         r"\centering",
         r"\caption{Cross-dataset transfer AUC-ROC for Laguna-XS2. "
-        r"\emph{In-distribution} probes are trained and evaluated on the same dataset. "
-        r"\emph{Transfer} probes use weights trained on one dataset and evaluated on the other.}",
+        r"Gray rows show in-distribution (in-dist) reference performance. "
+        r"Transfer rows show the AUC when probe weights trained on one dataset are "
+        r"evaluated on the other; the subscript shows the difference relative to the "
+        r"in-dist baseline on the \emph{same evaluation set}.}",
         r"\label{tab:transfer}",
         rf"\begin{{tabular}}{{{col_spec}}}",
         r"\toprule",
@@ -382,33 +383,43 @@ def build_transfer_table(
         probe_label = PROBE_LABELS.get(probe, probe)
         lines.append(rf"\multicolumn{{{1 + n_layer_cols}}}{{l}}{{\textit{{{probe_label}}}}} \\")
 
-        # Find global best AUC across all rows for bolding
-        best: dict[int, float] = {}
-        for _, res_dir, run_id in rows:
-            res = _load(res_dir, run_id, probe)
-            if res is None:
-                continue
-            for l in layers:
-                v = _weighted_mean(res.get(l, []), "test_auc")
-                if not math.isnan(v) and v > best.get(l, float("-inf")):
-                    best[l] = v
+        # Load all four result sets
+        v_aucs  = _get_aucs(verified_results_dir, verified_pooled_run_id, probe)   # in-dist Verified
+        p_aucs  = _get_aucs(pro_results_dir,      pro_pooled_run_id,      probe)   # in-dist Pro
+        vp_aucs = _get_aucs(pro_results_dir,      verified_to_pro_run_id, probe)   # Verified→Pro
+        pv_aucs = _get_aucs(verified_results_dir, pro_to_verified_run_id, probe)   # Pro→Verified
 
-        for row_key, res_dir, run_id in rows:
-            res = _load(res_dir, run_id, probe)
-            row_label = TRANSFER_ROW_LABELS[row_key]
-            cells = []
-            for l in layers:
-                if res is None:
-                    cells.append("—")
-                    continue
-                v = _weighted_mean(res.get(l, []), "test_auc")
-                if math.isnan(v):
-                    cells.append("—")
-                elif not math.isnan(best.get(l, float("nan"))) and abs(v - best[l]) < 1e-9:
-                    cells.append(rf"\textbf{{{v:.3f}}}")
-                else:
-                    cells.append(f"{v:.3f}")
-            lines.append(f"\\quad {row_label} & " + " & ".join(cells) + r" \\")
+        # --- compact gray reference rows ---
+        def _ref_cell(v):
+            return rf"\textcolor{{gray}}{{\small {v:.3f}}}" if not math.isnan(v) else "—"
+
+        lines.append(
+            r"\quad\textcolor{gray}{\small In-dist (Verified)} & "
+            + " & ".join(_ref_cell(v_aucs[l]) for l in layers) + r" \\"
+        )
+        lines.append(
+            r"\quad\textcolor{gray}{\small In-dist (Pro)} & "
+            + " & ".join(_ref_cell(p_aucs[l]) for l in layers) + r" \\"
+        )
+
+        # --- transfer rows with deltas ---
+        def _transfer_cell(transfer_v, ref_v):
+            if math.isnan(transfer_v):
+                return "—"
+            delta = transfer_v - ref_v if not math.isnan(ref_v) else float("nan")
+            delta_str = _fmt_delta(delta) if not math.isnan(delta) else ""
+            return rf"{transfer_v:.3f}\,{delta_str}"
+
+        lines.append(
+            r"\quad Verified $\rightarrow$ Pro & "
+            + " & ".join(_transfer_cell(vp_aucs[l], p_aucs[l]) for l in layers)
+            + r"  \\"
+        )
+        lines.append(
+            r"\quad Pro $\rightarrow$ Verified & "
+            + " & ".join(_transfer_cell(pv_aucs[l], v_aucs[l]) for l in layers)
+            + r"  \\"
+        )
 
         lines.append(r"\midrule")
 
