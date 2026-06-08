@@ -9,4 +9,4 @@
 set -euo pipefail
 mkdir -p logs
 
-uv run python run_figures.py "$@"
+uv run python run_paper_figures.py "$@"

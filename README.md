@@ -2,7 +2,7 @@
 
 Measures whether a language model's internal hidden states linearly predict properties of its own output before those properties are realised.
 
-Pipeline: inference + activation hooks → per-sample `.pt` files → per-(layer, probe) cache tensors → linear probe training with W&B sweep → accuracy heatmaps → static dashboard.
+Pipeline: inference + activation hooks → per-sample `.pt` files → per-(layer, probe) cache tensors → linear probe training with W&B sweep → paper figures → static dashboard.
 
 ## Pipeline overview
 
@@ -27,7 +27,8 @@ run_probe.py final       train linear probe on best hparams → W&B run with met
                           (or pass --from-sweep to auto-load best HPs from a sweep)
         │
         ▼
-run_figures.py           accuracy heatmaps per layer × relative-position bin
+run_paper_figures.py     AUC heatmaps, layer plots, lookahead, barplot, LaTeX tables
+                         → paper/figures/  +  paper/*.tex
 run_export_dashboard.py  → dashboard/index.html  (open in browser)
 ```
 
@@ -62,7 +63,7 @@ run_attach_labels_swebench.py  load activations + trajectory + _labels.json,
                                → outputs/swebench/<run_id>_labeled/<instance_id>.pt
         │
         ▼
-run_build_cache.py  →  run_probe.py  →  run_figures.py   (same as standard path)
+run_build_cache.py  →  run_probe.py  →  run_paper_figures.py   (same as standard path)
 ```
 
 Dynamic probes (`currently_correct`, `currently_compiles`, `currently_reduces_failing`, `currently_has_regressions`) only make sense in the agentic path because they require `EditEvent` history with per-edit `test_results`. The carry-forward step in `run_attach_labels_swebench.py` expands one label per edit into one label per stride step; steps before the first edit are masked (`None` → `-1` → excluded from training).
@@ -258,10 +259,24 @@ Queries `sweep.best_run()` via the W&B API to auto-populate `lr`, `weight_decay`
 ### 4. Figures
 
 ```bash
-uv run python run_figures.py \
-  --run-id my_run \
-  --probe will_be_correct \
-  --model-config configs/models/qwen3_8b.yaml
+uv run python run_paper_figures.py \
+  --results-dir results/swebench \
+  --probes currently_compiles currently_correct currently_reduces_failing currently_has_regressions \
+  --model-run-ids laguna_xs2_full qwen36_35b_a3b_full \
+  --shuffled-run-ids laguna_xs2_full_shuffled qwen36_35b_a3b_full_shuffled
+```
+
+This generates all publication figures under `paper/figures/` and LaTeX tables under `paper/`.
+It also writes `paper/figures/manifest.json` for the dashboard figures gallery.
+
+For lookahead horizon figures, pass the shifted-label run IDs:
+
+```bash
+uv run python run_paper_figures.py \
+  ... \
+  --lookahead-run-ids laguna_xs2_full_shift0_max50 laguna_xs2_full_shift1_max50 ... laguna_xs2_full_shift50_max50 \
+  --lookahead-k-values $(seq 0 50) \
+  --lookahead-filename-suffix max50
 ```
 
 ### 5. Export dashboard
@@ -311,8 +326,11 @@ sbatch slurm/probe_final.sh \
   --model-config configs/models/qwen3_8b.yaml \
   --from-sweep abc123xyz
 
-sbatch slurm/figures.sh --run-id my_run --probe will_be_correct \
-  --model-config configs/models/qwen3_8b.yaml
+sbatch slurm/figures.sh \
+  --results-dir results/swebench \
+  --probes currently_compiles currently_correct currently_reduces_failing currently_has_regressions \
+  --model-run-ids laguna_xs2_full qwen36_35b_a3b_full \
+  --shuffled-run-ids laguna_xs2_full_shuffled qwen36_35b_a3b_full_shuffled
 
 sbatch slurm/export_dashboard.sh \
   --run-id my_run --probe will_be_correct \

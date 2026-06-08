@@ -1,0 +1,15 @@
+{
+  "Verified": {
+    "Laguna-XS2":      {"lr": 0.00034219718825575905, "weight_decay": 0.0014714964923484015, "batch_size": 256,  "patience": 50},
+    "Qwen3.6-35B-A3B": {"lr": 0.00117,               "weight_decay": 0.0981,                "batch_size": 1024, "patience": 10}
+  },
+  "Pro": {
+    "Laguna-XS2": {
+      "Syntactic correctness": {"lr": 0.0002528899667354841,  "weight_decay": 0.00027521054719050283, "batch_size": 256,  "patience": 50},
+      "Semantic correctness":  {"lr": 0.0006160451703789833,  "weight_decay": 0.00517666984834032,    "batch_size": 1024, "patience": 25},
+      "Reduces failures":      {"lr": 0.0002310173345942377,  "weight_decay": 0.0040400920896719915,  "batch_size": 256,  "patience": 10},
+      "Has regressions":       {"lr": 0.00015055365890504895, "weight_decay": 0.0326146475479764,     "batch_size": 1024, "patience": 10}
+    },
+    "Qwen3.6-35B-A3B": null
+  }
+}

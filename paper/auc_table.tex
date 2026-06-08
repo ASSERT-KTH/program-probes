@@ -1,0 +1,40 @@
+\begin{table*}[h]
+\centering
+\caption{Test AUC-ROC per probe, model, and benchmark across transformer layers. \textbf{Bold} marks the best layer per row. \emph{Shuffled} uses label-permuted data as a sanity baseline.}
+\label{tab:auc_roc}
+\begin{tabular}{lccccc}
+\toprule
+ & \multicolumn{4}{c}{AUC-ROC $\uparrow$} & Shuffled \\
+\cmidrule(lr){2-5}
+Probe & 10 & 20 & 30 & 39 & (best layer) \\
+\midrule
+\multicolumn{6}{l}{\textsc{SWE-bench Verified}} \\
+\addlinespace[2pt]
+\multicolumn{6}{l}{\quad\textit{Laguna-XS2}} \\
+Syntactic correctness & \textbf{0.698} & 0.669 & 0.679 & 0.626 & 0.502 \\
+Semantic correctness & 0.775 & \textbf{0.791} & 0.769 & 0.716 & 0.501 \\
+Reduces failures & 0.743 & \textbf{0.769} & 0.743 & 0.674 & 0.501 \\
+Has regressions & 0.688 & \textbf{0.697} & 0.675 & 0.612 & 0.501 \\
+\addlinespace[3pt]
+\multicolumn{6}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & \textbf{0.777} & 0.755 & 0.771 & 0.692 & 0.499 \\
+Semantic correctness & 0.816 & 0.836 & \textbf{0.839} & 0.786 & 0.503 \\
+Reduces failures & 0.818 & \textbf{0.835} & 0.832 & 0.776 & 0.506 \\
+Has regressions & 0.723 & 0.773 & \textbf{0.778} & 0.698 & 0.500 \\
+\midrule
+\multicolumn{6}{l}{\textsc{SWE-bench Pro}} \\
+\addlinespace[2pt]
+\multicolumn{6}{l}{\quad\textit{Laguna-XS2}} \\
+Syntactic correctness & \textbf{0.780} & 0.746 & 0.757 & 0.756 & — \\
+Semantic correctness & 0.681 & \textbf{0.726} & 0.714 & 0.670 & — \\
+Reduces failures & 0.681 & \textbf{0.718} & 0.697 & 0.657 & — \\
+Has regressions & 0.645 & 0.705 & \textbf{0.739} & 0.691 & — \\
+\addlinespace[3pt]
+\multicolumn{6}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & — & — & — & — & — \\
+Semantic correctness & — & — & — & — & — \\
+Reduces failures & — & — & — & — & — \\
+Has regressions & — & — & — & — & — \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,6 +1,7 @@
 "use strict";
 
 const DATA_ROOT = "data";
+const FIGURES_ROOT = "../paper/figures";
 let state = {
   manifest: [],
   runId: null,
@@ -807,7 +808,7 @@ function switchTab(name) {
 
 async function loadFiguresManifest() {
   try {
-    return await fetchJSON(`${DATA_ROOT}/figures/manifest.json`);
+    return await fetchJSON(`${FIGURES_ROOT}/manifest.json`);
   } catch {
     return [];
   }
@@ -824,7 +825,7 @@ function renderGallery() {
     );
 
     if (filtered.length === 0) {
-      container.innerHTML = '<p style="color:#888;font-size:13px;">No figures found. Run run_figures.py and re-export the dashboard.</p>';
+      container.innerHTML = '<p style="color:#888;font-size:13px;">No figures found. Run run_paper_figures.py to generate figures and manifest.</p>';
       return;
     }
 
@@ -853,19 +854,21 @@ function renderGallery() {
         card.style.cssText = "cursor:pointer;border:1px solid #ddd;border-radius:6px;overflow:hidden;width:200px;background:#fafafa;";
         card.title = fig.title || fig.path;
 
-        const img = document.createElement("img");
         const cacheBust = `?v=${Date.now()}`;
-        img.src = `${DATA_ROOT}/figures/${fig.path}${cacheBust}`;
-        img.style.cssText = "width:200px;height:130px;object-fit:contain;background:#fff;";
-        img.loading = "lazy";
+        const figSrc = `${FIGURES_ROOT}/${fig.path}${cacheBust}`;
+        const embed = document.createElement("embed");
+        embed.src = figSrc;
+        embed.type = "application/pdf";
+        embed.style.cssText = "width:200px;height:130px;background:#fff;pointer-events:none;";
 
         const caption = document.createElement("div");
-        caption.textContent = fig.title || fig.path.split("/").pop().replace(".png", "");
+        const ext = fig.path.split(".").pop();
+        caption.textContent = fig.title || fig.path.split("/").pop().replace(`.${ext}`, "");
         caption.style.cssText = "font-size:10px;color:#555;padding:4px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;";
 
-        card.appendChild(img);
+        card.appendChild(embed);
         card.appendChild(caption);
-        card.addEventListener("click", () => openLightbox(`${DATA_ROOT}/figures/${fig.path}${cacheBust}`, fig.title || fig.path));
+        card.addEventListener("click", () => openLightbox(figSrc, fig.title || fig.path));
         grid.appendChild(card);
       }
 
