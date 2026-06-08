@@ -355,8 +355,8 @@ def build_transfer_table(
     layer_header = " & ".join(f"Layer {l}" for l in layers)
 
     def _fmt_delta(delta: float) -> str:
-        sign = "+" if delta >= 0 else "−"
-        return rf"{{\scriptsize {sign}{abs(delta):.3f}}}"
+        sign = "+" if delta >= 0 else "-"
+        return rf"{{\scriptsize ${sign}{abs(delta):.3f}$}}"
 
     def _get_aucs(res_dir, run_id, probe):
         res = _load(res_dir, run_id, probe)
