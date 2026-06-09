@@ -629,25 +629,30 @@ def plot_auc_heatmap(
     out_dir.mkdir(parents=True, exist_ok=True)
 
     fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_HEAT))
-    norm    = mcolors.Normalize(vmin=_style.HEATMAP_VMIN, vmax=_style.HEATMAP_VMAX)
-    im      = ax.imshow(grid, aspect="auto", cmap=_style.HEATMAP_CMAP,
-                        norm=norm, origin="lower")
+    ax.grid(False)  # override global rcParam — grid lines bleed over heatmap cells
 
-    ax.set_xticks(range(n_bins))
+    norm = mcolors.Normalize(vmin=_style.HEATMAP_VMIN, vmax=_style.HEATMAP_VMAX)
+    # pcolormesh gives crisp cell edges with no interpolation artefacts
+    im = ax.pcolormesh(grid, cmap=_style.HEATMAP_CMAP, norm=norm,
+                       linewidth=0.5, edgecolors="white")
+
+    ax.set_xticks([i + 0.5 for i in range(n_bins)])
     ax.set_xticklabels(
         [f"{i/n_bins:.1f}–{(i+1)/n_bins:.1f}" for i in range(n_bins)],
         rotation=40, ha="right",
     )
-    ax.set_yticks(range(len(layers)))
+    ax.set_yticks([i + 0.5 for i in range(len(layers))])
     ax.set_yticklabels([f"Layer {l}" for l in layers])
     ax.set_xlabel(x_label)
     ax.set_ylabel("Layer")
+    ax.tick_params(length=0)  # hide tick marks — cells are already delimited
 
     model_key   = run_id.replace("_shuffled", "").replace("_step_rel", "").replace("_pooled_bineval", "")
     probe_label = PROBE_LABELS.get(probe, probe)
     ax.set_title(f"{probe_label} — {MODEL_LABELS.get(model_key, model_key)}")
 
     cb = plt.colorbar(im, ax=ax, label="AUC-ROC")
+    cb.set_ticks([0.5, 0.625, 0.75, 0.875, 1.0])
     cb.ax.tick_params(labelsize=8)
 
     mid = (_style.HEATMAP_VMIN + _style.HEATMAP_VMAX) / 2
@@ -655,7 +660,7 @@ def plot_auc_heatmap(
         for bi in range(n_bins):
             v = grid[li, bi]
             if not math.isnan(v):
-                ax.text(bi, li, f"{v:.2f}", ha="center", va="center",
+                ax.text(bi + 0.5, li + 0.5, f"{v:.2f}", ha="center", va="center",
                         fontsize=6.5, color="white" if v > mid else "black")
 
     fname = f"{probe}_auc_heatmap{suffix}.pdf"

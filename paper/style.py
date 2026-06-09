@@ -34,8 +34,8 @@ HATCH = {
 
 # --- Heatmap ---
 HEATMAP_CMAP = "Blues"
-HEATMAP_VMIN = 0.55
-HEATMAP_VMAX = 0.85
+HEATMAP_VMIN = 0.5
+HEATMAP_VMAX = 1.0
 
 
 def apply() -> None:
