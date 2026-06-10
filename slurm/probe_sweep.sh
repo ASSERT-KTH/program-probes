@@ -2,7 +2,7 @@
 #SBATCH -J pp-probe-sweep
 #SBATCH -p berzelius-cpu
 #SBATCH -n 8
-#SBATCH --mem=150G
+#SBATCH --mem=256G
 #SBATCH -t 04:00:00
 #SBATCH -o logs/probe_sweep_%j.out
 #SBATCH -e logs/probe_sweep_%j.err

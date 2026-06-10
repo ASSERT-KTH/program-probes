@@ -62,6 +62,9 @@ def main():
     eval_p.add_argument("--output-run-id", required=True,
                         help="Run ID under which to save results.pt")
 
+    parser.add_argument("--layer", type=int, default=None,
+                        help="Run sweep/final for this single layer only (overrides model config loop)")
+
     args = parser.parse_args()
     if args.n_eval_bins is not None and args.n_eval_bins != args.n_bins and args.n_bins != 1:
         parser.error("--n-eval-bins requires --n-bins 1 or --n-eval-bins equal to --n-bins")
@@ -73,26 +76,29 @@ def main():
             run_id=args.run_id,
             probe_name=args.probe,
             fixed_params=args.fixed,
+            layer=args.layer,
         )
     elif args.mode == "sweep":
-        run_sweep(
-            run_id=args.run_id,
-            probe_name=args.probe,
-            probe_layers=model_cfg.probe_layers,
-            seed=args.seed,
-            sweep_id=args.sweep_id,
-            count=args.count,
-            cache_dir=args.cache_dir,
-            cache_run_id=cache_run_id,
-            n_bins=args.n_bins,
-            probe_arch=args.probe_arch,
-            n_eval_bins=args.n_eval_bins,
-            eval_bin_axis=args.eval_bin_axis,
-            then_final=args.then_final,
-            results_dir=args.results_dir,
-            fixed_params=args.fixed,
-            shuffle_labels=args.shuffle_labels,
-        )
+        layers = [args.layer] if args.layer is not None else model_cfg.probe_layers
+        for layer in layers:
+            run_sweep(
+                run_id=args.run_id,
+                probe_name=args.probe,
+                probe_layers=[layer],
+                seed=args.seed,
+                sweep_id=args.sweep_id,
+                count=args.count,
+                cache_dir=args.cache_dir,
+                cache_run_id=cache_run_id,
+                n_bins=args.n_bins,
+                probe_arch=args.probe_arch,
+                n_eval_bins=args.n_eval_bins,
+                eval_bin_axis=args.eval_bin_axis,
+                then_final=args.then_final,
+                results_dir=args.results_dir,
+                fixed_params=args.fixed,
+                shuffle_labels=args.shuffle_labels,
+            )
     elif args.mode == "eval":
         run_eval(
             weights_run_id=args.weights_run_id or args.run_id,
@@ -111,10 +117,11 @@ def main():
             tool_nll_run_id=args.tool_nll_run_id,
         )
     else:
+        layers = [args.layer] if args.layer is not None else model_cfg.probe_layers
         run_final(
             run_id=args.run_id,
             probe_name=args.probe,
-            probe_layers=model_cfg.probe_layers,
+            probe_layers=layers,
             lr=args.lr,
             weight_decay=args.weight_decay,
             batch_size=args.batch_size,

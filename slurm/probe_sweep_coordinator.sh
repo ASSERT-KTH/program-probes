@@ -1,9 +1,27 @@
 #!/bin/bash
+# Coordinator for a single (probe, layer) sweep.
+# Creates one W&B sweep, submits N parallel worker jobs, then submits final
+# training as a dependent job that runs after all workers complete.
+#
+# Usage — one call per (probe, layer):
+#   sbatch slurm/probe_sweep_coordinator.sh \
+#     --model-config configs/models/laguna_xs2.yaml \
+#     --layer 0 \
+#     --probe currently_correct \
+#     --probe-arch linear \
+#     --run-id laguna_xs2_full_pooled \
+#     --cache-dir cache/swebench \
+#     --cache-run-id laguna_xs2_full \
+#     --results-dir results/swebench \
+#     --n-bins 1 \
+#     --n-agents 4 \
+#     --count 5
+#
 #SBATCH -J pp-probe-coord
 #SBATCH -p berzelius-cpu
-#SBATCH -n 8
-#SBATCH --mem=150G
-#SBATCH -t 04:00:00
+#SBATCH -n 2
+#SBATCH --mem=8G
+#SBATCH -t 00:10:00
 #SBATCH -o logs/probe_sweep_coordinator_%j.out
 #SBATCH -e logs/probe_sweep_coordinator_%j.err
 
@@ -11,42 +29,46 @@ set -euo pipefail
 mkdir -p logs
 
 # ---------------------------------------------------------------------------
-# Parse --n-agents and --count; collect everything else as probe_args
+# Parse --n-agents and --count; pass everything else through to run_probe.py
 # ---------------------------------------------------------------------------
-N_AGENTS=2
-COUNT=10
+N_AGENTS=4
+COUNT=20
 PROBE_ARGS=()
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --n-agents)  N_AGENTS="$2"; shift 2 ;;
-        --count)     COUNT="$2";    shift 2 ;;
-        *)           PROBE_ARGS+=("$1"); shift ;;
+        --n-agents) N_AGENTS="$2"; shift 2 ;;
+        --count)    COUNT="$2";    shift 2 ;;
+        *)          PROBE_ARGS+=("$1"); shift ;;
     esac
 done
 
+COUNT_PER_AGENT=$(( COUNT / N_AGENTS ))
+
 # ---------------------------------------------------------------------------
-# 1. Create the sweep and capture only the ID (printed to stdout by create_sweep)
+# 1. Create the sweep — layer name baked in via --layer in PROBE_ARGS
 # ---------------------------------------------------------------------------
-echo "[coordinator] Creating sweep (n_agents=${N_AGENTS}, count_per_agent=${COUNT})"
+echo "[coordinator] Creating sweep (n_agents=${N_AGENTS}, count=${COUNT}, count_per_agent=${COUNT_PER_AGENT})"
 SWEEP_ID=$(uv run python run_probe.py "${PROBE_ARGS[@]}" create-sweep)
 echo "[coordinator] Sweep ID: ${SWEEP_ID}"
 
 # ---------------------------------------------------------------------------
-# 2. Submit N-1 additional agent jobs
+# 2. Submit N parallel worker jobs
 # ---------------------------------------------------------------------------
-AGENT_SLURM_TIME="${SLURM_TIMELIMIT:-04:00:00}"
-
-for i in $(seq 2 "${N_AGENTS}"); do
-    JOB_ID=$(sbatch --parsable \
-        --time="${AGENT_SLURM_TIME}" \
+WORKER_IDS=()
+for i in $(seq 1 "${N_AGENTS}"); do
+    JID=$(sbatch --parsable \
         slurm/probe_sweep.sh \
-        "${PROBE_ARGS[@]}" sweep --sweep-id "${SWEEP_ID}" --count "${COUNT}")
-    echo "[coordinator] Submitted agent ${i} as SLURM job ${JOB_ID}"
+        "${PROBE_ARGS[@]}" sweep --sweep-id "${SWEEP_ID}" --count "${COUNT_PER_AGENT}")
+    WORKER_IDS+=("${JID}")
+    echo "[coordinator] Worker ${i} → job ${JID}"
 done
 
 # ---------------------------------------------------------------------------
-# 3. Run as agent 1
+# 3. Submit final training, dependent on all workers completing successfully
 # ---------------------------------------------------------------------------
-echo "[coordinator] Running as agent 1"
-uv run python run_probe.py "${PROBE_ARGS[@]}" sweep --sweep-id "${SWEEP_ID}" --count "${COUNT}"
+DEP="afterok:$(IFS=:; echo "${WORKER_IDS[*]}")"
+FINAL_JID=$(sbatch --parsable --dependency="${DEP}" \
+    slurm/probe_final.sh \
+    "${PROBE_ARGS[@]}" final --from-sweep "${SWEEP_ID}")
+echo "[coordinator] Final training → job ${FINAL_JID} (depends on ${WORKER_IDS[*]})"

@@ -42,4 +42,5 @@ uv run python run_extract_swebench.py \
   --shard-rank "$RANK" \
   --num-shards "$NUM_SHARDS" \
   --extraction-batch-size 1 \
+  --chunk-size 8192 \
   "$@"

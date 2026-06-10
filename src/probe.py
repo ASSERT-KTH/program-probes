@@ -360,10 +360,11 @@ def train_probe_layer(
     return results, weights
 
 
-def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None) -> str:
+def create_sweep(run_id: str, probe_name: str, fixed_params: dict | None = None, layer: int | None = None) -> str:
     import wandb
+    layer_suffix = f"-layer{layer}" if layer is not None else ""
     sweep_config = {
-        "name": f"sweep-{run_id}-{probe_name}",
+        "name": f"sweep-{run_id}-{probe_name}{layer_suffix}",
         "method": "random",
         "metric": {"name": "mean_val_auc", "goal": "maximize"},
         "parameters": {
@@ -427,16 +428,16 @@ def run_sweep(
     import wandb
     cache_base = Path(cache_dir) / (cache_run_id or run_id) / probe_name
 
-    middle_layer = probe_layers[len(probe_layers) // 2]
-    middle_cache = str(cache_base / f"layer_{middle_layer}.pt")
+    sweep_layer = probe_layers[0]
+    sweep_cache = str(cache_base / f"layer_{sweep_layer}.pt")
 
     if sweep_id is None:
-        sweep_id = create_sweep(run_id, probe_name, fixed_params=fixed_params)
+        sweep_id = create_sweep(run_id, probe_name, fixed_params=fixed_params, layer=sweep_layer)
 
     def sweep_fn():
         with wandb.init(
-            group=f"{run_id}/{probe_name}",
-            tags=[run_id, probe_name, "sweep"],
+            group=f"{run_id}/{probe_name}/layer_{sweep_layer}",
+            tags=[run_id, probe_name, f"layer_{sweep_layer}", "sweep"],
         ) as run:
             cfg = run.config
 
@@ -451,7 +452,7 @@ def run_sweep(
                 })
 
             results, _ = train_probe_layer(
-                middle_cache, middle_layer,
+                sweep_cache, sweep_layer,
                 lr=cfg.lr, weight_decay=cfg.weight_decay,
                 batch_size=cfg.batch_size, patience=cfg.patience,
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
@@ -543,12 +544,14 @@ def run_final(
     all_results: dict[int, list[ProbeResult]] = {}
     all_weights: dict[int, dict] = {}
 
+    layer_suffix = f"/layer_{probe_layers[0]}" if len(probe_layers) == 1 else ""
     with wandb.init(
         project="program-probes",
         job_type="final",
-        name=f"final-{run_id}-{probe_name}-{probe_arch}",
-        group=f"{run_id}/{probe_name}",
-        tags=[run_id, probe_name, "final", probe_arch],
+        name=f"final-{run_id}-{probe_name}-{probe_arch}{layer_suffix}",
+        group=f"{run_id}/{probe_name}{layer_suffix}",
+        tags=[run_id, probe_name, "final", probe_arch]
+              + ([f"layer_{probe_layers[0]}"] if len(probe_layers) == 1 else []),
     ) as run:
         for layer_idx in probe_layers:
             cache_path = str(cache_base / f"layer_{layer_idx}.pt")
@@ -597,8 +600,21 @@ def run_final(
 
     out = Path(results_dir) / run_id / probe_name
     out.mkdir(parents=True, exist_ok=True)
-    torch.save(all_results, out / "results.pt")
-    torch.save(all_weights, out / "weights.pt")
+
+    results_path = out / "results.pt"
+    if results_path.exists():
+        existing = torch.load(results_path, weights_only=False)
+        existing.update(all_results)
+        all_results = existing
+
+    weights_path = out / "weights.pt"
+    if weights_path.exists():
+        existing_w = torch.load(weights_path, weights_only=False)
+        existing_w.update(all_weights)
+        all_weights = existing_w
+
+    torch.save(all_results, results_path)
+    torch.save(all_weights, weights_path)
     return {layer: [vars(r) for r in rs] for layer, rs in all_results.items()}
 
 
