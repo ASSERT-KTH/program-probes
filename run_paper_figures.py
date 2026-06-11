@@ -68,15 +68,20 @@ def _layer_means(all_results: dict, field: str, layers: list[int]) -> dict[int, 
     return {l: _weighted_mean(all_results.get(l, []), field) for l in layers}
 
 
-def _auc_grid(all_results: dict, layers: list[int], n_bins: int = 10) -> np.ndarray:
-    grid = np.full((len(layers), n_bins), np.nan)
+def _auc_grid(all_results: dict, layers: list[int], n_bins: int = 10) -> tuple[np.ndarray, int]:
+    all_bins = [r.bin_idx if hasattr(r, "bin_idx") else r["bin_idx"]
+                for lr in all_results.values() for r in lr]
+    min_b    = min(all_bins) if all_bins else 0
+    eff_bins = max(max(all_bins) - min_b + 1, n_bins) if all_bins and min_b == 0 else (max(all_bins) - min_b + 1 if all_bins else n_bins)
+    grid = np.full((len(layers), eff_bins), np.nan)
     for li, layer in enumerate(layers):
         for r in all_results.get(layer, []):
             b = r.bin_idx if hasattr(r, "bin_idx") else r["bin_idx"]
             v = r.test_auc if hasattr(r, "test_auc") else r["test_auc"]
-            if b < n_bins:
-                grid[li, b] = v
-    return grid
+            idx = b - min_b
+            if 0 <= idx < eff_bins:
+                grid[li, idx] = v
+    return grid, eff_bins
 
 
 # ---------------------------------------------------------------------------
@@ -757,7 +762,7 @@ def plot_auc_heatmap(
         print(f"  [skip] {run_id}/{probe} — no results.pt")
         return
 
-    grid    = _auc_grid(all_res, layers, n_bins)
+    grid, eff_bins = _auc_grid(all_res, layers, n_bins)
     out_dir = figures_dir / run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -769,9 +774,9 @@ def plot_auc_heatmap(
     im = ax.pcolormesh(grid, cmap=_style.HEATMAP_CMAP, norm=norm,
                        linewidth=0.5, edgecolors="white")
 
-    ax.set_xticks([i + 0.5 for i in range(n_bins)])
+    ax.set_xticks([i + 0.5 for i in range(eff_bins)])
     ax.set_xticklabels(
-        [f"{i/n_bins:.1f}–{(i+1)/n_bins:.1f}" for i in range(n_bins)],
+        [f"{i/eff_bins:.1f}–{(i+1)/eff_bins:.1f}" for i in range(eff_bins)],
         rotation=40, ha="right",
     )
     ax.set_yticks([i + 0.5 for i in range(len(layers))])
@@ -794,7 +799,7 @@ def plot_auc_heatmap(
 
     mid = (_style.HEATMAP_VMIN + _style.HEATMAP_VMAX) / 2
     for li in range(len(layers)):
-        for bi in range(n_bins):
+        for bi in range(eff_bins):
             v = grid[li, bi]
             if not math.isnan(v):
                 ax.text(bi + 0.5, li + 0.5, f"{v:.2f}", ha="center", va="center",
@@ -1092,6 +1097,18 @@ def main():
         default=["laguna_xs2_full_pooled_bineval", "qwen36_35b_a3b_full_pooled_bineval"],
     )
     parser.add_argument(
+        "--after-edit-run-ids", nargs="+",
+        default=["laguna_xs2_full_pooled_after_edit", "qwen36_35b_a3b_full_pooled_after_edit"],
+    )
+    parser.add_argument(
+        "--pro-bineval-run-ids", nargs="+",
+        default=["laguna_xs2_pro_full_pooled_bineval"],
+    )
+    parser.add_argument(
+        "--pro-step-rel-run-ids", nargs="+",
+        default=["laguna_xs2_pro_full_pooled_step_rel"],
+    )
+    parser.add_argument(
         "--pooled-run-ids", nargs="+",
         default=["laguna_xs2_full_pooled", "qwen36_35b_a3b_full_pooled"],
     )
@@ -1228,6 +1245,39 @@ def main():
                 layers = layers, figures_dir = figures_dir,
                 n_bins = args.n_bins, x_label = "Relative step bin", suffix = "_step",
                 dataset_label = "Verified",
+            )
+
+    # --- AUC heatmaps (after-edit, Verified) ---
+    print("[fig] AUC after-edit heatmaps...")
+    for run_id in (args.after_edit_run_ids or []):
+        for probe in probes:
+            plot_auc_heatmap(
+                results_dir = results_dir, run_id = run_id, probe = probe,
+                layers = layers, figures_dir = figures_dir,
+                n_bins = args.n_bins, x_label = "Relative position bin (after edit)",
+                suffix = "_after_edit", dataset_label = "Verified",
+            )
+
+    # --- AUC heatmaps (Pro position bins) ---
+    print("[fig] AUC Pro position-bin heatmaps...")
+    for run_id in (args.pro_bineval_run_ids or []):
+        for probe in probes:
+            plot_auc_heatmap(
+                results_dir = pro_results_dir, run_id = run_id, probe = probe,
+                layers = layers, figures_dir = figures_dir,
+                n_bins = args.n_bins, x_label = "Relative position bin",
+                dataset_label = "Pro",
+            )
+
+    # --- AUC heatmaps (Pro step-relative bins) ---
+    print("[fig] AUC Pro step-relative heatmaps...")
+    for run_id in (args.pro_step_rel_run_ids or []):
+        for probe in probes:
+            plot_auc_heatmap(
+                results_dir = pro_results_dir, run_id = run_id, probe = probe,
+                layers = layers, figures_dir = figures_dir,
+                n_bins = args.n_bins, x_label = "Relative step bin",
+                suffix = "_step", dataset_label = "Pro",
             )
 
     # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
