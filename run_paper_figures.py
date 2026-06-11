@@ -217,7 +217,7 @@ def build_auc_table(
     n_cols       = 1 + n_layer_cols + 1
 
     lines = [
-        r"\begin{table*}[h]",
+        r"\begin{table*}[t]",
         r"\centering",
         r"\caption{AUC per probe, model, and benchmark across transformer layers."
         r" \textbf{Bold} marks the best layer per row."
@@ -333,7 +333,7 @@ def build_calibration_table(
     n_cols        = 1 + n_metric_cols
 
     lines = [
-        r"\begin{table*}[h]",
+        r"\begin{table*}[t]",
         r"\centering",
         r"\caption{Calibration metrics (ECE and Brier score) per probe across layers."
         r" Lower is better for both metrics.}",
@@ -503,7 +503,7 @@ def build_hparam_table(
     )
 
     lines = [
-        r"\begin{table}[h]",
+        r"\begin{table}[t]",
         r"\centering",
         (
             r"\caption{Chosen hyperparameters for each model and benchmark, "
@@ -594,7 +594,7 @@ def build_transfer_table(
         return {l: _weighted_mean(res.get(l, []), "test_auc") for l in layers}
 
     lines = [
-        r"\begin{table*}[h]",
+        r"\begin{table*}[t]",
         r"\centering",
         r"\caption{Cross-dataset transfer AUC for Laguna-XS2. "
         r"Gray rows show in-distribution reference performance. "
