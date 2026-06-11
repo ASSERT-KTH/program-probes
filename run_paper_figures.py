@@ -8,7 +8,7 @@ Outputs
 - paper/figures/<run_id>/<probe>_layer_auc.pdf
 - paper/figures/<run_id>/<probe>_lookahead[_suffix].pdf
 - paper/figures/<run_id>/<probe>_tool_nll_layer<N>[_suffix].pdf
-- paper/auc_table.tex                           : AUC-ROC table (appendix)
+- paper/auc_table.tex                           : AUC table (appendix)
 - paper/calibration_table.tex                  : ECE + Brier table (appendix)
 - paper/transfer_table.tex                     : Cross-dataset transfer table
 - paper/figures/manifest.json                  : Figure index for the dashboard
@@ -183,7 +183,7 @@ def plot_generalization_barplot(
         [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
         fontsize=8.5,
     )
-    ax.set_ylabel("Best-layer AUC-ROC")
+    ax.set_ylabel("Best-layer AUC")
     ax.set_ylim(0.45, 1.0)
     ax.legend(handles=legend_handles, ncol=2, loc="upper right")
     ax.set_title("Probe generalisation across models and datasets")
@@ -219,13 +219,13 @@ def build_auc_table(
     lines = [
         r"\begin{table*}[h]",
         r"\centering",
-        r"\caption{Test AUC-ROC per probe, model, and benchmark across transformer layers."
+        r"\caption{AUC per probe, model, and benchmark across transformer layers."
         r" \textbf{Bold} marks the best layer per row."
         r" \emph{Shuffled} uses label-permuted data as a sanity baseline.}",
         r"\label{tab:auc_roc}",
         rf"\begin{{tabular}}{{{col_spec}}}",
         r"\toprule",
-        rf" & \multicolumn{{{n_layer_cols}}}{{c}}{{AUC-ROC $\uparrow$}} & Shuffled \\",
+        rf" & \multicolumn{{{n_layer_cols}}}{{c}}{{AUC $\uparrow$}} & Shuffled \\",
         rf"\cmidrule(lr){{2-{1 + n_layer_cols}}}",
         "Probe & " + layer_header + r" & (best layer) \\",
         r"\midrule",
@@ -596,7 +596,7 @@ def build_transfer_table(
     lines = [
         r"\begin{table*}[h]",
         r"\centering",
-        r"\caption{Cross-dataset transfer AUC-ROC for Laguna-XS2. "
+        r"\caption{Cross-dataset transfer AUC for Laguna-XS2. "
         r"Gray rows show in-distribution reference performance. "
         r"Transfer rows show AUC when probe weights trained on one dataset are "
         r"evaluated on the other; the subscript shows the delta relative to the "
@@ -698,7 +698,7 @@ def plot_auc_heatmap(
     probe_label = PROBE_LABELS.get(probe, probe)
     ax.set_title(f"{probe_label} — {MODEL_LABELS.get(model_key, model_key)}")
 
-    cb = plt.colorbar(im, ax=ax, label="AUC-ROC")
+    cb = plt.colorbar(im, ax=ax, label="AUC")
     cb.set_ticks([0.5, 0.625, 0.75, 0.875, 1.0])
     cb.ax.tick_params(labelsize=8)
 
@@ -760,7 +760,7 @@ def plot_layer_auc(
     ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
                linewidth=1.0, label="Random")
     ax.set_xlabel("Layer")
-    ax.set_ylabel("Test AUC-ROC")
+    ax.set_ylabel("AUC")
     ax.set_title(PROBE_LABELS.get(probe, probe))
     ax.set_xticks(layers)
     ax.set_xticklabels([str(_layer_label(l)) for l in layers])
@@ -787,7 +787,7 @@ def plot_lookahead_horizon(
     out_run_id: str,
     filename_suffix: str = "",
 ) -> None:
-    """AUC-ROC vs lookahead horizon k (assistant turns) across layers."""
+    """AUC vs lookahead horizon k (assistant turns) across layers."""
     data: dict[int, list[tuple]] = {l: [] for l in layers}
     k_to_n: dict[int, int] = {}
 
@@ -842,7 +842,7 @@ def plot_lookahead_horizon(
 
     n_str = f"  (n≈{k_to_n[ks_present[0]]:,})" if ks_present else ""
     ax.set_xlabel(f"Horizon k (turns){n_str}")
-    ax.set_ylabel("AUC-ROC")
+    ax.set_ylabel("AUC")
     ax.set_ylim(bottom=0.48)
     ax.set_title(PROBE_LABELS.get(probe, probe))
     ax.margins(x=0.06)

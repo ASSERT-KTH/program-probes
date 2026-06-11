@@ -22,6 +22,7 @@ mkdir -p logs
 module load buildenv-gcccuda/12.4.1-gcc13.3.0
 unset CPATH
 export LIBRARY_PATH="/usr/local/cuda/lib64:${LIBRARY_PATH:-}"
+export LD_LIBRARY_PATH="/software/sse/manual/GCC/13.3.0/lib64:${LD_LIBRARY_PATH:-}"
 export CUDA_HOME=/usr/local/cuda
 export PATH="/usr/local/cuda/bin:$PATH"
 export SSL_CERT_FILE=/etc/pki/tls/cert.pem
