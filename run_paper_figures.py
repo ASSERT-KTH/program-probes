@@ -1089,7 +1089,8 @@ def main():
         "--pro-model-run-ids", nargs="+",
         default=["laguna_xs2_pro_full_pooled"],
     )
-    parser.add_argument("--pro-shuffled-run-ids", nargs="+", default=None)
+    parser.add_argument("--pro-shuffled-run-ids", nargs="+",
+                        default=["laguna_xs2_pro_full_pooled_shuffled"])
     parser.add_argument("--pro-pooled-run-ids",   nargs="+",
                         default=["laguna_xs2_pro_full_pooled"])
     # Transfer
