@@ -10,7 +10,8 @@ Outputs
 - paper/figures/<run_id>/<probe>_tool_nll_layer<N>[_suffix].pdf
 - paper/auc_table.tex                           : AUC table (appendix)
 - paper/calibration_table.tex                  : ECE + Brier table (appendix)
-- paper/transfer_table.tex                     : Cross-dataset transfer table
+- paper/figures/transfer_barplot.pdf            : Cross-dataset transfer figure
+- paper/transfer_table.tex                     : Cross-dataset transfer table (appendix)
 - paper/figures/manifest.json                  : Figure index for the dashboard
 """
 
@@ -560,6 +561,90 @@ def build_hparam_table(
 
     output_path.write_text("\n".join(lines) + "\n")
     print(f"  [tex] {output_path}")
+
+
+# ---------------------------------------------------------------------------
+# Transfer barplot
+# ---------------------------------------------------------------------------
+
+def plot_transfer_barplot(
+    verified_results_dir: Path,
+    pro_results_dir: Path,
+    probes: list[str],
+    figures_dir: Path,
+    verified_pooled_run_id: str = "laguna_xs2_full_pooled",
+    pro_pooled_run_id: str = "laguna_xs2_full",
+    verified_to_pro_run_id: str = "laguna_xs2_full_verified_transfer",
+    pro_to_verified_run_id: str = "laguna_xs2_full_pro_transfer",
+) -> None:
+    """Grouped barplot: in-dist vs transfer AUC (best layer) per probe."""
+    def _best(res_dir: Path, run_id: str, probe: str) -> float:
+        res = _load(res_dir, run_id, probe)
+        return _best_layer_mean(res, "test_auc") if res is not None else float("nan")
+
+    color_v  = _style.COLORS["laguna_verified"]
+    color_p  = "#5C6BC0"   # indigo — distinguishes Pro in-dist from Verified
+    gray     = "#BDBDBD"
+    gray_p   = "#9E9E9E"
+
+    bar_width = 0.14
+    pair_gap  = 0.02
+    group_gap = 0.08
+    # Two pairs per probe: [in-dist V | V→P] and [in-dist P | P→V]
+    pair_w = bar_width * 2 + pair_gap
+    total  = 2 * pair_w + group_gap
+    left   = -(total / 2)
+    offsets = {
+        "indist_v":  left,
+        "vp":        left + bar_width + pair_gap,
+        "indist_p":  left + pair_w + group_gap,
+        "pv":        left + pair_w + group_gap + bar_width + pair_gap,
+    }
+
+    x   = np.arange(len(probes))
+    fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_BAR))
+
+    for pi, probe in enumerate(probes):
+        v_auc  = _best(verified_results_dir, verified_pooled_run_id,  probe)
+        p_auc  = _best(pro_results_dir,      pro_pooled_run_id,       probe)
+        vp_auc = _best(pro_results_dir,      verified_to_pro_run_id,  probe)
+        pv_auc = _best(verified_results_dir, pro_to_verified_run_id,  probe)
+
+        for val, offset, color, ec in [
+            (v_auc,  offsets["indist_v"], gray,    "#9E9E9E"),
+            (vp_auc, offsets["vp"],       color_v, color_v),
+            (p_auc,  offsets["indist_p"], gray_p,  "#757575"),
+            (pv_auc, offsets["pv"],       color_p, color_p),
+        ]:
+            if not math.isnan(val):
+                ax.bar(x[pi] + offset, val, width=bar_width,
+                       color=color, edgecolor=ec, linewidth=0.6, zorder=3)
+
+    ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"],
+               linewidth=1.0, zorder=2)
+
+    legend_handles = [
+        mpatches.Patch(facecolor=gray,    edgecolor="#9E9E9E", linewidth=0.6, label="In-dist (Verified)"),
+        mpatches.Patch(facecolor=color_v, edgecolor=color_v,  linewidth=0.6, label="Verified → Pro"),
+        mpatches.Patch(facecolor=gray_p,  edgecolor="#757575", linewidth=0.6, label="In-dist (Pro)"),
+        mpatches.Patch(facecolor=color_p, edgecolor=color_p,  linewidth=0.6, label="Pro → Verified"),
+        plt.Line2D([0], [0], linestyle="--", color=_style.COLORS["baseline"],
+                   linewidth=1.0, label="Random (0.5)"),
+    ]
+    ax.set_xticks(x)
+    ax.set_xticklabels(
+        [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
+        fontsize=8.5,
+    )
+    ax.set_ylabel("Best-layer AUC")
+    ax.set_ylim(0.45, 1.0)
+    ax.legend(handles=legend_handles, ncol=3, loc="upper right")
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    out = figures_dir / "transfer_barplot.pdf"
+    fig.savefig(out)
+    plt.close(fig)
+    print(f"  [fig] {out}")
 
 
 # ---------------------------------------------------------------------------
@@ -1130,7 +1215,18 @@ def main():
             out_run_id  = "combined",
         )
 
-    # --- Transfer table ---
+    # --- Transfer barplot + table ---
+    print("[fig] transfer barplot...")
+    plot_transfer_barplot(
+        verified_results_dir   = results_dir,
+        pro_results_dir        = pro_results_dir,
+        probes                 = probes,
+        figures_dir            = figures_dir,
+        verified_pooled_run_id = args.verified_pooled_run_id,
+        pro_pooled_run_id      = args.pro_pooled_run_id,
+        verified_to_pro_run_id = args.verified_to_pro_run_id,
+        pro_to_verified_run_id = args.pro_to_verified_run_id,
+    )
     print("[table] building transfer table...")
     transfer_tex = build_transfer_table(
         verified_results_dir  = results_dir,
