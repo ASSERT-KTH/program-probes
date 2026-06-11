@@ -8,3 +8,4 @@ prompt.md
 .venv/
 *.orig
 tmp/
+paper/figures/

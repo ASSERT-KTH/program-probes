@@ -419,8 +419,11 @@ def build_hparam_table(
     hparams format:
       {dataset_label: {model_label: hp_entry | None}}
     where hp_entry is either:
-      {lr, weight_decay, batch_size, patience}          — one set shared across probes
-      {probe_label: {lr, weight_decay, batch_size, patience}, ...}  — per-probe (Pro sweeps)
+      {lr, weight_decay, batch_size, patience}                            — one set shared across probes
+      {probe_label: {lr, weight_decay, batch_size, patience}, ...}        — per-probe
+      {probe_label: {layer_str: {lr, weight_decay, batch_size, patience}, ...}, ...}  — per-probe per-layer
+
+    Per-probe per-layer entries are collapsed to per-probe for display using the middle layer.
     """
     def _hp_cells(hp: dict) -> str:
         return (
@@ -428,8 +431,35 @@ def build_hparam_table(
             f"& {hp['batch_size']} & {hp['patience']}"
         )
 
+    def _is_per_layer(entry: dict) -> bool:
+        """True when entry values are dicts of layer→hp (per-probe per-layer)."""
+        first = next(iter(entry.values()), None)
+        if not isinstance(first, dict):
+            return False
+        first_inner = next(iter(first.values()), None)
+        return isinstance(first_inner, dict)
+
+    def _collapse_layers(entry: dict) -> dict:
+        """Collapse per-probe per-layer dict to per-probe by picking the middle layer."""
+        result = {}
+        for probe_label, layer_hps in entry.items():
+            layers_sorted = sorted(layer_hps.keys(), key=lambda x: int(x))
+            mid = layers_sorted[len(layers_sorted) // 2]
+            result[probe_label] = layer_hps[mid]
+        return result
+
     def _is_per_probe(entry) -> bool:
-        return entry is not None and isinstance(next(iter(entry.values())), dict)
+        if entry is None:
+            return False
+        if _is_per_layer(entry):
+            return True
+        return isinstance(next(iter(entry.values())), dict)
+
+    def _resolve_hp(entry) -> dict:
+        """Return a per-probe dict, collapsing layers if needed."""
+        if _is_per_layer(entry):
+            return _collapse_layers(entry)
+        return entry
 
     # Count total rows to size multirow for the dataset column
     def _n_rows_for_dataset(dataset_label: str) -> int:
@@ -438,7 +468,7 @@ def build_hparam_table(
         for model_label in model_labels:
             hp = dataset_hparams.get(model_label)
             if _is_per_probe(hp):
-                total += len(hp)
+                total += len(_resolve_hp(hp))
             else:
                 total += 1
         return total
@@ -462,8 +492,9 @@ def build_hparam_table(
         r"\centering",
         (
             r"\caption{Chosen hyperparameters for each model and benchmark, "
-            r"selected by 20-trial random search maximising mean validation AUC "
-            r"on the middle transformer layer. "
+            r"selected by 20-trial random search maximising mean validation AUC. "
+            r"Verified sweeps were run independently per probe and per layer; "
+            r"table shows the middle layer (layer 20) as representative. "
             r"Pro sweeps were run independently per probe.}"
         ),
         r"\label{tab:probe-hparams}",
@@ -484,11 +515,12 @@ def build_hparam_table(
             ds_cell = ds_multirow if not ds_printed else ""
 
             if _is_per_probe(hp):
-                probe_labels = list(hp.keys())
+                resolved = _resolve_hp(hp)
+                probe_labels = list(resolved.keys())
                 n_probe_rows = len(probe_labels)
                 model_multirow = rf"\multirow{{{n_probe_rows}}}{{*}}{{{model_label}}}"
                 for pi, probe_label in enumerate(probe_labels):
-                    probe_hp = hp[probe_label]
+                    probe_hp = resolved[probe_label]
                     model_cell = model_multirow if pi == 0 else ""
                     d_cell = ds_cell if pi == 0 else ""
                     if need_probe_col:

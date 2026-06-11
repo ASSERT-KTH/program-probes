@@ -1,19 +1,16 @@
 \begin{table}[h]
 \centering
-\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC on the middle transformer layer. Pro sweeps were run independently per probe.}
+\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC. Verified sweeps were run independently per probe and per layer; table shows the middle layer (layer 20) as representative. Pro sweeps were run independently per probe.}
 \label{tab:probe-hparams}
-\begin{tabular}{lllrrrr}
+\begin{tabular}{llrrrr}
 \toprule
-Dataset & Model & Probe & Learning rate & Weight decay & Batch size & Patience \\
+Dataset & Model & Learning rate & Weight decay & Batch size & Patience \\
 \midrule
-\multirow{2}{*}{\textsc{Verified}} & Laguna-XS2 & & $3.42 \times 10^{-4}$ & $1.47 \times 10^{-3}$ & 256 & 50 \\
- & Qwen3.6-35B-A3B & & $1.17 \times 10^{-3}$ & $9.81 \times 10^{-2}$ & 1024 & 10 \\
+\multirow{2}{*}{\textsc{Verified}} & laguna_xs2_full_pooled & — & — & — & — \\
+ & qwen36_35b_a3b_full_pooled & — & — & — & — \\
 \midrule
-\multirow{5}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS2} & Syntactic correctness & $2.53 \times 10^{-4}$ & $2.75 \times 10^{-4}$ & 256 & 50 \\
- &  & Semantic correctness & $6.16 \times 10^{-4}$ & $5.18 \times 10^{-3}$ & 1024 & 25 \\
- &  & Reduces failures & $2.31 \times 10^{-4}$ & $4.04 \times 10^{-3}$ & 256 & 10 \\
- &  & Has regressions & $1.51 \times 10^{-4}$ & $3.26 \times 10^{-2}$ & 1024 & 10 \\
- & Qwen3.6-35B-A3B & & — & — & — & — \\
+\multirow{2}{*}{\textsc{Pro}} & laguna_xs2_full_pooled & — & — & — & — \\
+ & qwen36_35b_a3b_full_pooled & — & — & — & — \\
 \bottomrule
 \end{tabular}
 \end{table}

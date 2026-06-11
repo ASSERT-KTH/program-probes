@@ -1,0 +1,62 @@
+{
+  "laguna_xs2_full_pooled": {
+    "currently_compiles": {
+      "0":  "v55l6xc7",
+      "10": "0q4ifi8n",
+      "20": "6cjkajc2",
+      "30": "jg9kyadg",
+      "39": "x2ytc4w9"
+    },
+    "currently_correct": {
+      "0":  "skugo2g9",
+      "10": "eqx1ui57",
+      "20": "c6i0naq5",
+      "30": "6zjhdufy",
+      "39": "0txtwbt7"
+    },
+    "currently_has_regressions": {
+      "0":  "1k3kyzmm",
+      "10": "3susi6pl",
+      "20": "8tiravgp",
+      "30": "wasw6u5c",
+      "39": "w3d0r6qw"
+    },
+    "currently_reduces_failing": {
+      "0":  "i96jviou",
+      "10": "18qz9pau",
+      "20": "shzkmxgq",
+      "30": "766qkdzm",
+      "39": "akk5sivd"
+    }
+  },
+  "qwen36_35b_a3b_full_pooled": {
+    "currently_compiles": {
+      "0":  "c26fd3zk",
+      "10": "mpjzzlk7",
+      "20": "h07uprbb",
+      "30": "8682o5gw",
+      "39": "idkpn8s1"
+    },
+    "currently_correct": {
+      "0":  "hzd72vvl",
+      "10": "qyk6wfsg",
+      "20": "0prezwxp",
+      "30": "deguga3b",
+      "39": "dn59n9iu"
+    },
+    "currently_has_regressions": {
+      "0":  "jn1esn4u",
+      "10": "u12dnr03",
+      "20": "cnwj0ves",
+      "30": "afed2rgh",
+      "39": "zd5inkiw"
+    },
+    "currently_reduces_failing": {
+      "0":  "9u5gxkpp",
+      "10": "m927ibql",
+      "20": "vwab3d4k",
+      "30": "booot4iw",
+      "39": "attrv8g3"
+    }
+  }
+}

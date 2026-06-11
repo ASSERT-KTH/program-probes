@@ -1,7 +1,65 @@
 {
   "Verified": {
-    "Laguna-XS2":      {"lr": 0.00034219718825575905, "weight_decay": 0.0014714964923484015, "batch_size": 256,  "patience": 50},
-    "Qwen3.6-35B-A3B": {"lr": 0.00117,               "weight_decay": 0.0981,                "batch_size": 1024, "patience": 10}
+    "Laguna-XS2": {
+      "Syntactic correctness": {
+        "0":  {"lr": 0.085995781991253,      "weight_decay": 0.0004544525053165965,  "batch_size": 256,  "patience": 10},
+        "10": {"lr": 0.0001563870301006489,  "weight_decay": 0.006500616811440741,   "batch_size": 512,  "patience": 50},
+        "20": {"lr": 0.00858372149740376,    "weight_decay": 0.0011776405069735014,  "batch_size": 512,  "patience": 50},
+        "30": {"lr": 0.0003727012871944739,  "weight_decay": 6.1990595363889e-05,    "batch_size": 256,  "patience": 25},
+        "39": {"lr": 0.018517496511636488,   "weight_decay": 8.618575750056427e-05,  "batch_size": 512,  "patience": 25}
+      },
+      "Semantic correctness": {
+        "0":  {"lr": 0.0010014583939810893,  "weight_decay": 0.01664632774011113,    "batch_size": 1024, "patience": 50},
+        "10": {"lr": 0.00015814777807367838, "weight_decay": 0.00018818150629057513, "batch_size": 512,  "patience": 25},
+        "20": {"lr": 0.0005194535231715412,  "weight_decay": 0.0038055257105627026,  "batch_size": 512,  "patience": 10},
+        "30": {"lr": 0.004596326093689299,   "weight_decay": 0.003849576778181837,   "batch_size": 512,  "patience": 25},
+        "39": {"lr": 0.00021129798379136095, "weight_decay": 0.009765560899432167,   "batch_size": 512,  "patience": 10}
+      },
+      "Has regressions": {
+        "0":  {"lr": 0.0032680533697964378,  "weight_decay": 0.0007289446727153021,  "batch_size": 1024, "patience": 10},
+        "10": {"lr": 0.0030900719130745225,  "weight_decay": 1.3553717863807534e-05, "batch_size": 1024, "patience": 10},
+        "20": {"lr": 0.029478428896016685,   "weight_decay": 5.18739760934974e-05,   "batch_size": 256,  "patience": 50},
+        "30": {"lr": 0.0003812365898568713,  "weight_decay": 0.054667551056353896,   "batch_size": 1024, "patience": 10},
+        "39": {"lr": 0.00039760671828948714, "weight_decay": 0.008157950686336289,   "batch_size": 512,  "patience": 10}
+      },
+      "Reduces failures": {
+        "0":  {"lr": 0.0008929843515164792,  "weight_decay": 0.0008931936839440095,  "batch_size": 256,  "patience": 25},
+        "10": {"lr": 0.00031390533357706377, "weight_decay": 5.451171571802822e-05,  "batch_size": 1024, "patience": 25},
+        "20": {"lr": 0.026617400788950037,   "weight_decay": 0.0021274457562880456,  "batch_size": 1024, "patience": 50},
+        "30": {"lr": 0.08081690326442972,    "weight_decay": 0.03141569844792272,    "batch_size": 1024, "patience": 50},
+        "39": {"lr": 0.0005343529408755926,  "weight_decay": 0.0039375135310659145,  "batch_size": 512,  "patience": 10}
+      }
+    },
+    "Qwen3.6-35B-A3B": {
+      "Syntactic correctness": {
+        "0":  {"lr": 0.003768644057689248,   "weight_decay": 4.927213546281526e-05,  "batch_size": 1024, "patience": 10},
+        "10": {"lr": 0.008139516401402848,   "weight_decay": 0.003413868546809107,   "batch_size": 512,  "patience": 50},
+        "20": {"lr": 0.0033253238247031272,  "weight_decay": 0.04197028759140096,    "batch_size": 512,  "patience": 25},
+        "30": {"lr": 0.001661953421059987,   "weight_decay": 0.029677984888971148,   "batch_size": 256,  "patience": 10},
+        "39": {"lr": 0.0037812878410230914,  "weight_decay": 0.0008506852822933884,  "batch_size": 256,  "patience": 10}
+      },
+      "Semantic correctness": {
+        "0":  {"lr": 0.003125683845504274,   "weight_decay": 1.061784065788334e-05,  "batch_size": 1024, "patience": 50},
+        "10": {"lr": 0.003706750712728356,   "weight_decay": 2.7232131257557303e-05, "batch_size": 512,  "patience": 25},
+        "20": {"lr": 0.01171095754262145,    "weight_decay": 0.00040994094069760864, "batch_size": 1024, "patience": 25},
+        "30": {"lr": 0.0031020007838138183,  "weight_decay": 0.0012156642988666534,  "batch_size": 1024, "patience": 50},
+        "39": {"lr": 0.00018357088988606567, "weight_decay": 1.764474558223875e-05,  "batch_size": 256,  "patience": 50}
+      },
+      "Has regressions": {
+        "0":  {"lr": 0.012377715097120571,   "weight_decay": 0.0005717179042995506,  "batch_size": 256,  "patience": 10},
+        "10": {"lr": 0.000915325260061164,   "weight_decay": 0.018558303793462468,   "batch_size": 256,  "patience": 10},
+        "20": {"lr": 0.0003109928556091418,  "weight_decay": 0.0001907431502002752,  "batch_size": 512,  "patience": 50},
+        "30": {"lr": 0.0018703031136702332,  "weight_decay": 1.1196989005172611e-05, "batch_size": 512,  "patience": 50},
+        "39": {"lr": 0.00025636772672585557, "weight_decay": 1.2132397191028086e-05, "batch_size": 1024, "patience": 10}
+      },
+      "Reduces failures": {
+        "0":  {"lr": 0.011084173395376457,   "weight_decay": 1.0250018693693617e-05, "batch_size": 512,  "patience": 10},
+        "10": {"lr": 0.0018254883000800267,  "weight_decay": 8.983820303543425e-05,  "batch_size": 1024, "patience": 10},
+        "20": {"lr": 0.003390129067302392,   "weight_decay": 0.0001753726853848273,  "batch_size": 1024, "patience": 10},
+        "30": {"lr": 0.0001434990947690135,  "weight_decay": 2.585620028698288e-05,  "batch_size": 256,  "patience": 10},
+        "39": {"lr": 0.00017715097229879204, "weight_decay": 0.001017787373896523,   "batch_size": 256,  "patience": 10}
+      }
+    }
   },
   "Pro": {
     "Laguna-XS2": {
