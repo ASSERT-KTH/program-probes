@@ -683,6 +683,7 @@ def run_eval(
     cache_dir: str = "cache",
     cache_run_id: str | None = None,
     results_dir: str = "results",
+    weights_results_dir: str | None = None,
     probe_arch: str = "linear",
     n_eval_bins: int = 10,
     eval_bin_axis: str = "position",
@@ -692,14 +693,14 @@ def run_eval(
 ) -> None:
     """Evaluate pre-trained probe weights on n_eval_bins bins without retraining.
 
-    Loads weights from results/<weights_run_id>/<probe>/weights.pt, runs forward
-    passes on the test split of the cache, and saves results to
-    results/<output_run_id>/<probe>/results.pt.
+    Loads weights from <weights_results_dir>/<weights_run_id>/<probe>/weights.pt
+    (defaults to results_dir), runs forward passes on the test split of the cache,
+    and saves results to results_dir/<output_run_id>/<probe>/results.pt.
 
     If tool_nll_run_id is given, also computes per-step Spearman correlation between
     tool output NLL and Brier score, saved to results/<output_run_id>/<probe>/nll_corr.pt.
     """
-    weights_path = Path(results_dir) / weights_run_id / probe_name / "weights.pt"
+    weights_path = Path(weights_results_dir or results_dir) / weights_run_id / probe_name / "weights.pt"
     all_weights = torch.load(weights_path, weights_only=False)
 
     edit_step_index = None

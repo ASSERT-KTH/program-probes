@@ -59,6 +59,8 @@ def main():
     eval_p = subparsers.add_parser("eval", help="Evaluate pre-trained weights on n_eval_bins bins (no retraining)")
     eval_p.add_argument("--weights-run-id", default=None,
                         help="Run ID whose weights.pt to load (defaults to --run-id)")
+    eval_p.add_argument("--weights-results-dir", default=None,
+                        help="Results dir to load weights from (defaults to --results-dir)")
     eval_p.add_argument("--output-run-id", required=True,
                         help="Run ID under which to save results.pt")
 
@@ -109,6 +111,7 @@ def main():
             cache_dir=args.cache_dir,
             cache_run_id=cache_run_id,
             results_dir=args.results_dir,
+            weights_results_dir=args.weights_results_dir,
             probe_arch=args.probe_arch,
             n_eval_bins=args.n_eval_bins or 10,
             eval_bin_axis=args.eval_bin_axis,
