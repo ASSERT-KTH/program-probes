@@ -1118,20 +1118,15 @@ def main():
                 n_bins = args.n_bins, x_label = "Relative step bin", suffix = "_step",
             )
 
-    # --- Layer AUC line plots (pooled runs only) ---
+    # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
     print("[fig] AUC vs layer plots...")
-    pooled_ids = args.pooled_run_ids
-    all_run_ids = pooled_ids + (args.shuffled_run_ids or [])
-    all_labels  = (
-        [MODEL_LABELS.get(r.replace("_pooled", ""), r) for r in pooled_ids]
-        + [MODEL_LABELS.get(r.replace("_shuffled", ""), r) + " (shuffled)"
-           for r in (args.shuffled_run_ids or [])]
-    )
+    pooled_ids  = args.pooled_run_ids
+    pool_labels = [MODEL_LABELS.get(_model_key(r), r) for r in pooled_ids]
     for probe in probes:
         plot_layer_auc(
             results_dir = results_dir,
-            run_ids     = all_run_ids,
-            run_labels  = all_labels,
+            run_ids     = pooled_ids,
+            run_labels  = pool_labels,
             probe       = probe,
             layers      = layers,
             figures_dir = figures_dir,
