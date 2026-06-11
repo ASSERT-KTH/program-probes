@@ -92,8 +92,10 @@ PROBE_LABELS = {
 }
 
 MODEL_LABELS = {
-    "laguna_xs2_full":     "Laguna-XS.2",
-    "qwen36_35b_a3b_full": "Qwen3.6-35B-A3B",
+    "laguna_xs2_full":         "Laguna-XS.2",
+    "laguna_xs2_pro_full":     "Laguna-XS.2",
+    "qwen36_35b_a3b_full":     "Qwen3.6-35B-A3B",
+    "qwen36_35b_a3b_pro_full": "Qwen3.6-35B-A3B",
 }
 
 _MODEL_KEYS = list(MODEL_LABELS.keys())
@@ -134,7 +136,8 @@ def plot_generalization_barplot(
     for i, (model_id, model_label) in enumerate(zip(verified_run_ids, model_labels)):
         model_key = "laguna" if "laguna" in model_id else "qwen"
         v_run = (verified_pooled_run_ids or verified_run_ids)[i]
-        p_run = (pro_pooled_run_ids or pro_run_ids)[i] if pro_run_ids else None
+        _pro_list = pro_pooled_run_ids or pro_run_ids
+        p_run = _pro_list[i] if pro_run_ids and i < len(_pro_list) else None
         series.append((f"{model_key}_verified", f"{model_label} (Verified)",
                         verified_results_dir, v_run))
         series.append((f"{model_key}_pro",      f"{model_label} (Pro)",
@@ -811,6 +814,7 @@ def plot_layer_auc(
     layers: list[int],
     figures_dir: Path,
     out_run_id: str,
+    extra_series: list[tuple[Path, str, str]] | None = None,
 ) -> None:
     out_dir = figures_dir / out_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -839,6 +843,17 @@ def plot_layer_auc(
 
         ax.plot(xs, ys, linestyle=ls, marker=marker, markersize=ms,
                 color=color, alpha=alpha, label=label, linewidth=1.4)
+
+    for extra_dir, extra_run_id, extra_label in (extra_series or []):
+        all_res = _load(extra_dir, extra_run_id, probe)
+        if all_res is None:
+            continue
+        layer_aucs = _layer_means(all_res, "test_auc", layers)
+        xs = [l for l in layers if not math.isnan(layer_aucs.get(l, float("nan")))]
+        ys = [layer_aucs[l] for l in xs]
+        color = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
+        ax.plot(xs, ys, linestyle="--", marker="s", markersize=5,
+                color=color, alpha=0.85, label=extra_label, linewidth=1.4)
 
     ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
                linewidth=1.0, label="Random")
@@ -1073,13 +1088,14 @@ def main():
     parser.add_argument("--pro-results-dir", default="results/swebench_pro")
     parser.add_argument(
         "--pro-model-run-ids", nargs="+",
-        default=["laguna_xs2_full", "qwen36_35b_a3b_full"],
+        default=["laguna_xs2_pro_full_pooled"],
     )
     parser.add_argument("--pro-shuffled-run-ids", nargs="+", default=None)
-    parser.add_argument("--pro-pooled-run-ids",   nargs="+", default=None)
+    parser.add_argument("--pro-pooled-run-ids",   nargs="+",
+                        default=["laguna_xs2_pro_full_pooled"])
     # Transfer
     parser.add_argument("--verified-pooled-run-id",  default="laguna_xs2_full_pooled")
-    parser.add_argument("--pro-pooled-run-id",        default="laguna_xs2_full")
+    parser.add_argument("--pro-pooled-run-id",        default="laguna_xs2_pro_full_pooled")
     parser.add_argument("--verified-to-pro-run-id",   default="laguna_xs2_full_verified_transfer")
     parser.add_argument("--pro-to-verified-run-id",   default="laguna_xs2_full_pro_transfer")
     # Lookahead — each variant is "max_k" or "max_k:run_suffix" where run_suffix is appended
@@ -1204,15 +1220,20 @@ def main():
     print("[fig] AUC vs layer plots...")
     pooled_ids  = args.pooled_run_ids
     pool_labels = [MODEL_LABELS.get(_model_key(r), r) for r in pooled_ids]
+    pro_extra   = [
+        (pro_results_dir, r, MODEL_LABELS.get(_model_key(r), r) + " (Pro)")
+        for r in (args.pro_pooled_run_ids or args.pro_model_run_ids or [])
+    ] if pro_results_dir.exists() else []
     for probe in probes:
         plot_layer_auc(
-            results_dir = results_dir,
-            run_ids     = pooled_ids,
-            run_labels  = pool_labels,
-            probe       = probe,
-            layers      = layers,
-            figures_dir = figures_dir,
-            out_run_id  = "combined",
+            results_dir  = results_dir,
+            run_ids      = pooled_ids,
+            run_labels   = pool_labels,
+            probe        = probe,
+            layers       = layers,
+            figures_dir  = figures_dir,
+            out_run_id   = "combined",
+            extra_series = pro_extra or None,
         )
 
     # --- Transfer barplot + table ---
