@@ -750,6 +750,7 @@ def plot_auc_heatmap(
     n_bins: int = 10,
     x_label: str = "Relative position bin",
     suffix: str = "",
+    dataset_label: str = "",
 ) -> None:
     all_res = _load(results_dir, run_id, probe)
     if all_res is None:
@@ -781,7 +782,11 @@ def plot_auc_heatmap(
 
     model_key   = _model_key(run_id)
     probe_label = PROBE_LABELS.get(probe, probe)
-    ax.set_title(f"{probe_label} — {MODEL_LABELS.get(model_key, model_key)}")
+    model_str   = MODEL_LABELS.get(model_key, model_key)
+    title       = f"{probe_label} — {model_str}"
+    if dataset_label:
+        title  += f" ({dataset_label})"
+    ax.set_title(title)
 
     cb = plt.colorbar(im, ax=ax, label="AUC")
     cb.set_ticks([0.5, 0.625, 0.75, 0.875, 1.0])
@@ -883,6 +888,7 @@ def plot_lookahead_horizon(
     figures_dir: Path,
     out_run_id: str,
     filename_suffix: str = "",
+    dataset_label: str = "",
 ) -> None:
     """AUC vs lookahead horizon k (assistant turns) across layers."""
     data: dict[int, list[tuple]] = {l: [] for l in layers}
@@ -940,7 +946,13 @@ def plot_lookahead_horizon(
     ax.set_xlabel("Horizon k (turns)")
     ax.set_ylabel("AUC")
     ax.set_ylim(bottom=0.48)
-    ax.set_title(PROBE_LABELS.get(probe, probe))
+    model_key  = _model_key(run_ids[0]) if run_ids else ""
+    model_str  = MODEL_LABELS.get(model_key, model_key)
+    title      = PROBE_LABELS.get(probe, probe)
+    if model_str or dataset_label:
+        parts  = [s for s in [model_str, dataset_label] if s]
+        title += f" — {', '.join(parts)}"
+    ax.set_title(title)
     ax.margins(x=0.06)
     ax.xaxis.set_major_locator(MaxNLocator(nbins=10, integer=True))
 
@@ -1204,6 +1216,7 @@ def main():
                 results_dir = results_dir, run_id = run_id, probe = probe,
                 layers = layers, figures_dir = figures_dir,
                 n_bins = args.n_bins, x_label = "Relative position bin",
+                dataset_label = "Verified",
             )
 
     # --- AUC heatmaps (step-relative bins) ---
@@ -1214,6 +1227,7 @@ def main():
                 results_dir = results_dir, run_id = run_id, probe = probe,
                 layers = layers, figures_dir = figures_dir,
                 n_bins = args.n_bins, x_label = "Relative step bin", suffix = "_step",
+                dataset_label = "Verified",
             )
 
     # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
@@ -1297,6 +1311,7 @@ def main():
                         figures_dir     = figures_dir,
                         out_run_id      = f"{model_run_id}_pooled",
                         filename_suffix = file_suffix,
+                        dataset_label   = "Verified",
                     )
 
             print(f"[fig] lookahead horizon plots (Pro, {file_suffix})...")
@@ -1312,6 +1327,7 @@ def main():
                         figures_dir     = figures_dir,
                         out_run_id      = f"{model_run_id}_pooled_pro",
                         filename_suffix = f"pro_{file_suffix}",
+                        dataset_label   = "Pro",
                     )
 
     # --- Tool NLL correlation plots ---
