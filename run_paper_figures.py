@@ -2,8 +2,7 @@
 
 Outputs
 -------
-- paper/figures/generalization_barplot.pdf      : Generalisation across models & datasets
-- paper/figures/auc_summary_barplot.pdf         : Main paper figure — best-layer AUC + shuffled
+- paper/figures/auc_summary_barplot.pdf         : Main paper figure — best-layer AUC per model & dataset
 - paper/figures/<run_id>/<probe>_auc_heatmap.pdf
 - paper/figures/<run_id>/<probe>_auc_heatmap_step.pdf
 - paper/figures/<run_id>/<probe>_layer_auc.pdf
@@ -113,7 +112,7 @@ def _layer_label(layer: int) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Generalization barplot  (main paper figure)
+# AUC summary barplot  (main paper figure)
 # ---------------------------------------------------------------------------
 
 def plot_generalization_barplot(
@@ -187,95 +186,6 @@ def plot_generalization_barplot(
     ax.set_ylabel("Best-layer AUC")
     ax.set_ylim(0.45, 1.0)
     ax.legend(handles=legend_handles, ncol=2, loc="upper right")
-    ax.set_title("Probe generalisation across models and datasets")
-
-    figures_dir.mkdir(parents=True, exist_ok=True)
-    out = figures_dir / "generalization_barplot.pdf"
-    fig.savefig(out)
-    plt.close(fig)
-    print(f"  [fig] {out}")
-
-
-# ---------------------------------------------------------------------------
-# AUC summary barplot  (main paper figure — best layer + shuffled)
-# ---------------------------------------------------------------------------
-
-def plot_auc_summary_barplot(
-    results_dir: Path,
-    run_ids: list[str],
-    shuffled_run_ids: list[str],
-    model_labels: list[str],
-    probes: list[str],
-    figures_dir: Path,
-) -> None:
-    """Grouped barplot: best-layer AUC vs shuffled baseline, one group per probe."""
-    n_models  = len(run_ids)
-    # Each model contributes 2 bars: probe + shuffled; small intra-model gap via offsets
-    bar_width  = 0.12
-    pair_gap   = 0.02   # gap between probe and its shuffled bar
-    group_gap  = 0.06   # extra gap between model groups
-    # compute offsets so pairs are centred around each probe's x position
-    pair_width = bar_width * 2 + pair_gap
-    total      = n_models * pair_width + (n_models - 1) * group_gap
-    starts     = [-(total / 2) + i * (pair_width + group_gap) for i in range(n_models)]
-    x          = np.arange(len(probes))
-
-    fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_BAR))
-
-    legend_handles = []
-    for i, (run_id, shuf_id, label) in enumerate(zip(run_ids, shuffled_run_ids, model_labels)):
-        model_key = _model_key(run_id)
-        color     = _style.COLORS["laguna_verified" if "laguna" in run_id else "qwen_verified"]
-        ec        = color
-
-        probe_bars_drawn = False
-        shuf_bars_drawn  = False
-        for pi, probe in enumerate(probes):
-            # Probe bar
-            all_res = _load(results_dir, run_id, probe)
-            if all_res is not None:
-                v = _best_layer_mean(all_res, "test_auc")
-                if not math.isnan(v):
-                    ax.bar(x[pi] + starts[i], v, width=bar_width,
-                           color=color, edgecolor=ec, linewidth=0.6, zorder=3)
-                    probe_bars_drawn = True
-
-            # Shuffled bar
-            shuf_res = _load(results_dir, shuf_id, probe) if shuf_id else None
-            if shuf_res is not None:
-                sv = _best_layer_mean(shuf_res, "test_auc")
-                if not math.isnan(sv):
-                    ax.bar(x[pi] + starts[i] + bar_width + pair_gap, sv,
-                           width=bar_width,
-                           color=_style.COLORS["shuffled"], edgecolor="#757575",
-                           linewidth=0.6, zorder=3)
-                    shuf_bars_drawn = True
-
-        if probe_bars_drawn:
-            legend_handles.append(mpatches.Patch(facecolor=color, edgecolor=ec,
-                                                  linewidth=0.6, label=label))
-        if shuf_bars_drawn and i == 0:
-            legend_handles.append(mpatches.Patch(
-                facecolor=_style.COLORS["shuffled"], edgecolor="#757575",
-                linewidth=0.6, label="Shuffled labels",
-            ))
-
-    ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"],
-               linewidth=1.0, zorder=2)
-    legend_handles.append(plt.Line2D(
-        [0], [0], linestyle="--", color=_style.COLORS["baseline"],
-        linewidth=1.0, label="Random (0.5)",
-    ))
-
-    ax.set_xticks(x)
-    ax.set_xticklabels(
-        [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
-        fontsize=8.5,
-    )
-    ax.set_ylabel("Best-layer AUC")
-    ax.set_ylim(0.45, 1.0)
-    ax.legend(handles=legend_handles, ncol=3, loc="upper right")
-
     figures_dir.mkdir(parents=True, exist_ok=True)
     out = figures_dir / "auc_summary_barplot.pdf"
     fig.savefig(out)
@@ -1123,8 +1033,8 @@ def main():
     probes       = args.probes
     model_labels = [MODEL_LABELS.get(_model_key(r), r) for r in args.model_run_ids]
 
-    # --- Generalization barplot ---
-    print("[fig] generalization barplot...")
+    # --- AUC summary barplot ---
+    print("[fig] AUC summary barplot...")
     plot_generalization_barplot(
         verified_results_dir  = results_dir,
         pro_results_dir       = pro_results_dir,
@@ -1136,17 +1046,6 @@ def main():
         figures_dir           = figures_dir,
         verified_pooled_run_ids = args.pooled_run_ids,
         pro_pooled_run_ids      = args.pro_pooled_run_ids,
-    )
-
-    # --- AUC summary barplot ---
-    print("[fig] AUC summary barplot...")
-    plot_auc_summary_barplot(
-        results_dir    = results_dir,
-        run_ids        = args.pooled_run_ids or args.model_run_ids,
-        shuffled_run_ids = args.shuffled_run_ids,
-        model_labels   = model_labels,
-        probes         = probes,
-        figures_dir    = figures_dir,
     )
 
     # --- Tables ---
