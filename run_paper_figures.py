@@ -838,8 +838,7 @@ def plot_lookahead_horizon(
     ax.text(ks_present[-1], 0.5, "  random", va="top", ha="left",
             fontsize=7, color="#999", transform=ax.transData)
 
-    n_str = f"  (n≈{k_to_n[ks_present[0]]:,})" if ks_present else ""
-    ax.set_xlabel(f"Horizon k (turns){n_str}")
+    ax.set_xlabel("Horizon k (turns)")
     ax.set_ylabel("AUC")
     ax.set_ylim(bottom=0.48)
     ax.set_title(PROBE_LABELS.get(probe, probe))
