@@ -2,39 +2,39 @@
 \centering
 \caption{Test AUC-ROC per probe, model, and benchmark across transformer layers. \textbf{Bold} marks the best layer per row. \emph{Shuffled} uses label-permuted data as a sanity baseline.}
 \label{tab:auc_roc}
-\begin{tabular}{lccccc}
+\begin{tabular}{lcccccc}
 \toprule
- & \multicolumn{4}{c}{AUC-ROC $\uparrow$} & Shuffled \\
-\cmidrule(lr){2-5}
-Probe & 10 & 20 & 30 & 39 & (best layer) \\
+ & \multicolumn{5}{c}{AUC-ROC $\uparrow$} & Shuffled \\
+\cmidrule(lr){2-6}
+Probe & 1 & 11 & 21 & 31 & 40 & (best layer) \\
 \midrule
-\multicolumn{6}{l}{\textsc{SWE-bench Verified}} \\
+\multicolumn{7}{l}{\textsc{SWE-bench Verified}} \\
 \addlinespace[2pt]
-\multicolumn{6}{l}{\quad\textit{laguna_xs2_full_pooled}} \\
-Syntactic correctness & 0.560 & 0.566 & \textbf{0.571} & 0.548 & 0.500 \\
-Semantic correctness & 0.705 & \textbf{0.727} & 0.705 & 0.649 & 0.501 \\
-Reduces failures & 0.682 & \textbf{0.708} & 0.680 & 0.641 & 0.500 \\
-Has regressions & 0.645 & \textbf{0.678} & 0.661 & 0.603 & 0.500 \\
+\multicolumn{7}{l}{\quad\textit{Laguna-XS.2}} \\
+Syntactic correctness & 0.502 & 0.560 & 0.566 & \textbf{0.571} & 0.548 & 0.500 \\
+Semantic correctness & 0.591 & 0.705 & \textbf{0.727} & 0.705 & 0.649 & 0.501 \\
+Reduces failures & 0.615 & 0.682 & \textbf{0.708} & 0.680 & 0.641 & 0.500 \\
+Has regressions & 0.548 & 0.645 & \textbf{0.678} & 0.661 & 0.603 & 0.500 \\
 \addlinespace[3pt]
-\multicolumn{6}{l}{\quad\textit{qwen36_35b_a3b_full_pooled}} \\
-Syntactic correctness & 0.576 & 0.553 & \textbf{0.587} & 0.584 & 0.501 \\
-Semantic correctness & 0.806 & 0.820 & \textbf{0.828} & 0.751 & 0.501 \\
-Reduces failures & 0.796 & 0.807 & \textbf{0.808} & 0.739 & 0.501 \\
-Has regressions & 0.594 & 0.721 & \textbf{0.721} & 0.681 & 0.501 \\
+\multicolumn{7}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & 0.499 & 0.576 & 0.553 & \textbf{0.587} & 0.584 & 0.501 \\
+Semantic correctness & 0.648 & 0.806 & 0.820 & \textbf{0.828} & 0.751 & 0.501 \\
+Reduces failures & 0.646 & 0.796 & 0.807 & \textbf{0.808} & 0.739 & 0.501 \\
+Has regressions & 0.533 & 0.594 & 0.721 & \textbf{0.721} & 0.681 & 0.501 \\
 \midrule
-\multicolumn{6}{l}{\textsc{SWE-bench Pro}} \\
+\multicolumn{7}{l}{\textsc{SWE-bench Pro}} \\
 \addlinespace[2pt]
-\multicolumn{6}{l}{\quad\textit{Laguna-XS2}} \\
-Syntactic correctness & — & — & — & — & — \\
-Semantic correctness & — & — & — & — & — \\
-Reduces failures & — & — & — & — & — \\
-Has regressions & — & — & — & — & — \\
+\multicolumn{7}{l}{\quad\textit{Laguna-XS.2}} \\
+Syntactic correctness & — & — & — & — & — & — \\
+Semantic correctness & — & — & — & — & — & — \\
+Reduces failures & — & — & — & — & — & — \\
+Has regressions & — & — & — & — & — & — \\
 \addlinespace[3pt]
-\multicolumn{6}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
-Syntactic correctness & — & — & — & — & — \\
-Semantic correctness & — & — & — & — & — \\
-Reduces failures & — & — & — & — & — \\
-Has regressions & — & — & — & — & — \\
+\multicolumn{7}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & — & — & — & — & — & — \\
+Semantic correctness & — & — & — & — & — & — \\
+Reduces failures & — & — & — & — & — & — \\
+Has regressions & — & — & — & — & — & — \\
 \bottomrule
 \end{tabular}
 \end{table*}

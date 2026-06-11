@@ -1,6 +1,6 @@
 {
   "Verified": {
-    "Laguna-XS2": {
+    "Laguna-XS.2": {
       "Syntactic correctness": {
         "0":  {"lr": 0.085995781991253,      "weight_decay": 0.0004544525053165965,  "batch_size": 256,  "patience": 10},
         "10": {"lr": 0.0001563870301006489,  "weight_decay": 0.006500616811440741,   "batch_size": 512,  "patience": 50},
@@ -62,7 +62,7 @@
     }
   },
   "Pro": {
-    "Laguna-XS2": {
+    "Laguna-XS.2": {
       "Syntactic correctness": {"lr": 0.0002528899667354841,  "weight_decay": 0.00027521054719050283, "batch_size": 256,  "patience": 50},
       "Semantic correctness":  {"lr": 0.0006160451703789833,  "weight_decay": 0.00517666984834032,    "batch_size": 1024, "patience": 25},
       "Reduces failures":      {"lr": 0.0002310173345942377,  "weight_decay": 0.0040400920896719915,  "batch_size": 256,  "patience": 10},

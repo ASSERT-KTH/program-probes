@@ -1,16 +1,25 @@
 \begin{table}[h]
 \centering
-\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC. Verified sweeps were run independently per probe and per layer; table shows the middle layer (layer 20) as representative. Pro sweeps were run independently per probe.}
+\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC. Verified sweeps were run independently per probe and per layer; table shows the middle probed layer as representative. Pro sweeps were run independently per probe.}
 \label{tab:probe-hparams}
-\begin{tabular}{llrrrr}
+\begin{tabular}{lllrrrr}
 \toprule
-Dataset & Model & Learning rate & Weight decay & Batch size & Patience \\
+Dataset & Model & Probe & Learning rate & Weight decay & Batch size & Patience \\
 \midrule
-\multirow{2}{*}{\textsc{Verified}} & laguna_xs2_full_pooled & — & — & — & — \\
- & qwen36_35b_a3b_full_pooled & — & — & — & — \\
+\multirow{8}{*}{\textsc{Verified}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $8.58 \times 10^{-3}$ & $1.18 \times 10^{-3}$ & 512 & 50 \\
+ &  & Semantic correctness & $5.19 \times 10^{-4}$ & $3.81 \times 10^{-3}$ & 512 & 10 \\
+ &  & Has regressions & $2.95 \times 10^{-2}$ & $5.19 \times 10^{-5}$ & 256 & 50 \\
+ &  & Reduces failures & $2.66 \times 10^{-2}$ & $2.13 \times 10^{-3}$ & 1024 & 50 \\
+ & \multirow{4}{*}{Qwen3.6-35B-A3B} & Syntactic correctness & $3.33 \times 10^{-3}$ & $4.20 \times 10^{-2}$ & 512 & 25 \\
+ &  & Semantic correctness & $1.17 \times 10^{-2}$ & $4.10 \times 10^{-4}$ & 1024 & 25 \\
+ &  & Has regressions & $3.11 \times 10^{-4}$ & $1.91 \times 10^{-4}$ & 512 & 50 \\
+ &  & Reduces failures & $3.39 \times 10^{-3}$ & $1.75 \times 10^{-4}$ & 1024 & 10 \\
 \midrule
-\multirow{2}{*}{\textsc{Pro}} & laguna_xs2_full_pooled & — & — & — & — \\
- & qwen36_35b_a3b_full_pooled & — & — & — & — \\
+\multirow{5}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $2.53 \times 10^{-4}$ & $2.75 \times 10^{-4}$ & 256 & 50 \\
+ &  & Semantic correctness & $6.16 \times 10^{-4}$ & $5.18 \times 10^{-3}$ & 1024 & 25 \\
+ &  & Reduces failures & $2.31 \times 10^{-4}$ & $4.04 \times 10^{-3}$ & 256 & 10 \\
+ &  & Has regressions & $1.51 \times 10^{-4}$ & $3.26 \times 10^{-2}$ & 1024 & 10 \\
+ & Qwen3.6-35B-A3B & & — & — & — & — \\
 \bottomrule
 \end{tabular}
 \end{table}

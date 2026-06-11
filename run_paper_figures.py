@@ -91,9 +91,24 @@ PROBE_LABELS = {
 }
 
 MODEL_LABELS = {
-    "laguna_xs2_full":     "Laguna-XS2",
+    "laguna_xs2_full":     "Laguna-XS.2",
     "qwen36_35b_a3b_full": "Qwen3.6-35B-A3B",
 }
+
+_MODEL_KEYS = list(MODEL_LABELS.keys())
+
+
+def _model_key(run_id: str) -> str:
+    """Strip run-suffix to get the canonical MODEL_LABELS key."""
+    for key in _MODEL_KEYS:
+        if run_id == key or run_id.startswith(key + "_"):
+            return key
+    return run_id
+
+
+def _layer_label(layer: int) -> int:
+    """Convert 0-indexed transformer layer to 1-indexed display label."""
+    return layer + 1
 
 
 # ---------------------------------------------------------------------------
@@ -198,7 +213,7 @@ def build_auc_table(
 ) -> str:
     n_layer_cols = len(layers)
     col_spec     = "l" + "c" * n_layer_cols + "c"
-    layer_header = " & ".join(str(l) for l in layers)
+    layer_header = " & ".join(str(_layer_label(l)) for l in layers)
     n_cols       = 1 + n_layer_cols + 1
 
     lines = [
@@ -263,7 +278,7 @@ def build_auc_table(
             r"\addlinespace[2pt]",
         ]
         for run_id, shuf_id, probe_run_id in zip(run_ids, shuf_ids, probe_run_ids):
-            model_label = MODEL_LABELS.get(run_id, run_id)
+            model_label = MODEL_LABELS.get(_model_key(run_id), run_id)
             block.append(
                 rf"\multicolumn{{{n_cols}}}{{l}}{{\quad\textit{{{model_label}}}}} \\"
             )
@@ -312,7 +327,7 @@ def build_calibration_table(
     pro_pooled_run_ids: list[str] | None = None,
 ) -> str:
     col_spec      = "l" + "cc" * len(layers)
-    layer_header  = " & ".join(rf"\multicolumn{{2}}{{c}}{{Layer {l}}}" for l in layers)
+    layer_header  = " & ".join(rf"\multicolumn{{2}}{{c}}{{Layer {_layer_label(l)}}}" for l in layers)
     sub_header    = " & ".join([r"ECE $\downarrow$ & Brier $\downarrow$"] * len(layers))
     n_metric_cols = len(layers) * 2
     n_cols        = 1 + n_metric_cols
@@ -365,7 +380,7 @@ def build_calibration_table(
             r"\addlinespace[2pt]",
         ]
         for run_id, probe_run_id in zip(run_ids, probe_run_ids):
-            model_label = MODEL_LABELS.get(run_id, run_id)
+            model_label = MODEL_LABELS.get(_model_key(run_id), run_id)
             block.append(
                 rf"\multicolumn{{{n_cols}}}{{l}}{{\quad\textit{{{model_label}}}}} \\"
             )
@@ -494,7 +509,7 @@ def build_hparam_table(
             r"\caption{Chosen hyperparameters for each model and benchmark, "
             r"selected by 20-trial random search maximising mean validation AUC. "
             r"Verified sweeps were run independently per probe and per layer; "
-            r"table shows the middle layer (layer 20) as representative. "
+            r"table shows the middle probed layer as representative. "
             r"Pro sweeps were run independently per probe.}"
         ),
         r"\label{tab:probe-hparams}",
@@ -565,7 +580,7 @@ def build_transfer_table(
 ) -> str:
     n_layer_cols = len(layers)
     col_spec     = "l" + "c" * n_layer_cols
-    layer_header = " & ".join(f"Layer {l}" for l in layers)
+    layer_header = " & ".join(f"Layer {_layer_label(l)}" for l in layers)
 
     def _fmt_delta(delta: float) -> str:
         sign  = "+" if delta >= 0 else "-"
@@ -674,12 +689,12 @@ def plot_auc_heatmap(
         rotation=40, ha="right",
     )
     ax.set_yticks([i + 0.5 for i in range(len(layers))])
-    ax.set_yticklabels([f"Layer {l}" for l in layers])
+    ax.set_yticklabels([f"Layer {_layer_label(l)}" for l in layers])
     ax.set_xlabel(x_label)
     ax.set_ylabel("Layer")
     ax.tick_params(length=0)  # hide tick marks — cells are already delimited
 
-    model_key   = run_id.replace("_shuffled", "").replace("_step_rel", "").replace("_pooled_bineval", "")
+    model_key   = _model_key(run_id)
     probe_label = PROBE_LABELS.get(probe, probe)
     ax.set_title(f"{probe_label} — {MODEL_LABELS.get(model_key, model_key)}")
 
@@ -748,6 +763,7 @@ def plot_layer_auc(
     ax.set_ylabel("Test AUC-ROC")
     ax.set_title(PROBE_LABELS.get(probe, probe))
     ax.set_xticks(layers)
+    ax.set_xticklabels([str(_layer_label(l)) for l in layers])
     ax.legend(fontsize=8)
     ax.set_ylim(bottom=0.45, top=1.0)
 
@@ -815,7 +831,7 @@ def plot_lookahead_horizon(
         ks   = [p[0] for p in pts]
         aucs = [p[1] for p in pts]
         ax.plot(ks, aucs, marker=markers[li % len(markers)], markersize=5,
-                linewidth=1.6, color=color, label=f"Layer {layer}", zorder=3)
+                linewidth=1.6, color=color, label=f"Layer {_layer_label(layer)}", zorder=3)
         ax.annotate(f"L{layer}", xy=(ks[-1], aucs[-1]), xytext=(5, 0),
                     textcoords="offset points", ha="left", va="center",
                     fontsize=8, color=color)
@@ -944,7 +960,7 @@ def main():
     parser.add_argument("--results-dir",  default="results/swebench")
     parser.add_argument("--figures-dir",  default="paper/figures")
     parser.add_argument("--output-dir",   default="paper")
-    parser.add_argument("--layers",       nargs="+", type=int, default=[10, 20, 30, 39])
+    parser.add_argument("--layers",       nargs="+", type=int, default=[0, 10, 20, 30, 39])
     parser.add_argument("--n-bins",       type=int,  default=10)
     parser.add_argument(
         "--probes", nargs="+",
@@ -1017,7 +1033,7 @@ def main():
 
     layers       = args.layers
     probes       = args.probes
-    model_labels = [MODEL_LABELS.get(r, r) for r in args.model_run_ids]
+    model_labels = [MODEL_LABELS.get(_model_key(r), r) for r in args.model_run_ids]
 
     # --- Generalization barplot ---
     print("[fig] generalization barplot...")

@@ -2,33 +2,33 @@
 \centering
 \caption{Cross-dataset transfer AUC-ROC for Laguna-XS2. Gray rows show in-distribution reference performance. Transfer rows show AUC when probe weights trained on one dataset are evaluated on the other; the subscript shows the delta relative to the in-distribution baseline on the \emph{same} evaluation set.}
 \label{tab:transfer}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
- & Layer 10 & Layer 20 & Layer 30 & Layer 39 \\
+ & Layer 1 & Layer 11 & Layer 21 & Layer 31 & Layer 40 \\
 \midrule
-\multicolumn{5}{l}{\textit{Syntactic correctness}} \\
-\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.560} & \textcolor{gray}{\small 0.566} & \textcolor{gray}{\small 0.571} & \textcolor{gray}{\small 0.548} \\
-\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — \\
-\quad Verified $\rightarrow$ Pro & — & — & — & —  \\
-\quad Pro $\rightarrow$ Verified & — & — & — & —  \\
+\multicolumn{6}{l}{\textit{Syntactic correctness}} \\
+\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.502} & \textcolor{gray}{\small 0.560} & \textcolor{gray}{\small 0.566} & \textcolor{gray}{\small 0.571} & \textcolor{gray}{\small 0.548} \\
+\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — & — \\
+\quad Verified $\rightarrow$ Pro & — & — & — & — & —  \\
+\quad Pro $\rightarrow$ Verified & — & — & — & — & —  \\
 \midrule
-\multicolumn{5}{l}{\textit{Semantic correctness}} \\
-\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.705} & \textcolor{gray}{\small 0.727} & \textcolor{gray}{\small 0.705} & \textcolor{gray}{\small 0.649} \\
-\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — \\
-\quad Verified $\rightarrow$ Pro & — & — & — & —  \\
-\quad Pro $\rightarrow$ Verified & — & — & — & —  \\
+\multicolumn{6}{l}{\textit{Semantic correctness}} \\
+\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.591} & \textcolor{gray}{\small 0.705} & \textcolor{gray}{\small 0.727} & \textcolor{gray}{\small 0.705} & \textcolor{gray}{\small 0.649} \\
+\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — & — \\
+\quad Verified $\rightarrow$ Pro & — & — & — & — & —  \\
+\quad Pro $\rightarrow$ Verified & — & — & — & — & —  \\
 \midrule
-\multicolumn{5}{l}{\textit{Reduces failures}} \\
-\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.682} & \textcolor{gray}{\small 0.708} & \textcolor{gray}{\small 0.680} & \textcolor{gray}{\small 0.641} \\
-\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — \\
-\quad Verified $\rightarrow$ Pro & — & — & — & —  \\
-\quad Pro $\rightarrow$ Verified & — & — & — & —  \\
+\multicolumn{6}{l}{\textit{Reduces failures}} \\
+\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.615} & \textcolor{gray}{\small 0.682} & \textcolor{gray}{\small 0.708} & \textcolor{gray}{\small 0.680} & \textcolor{gray}{\small 0.641} \\
+\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — & — \\
+\quad Verified $\rightarrow$ Pro & — & — & — & — & —  \\
+\quad Pro $\rightarrow$ Verified & — & — & — & — & —  \\
 \midrule
-\multicolumn{5}{l}{\textit{Has regressions}} \\
-\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.645} & \textcolor{gray}{\small 0.678} & \textcolor{gray}{\small 0.661} & \textcolor{gray}{\small 0.603} \\
-\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — \\
-\quad Verified $\rightarrow$ Pro & — & — & — & —  \\
-\quad Pro $\rightarrow$ Verified & — & — & — & —  \\
+\multicolumn{6}{l}{\textit{Has regressions}} \\
+\quad\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.548} & \textcolor{gray}{\small 0.645} & \textcolor{gray}{\small 0.678} & \textcolor{gray}{\small 0.661} & \textcolor{gray}{\small 0.603} \\
+\quad\textcolor{gray}{\small In-dist (Pro)} & — & — & — & — & — \\
+\quad Verified $\rightarrow$ Pro & — & — & — & — & —  \\
+\quad Pro $\rightarrow$ Verified & — & — & — & — & —  \\
 \bottomrule
 \end{tabular}
 \end{table*}

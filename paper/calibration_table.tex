@@ -2,39 +2,39 @@
 \centering
 \caption{Calibration metrics (ECE and Brier score) per probe across layers. Lower is better for both metrics.}
 \label{tab:calibration}
-\begin{tabular}{lcccccccc}
+\begin{tabular}{lcccccccccc}
 \toprule
-Probe & \multicolumn{2}{c}{Layer 10} & \multicolumn{2}{c}{Layer 20} & \multicolumn{2}{c}{Layer 30} & \multicolumn{2}{c}{Layer 39} \\
-\cmidrule(lr){2-9}
-& ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
+Probe & \multicolumn{2}{c}{Layer 1} & \multicolumn{2}{c}{Layer 11} & \multicolumn{2}{c}{Layer 21} & \multicolumn{2}{c}{Layer 31} & \multicolumn{2}{c}{Layer 40} \\
+\cmidrule(lr){2-11}
+& ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ & ECE $\downarrow$ & Brier $\downarrow$ \\
 \midrule
-\multicolumn{9}{l}{\textsc{SWE-bench Verified}} \\
+\multicolumn{11}{l}{\textsc{SWE-bench Verified}} \\
 \addlinespace[2pt]
-\multicolumn{9}{l}{\quad\textit{laguna_xs2_full_pooled}} \\
-Syntactic correctness & 0.058 & 0.056 & 0.121 & 0.101 & 0.084 & 0.079 & 0.182 & 0.154 \\
-Semantic correctness & 0.108 & 0.220 & 0.123 & 0.219 & 0.113 & 0.222 & 0.138 & 0.242 \\
-Reduces failures & 0.077 & 0.228 & 0.071 & 0.218 & 0.085 & 0.228 & 0.105 & 0.242 \\
-Has regressions & 0.081 & 0.080 & 0.083 & 0.070 & 0.127 & 0.081 & 0.101 & 0.087 \\
+\multicolumn{11}{l}{\quad\textit{Laguna-XS.2}} \\
+Syntactic correctness & 0.054 & 0.056 & 0.058 & 0.056 & 0.121 & 0.101 & 0.084 & 0.079 & 0.182 & 0.154 \\
+Semantic correctness & 0.117 & 0.250 & 0.108 & 0.220 & 0.123 & 0.219 & 0.113 & 0.222 & 0.138 & 0.242 \\
+Reduces failures & 0.050 & 0.240 & 0.077 & 0.228 & 0.071 & 0.218 & 0.085 & 0.228 & 0.105 & 0.242 \\
+Has regressions & 0.084 & 0.085 & 0.081 & 0.080 & 0.083 & 0.070 & 0.127 & 0.081 & 0.101 & 0.087 \\
 \addlinespace[3pt]
-\multicolumn{9}{l}{\quad\textit{qwen36_35b_a3b_full_pooled}} \\
-Syntactic correctness & 0.027 & 0.040 & 0.069 & 0.044 & 0.064 & 0.043 & 0.165 & 0.146 \\
-Semantic correctness & 0.067 & 0.161 & 0.067 & 0.157 & 0.077 & 0.157 & 0.128 & 0.188 \\
-Reduces failures & 0.057 & 0.169 & 0.066 & 0.167 & 0.085 & 0.171 & 0.111 & 0.196 \\
-Has regressions & 0.050 & 0.045 & 0.035 & 0.045 & 0.036 & 0.050 & 0.043 & 0.054 \\
+\multicolumn{11}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & 0.064 & 0.047 & 0.027 & 0.040 & 0.069 & 0.044 & 0.064 & 0.043 & 0.165 & 0.146 \\
+Semantic correctness & 0.057 & 0.193 & 0.067 & 0.161 & 0.067 & 0.157 & 0.077 & 0.157 & 0.128 & 0.188 \\
+Reduces failures & 0.024 & 0.201 & 0.057 & 0.169 & 0.066 & 0.167 & 0.085 & 0.171 & 0.111 & 0.196 \\
+Has regressions & 0.024 & 0.044 & 0.050 & 0.045 & 0.035 & 0.045 & 0.036 & 0.050 & 0.043 & 0.054 \\
 \midrule
-\multicolumn{9}{l}{\textsc{SWE-bench Pro}} \\
+\multicolumn{11}{l}{\textsc{SWE-bench Pro}} \\
 \addlinespace[2pt]
-\multicolumn{9}{l}{\quad\textit{Laguna-XS2}} \\
-Syntactic correctness & — & — & — & — & — & — & — & — \\
-Semantic correctness & — & — & — & — & — & — & — & — \\
-Reduces failures & — & — & — & — & — & — & — & — \\
-Has regressions & — & — & — & — & — & — & — & — \\
+\multicolumn{11}{l}{\quad\textit{Laguna-XS.2}} \\
+Syntactic correctness & — & — & — & — & — & — & — & — & — & — \\
+Semantic correctness & — & — & — & — & — & — & — & — & — & — \\
+Reduces failures & — & — & — & — & — & — & — & — & — & — \\
+Has regressions & — & — & — & — & — & — & — & — & — & — \\
 \addlinespace[3pt]
-\multicolumn{9}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
-Syntactic correctness & — & — & — & — & — & — & — & — \\
-Semantic correctness & — & — & — & — & — & — & — & — \\
-Reduces failures & — & — & — & — & — & — & — & — \\
-Has regressions & — & — & — & — & — & — & — & — \\
+\multicolumn{11}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+Syntactic correctness & — & — & — & — & — & — & — & — & — & — \\
+Semantic correctness & — & — & — & — & — & — & — & — & — & — \\
+Reduces failures & — & — & — & — & — & — & — & — & — & — \\
+Has regressions & — & — & — & — & — & — & — & — & — & — \\
 \bottomrule
 \end{tabular}
 \end{table*}
