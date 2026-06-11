@@ -1219,7 +1219,7 @@ def main():
     # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
     print("[fig] AUC vs layer plots...")
     pooled_ids  = args.pooled_run_ids
-    pool_labels = [MODEL_LABELS.get(_model_key(r), r) for r in pooled_ids]
+    pool_labels = [MODEL_LABELS.get(_model_key(r), r) + " (Verified)" for r in pooled_ids]
     pro_extra   = [
         (pro_results_dir, r, MODEL_LABELS.get(_model_key(r), r) + " (Pro)")
         for r in (args.pro_pooled_run_ids or args.pro_model_run_ids or [])
