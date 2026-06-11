@@ -510,9 +510,8 @@ def build_hparam_table(
         (
             r"\caption{Chosen hyperparameters for each model and benchmark, "
             r"selected by 20-trial random search maximising mean validation AUC. "
-            r"Verified sweeps were run independently per probe and per layer; "
-            r"table shows the middle probed layer as representative. "
-            r"Pro sweeps were run independently per probe.}"
+            r"Sweeps were run independently per probe and per layer; "
+            r"table shows the middle probed layer as representative.}"
         ),
         r"\label{tab:probe-hparams}",
         rf"\begin{{tabular}}{{{col_spec}}}",
