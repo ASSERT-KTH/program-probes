@@ -1252,24 +1252,27 @@ def build_dataset_stats_table(
     Each config dict: {model_label, dataset_label, gen_stats, results_pt_path, placeholder}.
     """
     caption = (
-        r"Dataset statistics. "
-        r"\#Trajectories counts all agent runs (including those that hit the step limit). "
-        r"\#Tokens is the total number of tokens across all trajectories. "
-        r"Train/Val/Test states are hidden-state positions captured on assistant-generated "
-        r"tokens (stride\,=\,5) for the syntactic-correctness probe, "
-        r"split 80/0.1/19.9\,\%. "
-        r"\#Traj\,$\geq$\,15/50 counts trajectories reaching at least that many turns."
+        r"Dataset statistics per (model, dataset) combination. "
+        r"\#Traj.\ counts all agent runs including those that hit the step limit. "
+        r"\#Tokens is the total token count across all runs. "
+        r"Train, Val, and Test report hidden-state positions (stride $s=5$, "
+        r"70/15/15\,\% split by task) for the syntactic-correctness probe; "
+        r"other probes use the same split. "
+        r"$\geq$15 and $\geq$50 count trajectories reaching those turn thresholds, "
+        r"the length filters used in the lookahead experiments. "
+        r"The $k_{\max}=15$ filter is nearly lossless (90--99\,\% of runs); "
+        r"the $k_{\max}=50$ filter retains 40--60\,\%."
     )
     header = (
-        r"\begin{table}[t]" "\n"
+        r"\begin{table*}[t]" "\n"
         r"\centering" "\n"
         r"\small" "\n"
         r"\caption{" + caption + r"}" "\n"
         r"\label{tab:dataset_stats}" "\n"
         r"\begin{tabular}{llrrrrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & \#Traj. & \#Tokens & \#Train & \#Val & \#Test"
-        r" & $\geq$15 turns & $\geq$50 turns \\" "\n"
+        r"Model & Dataset & \#Traj. & \#Tokens & Train states & Val states & Test states"
+        r" & \#Traj.\ $\geq$15 turns & \#Traj.\ $\geq$50 turns \\" "\n"
         r"\midrule" "\n"
     )
     rows = []
@@ -1307,7 +1310,7 @@ def build_dataset_stats_table(
         "\n"
         r"\bottomrule" "\n"
         r"\end{tabular}" "\n"
-        r"\end{table}"
+        r"\end{table*}"
     )
     tex = header + body + footer
     out_path.parent.mkdir(parents=True, exist_ok=True)
