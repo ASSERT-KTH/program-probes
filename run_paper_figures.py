@@ -1426,7 +1426,7 @@ def main():
     )
     parser.add_argument(
         "--shuffled-run-ids", nargs="+",
-        default=["laguna_xs2_full_shuffled", "qwen36_35b_a3b_full_shuffled"],
+        default=["laguna_xs2_full_pooled_shuffled", "qwen36_35b_a3b_full_pooled_shuffled"],
     )
     parser.add_argument(
         "--step-rel-run-ids", nargs="+",
