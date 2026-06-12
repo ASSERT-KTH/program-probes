@@ -1268,7 +1268,7 @@ def build_dataset_stats_table(
         r"\label{tab:dataset_stats}" "\n"
         r"\begin{tabular}{llrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & \#Traj. & \#Traj.\ $\geq$15 & \#Traj.\ $\geq$50 & \#Tokens \\" "\n"
+        r"Model & Dataset & \#Traj. & $\geq$15 & $\geq$50 & \#Tokens \\" "\n"
         r"\midrule" "\n"
     )
     # Configs are ordered: (model A, Verified), (model A, Pro), (model B, Verified), ...
@@ -1278,7 +1278,8 @@ def build_dataset_stats_table(
     while i < len(configs):
         group = configs[i:i + 2]  # pair of rows for the same model
         model_label = group[0]["model_label"]
-        model_cell  = r"\multirow{2}{*}{\texttt{" + model_label + r"}}"
+        model_short = model_label.split("-")[0]  # "Laguna-XS.2" → "Laguna", "Qwen3.6-35B-A3B" → "Qwen3.6"
+        model_cell  = r"\multirow{2}{*}{\texttt{" + model_short + r"}}"
         first_in_group = True
         for cfg in group:
             ds_short = "Verified" if cfg["dataset_label"] == "Verified" else "Pro"
