@@ -1253,8 +1253,8 @@ def build_dataset_stats_table(
     """
     caption = (
         r"Dataset statistics per (model, dataset) combination. "
-        r"\#Traj.\ counts all agent runs including those that hit the step limit. "
-        r"\#Tokens is the total token count across all runs. "
+        r"\#Traj.\ counts all agent runs by each model on each dataset. "
+        r"\#Tokens is the sum of tokens across all linearized trajectories. "
         r"$\geq$15 and $\geq$50 count trajectories reaching those turn thresholds, "
         r"the length filters used in the lookahead experiments. "
         r"The $k_{\max}=15$ filter is nearly lossless (90--99\,\% of runs); "
