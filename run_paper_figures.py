@@ -1272,11 +1272,19 @@ def build_dataset_stats_table(
         r" & \#Traj.\ $\geq$15 turns & \#Traj.\ $\geq$50 turns \\" "\n"
         r"\midrule" "\n"
     )
+    _DS_LABELS = {
+        "Verified": r"\texttt{SWE-Bench-Verified}",
+        "Pro":      r"\texttt{SWE-Bench-Pro}",
+    }
+
     rows = []
     for cfg in configs:
+        model_cell   = r"\texttt{" + cfg["model_label"] + r"}"
+        dataset_cell = _DS_LABELS.get(cfg["dataset_label"],
+                                      r"\texttt{" + cfg["dataset_label"] + r"}")
         if cfg.get("placeholder"):
             rows.append(
-                f"{cfg['model_label']} & {cfg['dataset_label']} & "
+                f"{model_cell} & {dataset_cell} & "
                 r"\multicolumn{4}{c}{---} \\"
             )
             continue
@@ -1287,7 +1295,7 @@ def build_dataset_stats_table(
         gt50   = sum(1 for s in stats if s["turns"] >= 50)
 
         rows.append(
-            f"{cfg['model_label']} & {cfg['dataset_label']} & "
+            f"{model_cell} & {dataset_cell} & "
             f"{n_traj:,} & {n_tok:,} & {gt15:,} & {gt50:,} \\\\"
         )
 
