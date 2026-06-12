@@ -1292,9 +1292,10 @@ def build_dataset_stats_table(
                 n_tok  = sum(s.get("n_tokens", 0) for s in stats)
                 gt15   = sum(1 for s in stats if s["turns"] >= 15)
                 gt50   = sum(1 for s in stats if s["turns"] >= 50)
+                tok_str = (f"{n_tok/1e9:.1f}B" if n_tok >= 1e9 else f"{n_tok/1e6:.0f}M")
                 rows.append(
                     f"{mc} & {ds_short} & "
-                    f"{n_traj:,} & {gt15:,} & {gt50:,} & {n_tok:,} \\\\"
+                    f"{n_traj:,} & {gt15:,} & {gt50:,} & {tok_str} \\\\"
                 )
         if i + 2 < len(configs):
             rows.append(r"\addlinespace")
