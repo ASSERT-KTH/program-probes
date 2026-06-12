@@ -1214,23 +1214,30 @@ def plot_label_prevalence_heatmap(
             grid[i, j] = prevs.get(probe, np.nan)
 
     fig, ax = plt.subplots(figsize=(max(4.0, 1.3 * n_cols), max(2.5, 0.8 * n_rows)))
-    cmap = plt.cm.RdYlGn
-    im   = ax.imshow(grid, cmap=cmap, vmin=0.0, vmax=1.0, aspect="auto")
-    plt.colorbar(im, ax=ax, label="P(y = 1)")
+    ax.grid(False)
 
-    ax.set_xticks(range(n_cols))
+    norm = mcolors.Normalize(vmin=0.0, vmax=1.0)
+    im   = ax.pcolormesh(grid, cmap="Blues", norm=norm,
+                         linewidth=0.5, edgecolors="white")
+
+    cb = plt.colorbar(im, ax=ax, label="P(y = 1)")
+    cb.ax.tick_params(labelsize=8)
+
+    ax.set_xticks([j + 0.5 for j in range(n_cols)])
     ax.set_xticklabels(col_labels, fontsize=8, ha="right", rotation=30)
-    ax.set_yticks(range(n_rows))
+    ax.set_yticks([i + 0.5 for i in range(n_rows)])
     ax.set_yticklabels(row_labels, fontsize=8)
+    ax.tick_params(length=0)
 
     for i in range(n_rows):
         for j in range(n_cols):
             v = grid[i, j]
             if not math.isnan(v):
-                ax.text(j, i, f"{v:.2f}", ha="center", va="center",
-                        fontsize=8, color="black" if 0.2 < v < 0.8 else "white")
+                ax.text(j + 0.5, i + 0.5, f"{v:.2f}", ha="center", va="center",
+                        fontsize=8, color="white" if v > 0.6 else "black")
             else:
-                ax.text(j, i, "—", ha="center", va="center", fontsize=8, color="#888888")
+                ax.text(j + 0.5, i + 0.5, "—", ha="center", va="center",
+                        fontsize=8, color="#888888")
 
     figures_dir.mkdir(parents=True, exist_ok=True)
     out = figures_dir / "label_prevalence_heatmap.pdf"
