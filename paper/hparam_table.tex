@@ -1,6 +1,6 @@
 \begin{table}[t]
 \centering
-\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC. Verified sweeps were run independently per probe and per layer; table shows the middle probed layer as representative. Pro sweeps were run independently per probe.}
+\caption{Chosen hyperparameters for each model and benchmark, selected by 20-trial random search maximising mean validation AUC. Sweeps were run independently per probe and per layer; table shows the middle probed layer as representative.}
 \label{tab:probe-hparams}
 \begin{tabular}{lllrrrr}
 \toprule
@@ -15,10 +15,10 @@ Dataset & Model & Probe & Learning rate & Weight decay & Batch size & Patience \
  &  & Has regressions & $3.11 \times 10^{-4}$ & $1.91 \times 10^{-4}$ & 512 & 50 \\
  &  & Reduces failures & $3.39 \times 10^{-3}$ & $1.75 \times 10^{-4}$ & 1024 & 10 \\
 \midrule
-\multirow{5}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $2.53 \times 10^{-4}$ & $2.75 \times 10^{-4}$ & 256 & 50 \\
- &  & Semantic correctness & $6.16 \times 10^{-4}$ & $5.18 \times 10^{-3}$ & 1024 & 25 \\
- &  & Reduces failures & $2.31 \times 10^{-4}$ & $4.04 \times 10^{-3}$ & 256 & 10 \\
- &  & Has regressions & $1.51 \times 10^{-4}$ & $3.26 \times 10^{-2}$ & 1024 & 10 \\
+\multirow{5}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $1.40 \times 10^{-3}$ & $3.93 \times 10^{-4}$ & 512 & 25 \\
+ &  & Semantic correctness & $2.09 \times 10^{-4}$ & $6.05 \times 10^{-4}$ & 256 & 25 \\
+ &  & Reduces failures & $1.52 \times 10^{-3}$ & $1.64 \times 10^{-3}$ & 1024 & 50 \\
+ &  & Has regressions & $1.13 \times 10^{-4}$ & $1.49 \times 10^{-2}$ & 1024 & 10 \\
  & Qwen3.6-35B-A3B & & — & — & — & — \\
 \bottomrule
 \end{tabular}

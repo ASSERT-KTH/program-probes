@@ -1045,6 +1045,265 @@ def plot_tool_nll_correlation(
 
 
 # ---------------------------------------------------------------------------
+# Dataset statistics
+# ---------------------------------------------------------------------------
+
+def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> list[dict]:
+    """Return one dict per trajectory JSON: {turns, submitted, instance_id}.
+
+    Results are cached to cache_path (JSON) if provided, to avoid re-reading
+    thousands of files on NFS on every run.
+    """
+    if cache_path and cache_path.exists():
+        return json.loads(cache_path.read_text())
+    records = []
+    for f in gen_dir.glob("*.json"):
+        try:
+            d = json.loads(f.read_text())
+        except Exception:
+            continue
+        turns     = len(d.get("command_history", []))
+        submitted = (d.get("result") or {}).get("exit_status") == "Submitted"
+        records.append({
+            "file":        f.name,
+            "instance_id": (d.get("metadata") or {}).get("instance_id", f.stem),
+            "turns":       turns,
+            "submitted":   submitted,
+        })
+    if cache_path:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(records))
+    return records
+
+
+def _compute_probe_prevalences(label_dir: Path, cache_path: Path | None = None) -> dict[str, float]:
+    """Return P(y=1) per probe from label files in label_dir.
+
+    Skips None labels and the baseline edit (cmd_idx=-1) for probes that
+    define it as always False by construction (reduces_failing, has_regressions).
+    Results are cached to cache_path (JSON) if provided.
+    """
+    if cache_path and cache_path.exists():
+        return json.loads(cache_path.read_text())
+    counts: dict[str, list[int]] = {
+        "currently_compiles":        [],
+        "currently_correct":         [],
+        "currently_reduces_failing": [],
+        "currently_has_regressions": [],
+    }
+    for f in label_dir.glob("*_labels.json"):
+        try:
+            d = json.loads(f.read_text())
+        except Exception:
+            continue
+        edits = d.get("edits", [])
+        # Identify baseline edit (cmd_idx == -1)
+        baseline = next((e for e in edits if e.get("cmd_idx") == -1), None)
+        baseline_failed  = set((baseline.get("test_results") or {}).get("failed", [])) if baseline else set()
+        baseline_passed  = set((baseline.get("test_results") or {}).get("passed", [])) if baseline else set()
+        baseline_n_fail  = len(baseline_failed)
+
+        for edit in edits:
+            cidx = edit.get("cmd_idx")
+
+            # currently_compiles
+            c = edit.get("compiles")
+            if c is not None:
+                counts["currently_compiles"].append(int(bool(c)))
+
+            # currently_correct
+            tr = edit.get("test_results") or {}
+            resolved = tr.get("resolved")
+            if resolved is not None:
+                counts["currently_correct"].append(int(bool(resolved)))
+
+            # reduces_failing: skip baseline (False by construction)
+            if cidx != -1:
+                if edit.get("test_results") is not None:
+                    curr_fail = len(tr.get("failed", []))
+                    counts["currently_reduces_failing"].append(int(curr_fail < baseline_n_fail))
+
+            # has_regressions: skip baseline (False by construction)
+            if cidx != -1:
+                if edit.get("test_results") is not None:
+                    curr_failed_set = set(tr.get("failed", []))
+                    counts["currently_has_regressions"].append(
+                        int(not curr_failed_set.isdisjoint(baseline_passed))
+                    )
+
+    result = {
+        probe: (sum(v) / len(v)) if v else float("nan")
+        for probe, v in counts.items()
+    }
+    if cache_path:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(result))
+    return result
+
+
+def plot_dataset_turns(
+    configs: list[dict],
+    figures_dir: Path,
+) -> None:
+    """Panel A: violin/box plots of trajectory turn counts per (model, dataset).
+
+    Each config dict: {gen_dir, label, color}.
+    """
+    all_turns  = [c["turns"] for c in configs]
+    all_labels = [c["label"] for c in configs]
+    all_colors = [c["color"] for c in configs]
+
+    fig, ax = plt.subplots(figsize=(max(3.5, 1.1 * len(configs)), 3.5))
+
+    for i, (turns, color) in enumerate(zip(all_turns, all_colors), start=1):
+        arr = np.array(turns)
+        if not len(arr):
+            continue
+        if len(arr) >= 50:
+            vp = ax.violinplot([arr], positions=[i], widths=0.6, showmedians=False,
+                               showextrema=False)
+            for body in vp["bodies"]:
+                body.set_facecolor(color)
+                body.set_alpha(0.5)
+        else:
+            bp = ax.boxplot([arr], positions=[i], widths=0.5, patch_artist=True,
+                            medianprops=dict(visible=False), whiskerprops=dict(linewidth=0.8),
+                            capprops=dict(linewidth=0.8), flierprops=dict(markersize=2))
+            for patch in bp["boxes"]:
+                patch.set_facecolor(color)
+                patch.set_alpha(0.5)
+        # Median line
+        med = np.median(arr)
+        ax.hlines(med, i - 0.3, i + 0.3, colors=color, linewidth=1.8, zorder=5)
+
+    ax.axhline(15,  color="#555555", linestyle="--", linewidth=0.9, label="15 turns")
+    ax.axhline(50, color="#222222", linestyle=":",  linewidth=0.9, label="50 turns")
+    ax.set_xticks(range(1, len(all_labels) + 1))
+    ax.set_xticklabels(all_labels, fontsize=8)
+    ax.set_ylabel("Turns")
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.legend(fontsize=7, frameon=False)
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    out = figures_dir / "dataset_turns_barplot.pdf"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  [fig] {out}")
+
+
+def plot_label_prevalence_heatmap(
+    configs: list[dict],
+    probes: list[str],
+    figures_dir: Path,
+) -> None:
+    """Panel B: heatmap of P(y=1) per probe × (model, dataset).
+
+    Each config dict: {label_dir, label} (or label_dir=None for placeholder).
+    Rows = probes, columns = model-dataset combos.
+    """
+    col_labels = [c["label"] for c in configs]
+    row_labels  = [PROBE_LABELS.get(p, p) for p in probes]
+    n_rows, n_cols = len(probes), len(configs)
+    grid = np.full((n_rows, n_cols), np.nan)
+
+    for j, cfg in enumerate(configs):
+        if cfg.get("label_dir") is None:
+            continue
+        prevs = _compute_probe_prevalences(cfg["label_dir"], cache_path=cfg.get("cache_path"))
+        for i, probe in enumerate(probes):
+            grid[i, j] = prevs.get(probe, np.nan)
+
+    fig, ax = plt.subplots(figsize=(max(4.0, 1.3 * n_cols), max(2.5, 0.8 * n_rows)))
+    cmap = plt.cm.RdYlGn
+    im   = ax.imshow(grid, cmap=cmap, vmin=0.0, vmax=1.0, aspect="auto")
+    plt.colorbar(im, ax=ax, label="P(y = 1)")
+
+    ax.set_xticks(range(n_cols))
+    ax.set_xticklabels(col_labels, fontsize=8, ha="right", rotation=30)
+    ax.set_yticks(range(n_rows))
+    ax.set_yticklabels(row_labels, fontsize=8)
+
+    for i in range(n_rows):
+        for j in range(n_cols):
+            v = grid[i, j]
+            if not math.isnan(v):
+                ax.text(j, i, f"{v:.2f}", ha="center", va="center",
+                        fontsize=8, color="black" if 0.2 < v < 0.8 else "white")
+            else:
+                ax.text(j, i, "—", ha="center", va="center", fontsize=8, color="#888888")
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    out = figures_dir / "label_prevalence_heatmap.pdf"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  [fig] {out}")
+
+
+def build_dataset_stats_table(
+    configs: list[dict],
+    probes: list[str],
+    out_path: Path,
+) -> None:
+    """LaTeX table: rows = (model, dataset), columns = tasks / raw runs / completed /
+    token positions / ≥15 turns / ≥50 turns.
+
+    Each config dict: {label, tasks, gen_stats, results_pt_path, placeholder}.
+    """
+    header = (
+        r"\begin{table}[t]" "\n"
+        r"\centering" "\n"
+        r"\small" "\n"
+        r"\caption{Dataset statistics. "
+        r"Token positions are summed across train, val, and test splits "
+        r"for the \texttt{currently\_compiles} probe.}" "\n"
+        r"\label{tab:dataset_stats}" "\n"
+        r"\begin{tabular}{llrrrrrr}" "\n"
+        r"\toprule" "\n"
+        r"Model & Dataset & Tasks & Raw runs & Completed & Token pos. & $\geq$15 turns & $\geq$50 turns \\" "\n"
+        r"\midrule" "\n"
+    )
+    rows = []
+    for cfg in configs:
+        if cfg.get("placeholder"):
+            rows.append(
+                f"{cfg['model_label']} & {cfg['dataset_label']} & "
+                r"\multicolumn{6}{c}{---} \\"
+            )
+            continue
+        stats  = cfg["gen_stats"]
+        raw    = len(stats)
+        compl  = sum(1 for s in stats if s["submitted"])
+        gt15   = sum(1 for s in stats if s["submitted"] and s["turns"] >= 15)
+        gt50   = sum(1 for s in stats if s["submitted"] and s["turns"] >= 50)
+        tasks  = cfg.get("n_tasks", len({s["instance_id"].rsplit("_run", 1)[0] for s in stats}))
+
+        tok_pos = "—"
+        rpt     = cfg.get("results_pt_path")
+        if rpt and Path(rpt).exists():
+            r = torch.load(rpt, weights_only=False)
+            layer   = list(r.keys())[0]
+            res0    = r[layer][0]
+            tok_pos = f"{res0.n_train + res0.n_val + res0.n_test:,}"
+
+        rows.append(
+            f"{cfg['model_label']} & {cfg['dataset_label']} & "
+            f"{tasks:,} & {raw:,} & {compl:,} & {tok_pos} & {gt15:,} & {gt50:,} \\\\"
+        )
+
+    body   = "\n".join(rows)
+    footer = (
+        "\n"
+        r"\bottomrule" "\n"
+        r"\end{tabular}" "\n"
+        r"\end{table}"
+    )
+    tex = header + body + footer
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(tex)
+    print(f"  [tex] {out_path}")
+
+
+# ---------------------------------------------------------------------------
 # Dashboard manifest
 # ---------------------------------------------------------------------------
 
@@ -1062,6 +1321,87 @@ def write_figures_manifest(figures_dir: Path) -> None:
     manifest = figures_dir / "manifest.json"
     manifest.write_text(json.dumps(entries, indent=2))
     print(f"  [manifest] {manifest} ({len(entries)} figures)")
+
+
+# ---------------------------------------------------------------------------
+# Dataset statistics orchestration
+# ---------------------------------------------------------------------------
+
+def _generate_dataset_stats(
+    args,
+    results_dir: Path,
+    pro_results_dir: Path,
+    figures_dir: Path,
+    out_dir: Path,
+    probes: list[str],
+) -> None:
+    print("[fig/table] dataset statistics...")
+    gen_root    = Path(args.generations_dir)
+    label_root  = Path(args.labels_dir)
+    cache_dir   = Path(args.dataset_stats_cache_dir)
+
+    _verified_color = _style.COLORS.get("laguna_verified", "#1565C0")
+    _pro_color      = _style.COLORS.get("laguna_pro",      "#64B5F6")
+    _qwen_color     = _style.COLORS.get("qwen_verified",   "#BF360C")
+    _qwen_pro_color = _style.COLORS.get("qwen_pro",        "#FF8A65")
+
+    _ds_entries = [
+        # (model_run_id, dataset_slug, model_label, dataset_label, color, placeholder)
+        ("laguna_xs2_full",     "swebench",     "Laguna-XS.2",     "Verified", _verified_color, False),
+        ("qwen36_35b_a3b_full", "swebench",     "Qwen3.6-35B-A3B", "Verified", _qwen_color,     False),
+        ("laguna_xs2_full",     "swebench_pro", "Laguna-XS.2",     "Pro",      _pro_color,      False),
+        ("qwen36_35b_a3b_full", "swebench_pro", "Qwen3.6-35B-A3B", "Pro",      _qwen_pro_color, True),
+    ]
+
+    ds_configs_turns: list[dict] = []
+    ds_configs_prev:  list[dict] = []
+    ds_configs_stats: list[dict] = []
+
+    for model_run_id, dataset_slug, model_lbl, ds_lbl, color, placeholder in _ds_entries:
+        slug       = f"{dataset_slug}__{model_run_id}"
+        gen_dir    = gen_root   / dataset_slug / model_run_id
+        label_dir  = label_root / dataset_slug / model_run_id
+        pooled_id  = (
+            f"{model_run_id.replace('_full', '_pro_full')}_pooled"
+            if dataset_slug == "swebench_pro"
+            else f"{model_run_id}_pooled"
+        )
+        rpt = (results_dir     / pooled_id / "currently_compiles" / "results.pt"
+               if dataset_slug == "swebench"
+               else pro_results_dir / pooled_id / "currently_compiles" / "results.pt")
+
+        label_str = f"{model_lbl}\n({ds_lbl})"
+        if not placeholder and gen_dir.exists():
+            gen_stats = _load_generation_stats(
+                gen_dir,
+                cache_path=cache_dir / f"gen_stats__{slug}.json",
+            )
+        else:
+            gen_stats = []
+        turns = [s["turns"] for s in gen_stats if s["submitted"]]
+
+        ld = label_dir if (not placeholder and label_dir.exists()) else None
+        ds_configs_turns.append({"label": label_str, "turns": turns, "color": color})
+        ds_configs_prev.append({
+            "label":     label_str,
+            "label_dir": ld,
+            "cache_path": cache_dir / f"prevalences__{slug}.json" if ld else None,
+        })
+        ds_configs_stats.append({
+            "model_label":    model_lbl,
+            "dataset_label":  ds_lbl,
+            "placeholder":    placeholder,
+            "gen_stats":      gen_stats,
+            "results_pt_path": str(rpt),
+        })
+
+    if any(c["turns"] for c in ds_configs_turns):
+        plot_dataset_turns(ds_configs_turns, figures_dir)
+    plot_label_prevalence_heatmap(ds_configs_prev, probes, figures_dir)
+    build_dataset_stats_table(
+        ds_configs_stats, probes,
+        out_path=out_dir / "dataset_stats_table.tex",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1143,6 +1483,15 @@ def main():
     # Hyperparameter table
     parser.add_argument("--hparams-file", default="paper/hparams.json",
                         help="JSON file with chosen HP values per model × dataset.")
+    # Dataset statistics
+    parser.add_argument("--generations-dir", default="generations",
+                        help="Root directory for trajectory JSONs.")
+    parser.add_argument("--labels-dir", default="labels",
+                        help="Root directory for label JSON files.")
+    parser.add_argument("--dataset-stats-cache-dir", default="paper/cache",
+                        help="Directory for caching generation/label stats (avoids re-reading NFS files).")
+    parser.add_argument("--no-dataset-stats", action="store_true",
+                        help="Skip dataset statistics figures and table.")
     # Tool NLL
     parser.add_argument("--tool-nll-run-id", default=None,
                         help="Run ID whose nll_corr.pt to use for tool-NLL correlation figures.")
@@ -1393,8 +1742,13 @@ def main():
                 filename_suffix = args.tool_nll_filename_suffix,
             )
 
+    # --- Dataset statistics ---
+    if args.no_dataset_stats:
+        print("[skip] dataset statistics (--no-dataset-stats)")
+    else:
+        _generate_dataset_stats(args, results_dir, pro_results_dir, figures_dir, out_dir, probes)
+
     # --- Dashboard manifest ---
-    print("[manifest] writing figures manifest...")
     write_figures_manifest(figures_dir)
 
     print("[done]")
