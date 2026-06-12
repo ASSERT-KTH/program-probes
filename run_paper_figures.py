@@ -1255,23 +1255,20 @@ def build_dataset_stats_table(
         r"Dataset statistics per (model, dataset) combination. "
         r"\#Traj.\ counts all agent runs including those that hit the step limit. "
         r"\#Tokens is the total token count across all runs. "
-        r"Train, Val, and Test report hidden-state positions (stride $s=5$, "
-        r"70/15/15\,\% split by task) for the syntactic-correctness probe; "
-        r"other probes use the same split. "
         r"$\geq$15 and $\geq$50 count trajectories reaching those turn thresholds, "
         r"the length filters used in the lookahead experiments. "
         r"The $k_{\max}=15$ filter is nearly lossless (90--99\,\% of runs); "
         r"the $k_{\max}=50$ filter retains 40--60\,\%."
     )
     header = (
-        r"\begin{table*}[t]" "\n"
+        r"\begin{table}[t]" "\n"
         r"\centering" "\n"
         r"\small" "\n"
         r"\caption{" + caption + r"}" "\n"
         r"\label{tab:dataset_stats}" "\n"
-        r"\begin{tabular}{llrrrrrrr}" "\n"
+        r"\begin{tabular}{llrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & \#Traj. & \#Tokens & Train states & Val states & Test states"
+        r"Model & Dataset & \#Traj. & \#Tokens"
         r" & \#Traj.\ $\geq$15 turns & \#Traj.\ $\geq$50 turns \\" "\n"
         r"\midrule" "\n"
     )
@@ -1280,29 +1277,18 @@ def build_dataset_stats_table(
         if cfg.get("placeholder"):
             rows.append(
                 f"{cfg['model_label']} & {cfg['dataset_label']} & "
-                r"\multicolumn{7}{c}{---} \\"
+                r"\multicolumn{4}{c}{---} \\"
             )
             continue
-        stats   = cfg["gen_stats"]
-        n_traj  = len(stats)
-        n_tok   = sum(s.get("n_tokens", 0) for s in stats)
-        gt15    = sum(1 for s in stats if s["turns"] >= 15)
-        gt50    = sum(1 for s in stats if s["turns"] >= 50)
-
-        n_train = n_val = n_test = "—"
-        rpt = cfg.get("results_pt_path")
-        if rpt and Path(rpt).exists():
-            r      = torch.load(rpt, weights_only=False)
-            layer  = list(r.keys())[0]
-            res0   = r[layer][0]
-            n_train = f"{res0.n_train:,}"
-            n_val   = f"{res0.n_val:,}"
-            n_test  = f"{res0.n_test:,}"
+        stats  = cfg["gen_stats"]
+        n_traj = len(stats)
+        n_tok  = sum(s.get("n_tokens", 0) for s in stats)
+        gt15   = sum(1 for s in stats if s["turns"] >= 15)
+        gt50   = sum(1 for s in stats if s["turns"] >= 50)
 
         rows.append(
             f"{cfg['model_label']} & {cfg['dataset_label']} & "
-            f"{n_traj:,} & {n_tok:,} & {n_train} & {n_val} & {n_test}"
-            f" & {gt15:,} & {gt50:,} \\\\"
+            f"{n_traj:,} & {n_tok:,} & {gt15:,} & {gt50:,} \\\\"
         )
 
     body   = "\n".join(rows)
@@ -1310,7 +1296,7 @@ def build_dataset_stats_table(
         "\n"
         r"\bottomrule" "\n"
         r"\end{tabular}" "\n"
-        r"\end{table*}"
+        r"\end{table}"
     )
     tex = header + body + footer
     out_path.parent.mkdir(parents=True, exist_ok=True)
