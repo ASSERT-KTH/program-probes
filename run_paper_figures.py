@@ -1049,7 +1049,7 @@ def plot_tool_nll_correlation(
 # ---------------------------------------------------------------------------
 
 def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> list[dict]:
-    """Return one dict per trajectory JSON: {turns, submitted, instance_id}.
+    """Return one dict per trajectory JSON: {turns, n_tokens, instance_id}.
 
     Results are cached to cache_path (JSON) if provided, to avoid re-reading
     thousands of files on NFS on every run.
@@ -1062,13 +1062,13 @@ def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> lis
             d = json.loads(f.read_text())
         except Exception:
             continue
-        turns     = len(d.get("command_history", []))
-        submitted = (d.get("result") or {}).get("exit_status") == "Submitted"
+        turns    = len(d.get("command_history", []))
+        n_tokens = len((d.get("tokenization") or {}).get("token_ids", []))
         records.append({
             "file":        f.name,
             "instance_id": (d.get("metadata") or {}).get("instance_id", f.stem),
             "turns":       turns,
-            "submitted":   submitted,
+            "n_tokens":    n_tokens,
         })
     if cache_path:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1244,22 +1244,32 @@ def build_dataset_stats_table(
     probes: list[str],
     out_path: Path,
 ) -> None:
-    """LaTeX table: rows = (model, dataset), columns = tasks / raw runs / completed /
-    token positions / ≥15 turns / ≥50 turns.
+    """LaTeX table: rows = (model, dataset), columns = #trajectories / #tokens /
+    #train states / #val states / #test states / ≥15 turns / ≥50 turns.
 
-    Each config dict: {label, tasks, gen_stats, results_pt_path, placeholder}.
+    States are hidden-state captures at assistant-generated tokens with stride=5
+    for the currently_compiles probe, split into train/val/test.
+    Each config dict: {model_label, dataset_label, gen_stats, results_pt_path, placeholder}.
     """
+    caption = (
+        r"Dataset statistics. "
+        r"\#Trajectories counts all agent runs (including those that hit the step limit). "
+        r"\#Tokens is the total number of tokens across all trajectories. "
+        r"Train/Val/Test states are hidden-state positions captured on assistant-generated "
+        r"tokens (stride\,=\,5) for the syntactic-correctness probe, "
+        r"split 80/0.1/19.9\,\%. "
+        r"\#Traj\,$\geq$\,15/50 counts trajectories reaching at least that many turns."
+    )
     header = (
         r"\begin{table}[t]" "\n"
         r"\centering" "\n"
         r"\small" "\n"
-        r"\caption{Dataset statistics. "
-        r"Token positions are summed across train, val, and test splits "
-        r"for the \texttt{currently\_compiles} probe.}" "\n"
+        r"\caption{" + caption + r"}" "\n"
         r"\label{tab:dataset_stats}" "\n"
-        r"\begin{tabular}{llrrrrrr}" "\n"
+        r"\begin{tabular}{llrrrrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & Tasks & Raw runs & Completed & Token pos. & $\geq$15 turns & $\geq$50 turns \\" "\n"
+        r"Model & Dataset & \#Traj. & \#Tokens & \#Train & \#Val & \#Test"
+        r" & $\geq$15 turns & $\geq$50 turns \\" "\n"
         r"\midrule" "\n"
     )
     rows = []
@@ -1267,27 +1277,29 @@ def build_dataset_stats_table(
         if cfg.get("placeholder"):
             rows.append(
                 f"{cfg['model_label']} & {cfg['dataset_label']} & "
-                r"\multicolumn{6}{c}{---} \\"
+                r"\multicolumn{7}{c}{---} \\"
             )
             continue
-        stats  = cfg["gen_stats"]
-        raw    = len(stats)
-        compl  = sum(1 for s in stats if s["submitted"])
-        gt15   = sum(1 for s in stats if s["submitted"] and s["turns"] >= 15)
-        gt50   = sum(1 for s in stats if s["submitted"] and s["turns"] >= 50)
-        tasks  = cfg.get("n_tasks", len({s["instance_id"].rsplit("_run", 1)[0] for s in stats}))
+        stats   = cfg["gen_stats"]
+        n_traj  = len(stats)
+        n_tok   = sum(s.get("n_tokens", 0) for s in stats)
+        gt15    = sum(1 for s in stats if s["turns"] >= 15)
+        gt50    = sum(1 for s in stats if s["turns"] >= 50)
 
-        tok_pos = "—"
-        rpt     = cfg.get("results_pt_path")
+        n_train = n_val = n_test = "—"
+        rpt = cfg.get("results_pt_path")
         if rpt and Path(rpt).exists():
-            r = torch.load(rpt, weights_only=False)
-            layer   = list(r.keys())[0]
-            res0    = r[layer][0]
-            tok_pos = f"{res0.n_train + res0.n_val + res0.n_test:,}"
+            r      = torch.load(rpt, weights_only=False)
+            layer  = list(r.keys())[0]
+            res0   = r[layer][0]
+            n_train = f"{res0.n_train:,}"
+            n_val   = f"{res0.n_val:,}"
+            n_test  = f"{res0.n_test:,}"
 
         rows.append(
             f"{cfg['model_label']} & {cfg['dataset_label']} & "
-            f"{tasks:,} & {raw:,} & {compl:,} & {tok_pos} & {gt15:,} & {gt50:,} \\\\"
+            f"{n_traj:,} & {n_tok:,} & {n_train} & {n_val} & {n_test}"
+            f" & {gt15:,} & {gt50:,} \\\\"
         )
 
     body   = "\n".join(rows)
@@ -1378,7 +1390,7 @@ def _generate_dataset_stats(
             )
         else:
             gen_stats = []
-        turns = [s["turns"] for s in gen_stats if s["submitted"]]
+        turns = [s["turns"] for s in gen_stats]
 
         ld = label_dir if (not placeholder and label_dir.exists()) else None
         ds_configs_turns.append({"label": label_str, "turns": turns, "color": color})
