@@ -1268,36 +1268,37 @@ def build_dataset_stats_table(
         r"\label{tab:dataset_stats}" "\n"
         r"\begin{tabular}{llrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & \#Traj. & \#Tokens"
-        r" & \#Traj.\ $\geq$15 turns & \#Traj.\ $\geq$50 turns \\" "\n"
+        r"Model & Dataset & \#Traj. & \#Traj.\ $\geq$15 & \#Traj.\ $\geq$50 & \#Tokens \\" "\n"
         r"\midrule" "\n"
     )
-    _DS_LABELS = {
-        "Verified": r"\texttt{SWE-Bench-Verified}",
-        "Pro":      r"\texttt{SWE-Bench-Pro}",
-    }
-
+    # Configs are ordered: (model A, Verified), (model A, Pro), (model B, Verified), ...
+    # Emit \multirow for the model name spanning its two dataset rows.
     rows = []
-    for cfg in configs:
-        model_cell   = r"\texttt{" + cfg["model_label"] + r"}"
-        dataset_cell = _DS_LABELS.get(cfg["dataset_label"],
-                                      r"\texttt{" + cfg["dataset_label"] + r"}")
-        if cfg.get("placeholder"):
-            rows.append(
-                f"{model_cell} & {dataset_cell} & "
-                r"\multicolumn{4}{c}{---} \\"
-            )
-            continue
-        stats  = cfg["gen_stats"]
-        n_traj = len(stats)
-        n_tok  = sum(s.get("n_tokens", 0) for s in stats)
-        gt15   = sum(1 for s in stats if s["turns"] >= 15)
-        gt50   = sum(1 for s in stats if s["turns"] >= 50)
-
-        rows.append(
-            f"{model_cell} & {dataset_cell} & "
-            f"{n_traj:,} & {n_tok:,} & {gt15:,} & {gt50:,} \\\\"
-        )
+    i = 0
+    while i < len(configs):
+        group = configs[i:i + 2]  # pair of rows for the same model
+        model_label = group[0]["model_label"]
+        model_cell  = r"\multirow{2}{*}{\texttt{" + model_label + r"}}"
+        first_in_group = True
+        for cfg in group:
+            ds_short = "Verified" if cfg["dataset_label"] == "Verified" else "Pro"
+            mc = model_cell if first_in_group else ""
+            first_in_group = False
+            if cfg.get("placeholder"):
+                rows.append(f"{mc} & {ds_short} & " + r"\multicolumn{4}{c}{---} \\")
+            else:
+                stats  = cfg["gen_stats"]
+                n_traj = len(stats)
+                n_tok  = sum(s.get("n_tokens", 0) for s in stats)
+                gt15   = sum(1 for s in stats if s["turns"] >= 15)
+                gt50   = sum(1 for s in stats if s["turns"] >= 50)
+                rows.append(
+                    f"{mc} & {ds_short} & "
+                    f"{n_traj:,} & {gt15:,} & {gt50:,} & {n_tok:,} \\\\"
+                )
+        if i + 2 < len(configs):
+            rows.append(r"\addlinespace")
+        i += 2
 
     body   = "\n".join(rows)
     footer = (
@@ -1357,8 +1358,8 @@ def _generate_dataset_stats(
     _ds_entries = [
         # (model_run_id, dataset_slug, model_label, dataset_label, color, placeholder)
         ("laguna_xs2_full",     "swebench",     "Laguna-XS.2",     "Verified", _verified_color, False),
-        ("qwen36_35b_a3b_full", "swebench",     "Qwen3.6-35B-A3B", "Verified", _qwen_color,     False),
         ("laguna_xs2_full",     "swebench_pro", "Laguna-XS.2",     "Pro",      _pro_color,      False),
+        ("qwen36_35b_a3b_full", "swebench",     "Qwen3.6-35B-A3B", "Verified", _qwen_color,     False),
         ("qwen36_35b_a3b_full", "swebench_pro", "Qwen3.6-35B-A3B", "Pro",      _qwen_pro_color, True),
     ]
 
