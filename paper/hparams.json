@@ -92,6 +92,35 @@
         "39": {"lr": 0.00017975627605562524, "weight_decay": 0.006011622733416447,   "batch_size": 1024, "patience": 25}
       }
     },
-    "Qwen3.6-35B-A3B": null
+    "Qwen3.6-35B-A3B": {
+      "Syntactic correctness": {
+        "0":  {"lr": 0.000156203654686611,   "weight_decay": 7.47362222314755e-05,   "batch_size": 512,  "patience": 10},
+        "10": {"lr": 0.0003249552377528427,  "weight_decay": 4.311754454139206e-05,  "batch_size": 256,  "patience": 25},
+        "20": {"lr": 0.00023034294294517176, "weight_decay": 1.4590938995742986e-05, "batch_size": 512,  "patience": 10},
+        "30": {"lr": 0.0001167923252935202,  "weight_decay": 1.6573792520408466e-05, "batch_size": 256,  "patience": 10},
+        "39": {"lr": 0.0004381588811908371,  "weight_decay": 0.007600185082058473,   "batch_size": 1024, "patience": 50}
+      },
+      "Semantic correctness": {
+        "0":  {"lr": 0.004584826623532229,   "weight_decay": 2.890791560448648e-05,  "batch_size": 512,  "patience": 10},
+        "10": {"lr": 0.00047207651209002694, "weight_decay": 4.862281081965527e-05,  "batch_size": 512,  "patience": 10},
+        "20": {"lr": 0.0004152559324263563,  "weight_decay": 0.0002271597094157307,  "batch_size": 1024, "patience": 10},
+        "30": {"lr": 0.00021489339313494129, "weight_decay": 1.860652588989379e-05,  "batch_size": 512,  "patience": 10},
+        "39": {"lr": 0.00015569885920222647, "weight_decay": 0.005976401781067226,   "batch_size": 256,  "patience": 50}
+      },
+      "Has regressions": {
+        "0":  {"lr": 0.02427934339709243,    "weight_decay": 1.2135034536071326e-05, "batch_size": 512,  "patience": 25},
+        "10": {"lr": 0.00041531044477290753, "weight_decay": 2.1088302455593535e-05, "batch_size": 256,  "patience": 50},
+        "20": {"lr": 0.002735917699190827,   "weight_decay": 0.00020002893950403315, "batch_size": 512,  "patience": 50},
+        "30": {"lr": 0.0014673691605666536,  "weight_decay": 0.00011083679319364298, "batch_size": 256,  "patience": 25},
+        "39": {"lr": 0.0002122748351965436,  "weight_decay": 0.0016320931293355616,  "batch_size": 1024, "patience": 10}
+      },
+      "Reduces failures": {
+        "0":  {"lr": 0.00046748455814782266, "weight_decay": 3.0110339178779343e-05, "batch_size": 256,  "patience": 25},
+        "10": {"lr": 0.0028216236009434167,  "weight_decay": 2.3493523397271992e-05, "batch_size": 512,  "patience": 25},
+        "20": {"lr": 0.001260535584389758,   "weight_decay": 8.971124973134079e-05,  "batch_size": 1024, "patience": 50},
+        "30": {"lr": 0.003268496889917597,   "weight_decay": 0.00021768801463130797, "batch_size": 1024, "patience": 25},
+        "39": {"lr": 0.0006516974422144963,  "weight_decay": 0.0022711238349527743,  "batch_size": 1024, "patience": 50}
+      }
+    }
   }
 }

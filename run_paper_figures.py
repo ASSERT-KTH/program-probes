@@ -579,73 +579,82 @@ def plot_transfer_barplot(
     pro_results_dir: Path,
     probes: list[str],
     figures_dir: Path,
-    verified_pooled_run_id: str = "laguna_xs2_full_pooled",
-    pro_pooled_run_id: str = "laguna_xs2_full",
-    verified_to_pro_run_id: str = "laguna_xs2_full_verified_transfer",
-    pro_to_verified_run_id: str = "laguna_xs2_full_pro_transfer",
+    model_labels: list[str],
+    verified_pooled_run_ids: list[str],
+    pro_pooled_run_ids: list[str],
+    verified_to_pro_run_ids: list[str],
+    pro_to_verified_run_ids: list[str],
 ) -> None:
-    """Grouped barplot: in-dist vs transfer AUC (best layer) per probe."""
+    """Grouped barplot: in-dist vs transfer AUC (best layer) per probe, one subplot per model."""
     def _best(res_dir: Path, run_id: str, probe: str) -> float:
         res = _load(res_dir, run_id, probe)
         return _best_layer_mean(res, "test_auc") if res is not None else float("nan")
 
-    color_v  = _style.COLORS["laguna_verified"]
-    color_p  = "#5C6BC0"   # indigo — distinguishes Pro in-dist from Verified
-    gray     = "#BDBDBD"
-    gray_p   = "#9E9E9E"
-
+    n_models  = len(model_labels)
     bar_width = 0.14
     pair_gap  = 0.02
     group_gap = 0.08
-    # Two pairs per probe: [in-dist V | V→P] and [in-dist P | P→V]
-    pair_w = bar_width * 2 + pair_gap
-    total  = 2 * pair_w + group_gap
-    left   = -(total / 2)
-    offsets = {
-        "indist_v":  left,
-        "vp":        left + bar_width + pair_gap,
-        "indist_p":  left + pair_w + group_gap,
-        "pv":        left + pair_w + group_gap + bar_width + pair_gap,
+    pair_w    = bar_width * 2 + pair_gap
+    total     = 2 * pair_w + group_gap
+    left      = -(total / 2)
+    offsets   = {
+        "indist_v": left,
+        "vp":       left + bar_width + pair_gap,
+        "indist_p": left + pair_w + group_gap,
+        "pv":       left + pair_w + group_gap + bar_width + pair_gap,
     }
 
-    x   = np.arange(len(probes))
-    fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_BAR))
+    fig, axes = plt.subplots(n_models, 1,
+                             figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_BAR * n_models),
+                             squeeze=False)
 
-    for pi, probe in enumerate(probes):
-        v_auc  = _best(verified_results_dir, verified_pooled_run_id,  probe)
-        p_auc  = _best(pro_results_dir,      pro_pooled_run_id,       probe)
-        vp_auc = _best(pro_results_dir,      verified_to_pro_run_id,  probe)
-        pv_auc = _best(verified_results_dir, pro_to_verified_run_id,  probe)
+    x = np.arange(len(probes))
+    for row, (model_label, v_pooled, p_pooled, vp_id, pv_id) in enumerate(zip(
+        model_labels, verified_pooled_run_ids, pro_pooled_run_ids,
+        verified_to_pro_run_ids, pro_to_verified_run_ids,
+    )):
+        ax         = axes[row, 0]
+        model_slug = "laguna" if "laguna" in v_pooled else "qwen"
+        color_v    = _style.COLORS[f"{model_slug}_verified"]
+        color_p    = _style.COLORS[f"{model_slug}_pro"]
+        gray       = "#BDBDBD"
+        gray_p     = "#9E9E9E"
 
-        for val, offset, color, ec in [
-            (v_auc,  offsets["indist_v"], gray,    "#9E9E9E"),
-            (vp_auc, offsets["vp"],       color_v, color_v),
-            (p_auc,  offsets["indist_p"], gray_p,  "#757575"),
-            (pv_auc, offsets["pv"],       color_p, color_p),
-        ]:
-            if not math.isnan(val):
-                ax.bar(x[pi] + offset, val, width=bar_width,
-                       color=color, edgecolor=ec, linewidth=0.6, zorder=3)
+        for pi, probe in enumerate(probes):
+            v_auc  = _best(verified_results_dir, v_pooled, probe)
+            p_auc  = _best(pro_results_dir,      p_pooled, probe)
+            vp_auc = _best(pro_results_dir,      vp_id,   probe)
+            pv_auc = _best(verified_results_dir, pv_id,   probe)
 
-    ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"],
-               linewidth=1.0, zorder=2)
+            for val, offset, color, ec in [
+                (v_auc,  offsets["indist_v"], gray,    "#9E9E9E"),
+                (vp_auc, offsets["vp"],       color_v, color_v),
+                (p_auc,  offsets["indist_p"], gray_p,  "#757575"),
+                (pv_auc, offsets["pv"],       color_p, color_p),
+            ]:
+                if not math.isnan(val):
+                    ax.bar(x[pi] + offset, val, width=bar_width,
+                           color=color, edgecolor=ec, linewidth=0.6, zorder=3)
 
-    legend_handles = [
-        mpatches.Patch(facecolor=gray,    edgecolor="#9E9E9E", linewidth=0.6, label="In-dist (Verified)"),
-        mpatches.Patch(facecolor=color_v, edgecolor=color_v,  linewidth=0.6, label="Verified → Pro"),
-        mpatches.Patch(facecolor=gray_p,  edgecolor="#757575", linewidth=0.6, label="In-dist (Pro)"),
-        mpatches.Patch(facecolor=color_p, edgecolor=color_p,  linewidth=0.6, label="Pro → Verified"),
-        plt.Line2D([0], [0], linestyle="--", color=_style.COLORS["baseline"],
-                   linewidth=1.0, label="Random (0.5)"),
-    ]
-    ax.set_xticks(x)
-    ax.set_xticklabels(
-        [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
-        fontsize=8.5,
-    )
-    ax.set_ylabel("Best-layer AUC")
-    ax.set_ylim(0.45, 1.0)
-    ax.legend(handles=legend_handles, ncol=3, loc="upper right")
+        ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"],
+                   linewidth=1.0, zorder=2)
+        legend_handles = [
+            mpatches.Patch(facecolor=gray,    edgecolor="#9E9E9E", linewidth=0.6, label="In-dist (Verified)"),
+            mpatches.Patch(facecolor=color_v, edgecolor=color_v,  linewidth=0.6, label="Verified → Pro"),
+            mpatches.Patch(facecolor=gray_p,  edgecolor="#757575", linewidth=0.6, label="In-dist (Pro)"),
+            mpatches.Patch(facecolor=color_p, edgecolor=color_p,  linewidth=0.6, label="Pro → Verified"),
+            plt.Line2D([0], [0], linestyle="--", color=_style.COLORS["baseline"],
+                       linewidth=1.0, label="Random (0.5)"),
+        ]
+        ax.set_xticks(x)
+        ax.set_xticklabels(
+            [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
+            fontsize=8.5,
+        )
+        ax.set_ylabel("Best-layer AUC")
+        ax.set_ylim(0.45, 1.0)
+        ax.set_title(model_label)
+        ax.legend(handles=legend_handles, ncol=3, loc="upper right")
 
     figures_dir.mkdir(parents=True, exist_ok=True)
     out = figures_dir / "transfer_barplot.pdf"
@@ -663,14 +672,16 @@ def build_transfer_table(
     pro_results_dir: Path,
     probes: list[str],
     layers: list[int],
-    verified_pooled_run_id: str = "laguna_xs2_full_pooled",
-    pro_pooled_run_id: str = "laguna_xs2_full",
-    verified_to_pro_run_id: str = "laguna_xs2_full_verified_transfer",
-    pro_to_verified_run_id: str = "laguna_xs2_full_pro_transfer",
+    model_labels: list[str],
+    verified_pooled_run_ids: list[str],
+    pro_pooled_run_ids: list[str],
+    verified_to_pro_run_ids: list[str],
+    pro_to_verified_run_ids: list[str],
 ) -> str:
     n_layer_cols = len(layers)
     col_spec     = "l" + "c" * n_layer_cols
     layer_header = " & ".join(f"Layer {_layer_label(l)}" for l in layers)
+    multi_model  = len(model_labels) > 1
 
     def _fmt_delta(delta: float) -> str:
         sign  = "+" if delta >= 0 else "-"
@@ -683,10 +694,20 @@ def build_transfer_table(
             return {l: float("nan") for l in layers}
         return {l: _weighted_mean(res.get(l, []), "test_auc") for l in layers}
 
+    def _ref_cell(v: float) -> str:
+        return rf"\textcolor{{gray}}{{\small {v:.3f}}}" if not math.isnan(v) else "—"
+
+    def _transfer_cell(transfer_v: float, ref_v: float) -> str:
+        if math.isnan(transfer_v):
+            return "—"
+        delta     = transfer_v - ref_v if not math.isnan(ref_v) else float("nan")
+        delta_str = _fmt_delta(delta) if not math.isnan(delta) else ""
+        return rf"{transfer_v:.3f}\,{delta_str}"
+
     lines = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Cross-dataset transfer AUC for Laguna-XS2. "
+        r"\caption{Cross-dataset transfer AUC. "
         r"Gray rows show in-distribution reference performance. "
         r"Transfer rows show AUC when probe weights trained on one dataset are "
         r"evaluated on the other; the subscript shows the delta relative to the "
@@ -703,38 +724,36 @@ def build_transfer_table(
         lines.append(
             rf"\multicolumn{{{1 + n_layer_cols}}}{{l}}{{\textit{{{probe_label}}}}} \\"
         )
+        for model_label, v_pooled, p_pooled, vp_id, pv_id in zip(
+            model_labels, verified_pooled_run_ids, pro_pooled_run_ids,
+            verified_to_pro_run_ids, pro_to_verified_run_ids,
+        ):
+            indent = r"\qquad" if multi_model else r"\quad"
+            if multi_model:
+                lines.append(
+                    rf"\quad\textit{{{model_label}}} \\"
+                )
+            v_aucs  = _get_aucs(verified_results_dir, v_pooled, probe)
+            p_aucs  = _get_aucs(pro_results_dir,      p_pooled, probe)
+            vp_aucs = _get_aucs(pro_results_dir,      vp_id,   probe)
+            pv_aucs = _get_aucs(verified_results_dir, pv_id,   probe)
 
-        v_aucs  = _get_aucs(verified_results_dir, verified_pooled_run_id, probe)
-        p_aucs  = _get_aucs(pro_results_dir,      pro_pooled_run_id,      probe)
-        vp_aucs = _get_aucs(pro_results_dir,      verified_to_pro_run_id, probe)
-        pv_aucs = _get_aucs(verified_results_dir, pro_to_verified_run_id, probe)
-
-        def _ref_cell(v: float) -> str:
-            return rf"\textcolor{{gray}}{{\small {v:.3f}}}" if not math.isnan(v) else "—"
-
-        def _transfer_cell(transfer_v: float, ref_v: float) -> str:
-            if math.isnan(transfer_v):
-                return "—"
-            delta     = transfer_v - ref_v if not math.isnan(ref_v) else float("nan")
-            delta_str = _fmt_delta(delta) if not math.isnan(delta) else ""
-            return rf"{transfer_v:.3f}\,{delta_str}"
-
-        lines.append(
-            r"\quad\textcolor{gray}{\small In-dist (Verified)} & "
-            + " & ".join(_ref_cell(v_aucs[l]) for l in layers) + r" \\"
-        )
-        lines.append(
-            r"\quad\textcolor{gray}{\small In-dist (Pro)} & "
-            + " & ".join(_ref_cell(p_aucs[l]) for l in layers) + r" \\"
-        )
-        lines.append(
-            r"\quad Verified $\rightarrow$ Pro & "
-            + " & ".join(_transfer_cell(vp_aucs[l], p_aucs[l]) for l in layers) + r"  \\"
-        )
-        lines.append(
-            r"\quad Pro $\rightarrow$ Verified & "
-            + " & ".join(_transfer_cell(pv_aucs[l], v_aucs[l]) for l in layers) + r"  \\"
-        )
+            lines.append(
+                indent + r"\textcolor{gray}{\small In-dist (Verified)} & "
+                + " & ".join(_ref_cell(v_aucs[l]) for l in layers) + r" \\"
+            )
+            lines.append(
+                indent + r"\textcolor{gray}{\small In-dist (Pro)} & "
+                + " & ".join(_ref_cell(p_aucs[l]) for l in layers) + r" \\"
+            )
+            lines.append(
+                indent + r"Verified $\rightarrow$ Pro & "
+                + " & ".join(_transfer_cell(vp_aucs[l], p_aucs[l]) for l in layers) + r"  \\"
+            )
+            lines.append(
+                indent + r"Pro $\rightarrow$ Verified & "
+                + " & ".join(_transfer_cell(pv_aucs[l], v_aucs[l]) for l in layers) + r"  \\"
+            )
         lines.append(r"\midrule")
 
     lines[-1] = r"\bottomrule"
@@ -1369,7 +1388,7 @@ def _generate_dataset_stats(
         ("laguna_xs2_full",     "swebench",     "Laguna-XS.2",     "Verified", _verified_color, False),
         ("laguna_xs2_full",     "swebench_pro", "Laguna-XS.2",     "Pro",      _pro_color,      False),
         ("qwen36_35b_a3b_full", "swebench",     "Qwen3.6-35B-A3B", "Verified", _qwen_color,     False),
-        ("qwen36_35b_a3b_full", "swebench_pro", "Qwen3.6-35B-A3B", "Pro",      _qwen_pro_color, True),
+        ("qwen36_35b_a3b_full", "swebench_pro", "Qwen3.6-35B-A3B", "Pro",      _qwen_pro_color, False),
     ]
 
     ds_configs_turns: list[dict] = []
@@ -1461,11 +1480,11 @@ def main():
     )
     parser.add_argument(
         "--pro-bineval-run-ids", nargs="+",
-        default=["laguna_xs2_pro_full_pooled_bineval"],
+        default=["laguna_xs2_pro_full_pooled_bineval", "qwen36_35b_a3b_pro_full_pooled_bineval"],
     )
     parser.add_argument(
         "--pro-step-rel-run-ids", nargs="+",
-        default=["laguna_xs2_pro_full_pooled_step_rel"],
+        default=["laguna_xs2_pro_full_pooled_step_rel", "qwen36_35b_a3b_pro_full_pooled_step_rel"],
     )
     parser.add_argument(
         "--pooled-run-ids", nargs="+",
@@ -1475,17 +1494,21 @@ def main():
     parser.add_argument("--pro-results-dir", default="results/swebench_pro")
     parser.add_argument(
         "--pro-model-run-ids", nargs="+",
-        default=["laguna_xs2_pro_full_pooled"],
+        default=["laguna_xs2_pro_full_pooled", "qwen36_35b_a3b_pro_full_pooled"],
     )
     parser.add_argument("--pro-shuffled-run-ids", nargs="+",
-                        default=["laguna_xs2_pro_full_pooled_shuffled"])
+                        default=["laguna_xs2_pro_full_pooled_shuffled", "qwen36_35b_a3b_pro_full_pooled_shuffled"])
     parser.add_argument("--pro-pooled-run-ids",   nargs="+",
-                        default=["laguna_xs2_pro_full_pooled"])
+                        default=["laguna_xs2_pro_full_pooled", "qwen36_35b_a3b_pro_full_pooled"])
     # Transfer
-    parser.add_argument("--verified-pooled-run-id",  default="laguna_xs2_full_pooled")
-    parser.add_argument("--pro-pooled-run-id",        default="laguna_xs2_pro_full_pooled")
-    parser.add_argument("--verified-to-pro-run-id",   default="laguna_xs2_full_verified_transfer")
-    parser.add_argument("--pro-to-verified-run-id",   default="laguna_xs2_full_pro_transfer")
+    parser.add_argument("--verified-pooled-run-ids", nargs="+",
+                        default=["laguna_xs2_full_pooled", "qwen36_35b_a3b_full_pooled"])
+    parser.add_argument("--pro-pooled-run-ids-transfer", nargs="+",
+                        default=["laguna_xs2_pro_full_pooled", "qwen36_35b_a3b_pro_full_pooled"])
+    parser.add_argument("--verified-to-pro-run-ids", nargs="+",
+                        default=["laguna_xs2_full_verified_transfer", "qwen36_35b_a3b_full_verified_transfer"])
+    parser.add_argument("--pro-to-verified-run-ids", nargs="+",
+                        default=["laguna_xs2_full_pro_transfer", "qwen36_35b_a3b_full_pro_transfer"])
     # Lookahead — each variant is "max_k" or "max_k:run_suffix" where run_suffix is appended
     # after _max{k} in the run ID (e.g. "15:after_edit" → _shift{k}_max15_after_edit).
     parser.add_argument("--lookahead-variants", nargs="+",
@@ -1669,27 +1692,31 @@ def main():
         )
 
     # --- Transfer barplot + table ---
+    transfer_model_labels = [MODEL_LABELS.get(_model_key(r), r)
+                             for r in args.verified_pooled_run_ids]
     print("[fig] transfer barplot...")
     plot_transfer_barplot(
         verified_results_dir   = results_dir,
         pro_results_dir        = pro_results_dir,
         probes                 = probes,
         figures_dir            = figures_dir,
-        verified_pooled_run_id = args.verified_pooled_run_id,
-        pro_pooled_run_id      = args.pro_pooled_run_id,
-        verified_to_pro_run_id = args.verified_to_pro_run_id,
-        pro_to_verified_run_id = args.pro_to_verified_run_id,
+        model_labels           = transfer_model_labels,
+        verified_pooled_run_ids = args.verified_pooled_run_ids,
+        pro_pooled_run_ids      = args.pro_pooled_run_ids_transfer,
+        verified_to_pro_run_ids = args.verified_to_pro_run_ids,
+        pro_to_verified_run_ids = args.pro_to_verified_run_ids,
     )
     print("[table] building transfer table...")
     transfer_tex = build_transfer_table(
-        verified_results_dir  = results_dir,
-        pro_results_dir       = pro_results_dir,
-        probes                = probes,
-        layers                = layers,
-        verified_pooled_run_id  = args.verified_pooled_run_id,
-        pro_pooled_run_id       = args.pro_pooled_run_id,
-        verified_to_pro_run_id  = args.verified_to_pro_run_id,
-        pro_to_verified_run_id  = args.pro_to_verified_run_id,
+        verified_results_dir    = results_dir,
+        pro_results_dir         = pro_results_dir,
+        probes                  = probes,
+        layers                  = layers,
+        model_labels            = transfer_model_labels,
+        verified_pooled_run_ids = args.verified_pooled_run_ids,
+        pro_pooled_run_ids      = args.pro_pooled_run_ids_transfer,
+        verified_to_pro_run_ids = args.verified_to_pro_run_ids,
+        pro_to_verified_run_ids = args.pro_to_verified_run_ids,
     )
     p = out_dir / "transfer_table.tex"
     p.write_text(transfer_tex)
