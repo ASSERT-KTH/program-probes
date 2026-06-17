@@ -1,0 +1,17 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Dataset statistics per (model, dataset) combination. \#Traj.\ counts all agent runs by each model on each dataset. \#Tokens is the sum of tokens across all linearized trajectories. $\geq$15 and $\geq$50 count trajectories reaching those turn thresholds, the length filters used in the lookahead experiments. The $k_{\max}=15$ filter is nearly lossless (90--99\,\% of runs); the $k_{\max}=50$ filter retains 40--60\,\%.}
+\label{tab:dataset_stats}
+\begin{tabular}{llrrrr}
+\toprule
+Model & Dataset & \#Traj. & $\geq$15 & $\geq$50 & \#Tokens \\
+\midrule
+\multirow{2}{*}{\texttt{Laguna}} & Verified & 4,991 & 4,880 & 2,837 & 191M \\
+ & Pro & 6,921 & 6,834 & 4,159 & 378M \\
+\addlinespace
+\multirow{2}{*}{\texttt{Qwen3.6}} & Verified & 4,998 & 4,497 & 2,001 & 115M \\
+ & Pro & 5,804 & 5,613 & 3,186 & 231M \\
+\bottomrule
+\end{tabular}
+\end{table}

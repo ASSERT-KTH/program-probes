@@ -656,9 +656,10 @@ def plot_transfer_barplot(
         ax.set_title(model_label)
         ax.legend(handles=legend_handles, ncol=3, loc="upper right")
 
+    fig.tight_layout()
     figures_dir.mkdir(parents=True, exist_ok=True)
     out = figures_dir / "transfer_barplot.pdf"
-    fig.savefig(out)
+    fig.savefig(out, bbox_inches="tight")
     plt.close(fig)
     print(f"  [fig] {out}")
 
@@ -728,10 +729,10 @@ def build_transfer_table(
             model_labels, verified_pooled_run_ids, pro_pooled_run_ids,
             verified_to_pro_run_ids, pro_to_verified_run_ids,
         ):
-            indent = r"\qquad" if multi_model else r"\quad"
+            indent = r"\qquad{}" if multi_model else r"\quad{}"
             if multi_model:
                 lines.append(
-                    rf"\quad\textit{{{model_label}}} \\"
+                    rf"\quad{{}}\textit{{{model_label}}} \\"
                 )
             v_aucs  = _get_aucs(verified_results_dir, v_pooled, probe)
             p_aucs  = _get_aucs(pro_results_dir,      p_pooled, probe)
@@ -890,11 +891,12 @@ def plot_layer_auc(
     ax.set_title(PROBE_LABELS.get(probe, probe))
     ax.set_xticks(layers)
     ax.set_xticklabels([str(_layer_label(l)) for l in layers])
-    ax.legend(fontsize=8)
+    ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1),
+              borderaxespad=0, frameon=True)
     ax.set_ylim(bottom=0.45, top=1.0)
 
     fname = f"{probe}_layer_auc.pdf"
-    fig.savefig(out_dir / fname)
+    fig.savefig(out_dir / fname, bbox_inches="tight")
     plt.close(fig)
     print(f"  [fig] {out_dir / fname}")
 
@@ -959,7 +961,7 @@ def plot_lookahead_horizon(
         aucs = [p[1] for p in pts]
         ax.plot(ks, aucs, marker=markers[li % len(markers)], markersize=5,
                 linewidth=1.6, color=color, label=f"Layer {_layer_label(layer)}", zorder=3)
-        ax.annotate(f"L{layer}", xy=(ks[-1], aucs[-1]), xytext=(5, 0),
+        ax.annotate(f"L{_layer_label(layer)}", xy=(ks[-1], aucs[-1]), xytext=(5, 0),
                     textcoords="offset points", ha="left", va="center",
                     fontsize=8, color=color)
 
@@ -1055,7 +1057,7 @@ def plot_tool_nll_correlation(
         rho_str = f"ρ = {rho:.3f}" if not np.isnan(rho) else "ρ = n/a"
         ax.set_xlabel("Tool output NLL (model surprise)")
         ax.set_ylabel("Brier score (per step)")
-        ax.set_title(f"{probe_label} — layer {layer}\n{rho_str}  (n = {n_with:,})")
+        ax.set_title(f"{probe_label} — layer {_layer_label(layer)}\n{rho_str}  (n = {n_with:,})")
 
         fname = f"{probe}_tool_nll_layer{layer}{suffix}.pdf"
         fig.savefig(out_dir / fname)
@@ -1200,6 +1202,7 @@ def plot_dataset_turns(
     ax.set_xticks(range(1, len(all_labels) + 1))
     ax.set_xticklabels(all_labels, fontsize=8)
     ax.set_ylabel("Turns")
+    ax.set_ylim(top=100)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.legend(fontsize=7, frameon=False)
 
@@ -1487,6 +1490,10 @@ def main():
         default=["laguna_xs2_pro_full_pooled_step_rel", "qwen36_35b_a3b_pro_full_pooled_step_rel"],
     )
     parser.add_argument(
+        "--pro-after-edit-run-ids", nargs="+",
+        default=["laguna_xs2_pro_full_pooled_after_edit", "qwen36_35b_a3b_pro_full_pooled_after_edit"],
+    )
+    parser.add_argument(
         "--pooled-run-ids", nargs="+",
         default=["laguna_xs2_full_pooled", "qwen36_35b_a3b_full_pooled"],
     )
@@ -1671,6 +1678,17 @@ def main():
                 suffix = "_step", dataset_label = "Pro",
             )
 
+    # --- AUC heatmaps (after-edit, Pro) ---
+    print("[fig] AUC Pro after-edit heatmaps...")
+    for run_id in (args.pro_after_edit_run_ids or []):
+        for probe in probes:
+            plot_auc_heatmap(
+                results_dir = pro_results_dir, run_id = run_id, probe = probe,
+                layers = layers, figures_dir = figures_dir,
+                n_bins = args.n_bins, x_label = "Relative position bin (after edit)",
+                suffix = "_after_edit", dataset_label = "Pro",
+            )
+
     # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
     print("[fig] AUC vs layer plots...")
     pooled_ids  = args.pooled_run_ids
@@ -1743,7 +1761,8 @@ def main():
             file_suffix = f"max{max_k}_{run_sfx}" if run_sfx else f"max{max_k}"
 
             print(f"[fig] lookahead horizon plots (Verified, {file_suffix})...")
-            for model_run_id in args.model_run_ids:
+            verified_bases = args.pooled_run_ids or args.model_run_ids
+            for model_run_id in verified_bases:
                 run_ids  = args.lookahead_run_ids  or _lookahead_run_ids(model_run_id, max_k, run_sfx)
                 k_values = args.lookahead_k_values or k_range
                 for probe in lookahead_probes:
@@ -1754,7 +1773,7 @@ def main():
                         probe           = probe,
                         layers          = layers,
                         figures_dir     = figures_dir,
-                        out_run_id      = f"{model_run_id}_pooled",
+                        out_run_id      = model_run_id,
                         filename_suffix = file_suffix,
                         dataset_label   = "Verified",
                     )
