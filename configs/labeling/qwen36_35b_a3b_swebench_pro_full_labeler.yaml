@@ -1,0 +1,13 @@
+# Label full Qwen3.6-35B-A3B run on SWE-bench Pro (all available trajectories, resume-safe)
+# Usage:
+#   sbatch slurm/swebench_pro_label.sh \
+#     --config configs/labeling/qwen36_35b_a3b_swebench_pro_full_labeler.yaml
+
+trajectory_dir: generations/swebench_pro/qwen36_35b_a3b_full
+output_dir: labels/swebench_pro/qwen36_35b_a3b_full
+scripts_dir: SWE-bench_Pro-os
+modal_app_name: program-probes-labeler-pro
+sandbox_timeout: 3600
+eval_timeout: 600
+resume: true
+n_workers: 100
