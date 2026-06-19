@@ -32,6 +32,32 @@ HATCH = {
     "pro":      "///",  # diagonal hatch
 }
 
+
+# --- Program-property identity (color + marker) ---
+# Mirrors the LaTeX macros in main.tex (\Syntactic, \Semantic, \RedFail,
+# \Regressions). Color encodes the *property* and is reserved for property
+# labels (subplot titles / axis tick labels), NOT data series: data series
+# still use the model colors above. Markers make the encoding survive
+# grayscale and colorblindness. Keep these hex values in sync with main.tex.
+PROPERTY_COLORS = {
+    "syntactic":   "#E69F00",   # orange
+    "semantic":    "#009E73",   # green
+    "reduced":     "#CC79A7",   # purple  (reduced failing tests)
+    "regressions": "#8C6D31",   # brown
+}
+PROPERTY_MARKERS = {
+    "syntactic":   "^",   # triangle
+    "semantic":    "o",   # circle
+    "reduced":     "s",   # square
+    "regressions": "D",   # diamond
+}
+PROPERTY_LABELS = {
+    "syntactic":   "Syntactic Correctness",
+    "semantic":    "Semantic Correctness",
+    "reduced":     "Reduced Failing Tests",
+    "regressions": "Introduced Regressions",
+}
+
 # --- Heatmap ---
 HEATMAP_CMAP = "Blues"
 HEATMAP_VMIN = 0.5
