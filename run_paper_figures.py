@@ -89,11 +89,38 @@ def _auc_grid(all_results: dict, layers: list[int], n_bins: int = 10) -> tuple[n
 # ---------------------------------------------------------------------------
 
 PROBE_LABELS = {
-    "currently_compiles":        "Syntactic correctness",
-    "currently_correct":         "Semantic correctness",
-    "currently_reduces_failing": "Reduces failures",
-    "currently_has_regressions": "Has regressions",
+    "currently_compiles":        _style.PROPERTY_LABELS["syntactic"],
+    "currently_correct":         _style.PROPERTY_LABELS["semantic"],
+    "currently_reduces_failing": _style.PROPERTY_LABELS["reduced"],
+    "currently_has_regressions": _style.PROPERTY_LABELS["regressions"],
     "will_resolve":              "Will resolve",
+}
+
+PROBE_TO_PROPERTY = {
+    "currently_compiles":        "syntactic",
+    "currently_correct":         "semantic",
+    "currently_reduces_failing": "reduced",
+    "currently_has_regressions": "regressions",
+}
+
+PROBE_LABELS_TEX = {
+    "currently_compiles":        r"\Syntactic{}",
+    "currently_correct":         r"\Semantic{}",
+    "currently_reduces_failing": r"\RedFail{}",
+    "currently_has_regressions": r"\Regressions{}",
+    "will_resolve":              "Will resolve",
+}
+
+# Map hparams.json probe-label strings (old and canonical) to LaTeX macros
+_HPARAM_LABEL_TEX = {
+    "Syntactic correctness":  r"\Syntactic{}",
+    "Semantic correctness":   r"\Semantic{}",
+    "Reduces failures":       r"\RedFail{}",
+    "Has regressions":        r"\Regressions{}",
+    "Syntactic Correctness":  r"\Syntactic{}",
+    "Semantic Correctness":   r"\Semantic{}",
+    "Reduced Failing Tests":  r"\RedFail{}",
+    "Introduced Regressions": r"\Regressions{}",
 }
 
 MODEL_LABELS = {
@@ -104,6 +131,66 @@ MODEL_LABELS = {
 }
 
 _MODEL_KEYS = list(MODEL_LABELS.keys())
+
+DATASET_LABELS = {
+    "Verified": "SWE-Bench-Verified",
+    "Pro":      "SWE-Bench-Pro",
+}
+
+
+def _prop_tick_label(probe: str) -> str:
+    """Return a wrapped tick label with glyph on first line; label in uppercase (small-caps proxy)."""
+    label = PROBE_LABELS.get(probe, probe).upper()
+    prop  = PROBE_TO_PROPERTY.get(probe)
+    glyph = _style.PROPERTY_GLYPHS[prop] if prop else ""
+    words = label.split()
+    first_line = f"{glyph} {words[0]}" if glyph else words[0]
+    return first_line + ("\n" + "\n".join(words[1:]) if len(words) > 1 else "")
+
+
+def _apply_title(ax, probe: str, model_str: str = "", dataset_label: str = "", fontsize: float | None = None) -> None:
+    """Set a split axes title:
+      - property glyph + label: property color, uppercase (small-caps proxy)
+      - model / benchmark:      black, monospace font, slightly smaller
+    The two parts are separate annotate objects so their colors don't mix.
+    """
+    label      = PROBE_LABELS.get(probe, probe).upper()
+    prop       = PROBE_TO_PROPERTY.get(probe)
+    glyph      = _style.PROPERTY_GLYPHS.get(prop, "")
+    prop_color = _style.PROPERTY_COLORS[prop] if prop else "black"
+    prop_text  = f"{glyph} {label}" if glyph else label
+
+    ts = fontsize if fontsize is not None else float(plt.rcParams.get("axes.titlesize", 11))
+    ss = max(ts * 0.82, 7.0)
+
+    ax.set_title("")  # suppress the built-in title slot
+
+    full_ds = DATASET_LABELS.get(dataset_label, dataset_label)
+    parts   = [s for s in [model_str, full_ds] if s]
+
+    if parts:
+        subtitle = " — ".join(parts)
+        # subtitle: lower of the two (just above the axes border)
+        ax.annotate(subtitle,
+                    xy=(0.5, 1.0), xycoords="axes fraction",
+                    xytext=(0, 3), textcoords="offset points",
+                    ha="center", va="bottom",
+                    fontsize=ss, family="monospace", color="black",
+                    annotation_clip=False)
+        # property label: above the subtitle
+        ax.annotate(prop_text,
+                    xy=(0.5, 1.0), xycoords="axes fraction",
+                    xytext=(0, 3 + ss * 1.35), textcoords="offset points",
+                    ha="center", va="bottom",
+                    fontsize=ts, fontweight="bold", color=prop_color,
+                    annotation_clip=False)
+    else:
+        ax.annotate(prop_text,
+                    xy=(0.5, 1.0), xycoords="axes fraction",
+                    xytext=(0, 6), textcoords="offset points",
+                    ha="center", va="bottom",
+                    fontsize=ts, fontweight="bold", color=prop_color,
+                    annotation_clip=False)
 
 
 def _model_key(run_id: str) -> str:
@@ -117,6 +204,40 @@ def _model_key(run_id: str) -> str:
 def _layer_label(layer: int) -> int:
     """Convert 0-indexed transformer layer to 1-indexed display label."""
     return layer + 1
+
+
+# ---------------------------------------------------------------------------
+# Test-set size annotation helpers
+# ---------------------------------------------------------------------------
+
+def _n_test_from_results(all_res: dict) -> int:
+    """Return total n_test for one probe/run by summing across bins in the first layer."""
+    for layer_results in all_res.values():
+        if layer_results:
+            return sum(
+                r.n_test if hasattr(r, "n_test") else r.get("n_test", 0)
+                for r in layer_results
+            )
+    return 0
+
+
+def _fmt_n(n: int) -> str:
+    """Format a hidden-state count as e.g. '488k' or '4.7M' (no units)."""
+    if n <= 0:
+        return ""
+    return f"{n/1e3:.0f}k" if n < 1e6 else f"{n/1e6:.1f}M"
+
+
+def _annotate_n_test(ax, n: int) -> None:
+    """Small grey n= annotation in the bottom-right corner of ax."""
+    s = _fmt_n(n)
+    if not s:
+        return
+    ax.annotate(f"n = {s} $h_t$",
+                xy=(1, 0), xycoords="axes fraction",
+                xytext=(-4, 4), textcoords="offset points",
+                ha="right", va="bottom", fontsize=7, color="#999999",
+                annotation_clip=False)
 
 
 # ---------------------------------------------------------------------------
@@ -188,10 +309,11 @@ def plot_generalization_barplot(
     ))
 
     ax.set_xticks(x)
-    ax.set_xticklabels(
-        [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
-        fontsize=8.5,
-    )
+    ax.set_xticklabels([_prop_tick_label(p) for p in probes], fontsize=8.5)
+    for tick, p in zip(ax.get_xticklabels(), probes):
+        prop = PROBE_TO_PROPERTY.get(p)
+        if prop:
+            tick.set_color(_style.PROPERTY_COLORS[prop])
     ax.set_ylabel("Best-layer AUC")
     ax.set_ylim(0.45, 1.0)
     ax.legend(handles=legend_handles, ncol=2, loc="upper right")
@@ -243,9 +365,10 @@ def build_auc_table(
         for probe in probes:
             all_res  = _load(res_dir, probe_run_id, probe)
             shuf_res = _load(res_dir, shuf_id, probe) if shuf_id else None
+            tex_lbl  = PROBE_LABELS_TEX.get(probe, probe)
             if all_res is None:
                 rows.append(
-                    f"{PROBE_LABELS.get(probe, probe)} & "
+                    f"{tex_lbl} & "
                     + " & ".join(["—"] * n_layer_cols) + " & — \\\\"
                 )
                 continue
@@ -266,7 +389,7 @@ def build_auc_table(
                     cells.append(f"{v:.3f}")
             shuf_str = f"{shuf_auc:.3f}" if not math.isnan(shuf_auc) else "—"
             rows.append(
-                f"{PROBE_LABELS.get(probe, probe)} & "
+                f"{tex_lbl} & "
                 + " & ".join(cells) + f" & {shuf_str} \\\\"
             )
         return rows
@@ -357,9 +480,10 @@ def build_calibration_table(
         rows = []
         for probe in probes:
             all_res = _load(res_dir, probe_run_id, probe)
+            tex_lbl = PROBE_LABELS_TEX.get(probe, probe)
             if all_res is None:
                 rows.append(
-                    f"{PROBE_LABELS.get(probe, probe)} & "
+                    f"{tex_lbl} & "
                     + " & ".join(["— & —"] * len(layers)) + r" \\"
                 )
                 continue
@@ -372,7 +496,7 @@ def build_calibration_table(
                     f" & {'—' if math.isnan(brier) else f'{brier:.3f}'}"
                 )
             rows.append(
-                f"{PROBE_LABELS.get(probe, probe)} & " + " & ".join(cells) + r" \\"
+                f"{tex_lbl} & " + " & ".join(cells) + r" \\"
             )
         return rows
 
@@ -544,9 +668,10 @@ def build_hparam_table(
                     probe_hp = resolved[probe_label]
                     model_cell = model_multirow if pi == 0 else ""
                     d_cell = ds_cell if pi == 0 else ""
+                    tex_probe = _HPARAM_LABEL_TEX.get(probe_label, probe_label)
                     if need_probe_col:
                         lines.append(
-                            f"{d_cell} & {model_cell} & {probe_label} & {_hp_cells(probe_hp)} \\\\"
+                            f"{d_cell} & {model_cell} & {tex_probe} & {_hp_cells(probe_hp)} \\\\"
                         )
                     ds_printed = True
             else:
@@ -647,10 +772,11 @@ def plot_transfer_barplot(
                        linewidth=1.0, label="Random (0.5)"),
         ]
         ax.set_xticks(x)
-        ax.set_xticklabels(
-            [PROBE_LABELS.get(p, p).replace(" ", "\n") for p in probes],
-            fontsize=8.5,
-        )
+        ax.set_xticklabels([_prop_tick_label(p) for p in probes], fontsize=8.5)
+        for tick, p in zip(ax.get_xticklabels(), probes):
+            prop = PROBE_TO_PROPERTY.get(p)
+            if prop:
+                tick.set_color(_style.PROPERTY_COLORS[prop])
         ax.set_ylabel("Best-layer AUC")
         ax.set_ylim(0.45, 1.0)
         ax.set_title(model_label)
@@ -721,7 +847,7 @@ def build_transfer_table(
     ]
 
     for probe in probes:
-        probe_label = PROBE_LABELS.get(probe, probe)
+        probe_label = PROBE_LABELS_TEX.get(probe, probe)
         lines.append(
             rf"\multicolumn{{{1 + n_layer_cols}}}{{l}}{{\textit{{{probe_label}}}}} \\"
         )
@@ -805,13 +931,9 @@ def plot_auc_heatmap(
     ax.set_ylabel("Layer")
     ax.tick_params(length=0)  # hide tick marks — cells are already delimited
 
-    model_key   = _model_key(run_id)
-    probe_label = PROBE_LABELS.get(probe, probe)
-    model_str   = MODEL_LABELS.get(model_key, model_key)
-    title       = f"{probe_label} — {model_str}"
-    if dataset_label:
-        title  += f" ({dataset_label})"
-    ax.set_title(title)
+    model_key = _model_key(run_id)
+    model_str = MODEL_LABELS.get(model_key, model_key)
+    _apply_title(ax, probe, model_str, dataset_label)
 
     cb = plt.colorbar(im, ax=ax, label="AUC")
     cb.set_ticks([0.5, 0.625, 0.75, 0.875, 1.0])
@@ -825,6 +947,7 @@ def plot_auc_heatmap(
                 ax.text(bi + 0.5, li + 0.5, f"{v:.2f}", ha="center", va="center",
                         fontsize=6.5, color="white" if v > mid else "black")
 
+    _annotate_n_test(ax, _n_test_from_results(all_res))
     fname = f"{probe}_auc_heatmap{suffix}.pdf"
     fig.savefig(out_dir / fname)
     plt.close(fig)
@@ -848,6 +971,9 @@ def plot_layer_auc(
     out_dir = figures_dir / out_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    prop_key    = PROBE_TO_PROPERTY.get(probe)
+    prop_marker = _style.PROPERTY_MARKERS[prop_key] if prop_key else "o"
+
     fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_LINE))
 
     for run_id, label in zip(run_ids, run_labels):
@@ -865,10 +991,10 @@ def plot_layer_auc(
             ls, marker, ms, alpha = "--", None, 0, 0.7
         elif is_qwen:
             color = _style.COLORS["qwen_verified"]
-            ls, marker, ms, alpha = "-", "o", 5, 1.0
+            ls, marker, ms, alpha = "-", prop_marker, 5, 1.0
         else:
             color = _style.COLORS["laguna_verified"]
-            ls, marker, ms, alpha = "-", "o", 5, 1.0
+            ls, marker, ms, alpha = "-", prop_marker, 5, 1.0
 
         ax.plot(xs, ys, linestyle=ls, marker=marker, markersize=ms,
                 color=color, alpha=alpha, label=label, linewidth=1.4)
@@ -881,21 +1007,129 @@ def plot_layer_auc(
         xs = [l for l in layers if not math.isnan(layer_aucs.get(l, float("nan")))]
         ys = [layer_aucs[l] for l in xs]
         color = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
-        ax.plot(xs, ys, linestyle="--", marker="s", markersize=5,
+        ax.plot(xs, ys, linestyle="--", marker=prop_marker, markersize=5,
                 color=color, alpha=0.85, label=extra_label, linewidth=1.4)
 
     ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
                linewidth=1.0, label="Random")
     ax.set_xlabel("Layer")
     ax.set_ylabel("AUC")
-    ax.set_title(PROBE_LABELS.get(probe, probe))
+    _apply_title(ax, probe)
     ax.set_xticks(layers)
     ax.set_xticklabels([str(_layer_label(l)) for l in layers])
     ax.legend(fontsize=8, loc="upper left", bbox_to_anchor=(1.01, 1),
               borderaxespad=0, frameon=True)
     ax.set_ylim(bottom=0.45, top=1.0)
+    for run_id in run_ids:
+        if "shuffled" not in run_id:
+            res = _load(results_dir, run_id, probe)
+            if res:
+                _annotate_n_test(ax, _n_test_from_results(res))
+                break
 
     fname = f"{probe}_layer_auc.pdf"
+    fig.savefig(out_dir / fname, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  [fig] {out_dir / fname}")
+
+
+# ---------------------------------------------------------------------------
+# 2×2 layer-AUC grid (all four probes, single shared legend)
+# ---------------------------------------------------------------------------
+
+def plot_layer_auc_grid(
+    results_dir: Path,
+    run_ids: list[str],
+    run_labels: list[str],
+    probes: list[str],
+    layers: list[int],
+    figures_dir: Path,
+    out_run_id: str,
+    extra_series: list[tuple[Path, str, str]] | None = None,
+) -> None:
+    """2×2 panel of AUC-vs-layer curves for all four probes, one shared legend."""
+    assert len(probes) == 4, "grid expects exactly 4 probes"
+
+    fig, axes = plt.subplots(
+        2, 2,
+        figsize=(_style.FULL_WIDTH, 4.0),
+        sharex=True, sharey=True,
+    )
+    axes_flat = axes.flatten()
+
+    legend_handles: list = []
+    legend_built = False
+
+    for ax, probe in zip(axes_flat, probes):
+        prop_key    = PROBE_TO_PROPERTY.get(probe)
+        prop_marker = _style.PROPERTY_MARKERS[prop_key] if prop_key else "o"
+
+        for run_id, label in zip(run_ids, run_labels):
+            all_res = _load(results_dir, run_id, probe)
+            if all_res is None:
+                continue
+            layer_aucs = _layer_means(all_res, "test_auc", layers)
+            xs = [l for l in layers if not math.isnan(layer_aucs.get(l, float("nan")))]
+            ys = [layer_aucs[l] for l in xs]
+
+            is_qwen = "qwen" in run_id
+            color   = _style.COLORS["qwen_verified" if is_qwen else "laguna_verified"]
+            line,   = ax.plot(xs, ys, linestyle="-", marker=prop_marker, markersize=4,
+                              color=color, linewidth=1.4, label=label)
+            if not legend_built:
+                legend_handles.append(line)
+
+        for extra_dir, extra_run_id, extra_label in (extra_series or []):
+            all_res = _load(extra_dir, extra_run_id, probe)
+            if all_res is None:
+                continue
+            layer_aucs = _layer_means(all_res, "test_auc", layers)
+            xs = [l for l in layers if not math.isnan(layer_aucs.get(l, float("nan")))]
+            ys = [layer_aucs[l] for l in xs]
+            color = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
+            line, = ax.plot(xs, ys, linestyle="--", marker=prop_marker, markersize=4,
+                            color=color, alpha=0.85, linewidth=1.4, label=extra_label)
+            if not legend_built:
+                legend_handles.append(line)
+
+        rand_line = ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
+                               linewidth=1.0, label="Random")
+        if not legend_built:
+            legend_handles.append(rand_line)
+            legend_built = True
+
+        _apply_title(ax, probe, fontsize=8.5)
+        ax.set_xticks(layers)
+        ax.set_xticklabels([str(_layer_label(l)) for l in layers])
+        ax.set_ylim(bottom=0.45, top=1.0)
+        ax.set_ylabel("AUC")
+
+        # n_test annotation — top-right of each panel
+        for run_id in run_ids:
+            if "shuffled" not in run_id:
+                res = _load(results_dir, run_id, probe)
+                if res:
+                    _annotate_n_test(ax, _n_test_from_results(res))
+                    break
+
+    # x-label only on bottom row
+    for ax in axes[1]:
+        ax.set_xlabel("Layer")
+
+    # single legend below the grid
+    fig.legend(
+        handles=legend_handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.04),
+        ncol=len(legend_handles),
+        fontsize=8,
+        frameon=True,
+    )
+    fig.tight_layout()
+
+    out_dir = figures_dir / out_run_id
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fname = "layer_auc_grid.pdf"
     fig.savefig(out_dir / fname, bbox_inches="tight")
     plt.close(fig)
     print(f"  [fig] {out_dir / fname}")
@@ -945,10 +1179,12 @@ def plot_lookahead_horizon(
         print(f"  [skip] {probe} lookahead — no data")
         return
 
+    prop_key    = PROBE_TO_PROPERTY.get(probe)
+    prop_marker = _style.PROPERTY_MARKERS[prop_key] if prop_key else "o"
+
     n_layers     = len(layers)
     blues        = plt.get_cmap("Blues")
     layer_colors = [blues(0.85 - 0.45 * i / max(n_layers - 1, 1)) for i in range(n_layers)]
-    markers      = ["o", "s", "^", "D"]
     fig_width    = max(_style.FULL_WIDTH, _style.FULL_WIDTH + (len(ks_present) - 16) * 0.12)
 
     fig, ax = plt.subplots(figsize=(fig_width, _style.FIG_HEIGHT_LINE + 0.5))
@@ -959,10 +1195,10 @@ def plot_lookahead_horizon(
             continue
         ks   = [p[0] for p in pts]
         aucs = [p[1] for p in pts]
-        ax.plot(ks, aucs, marker=markers[li % len(markers)], markersize=5,
+        ax.plot(ks, aucs, marker=prop_marker, markersize=5,
                 linewidth=1.6, color=color, label=f"Layer {_layer_label(layer)}", zorder=3)
-        ax.annotate(f"L{_layer_label(layer)}", xy=(ks[-1], aucs[-1]), xytext=(5, 0),
-                    textcoords="offset points", ha="left", va="center",
+        ax.annotate(f"L{_layer_label(layer)}", xy=(ks[0], aucs[0]), xytext=(-5, 0),
+                    textcoords="offset points", ha="right", va="center",
                     fontsize=8, color=color)
 
     ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"], linewidth=1.0, zorder=1)
@@ -972,15 +1208,20 @@ def plot_lookahead_horizon(
     ax.set_xlabel("Horizon k (turns)")
     ax.set_ylabel("AUC")
     ax.set_ylim(bottom=0.48)
-    model_key  = _model_key(run_ids[0]) if run_ids else ""
-    model_str  = MODEL_LABELS.get(model_key, model_key)
-    title      = PROBE_LABELS.get(probe, probe)
-    if model_str or dataset_label:
-        parts  = [s for s in [model_str, dataset_label] if s]
-        title += f" — {', '.join(parts)}"
-    ax.set_title(title)
+    model_key = _model_key(run_ids[0]) if run_ids else ""
+    model_str = MODEL_LABELS.get(model_key, model_key)
+    _apply_title(ax, probe, model_str, dataset_label)
     ax.margins(x=0.06)
     ax.xaxis.set_major_locator(MaxNLocator(nbins=10, integer=True))
+    if k_to_n:
+        n = next(iter(k_to_n.values()))
+        s = _fmt_n(n)
+        if s:
+            ax.annotate(f"n = {s} $h_t$",
+                        xy=(1, 1), xycoords="axes fraction",
+                        xytext=(-4, -4), textcoords="offset points",
+                        ha="right", va="top", fontsize=7, color="#999999",
+                        annotation_clip=False)
 
     out_dir = figures_dir / out_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -1095,6 +1336,51 @@ def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> lis
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         cache_path.write_text(json.dumps(records))
     return records
+
+
+def _compute_edit_stats(label_dir: Path, cache_path: Path | None = None) -> dict:
+    """Return edit-count stats across trajectories: total, median, q25, q75."""
+    if cache_path and cache_path.exists():
+        return json.loads(cache_path.read_text())
+    counts = []
+    for f in label_dir.glob("*_labels.json"):
+        try:
+            d = json.loads(f.read_text())
+        except Exception:
+            continue
+        counts.append(sum(1 for e in d.get("edits", []) if e.get("cmd_idx") != -1))
+    if not counts:
+        result = {"total": 0, "ge2": 0, "median": 0, "q25": 0, "q75": 0}
+    else:
+        s = sorted(counts)
+        n = len(s)
+        result = {
+            "total":  sum(s),
+            "ge2":    sum(1 for c in s if c >= 2),
+            "median": s[n // 2],
+            "q25":    s[n // 4],
+            "q75":    s[3 * n // 4],
+        }
+    if cache_path:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(result))
+    return result
+
+
+def _load_n_states(results_pt_path: str) -> int:
+    """Sum n_train + n_val + n_test from the first result entry in a results.pt."""
+    p = Path(results_pt_path)
+    if not p.exists():
+        return 0
+    data = torch.load(p, weights_only=False)
+    for layer_results in data.values():
+        if layer_results:
+            r = layer_results[0]
+            n_train = r.n_train if hasattr(r, "n_train") else r.get("n_train", 0)
+            n_val   = r.n_val   if hasattr(r, "n_val")   else r.get("n_val",   0)
+            n_test  = r.n_test  if hasattr(r, "n_test")  else r.get("n_test",  0)
+            return n_train + n_val + n_test
+    return 0
 
 
 def _compute_probe_prevalences(label_dir: Path, cache_path: Path | None = None) -> dict[str, float]:
@@ -1213,6 +1499,48 @@ def plot_dataset_turns(
     print(f"  [fig] {out}")
 
 
+def plot_trajectory_tokens_histogram(
+    all_gen_stats: list[list[dict]],
+    figures_dir: Path,
+) -> None:
+    """Histogram of per-trajectory token counts (log x-scale), all datasets merged."""
+    tokens = np.array([s["n_tokens"] for gs in all_gen_stats for s in gs if s["n_tokens"] > 0])
+    if not len(tokens):
+        return
+
+    color = _style.COLORS["laguna_verified"]
+
+    # Bins evenly spaced in log space
+    bins = np.logspace(np.log10(tokens.min()), np.log10(tokens.max()), 40)
+
+    fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH * 0.55, 1.8))
+    ax.hist(tokens, bins=bins, color=color, alpha=0.75, edgecolor="white", linewidth=0.3)
+
+    # Median line
+    med = np.median(tokens)
+    ax.axvline(med, color=color, linewidth=1.4, linestyle="--",
+               label=f"Median {med/1e3:.0f}k")
+    ax.legend(fontsize=7, frameon=False)
+
+    ax.set_xscale("log")
+    ax.set_xlabel("Tokens per trajectory")
+    ax.set_ylabel("Trajectories")
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+
+    ax.xaxis.set_major_formatter(
+        plt.FuncFormatter(lambda x, _: f"{int(x/1e3)}k" if x < 1e6 else f"{x/1e6:.1f}M")
+    )
+    ax.xaxis.set_major_locator(plt.LogLocator(base=10, numticks=8))
+    ax.xaxis.set_minor_formatter(plt.NullFormatter())
+
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    out = figures_dir / "trajectory_tokens_histogram.pdf"
+    fig.savefig(out, bbox_inches="tight")
+    plt.close(fig)
+    print(f"  [fig] {out}")
+
+
 def plot_label_prevalence_heatmap(
     configs: list[dict],
     probes: list[str],
@@ -1224,7 +1552,11 @@ def plot_label_prevalence_heatmap(
     Rows = probes, columns = model-dataset combos.
     """
     col_labels = [c["label"] for c in configs]
-    row_labels  = [PROBE_LABELS.get(p, p) for p in probes]
+    row_labels = [
+        f"{_style.PROPERTY_GLYPHS[PROBE_TO_PROPERTY[p]]} {PROBE_LABELS.get(p, p).upper()}"
+        if PROBE_TO_PROPERTY.get(p) else PROBE_LABELS.get(p, p).upper()
+        for p in probes
+    ]
     n_rows, n_cols = len(probes), len(configs)
     grid = np.full((n_rows, n_cols), np.nan)
 
@@ -1249,6 +1581,10 @@ def plot_label_prevalence_heatmap(
     ax.set_xticklabels(col_labels, fontsize=8, ha="right", rotation=30)
     ax.set_yticks([i + 0.5 for i in range(n_rows)])
     ax.set_yticklabels(row_labels, fontsize=8)
+    for tick, p in zip(ax.get_yticklabels(), probes):
+        prop = PROBE_TO_PROPERTY.get(p)
+        if prop:
+            tick.set_color(_style.PROPERTY_COLORS[prop])
     ax.tick_params(length=0)
 
     for i in range(n_rows):
@@ -1273,69 +1609,89 @@ def build_dataset_stats_table(
     probes: list[str],
     out_path: Path,
 ) -> None:
-    """LaTeX table: rows = (model, dataset), columns = #trajectories / #tokens /
-    #train states / #val states / #test states / ≥15 turns / ≥50 turns.
+    """LaTeX table: rows = (model, benchmark), with trajectory, edit, and state counts.
 
-    States are hidden-state captures at assistant-generated tokens with stride=5
-    for the currently_compiles probe, split into train/val/test.
-    Each config dict: {model_label, dataset_label, gen_stats, results_pt_path, placeholder}.
+    Each config dict: {model_label, dataset_label, gen_stats, edit_stats, n_states, placeholder}.
+    edit_stats: {total, median, q25, q75}; n_states: int (train+val+test hidden states).
     """
     caption = (
-        r"Dataset statistics per (model, dataset) combination. "
-        r"\#Traj.\ counts all agent runs by each model on each dataset. "
-        r"\#Tokens is the sum of tokens across all linearized trajectories. "
-        r"$\geq$15 and $\geq$50 count trajectories reaching those turn thresholds, "
-        r"the length filters used in the lookahead experiments. "
-        r"The $k_{\max}=15$ filter is nearly lossless (90--99\,\% of runs); "
-        r"the $k_{\max}=50$ filter retains 40--60\,\%."
+        r"Dataset statistics per model and benchmark. "
+        r"\#Traj.\ counts all agent runs; "
+        r"$\geq$50 counts trajectories reaching that turn threshold "
+        r"(the length filter used in the lookahead experiments). "
+        r"\#Edits is the total number of code edits across all trajectories. "
+        r"$\geq$2 edits counts trajectories with at least two edits. "
+        r"$\#h_t$ is the total number of collected hidden-state vectors."
     )
+
+    def _fmt_states(n: int) -> str:
+        if n == 0:
+            return "—"
+        return f"{n/1e6:.1f}M"
+
     header = (
         r"\begin{table}[t]" "\n"
         r"\centering" "\n"
-        r"\small" "\n"
+        r"\footnotesize" "\n"
         r"\caption{" + caption + r"}" "\n"
         r"\label{tab:dataset_stats}" "\n"
-        r"\begin{tabular}{llrrrr}" "\n"
+        r"\resizebox{\columnwidth}{!}{" "\n"
+        r"\begin{tabular}{llrrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Dataset & \#Traj. & $\geq$15 & $\geq$50 & \#Tokens \\" "\n"
+        r"Model & Benchmark & \#Traj. & $\geq$50 steps & \#Edits & $\geq$2 edits & $\#h_t$ \\" "\n"
         r"\midrule" "\n"
     )
-    # Configs are ordered: (model A, Verified), (model A, Pro), (model B, Verified), ...
-    # Emit \multirow for the model name spanning its two dataset rows.
+
     rows = []
+    tot_traj = tot_gt50 = tot_ge2 = tot_edits = tot_states = 0
+
     i = 0
     while i < len(configs):
         group = configs[i:i + 2]  # pair of rows for the same model
         model_label = group[0]["model_label"]
-        model_short = model_label.split("-")[0]  # "Laguna-XS.2" → "Laguna", "Qwen3.6-35B-A3B" → "Qwen3.6"
+        model_short = model_label.split("-")[0]
         model_cell  = r"\multirow{2}{*}{\texttt{" + model_short + r"}}"
         first_in_group = True
         for cfg in group:
-            ds_short = "Verified" if cfg["dataset_label"] == "Verified" else "Pro"
+            bm = cfg["dataset_label"]  # "Verified" or "Pro"
             mc = model_cell if first_in_group else ""
             first_in_group = False
             if cfg.get("placeholder"):
-                rows.append(f"{mc} & {ds_short} & " + r"\multicolumn{4}{c}{---} \\")
+                rows.append(rf"{mc} & {bm} & " + r"\multicolumn{5}{c}{---} \\")
             else:
-                stats  = cfg["gen_stats"]
-                n_traj = len(stats)
-                n_tok  = sum(s.get("n_tokens", 0) for s in stats)
-                gt15   = sum(1 for s in stats if s["turns"] >= 15)
-                gt50   = sum(1 for s in stats if s["turns"] >= 50)
-                tok_str = (f"{n_tok/1e9:.1f}B" if n_tok >= 1e9 else f"{n_tok/1e6:.0f}M")
+                stats    = cfg["gen_stats"]
+                n_traj   = len(stats)
+                gt50     = sum(1 for s in stats if s["turns"] >= 50)
+                es       = cfg["edit_stats"]
+                n_states = cfg["n_states"]
+
+                tot_traj   += n_traj
+                tot_gt50   += gt50
+                tot_ge2    += es.get("ge2", 0)
+                tot_edits  += es["total"]
+                tot_states += n_states
+
                 rows.append(
-                    f"{mc} & {ds_short} & "
-                    f"{n_traj:,} & {gt15:,} & {gt50:,} & {tok_str} \\\\"
+                    rf"{mc} & {bm} & "
+                    rf"{n_traj:,} & {gt50:,} & {es['total']:,} & {es.get('ge2', 0):,} & {_fmt_states(n_states)} \\"
                 )
         if i + 2 < len(configs):
             rows.append(r"\addlinespace")
         i += 2
+
+    # Total row
+    rows.append(r"\midrule")
+    rows.append(
+        rf"\multicolumn{{2}}{{l}}{{Total}} & "
+        rf"{tot_traj:,} & {tot_gt50:,} & {tot_edits:,} & {tot_ge2:,} & {_fmt_states(tot_states)} \\"
+    )
 
     body   = "\n".join(rows)
     footer = (
         "\n"
         r"\bottomrule" "\n"
         r"\end{tabular}" "\n"
+        r"}" "\n"
         r"\end{table}"
     )
     tex = header + body + footer
@@ -1362,6 +1718,61 @@ def write_figures_manifest(figures_dir: Path) -> None:
     manifest = figures_dir / "manifest.json"
     manifest.write_text(json.dumps(entries, indent=2))
     print(f"  [manifest] {manifest} ({len(entries)} figures)")
+
+
+# ---------------------------------------------------------------------------
+# Agent hyperparameter table
+# ---------------------------------------------------------------------------
+
+def build_agent_hparam_table(
+    gen_root: Path,
+    out_path: Path,
+) -> None:
+    """LaTeX table of agent sampling hyperparameters, one row per model."""
+    _entries = [
+        ("laguna_xs2_full",     "swebench",     "Laguna-XS.2"),
+        ("qwen36_35b_a3b_full", "swebench",     "Qwen3.6-35B-A3B"),
+    ]
+
+    rows = []
+    for model_run_id, dataset_slug, model_label in _entries:
+        p = gen_root / dataset_slug / model_run_id
+        f = next(p.glob("*.json"), None)
+        if f is None:
+            continue
+        rc = json.loads(f.read_text())["metadata"]["run_config"]
+        ctx_k = f"{rc['max_model_len'] // 1024}k"
+        rows.append(
+            rf"\texttt{{{model_label}}} & "
+            rf"{rc['temperature']} & "
+            rf"{rc['top_p']} & "
+            rf"{ctx_k} & "
+            rf"{rc['step_limit']} & "
+            rf"{rc['command_timeout']}\,s \\"
+        )
+
+    tex = "\n".join([
+        r"\begin{table}[h]",
+        r"\centering",
+        r"\footnotesize",
+        r"\caption{Agent hyperparameters used during trajectory generation, "
+        r"following the recommended settings provided by each model vendor. "
+        r"Temperature and top-$p$ control sampling; context is the maximum "
+        r"sequence length; max steps is the turn limit per trajectory; "
+        r"and step timeout is the wall-clock limit per tool call.}",
+        r"\label{tab:agent_hparams}",
+        r"\begin{tabular}{lrrrrr}",
+        r"\toprule",
+        r"Model & Temp. & Top-$p$ & Context & Max steps & Step timeout \\",
+        r"\midrule",
+        *rows,
+        r"\bottomrule",
+        r"\end{tabular}",
+        r"\end{table}",
+    ])
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(tex)
+    print(f"  [tex] {out_path}")
 
 
 # ---------------------------------------------------------------------------
@@ -1422,6 +1833,12 @@ def _generate_dataset_stats(
         turns = [s["turns"] for s in gen_stats]
 
         ld = label_dir if (not placeholder and label_dir.exists()) else None
+        edit_stats = (
+            _compute_edit_stats(label_dir, cache_path=cache_dir / f"edit_stats__{slug}.json")
+            if ld else {"total": 0, "median": 0, "q25": 0, "q75": 0}
+        )
+        n_states = _load_n_states(str(rpt)) if not placeholder else 0
+
         ds_configs_turns.append({"label": label_str, "turns": turns, "color": color})
         ds_configs_prev.append({
             "label":     label_str,
@@ -1433,11 +1850,15 @@ def _generate_dataset_stats(
             "dataset_label":  ds_lbl,
             "placeholder":    placeholder,
             "gen_stats":      gen_stats,
-            "results_pt_path": str(rpt),
+            "edit_stats":     edit_stats,
+            "n_states":       n_states,
         })
 
     if any(c["turns"] for c in ds_configs_turns):
         plot_dataset_turns(ds_configs_turns, figures_dir)
+    all_gs = [c["gen_stats"] for c in ds_configs_stats if c["gen_stats"]]
+    if all_gs:
+        plot_trajectory_tokens_histogram(all_gs, figures_dir)
     plot_label_prevalence_heatmap(ds_configs_prev, probes, figures_dir)
     build_dataset_stats_table(
         ds_configs_stats, probes,
@@ -1708,6 +2129,17 @@ def main():
             out_run_id   = "combined",
             extra_series = pro_extra or None,
         )
+    if len(probes) == 4:
+        plot_layer_auc_grid(
+            results_dir  = results_dir,
+            run_ids      = pooled_ids,
+            run_labels   = pool_labels,
+            probes       = probes,
+            layers       = layers,
+            figures_dir  = figures_dir,
+            out_run_id   = "combined",
+            extra_series = pro_extra or None,
+        )
 
     # --- Transfer barplot + table ---
     transfer_model_labels = [MODEL_LABELS.get(_model_key(r), r)
@@ -1806,6 +2238,12 @@ def main():
                 figures_dir     = figures_dir,
                 filename_suffix = args.tool_nll_filename_suffix,
             )
+
+    # --- Agent hyperparameter table ---
+    build_agent_hparam_table(
+        gen_root=Path(args.generations_dir),
+        out_path=out_dir / "agent_hparam_table.tex",
+    )
 
     # --- Dataset statistics ---
     if args.no_dataset_stats:

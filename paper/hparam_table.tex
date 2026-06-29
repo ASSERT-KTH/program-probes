@@ -6,23 +6,23 @@
 \toprule
 Dataset & Model & Probe & Learning rate & Weight decay & Batch size & Patience \\
 \midrule
-\multirow{8}{*}{\textsc{Verified}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $8.58 \times 10^{-3}$ & $1.18 \times 10^{-3}$ & 512 & 50 \\
- &  & Semantic correctness & $5.19 \times 10^{-4}$ & $3.81 \times 10^{-3}$ & 512 & 10 \\
- &  & Has regressions & $2.95 \times 10^{-2}$ & $5.19 \times 10^{-5}$ & 256 & 50 \\
- &  & Reduces failures & $2.66 \times 10^{-2}$ & $2.13 \times 10^{-3}$ & 1024 & 50 \\
- & \multirow{4}{*}{Qwen3.6-35B-A3B} & Syntactic correctness & $3.33 \times 10^{-3}$ & $4.20 \times 10^{-2}$ & 512 & 25 \\
- &  & Semantic correctness & $1.17 \times 10^{-2}$ & $4.10 \times 10^{-4}$ & 1024 & 25 \\
- &  & Has regressions & $3.11 \times 10^{-4}$ & $1.91 \times 10^{-4}$ & 512 & 50 \\
- &  & Reduces failures & $3.39 \times 10^{-3}$ & $1.75 \times 10^{-4}$ & 1024 & 10 \\
+\multirow{8}{*}{\textsc{Verified}} & \multirow{4}{*}{Laguna-XS.2} & \Syntactic{} & $8.58 \times 10^{-3}$ & $1.18 \times 10^{-3}$ & 512 & 50 \\
+ &  & \Semantic{} & $5.19 \times 10^{-4}$ & $3.81 \times 10^{-3}$ & 512 & 10 \\
+ &  & \Regressions{} & $2.95 \times 10^{-2}$ & $5.19 \times 10^{-5}$ & 256 & 50 \\
+ &  & \RedFail{} & $2.66 \times 10^{-2}$ & $2.13 \times 10^{-3}$ & 1024 & 50 \\
+ & \multirow{4}{*}{Qwen3.6-35B-A3B} & \Syntactic{} & $3.33 \times 10^{-3}$ & $4.20 \times 10^{-2}$ & 512 & 25 \\
+ &  & \Semantic{} & $1.17 \times 10^{-2}$ & $4.10 \times 10^{-4}$ & 1024 & 25 \\
+ &  & \Regressions{} & $3.11 \times 10^{-4}$ & $1.91 \times 10^{-4}$ & 512 & 50 \\
+ &  & \RedFail{} & $3.39 \times 10^{-3}$ & $1.75 \times 10^{-4}$ & 1024 & 10 \\
 \midrule
-\multirow{8}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & Syntactic correctness & $1.40 \times 10^{-3}$ & $3.93 \times 10^{-4}$ & 512 & 25 \\
- &  & Semantic correctness & $2.09 \times 10^{-4}$ & $6.05 \times 10^{-4}$ & 256 & 25 \\
- &  & Reduces failures & $1.52 \times 10^{-3}$ & $1.64 \times 10^{-3}$ & 1024 & 50 \\
- &  & Has regressions & $1.13 \times 10^{-4}$ & $1.49 \times 10^{-2}$ & 1024 & 10 \\
- & \multirow{4}{*}{Qwen3.6-35B-A3B} & Syntactic correctness & $2.30 \times 10^{-4}$ & $1.46 \times 10^{-5}$ & 512 & 10 \\
- &  & Semantic correctness & $4.15 \times 10^{-4}$ & $2.27 \times 10^{-4}$ & 1024 & 10 \\
- &  & Has regressions & $2.74 \times 10^{-3}$ & $2.00 \times 10^{-4}$ & 512 & 50 \\
- &  & Reduces failures & $1.26 \times 10^{-3}$ & $8.97 \times 10^{-5}$ & 1024 & 50 \\
+\multirow{8}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & \Syntactic{} & $1.40 \times 10^{-3}$ & $3.93 \times 10^{-4}$ & 512 & 25 \\
+ &  & \Semantic{} & $2.09 \times 10^{-4}$ & $6.05 \times 10^{-4}$ & 256 & 25 \\
+ &  & \RedFail{} & $1.52 \times 10^{-3}$ & $1.64 \times 10^{-3}$ & 1024 & 50 \\
+ &  & \Regressions{} & $1.13 \times 10^{-4}$ & $1.49 \times 10^{-2}$ & 1024 & 10 \\
+ & \multirow{4}{*}{Qwen3.6-35B-A3B} & \Syntactic{} & $2.30 \times 10^{-4}$ & $1.46 \times 10^{-5}$ & 512 & 10 \\
+ &  & \Semantic{} & $4.15 \times 10^{-4}$ & $2.27 \times 10^{-4}$ & 1024 & 10 \\
+ &  & \Regressions{} & $2.74 \times 10^{-3}$ & $2.00 \times 10^{-4}$ & 512 & 50 \\
+ &  & \RedFail{} & $1.26 \times 10^{-3}$ & $8.97 \times 10^{-5}$ & 1024 & 50 \\
 \bottomrule
 \end{tabular}
 \end{table}

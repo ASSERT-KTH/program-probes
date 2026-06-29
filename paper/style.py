@@ -51,6 +51,12 @@ PROPERTY_MARKERS = {
     "reduced":     "s",   # square
     "regressions": "D",   # diamond
 }
+PROPERTY_GLYPHS = {
+    "syntactic":   "▲",
+    "semantic":    "●",
+    "reduced":     "■",
+    "regressions": "◆",
+}
 PROPERTY_LABELS = {
     "syntactic":   "Syntactic Correctness",
     "semantic":    "Semantic Correctness",
