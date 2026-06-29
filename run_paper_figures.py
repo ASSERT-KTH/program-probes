@@ -1057,12 +1057,17 @@ def plot_layer_auc_grid(
     )
     axes_flat = axes.flatten()
 
+    # Per-dataset-series markers: encode the legend entries (the data series),
+    # NOT the program property. Chosen distinct from the property markers
+    # ({^, o, s, D} used for the probe names) so the two encodings don't clash.
+    SERIES_MARKERS = ["P", "X", "*", "h"]  # filled plus, filled x, star, hexagon
+
     legend_handles: list = []
     legend_built = False
 
-    for ax, probe in zip(axes_flat, probes):
-        prop_key    = PROBE_TO_PROPERTY.get(probe)
-        prop_marker = _style.PROPERTY_MARKERS[prop_key] if prop_key else "o"
+    for idx, (ax, probe) in enumerate(zip(axes_flat, probes)):
+        row, col = idx // 2, idx % 2
+        series_i = 0
 
         for run_id, label in zip(run_ids, run_labels):
             all_res = _load(results_dir, run_id, probe)
@@ -1074,7 +1079,9 @@ def plot_layer_auc_grid(
 
             is_qwen = "qwen" in run_id
             color   = _style.COLORS["qwen_verified" if is_qwen else "laguna_verified"]
-            line,   = ax.plot(xs, ys, linestyle="-", marker=prop_marker, markersize=4,
+            marker  = SERIES_MARKERS[series_i % len(SERIES_MARKERS)]
+            series_i += 1
+            line,   = ax.plot(xs, ys, linestyle="-", marker=marker, markersize=5,
                               color=color, linewidth=1.4, label=label)
             if not legend_built:
                 legend_handles.append(line)
@@ -1086,14 +1093,16 @@ def plot_layer_auc_grid(
             layer_aucs = _layer_means(all_res, "test_auc", layers)
             xs = [l for l in layers if not math.isnan(layer_aucs.get(l, float("nan")))]
             ys = [layer_aucs[l] for l in xs]
-            color = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
-            line, = ax.plot(xs, ys, linestyle="--", marker=prop_marker, markersize=4,
+            color  = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
+            marker = SERIES_MARKERS[series_i % len(SERIES_MARKERS)]
+            series_i += 1
+            line, = ax.plot(xs, ys, linestyle="--", marker=marker, markersize=5,
                             color=color, alpha=0.85, linewidth=1.4, label=extra_label)
             if not legend_built:
                 legend_handles.append(line)
 
-        rand_line = ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
-                               linewidth=1.0, label="Random")
+        rand_line = ax.axhline(0.5, linestyle=(0, (1, 1.5)), color="#C2C2C2",
+                               linewidth=1.4, zorder=0.5, label="Random")
         if not legend_built:
             legend_handles.append(rand_line)
             legend_built = True
@@ -1102,14 +1111,28 @@ def plot_layer_auc_grid(
         ax.set_xticks(layers)
         ax.set_xticklabels([str(_layer_label(l)) for l in layers])
         ax.set_ylim(bottom=0.45, top=1.0)
-        ax.set_ylabel("AUC")
 
-        # n_test annotation — top-right of each panel
+        # Keep tick numbers readable on each panel without crossing the grid:
+        # x-numbers on the top row too, y-numbers ("units") on the right column.
+        ax.tick_params(labelbottom=True)
+        if col == 1:
+            ax.tick_params(labelright=True, labelleft=False)
+        if col == 0:
+            ax.set_ylabel("AUC")
+
+        # n_test annotation — top-right corner, clear of the 0.5 baseline
         for run_id in run_ids:
             if "shuffled" not in run_id:
                 res = _load(results_dir, run_id, probe)
                 if res:
-                    _annotate_n_test(ax, _n_test_from_results(res))
+                    n = _n_test_from_results(res)
+                    s = _fmt_n(n)
+                    if s:
+                        ax.annotate(f"n = {s} $h_t$",
+                                    xy=(1, 1), xycoords="axes fraction",
+                                    xytext=(-4, -4), textcoords="offset points",
+                                    ha="right", va="top", fontsize=7,
+                                    color="#999999", annotation_clip=False)
                     break
 
     # x-label only on bottom row
@@ -1350,7 +1373,7 @@ def _compute_edit_stats(label_dir: Path, cache_path: Path | None = None) -> dict
             continue
         counts.append(sum(1 for e in d.get("edits", []) if e.get("cmd_idx") != -1))
     if not counts:
-        result = {"total": 0, "ge2": 0, "median": 0, "q25": 0, "q75": 0}
+        result = {"total": 0, "ge2": 0, "median": 0, "q25": 0, "q75": 0, "counts": []}
     else:
         s = sorted(counts)
         n = len(s)
@@ -1360,6 +1383,7 @@ def _compute_edit_stats(label_dir: Path, cache_path: Path | None = None) -> dict
             "median": s[n // 2],
             "q25":    s[n // 4],
             "q75":    s[3 * n // 4],
+            "counts": s,  # raw per-trajectory edit counts, for pooled medians
         }
     if cache_path:
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1486,7 +1510,13 @@ def plot_dataset_turns(
     ax.axhline(15,  color="#555555", linestyle="--", linewidth=0.9, label="15 turns")
     ax.axhline(50, color="#222222", linestyle=":",  linewidth=0.9, label="50 turns")
     ax.set_xticks(range(1, len(all_labels) + 1))
-    ax.set_xticklabels(all_labels, fontsize=8)
+    # Shorten the model name (e.g. "Qwen3.6-35B-A3B" -> "Qwen3.6") so the
+    # horizontal tick labels don't overlap between adjacent ticks.
+    def _short_label(label: str) -> str:
+        parts = label.split("\n")
+        parts[0] = parts[0].split("-")[0]
+        return "\n".join(parts)
+    ax.set_xticklabels([_short_label(l) for l in all_labels], fontsize=8)
     ax.set_ylabel("Turns")
     ax.set_ylim(top=100)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -1619,8 +1649,10 @@ def build_dataset_stats_table(
         r"\#Traj.\ counts all agent runs; "
         r"$\geq$50 counts trajectories reaching that turn threshold "
         r"(the length filter used in the lookahead experiments). "
+        r"Med.\ steps is the median number of turns per trajectory. "
         r"\#Edits is the total number of code edits across all trajectories. "
         r"$\geq$2 edits counts trajectories with at least two edits. "
+        r"Med.\ edits is the median number of edits per trajectory. "
         r"$\#h_t$ is the total number of collected hidden-state vectors."
     )
 
@@ -1636,14 +1668,16 @@ def build_dataset_stats_table(
         r"\caption{" + caption + r"}" "\n"
         r"\label{tab:dataset_stats}" "\n"
         r"\resizebox{\columnwidth}{!}{" "\n"
-        r"\begin{tabular}{llrrrrr}" "\n"
+        r"\begin{tabular}{llrrrrrrr}" "\n"
         r"\toprule" "\n"
-        r"Model & Benchmark & \#Traj. & $\geq$50 steps & \#Edits & $\geq$2 edits & $\#h_t$ \\" "\n"
+        r"Model & Benchmark & \#Traj. & $\geq$50 steps & Med.\ steps & \#Edits & $\geq$2 edits & Med.\ edits & $\#h_t$ \\" "\n"
         r"\midrule" "\n"
     )
 
     rows = []
     tot_traj = tot_gt50 = tot_ge2 = tot_edits = tot_states = 0
+    all_turns: list[int] = []   # pooled across configs, for the total median
+    all_edits: list[int] = []
 
     i = 0
     while i < len(configs):
@@ -1657,12 +1691,15 @@ def build_dataset_stats_table(
             mc = model_cell if first_in_group else ""
             first_in_group = False
             if cfg.get("placeholder"):
-                rows.append(rf"{mc} & {bm} & " + r"\multicolumn{5}{c}{---} \\")
+                rows.append(rf"{mc} & {bm} & " + r"\multicolumn{7}{c}{---} \\")
             else:
                 stats    = cfg["gen_stats"]
                 n_traj   = len(stats)
                 gt50     = sum(1 for s in stats if s["turns"] >= 50)
+                turns    = sorted(s["turns"] for s in stats)
+                med_steps = turns[len(turns) // 2] if turns else 0
                 es       = cfg["edit_stats"]
+                med_edits = es.get("median", 0)
                 n_states = cfg["n_states"]
 
                 tot_traj   += n_traj
@@ -1670,20 +1707,29 @@ def build_dataset_stats_table(
                 tot_ge2    += es.get("ge2", 0)
                 tot_edits  += es["total"]
                 tot_states += n_states
+                all_turns.extend(s["turns"] for s in stats)
+                all_edits.extend(es.get("counts", []))
 
                 rows.append(
                     rf"{mc} & {bm} & "
-                    rf"{n_traj:,} & {gt50:,} & {es['total']:,} & {es.get('ge2', 0):,} & {_fmt_states(n_states)} \\"
+                    rf"{n_traj:,} & {gt50:,} & {med_steps:,} & {es['total']:,} & {es.get('ge2', 0):,} & {med_edits:,} & {_fmt_states(n_states)} \\"
                 )
         if i + 2 < len(configs):
             rows.append(r"\addlinespace")
         i += 2
 
-    # Total row
+    # Total row (medians pooled across all trajectories, not summed)
+    def _median(xs: list[int]) -> str:
+        if not xs:
+            return "---"
+        s = sorted(xs)
+        return f"{s[len(s) // 2]:,}"
+
     rows.append(r"\midrule")
     rows.append(
         rf"\multicolumn{{2}}{{l}}{{Total}} & "
-        rf"{tot_traj:,} & {tot_gt50:,} & {tot_edits:,} & {tot_ge2:,} & {_fmt_states(tot_states)} \\"
+        rf"{tot_traj:,} & {tot_gt50:,} & {_median(all_turns)} & "
+        rf"{tot_edits:,} & {tot_ge2:,} & {_median(all_edits)} & {_fmt_states(tot_states)} \\"
     )
 
     body   = "\n".join(rows)

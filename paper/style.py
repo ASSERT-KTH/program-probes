@@ -58,10 +58,10 @@ PROPERTY_GLYPHS = {
     "regressions": "◆",
 }
 PROPERTY_LABELS = {
-    "syntactic":   "Syntactic Correctness",
-    "semantic":    "Semantic Correctness",
-    "reduced":     "Reduced Failing Tests",
-    "regressions": "Introduced Regressions",
+    "syntactic":   "Well-formedness",
+    "semantic":    "Full Correctness",
+    "reduced":     "Partial Correctness",
+    "regressions": "Regression",
 }
 
 # --- Heatmap ---
