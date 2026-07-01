@@ -4,6 +4,24 @@ Measures whether a language model's internal hidden states linearly predict prop
 
 The experiment runs a coding agent (mini-SWE-agent) on SWE-bench, records hidden states at every assistant turn, and trains linear probes to predict per-edit properties such as *does the code currently compile?* and *are all tests currently passing?*
 
+## Clone
+
+This repo vendors `SWE-bench_Pro-os` as a git submodule, so clone recursively:
+
+```bash
+git clone --recurse-submodules https://github.com/ASSERT-KTH/program-probes
+# already cloned without --recurse-submodules?
+git submodule update --init --recursive
+```
+
+## Data
+
+The labeled agent trajectories used in the paper are released on the Hugging Face Hub:
+
+- **[ASSERT-KTH/latent-programming-horizons-trajs](https://huggingface.co/datasets/ASSERT-KTH/latent-programming-horizons-trajs)**
+
+These are the outputs of steps 1–2 of the [pipeline](#pipeline) (generation + labeling). Downloading them lets you skip the GPU generation step and start from hidden-state extraction (step 3) onward. Point `--traj-dir` / `--label-dir` at the downloaded trajectories in the commands below.
+
 ## Pipeline
 
 ```
