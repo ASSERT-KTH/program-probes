@@ -31,6 +31,7 @@ def build_cache(
         for layer_idx in probe_layer_indices:
             print(f"  [{probe_name}] Building layer {layer_idx}...", flush=True)
             H_list, y_list, rel_list, step_list, sid_list, gid_list = [], [], [], [], [], []
+            target_step_list: list[int] = []
             y_original_list: list[int] = []  # only populated when label_shift > 0
 
             for fi, f in enumerate(pt_files):
@@ -38,14 +39,18 @@ def build_cache(
                     print(f"    file {fi}/{len(pt_files)}: {f.name}", flush=True)
                 data = torch.load(f, weights_only=False)
                 label_path = f.parent / f"{f.stem}_labels.pt"
+                pos_turns = None
+                turn_labels = None
                 if label_path.exists():
-                    label = torch.load(label_path, weights_only=False)["labels"].get(probe_name)
+                    label_data = torch.load(label_path, weights_only=False)
+                    label = label_data["labels"].get(probe_name)
+                    pos_turns = label_data.get("step_idx")
+                    turn_labels = label_data.get("turn_labels", {}).get(probe_name)
                 else:
                     label = data.get("labels", {}).get(probe_name)
                 sample = data["sample_id"]
                 raw_group = data["group_id"]
                 group = raw_group.rsplit('-', 1)[0] if group_by == "project" else raw_group
-                n_turns = data.get("n_turns") or 1
 
                 acts = data["activations"][layer_idx]  # [T, hidden_dim] float16
                 T = acts.shape[0]
@@ -57,10 +62,21 @@ def build_cache(
                 rel_pos = torch.arange(T, dtype=torch.float32) / max(T - 1, 1)
 
                 if isinstance(label, list):
-                    K = n_turns
-                    y_vals = [-1 if (label[t] if t < len(label) else None) is None
-                              else (1 if label[t] else 0) for t in range(T)]
-                    step_idx_vals = [min(int(i * K / T), K - 1) for i in range(T)]
+                    if pos_turns is None or turn_labels is None:
+                        raise ValueError(
+                            f"{label_path} has no per-position turn indices for dynamic probe "
+                            f"{probe_name!r}; re-run run_attach_labels_swebench.py."
+                        )
+                    if len(pos_turns) != T or len(label) != T:
+                        raise ValueError(
+                            f"{f.name}: {T} activations but {len(label)} labels / "
+                            f"{len(pos_turns)} turn indices."
+                        )
+                    # Per-turn labels, including turns with no extracted position.
+                    turn_label = [-1 if raw is None else (1 if raw else 0) for raw in turn_labels]
+                    K = len(turn_label)
+                    y_vals = [-1 if label[t] is None else (1 if label[t] else 0) for t in range(T)]
+                    step_idx_vals = list(pos_turns)
                 else:
                     y_int = -1 if label is None else (1 if label else 0)
                     y_vals = [y_int] * T
@@ -70,23 +86,15 @@ def build_cache(
                 # else label_shift) — ensures same token set across all k when max_label_shift is fixed
                 window_shift = max_label_shift if max_label_shift is not None else label_shift
                 if window_shift > 0 and isinstance(label, list):
-                    # Build per-turn label: for each turn index, its label value
-                    turn_label: dict[int, int] = {}
-                    for t in range(T):
-                        turn = step_idx_vals[t]
-                        if turn not in turn_label:
-                            raw = label[t] if t < len(label) else None
-                            turn_label[turn] = -1 if raw is None else (1 if raw else 0)
-
                     # Keep tokens within the fixed window (window_shift), label from label_shift ahead
-                    valid = [t for t in range(T) if step_idx_vals[t] + window_shift < n_turns]
+                    valid = [t for t in range(T) if step_idx_vals[t] + window_shift < K]
                     if not valid:
                         continue
                     valid_t = torch.tensor(valid)
                     acts = acts[valid_t]
                     rel_pos = rel_pos[valid_t]
                     y_original = [y_vals[t] for t in valid]
-                    y_vals = [turn_label.get(step_idx_vals[t] + label_shift, -1) for t in valid]
+                    y_vals = [turn_label[step_idx_vals[t] + label_shift] for t in valid]
                     step_idx_vals = [step_idx_vals[t] for t in valid]
                     T = len(valid)
                     y_original_list.extend(y_original)
@@ -95,6 +103,9 @@ def build_cache(
                 y_list.extend(y_vals)
                 rel_list.extend(rel_pos.tolist())
                 step_list.extend(step_idx_vals)
+                # Turn whose label y refers to (differs from step_idx when label_shift > 0).
+                shift = label_shift if isinstance(label, list) else 0
+                target_step_list.extend(s + shift for s in step_idx_vals)
                 sid_list.extend([sample] * T)
                 gid_list.extend([group] * T)
 
@@ -107,10 +118,11 @@ def build_cache(
                 "y": torch.tensor(y_list, dtype=torch.int64),
                 "rel_pos": torch.tensor(rel_list, dtype=torch.float32),
                 "step_idx": torch.tensor(step_list, dtype=torch.int64),
+                "target_step_idx": torch.tensor(target_step_list, dtype=torch.int64),
                 "sample_id": sid_list,
                 "group_id": gid_list,
             }
             if label_shift > 0:
                 cache["y_original"] = torch.tensor(y_original_list, dtype=torch.int64)
             torch.save(cache, out_dir / f"layer_{layer_idx}.pt")
-            del cache, H_list, y_list, rel_list, step_list, sid_list, gid_list, y_original_list
+            del cache, H_list, y_list, rel_list, step_list, target_step_list, sid_list, gid_list, y_original_list

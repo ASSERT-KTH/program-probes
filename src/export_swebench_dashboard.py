@@ -94,50 +94,6 @@ def _per_bin_majority_baseline_from_cache(
     return result
 
 
-def _per_turn_labels(segments: list[dict], n_tokens: int, label_seq: list) -> list:
-    """Return one label per assistant turn — the value at the last extracted position in that turn.
-
-    Infers stride from total assistant tokens vs label sequence length.
-    """
-    mask = [0] * n_tokens
-    for seg in segments:
-        if seg.get("role") == "assistant":
-            for pos in range(seg["start_token"], min(seg["end_token"], n_tokens)):
-                mask[pos] = 1
-
-    total_asst = sum(mask)
-    n_labels = len(label_seq)
-    if n_labels == 0 or total_asst == 0:
-        asst_count = sum(1 for s in segments if s.get("role") == "assistant")
-        return [None] * asst_count
-
-    stride = max(1, round(total_asst / n_labels))
-
-    # Build list of strided extracted positions with their label index
-    extracted: list[int] = []
-    counter = 0
-    for pos, m in enumerate(mask):
-        if m == 1:
-            if counter % stride == 0:
-                extracted.append(pos)
-            counter += 1
-
-    # For each assistant segment, find the last extracted position and its label
-    result = []
-    for seg in segments:
-        if seg.get("role") != "assistant":
-            continue
-        start, end = seg["start_token"], min(seg["end_token"], n_tokens)
-        # Last extracted position within this segment
-        seg_extracted = [i for i, pos in enumerate(extracted) if start <= pos < end]
-        if seg_extracted:
-            idx = min(seg_extracted[-1], len(label_seq) - 1)
-            result.append(label_seq[idx])
-        else:
-            result.append(None)
-    return result
-
-
 def _load_traj_data(traj_dir: Path, instance_id: str) -> tuple[list[dict], list[dict], int, int]:
     """Load messages, segments, total token count, and turn count from a trajectory JSON.
 
@@ -193,8 +149,11 @@ def export_swebench_dashboard(
         outcome = bool(data.get("outcome", False))
         n_captured_steps = data.get("n_captured_steps", 0)
         label_file = pt_file.parent / f"{pt_file.stem}_labels.pt"
+        turn_labels: dict = {}
         if label_file.exists():
-            labels = torch.load(label_file, weights_only=False)["labels"]
+            label_data = torch.load(label_file, weights_only=False)
+            labels = label_data["labels"]
+            turn_labels = label_data.get("turn_labels", {})
         else:
             labels = data.get("labels", {})
 
@@ -219,8 +178,8 @@ def export_swebench_dashboard(
             if isinstance(lbl, list):
                 label_entry[probe_name] = lbl
                 probe_trans[probe_name].append(_compute_transitions(lbl))
-                if segments:
-                    per_turn_labels[probe_name] = _per_turn_labels(segments, n_tokens, lbl)
+                if probe_name in turn_labels:
+                    per_turn_labels[probe_name] = turn_labels[probe_name]
             else:
                 label_entry[probe_name] = outcome
                 probe_trans[probe_name].append({"total": 0, "false_to_true": 0, "true_to_false": 0})

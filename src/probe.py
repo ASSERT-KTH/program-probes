@@ -57,6 +57,41 @@ def _bin_index(rel_pos: float, n_bins: int = 10) -> int:
     return min(int(math.floor(rel_pos * n_bins)), n_bins - 1)
 
 
+def _after_edit_mask(target_step_idx: torch.Tensor, sample_ids: list[str], edit_step_index: dict) -> torch.Tensor:
+    """True where the label refers to the first turn after a code edit.
+
+    Uses the cache's target_step_idx (the turn the label belongs to), so with
+    label_shift > 0 the filter selects freshly edited *targets*, not sources.
+    """
+    edit_sets = {sid: set(steps) for sid, steps in edit_step_index.items()}
+    return torch.tensor(
+        [target_step_idx[i].item() in edit_sets.get(sample_ids[i], set()) for i in range(len(sample_ids))],
+        dtype=torch.bool,
+    )
+
+
+def _shuffle_by_trajectory(y: torch.Tensor, sample_ids: list[str]) -> torch.Tensor:
+    """Give each trajectory the label sequence of a randomly chosen other trajectory.
+
+    Donor sequences are resampled to the recipient's length by relative
+    position, so within-trajectory autocorrelation and the per-trajectory
+    label structure are preserved while the link to the hidden states is broken.
+    """
+    order: dict[str, list[int]] = {}
+    for i, sid in enumerate(sample_ids):
+        order.setdefault(sid, []).append(i)
+    sids = list(order)
+    perm = torch.randperm(len(sids)).tolist()
+    out = torch.empty_like(y)
+    for recipient, donor_pos in zip(sids, perm):
+        r_idx = order[recipient]
+        d_idx = order[sids[donor_pos]]
+        n_r, n_d = len(r_idx), len(d_idx)
+        src = [d_idx[round(j * (n_d - 1) / max(n_r - 1, 1))] for j in range(n_r)]
+        out[r_idx] = y[src]
+    return out
+
+
 def _compute_ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> float:
     """Expected Calibration Error — weighted average of |acc - conf| across bins."""
     bin_boundaries = np.linspace(0, 1, n_bins + 1)
@@ -125,6 +160,7 @@ def train_probe_layer(
     shuffle_labels: bool = False,
     after_edit_only: bool = False,
     edit_step_index: dict | None = None,
+    shuffle_unit: str = "token",
 ) -> tuple[list[ProbeResult], dict[int, dict]]:
     _set_seeds(seed)
     data = torch.load(cache_path, weights_only=False)
@@ -156,12 +192,7 @@ def train_probe_layer(
     bin_ids = (rel_pos * train_n_bins).floor().long().clamp(0, train_n_bins - 1)
     valid = y >= 0
     if after_edit_only and edit_step_index is not None and step_idx is not None:
-        edit_sets = {sid: set(steps) for sid, steps in edit_step_index.items()}
-        after_edit = torch.tensor(
-            [step_idx[i].item() in edit_sets.get(sample_ids[i], set()) for i in range(len(sample_ids))],
-            dtype=torch.bool,
-        )
-        valid = valid & after_edit
+        valid = valid & _after_edit_mask(data.get("target_step_idx", step_idx), sample_ids, edit_step_index)
 
     for bin_idx in range(train_n_bins):
         bin_mask = (bin_ids == bin_idx) & valid
@@ -193,7 +224,11 @@ def train_probe_layer(
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
 
-        if shuffle_labels:
+        if shuffle_labels and shuffle_unit == "trajectory":
+            y_train = _shuffle_by_trajectory(y_train, [s for s, m in zip(bin_samples, train_mask.tolist()) if m])
+            y_val   = _shuffle_by_trajectory(y_val, [s for s, m in zip(bin_samples, val_mask.tolist()) if m])
+            y_test  = _shuffle_by_trajectory(y_test, [s for s, m in zip(bin_samples, test_mask.tolist()) if m])
+        elif shuffle_labels:
             y_train = y_train[torch.randperm(len(y_train))]
             y_val   = y_val[torch.randperm(len(y_val))]
             y_test  = y_test[torch.randperm(len(y_test))]
@@ -418,6 +453,7 @@ def run_sweep(
     results_dir: str = "results",
     fixed_params: dict | None = None,
     shuffle_labels: bool = False,
+    shuffle_unit: str = "token",
 ) -> str:
     """Run hyperparameter sweep, optionally followed by final training.
 
@@ -458,7 +494,7 @@ def run_sweep(
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 loss="cross_entropy", pos_weight=1.0,
                 log_fn=log_fn, n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
-                shuffle_labels=shuffle_labels,
+                shuffle_labels=shuffle_labels, shuffle_unit=shuffle_unit,
             )
             wandb.log({
                 "mean_val_f1": np.mean([r.val_f1 for r in results]) if results else 0.0,
@@ -484,6 +520,8 @@ def run_sweep(
             probe_arch=probe_arch,
             n_eval_bins=n_eval_bins,
             eval_bin_axis=eval_bin_axis,
+            shuffle_labels=shuffle_labels,
+            shuffle_unit=shuffle_unit,
         )
 
     return sweep_id
@@ -511,6 +549,7 @@ def run_final(
     shuffle_labels: bool = False,
     after_edit_only: bool = False,
     edit_index_run_id: str | None = None,
+    shuffle_unit: str = "token",
 ) -> dict:
     if sweep_id is not None:
         best = fetch_best_sweep_config(sweep_id)
@@ -575,7 +614,7 @@ def run_final(
                 seed=seed, n_bins=n_bins, probe_arch=probe_arch,
                 loss=loss, pos_weight=pos_weight,
                 log_fn=make_log_fn(layer_idx), n_eval_bins=n_eval_bins, eval_bin_axis=eval_bin_axis,
-                shuffle_labels=shuffle_labels,
+                shuffle_labels=shuffle_labels, shuffle_unit=shuffle_unit,
                 after_edit_only=after_edit_only, edit_step_index=edit_step_index,
             )
             all_results[layer_idx] = results
@@ -762,12 +801,7 @@ def run_eval(
 
         valid = y >= 0
         if after_edit_only and edit_step_index is not None and step_idx is not None:
-            edit_sets = {sid: set(steps) for sid, steps in edit_step_index.items()}
-            after_edit = torch.tensor(
-                [step_idx[i].item() in edit_sets.get(sample_ids[i], set()) for i in range(len(sample_ids))],
-                dtype=torch.bool,
-            )
-            valid = valid & after_edit
+            valid = valid & _after_edit_mask(data.get("target_step_idx", step_idx), sample_ids, edit_step_index)
         results = []
 
         for eb in range(n_eval_bins):

@@ -233,6 +233,8 @@ A probe asks: *does the model's hidden state at a given point in generation line
 
 Dynamic probes require an `edit_history` with per-edit `test_results`. The carry-forward step in `run_attach_labels_swebench.py` expands one label per edit into one label per stride step; tokens before the first edit are excluded from training.
 
+An edit issued in assistant turn N takes effect from turn N+1. Alongside the per-position labels, `*_labels.pt` stores `step_idx` (the real assistant-turn index of each extracted position) and `turn_labels` (the label in effect at each turn); `build_cache` requires both for dynamic probes and uses them for lookahead (`--label-shift`) and the after-edit filter. Label files written before these fields existed must be regenerated.
+
 ### SWE-bench label format
 
 Each `_labels.json` produced by the labeler contains:
