@@ -1172,10 +1172,12 @@ def plot_lookahead_horizon(
     out_run_id: str,
     filename_suffix: str = "",
     dataset_label: str = "",
+    show_baseline: bool = True,
 ) -> None:
-    """AUC vs lookahead horizon k (assistant turns) across layers."""
+    """AUC vs lookahead horizon k (assistant steps) across layers."""
     data: dict[int, list[tuple]] = {l: [] for l in layers}
     k_to_n: dict[int, int] = {}
+    baseline_pts: list[tuple] = []
 
     for k, run_id in zip(k_values, run_ids):
         all_res = _load(results_dir, run_id, probe)
@@ -1196,6 +1198,15 @@ def plot_lookahead_horizon(
                 continue
             data[layer].append((k, total_auc_w / total_n, total_n))
             k_to_n.setdefault(k, total_n)
+
+        if show_baseline:
+            baseline_path = results_dir / run_id / probe / "persistence_baseline.pt"
+            if baseline_path.exists():
+                baseline_results = torch.load(baseline_path, weights_only=False)
+                if baseline_results:
+                    baseline_pts.append((k, _weighted_mean(baseline_results, "test_auc")))
+            else:
+                print(f"  [lookahead] missing persistence_baseline for {run_id}/{probe}")
 
     ks_present = sorted(k_to_n.keys())
     if not ks_present:
@@ -1228,7 +1239,17 @@ def plot_lookahead_horizon(
     ax.text(ks_present[-1], 0.5, "  random", va="top", ha="left",
             fontsize=7, color="#999", transform=ax.transData)
 
-    ax.set_xlabel("Horizon k (turns)")
+    if baseline_pts:
+        baseline_pts.sort(key=lambda x: x[0])
+        base_ks   = [p[0] for p in baseline_pts]
+        base_aucs = [p[1] for p in baseline_pts]
+        ax.plot(base_ks, base_aucs, linestyle=":", marker="s", markersize=4,
+                color=_style.COLORS["baseline"], linewidth=1.4, zorder=2)
+        ax.annotate("persistence", xy=(base_ks[0], base_aucs[0]), xytext=(-5, 0),
+                    textcoords="offset points", ha="right", va="center",
+                    fontsize=7, color=_style.COLORS["baseline"])
+
+    ax.set_xlabel("Horizon k (steps)")
     ax.set_ylabel("AUC")
     ax.set_ylim(bottom=0.48)
     model_key = _model_key(run_ids[0]) if run_ids else ""
@@ -1996,6 +2017,8 @@ def main():
                         help="Subset of probes for lookahead figures (default: all probes).")
     parser.add_argument("--no-lookahead", action="store_true",
                         help="Skip all lookahead figures.")
+    parser.add_argument("--no-lookahead-baseline", action="store_true",
+                        help="Skip the naive-persistence baseline curve on lookahead figures.")
     # Hyperparameter table
     parser.add_argument("--hparams-file", default="paper/hparams.json",
                         help="JSON file with chosen HP values per model × dataset.")
@@ -2254,6 +2277,7 @@ def main():
                         out_run_id      = model_run_id,
                         filename_suffix = file_suffix,
                         dataset_label   = "Verified",
+                        show_baseline   = not args.no_lookahead_baseline,
                     )
 
             print(f"[fig] lookahead horizon plots (Pro, {file_suffix})...")
@@ -2270,6 +2294,7 @@ def main():
                         out_run_id      = f"{model_run_id}_pooled_pro",
                         filename_suffix = f"pro_{file_suffix}",
                         dataset_label   = "Pro",
+                        show_baseline   = not args.no_lookahead_baseline,
                     )
 
     # --- Tool NLL correlation plots ---

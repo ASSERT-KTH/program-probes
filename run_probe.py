@@ -1,7 +1,10 @@
 import argparse
 import json
+from pathlib import Path
+import torch
 from src.configs import ModelConfig, load_config
 from src.probe import run_sweep, run_final, run_eval, create_sweep
+from src.baselines import compute_persistence_baseline
 
 
 def main():
@@ -67,6 +70,11 @@ def main():
     eval_p.add_argument("--output-run-id", required=True,
                         help="Run ID under which to save results.pt")
 
+    baseline_p = subparsers.add_parser(
+        "baseline-persistence",
+        help="Compute the naive-persistence baseline (predict y_{t+k} = y_t) from an existing cache",
+    )
+
     parser.add_argument("--layer", type=int, default=None,
                         help="Run sweep/final for this single layer only (overrides model config loop)")
 
@@ -123,6 +131,20 @@ def main():
             edit_index_run_id=args.edit_index_run_id,
             tool_nll_run_id=args.tool_nll_run_id,
         )
+    elif args.mode == "baseline-persistence":
+        layer = args.layer if args.layer is not None else model_cfg.probe_layers[0]
+        cache_path = Path(args.cache_dir) / cache_run_id / args.probe / f"layer_{layer}.pt"
+        results = compute_persistence_baseline(
+            str(cache_path),
+            seed=args.seed,
+            n_eval_bins=args.n_eval_bins or 10,
+            eval_bin_axis=args.eval_bin_axis,
+        )
+        out = Path(args.results_dir) / args.run_id / args.probe
+        out.mkdir(parents=True, exist_ok=True)
+        out_path = out / "persistence_baseline.pt"
+        torch.save([vars(r) for r in results], out_path)
+        print(f"[baseline-persistence] saved {len(results)} bins to {out_path}")
     else:
         layers = [args.layer] if args.layer is not None else model_cfg.probe_layers
         run_final(
