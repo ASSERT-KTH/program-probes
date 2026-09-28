@@ -23,8 +23,11 @@ def main():
     parser.add_argument("--probe-arch", choices=["linear", "mlp"], default="linear")
     parser.add_argument("--shuffle-labels", action="store_true",
                         help="Randomly permute labels within each split before training (sanity-check baseline).")
+    parser.add_argument("--shuffle-unit", choices=["token", "trajectory"], default="token",
+                        help="With --shuffle-labels: permute individual token labels, or give each trajectory "
+                             "the label sequence of another trajectory (preserves within-trajectory structure).")
     parser.add_argument("--after-edit-only", action="store_true",
-                        help="Restrict eval (and training) to tokens on the first turn after a code edit.")
+                        help="Restrict eval (and training) to tokens whose label refers to the first turn after a code edit.")
     parser.add_argument("--edit-index-run-id", default=None,
                         help="Run ID whose edit_step_index.pt to load (defaults to cache-run-id or run-id).")
     parser.add_argument("--tool-nll-run-id", default=None,
@@ -100,6 +103,7 @@ def main():
                 results_dir=args.results_dir,
                 fixed_params=args.fixed,
                 shuffle_labels=args.shuffle_labels,
+                shuffle_unit=args.shuffle_unit,
             )
     elif args.mode == "eval":
         run_eval(
@@ -141,6 +145,7 @@ def main():
             n_eval_bins=args.n_eval_bins,
             eval_bin_axis=args.eval_bin_axis,
             shuffle_labels=args.shuffle_labels,
+            shuffle_unit=args.shuffle_unit,
             after_edit_only=args.after_edit_only,
             edit_index_run_id=args.edit_index_run_id,
         )

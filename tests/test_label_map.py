@@ -252,3 +252,38 @@ class TestRealTrajectory:
             probe="currently_correct",
         )
         assert all(l is not None for l in labels)
+
+
+# ---------------------------------------------------------------------------
+# map_positions_to_turns / edit_labels_by_turn
+# ---------------------------------------------------------------------------
+
+def test_positions_to_turns_uneven_turn_lengths():
+    """Turn indices follow real segment boundaries, not a uniform split."""
+    from src.tasks.swe_bench_label_map import map_positions_to_turns
+
+    msgs = _make_messages(3)
+    # system, user, a0 (20 tok), u1, a1 (2 tok), u2, a2 (8 tok), u3
+    lengths = [5, 5, 20, 5, 2, 5, 8, 5]
+    segs, pos = [], 0
+    for i, (m, n) in enumerate(zip(msgs, lengths)):
+        segs.append({"message_idx": i, "role": m["role"], "start_token": pos, "end_token": pos + n})
+        pos += n
+    mask = _make_mask(segs, pos)
+
+    turns = map_positions_to_turns(segs, msgs, mask, stride=1)
+    assert turns == [0] * 20 + [1] * 2 + [2] * 8
+
+
+def test_edit_labels_by_turn_carry_forward():
+    """Edit at cmd_idx N takes effect from turn N+1; baseline from turn 0."""
+    from src.tasks.swe_bench_label_map import edit_labels_by_turn
+
+    edits = [{"cmd_idx": -1}, {"cmd_idx": 1}, {"cmd_idx": 3}]
+    assert edit_labels_by_turn(edits, [False, True, False], 6) == [False, False, True, True, False, False]
+
+
+def test_edit_labels_by_turn_no_baseline():
+    from src.tasks.swe_bench_label_map import edit_labels_by_turn
+
+    assert edit_labels_by_turn([{"cmd_idx": 0}], [True], 3) == [None, True, True]

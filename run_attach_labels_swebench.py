@@ -24,7 +24,11 @@ import torch
 from src.configs import GenerationConfig, load_config
 from src.probes.base import EditEvent, TrajectoryContext
 from src.tasks.swe_bench_extract import load_trajectories
-from src.tasks.swe_bench_label_map import map_edit_labels_to_positions
+from src.tasks.swe_bench_label_map import (
+    edit_labels_by_turn,
+    map_edit_labels_to_positions,
+    map_positions_to_turns,
+)
 
 
 def _load_probe(probe_name: str):
@@ -122,7 +126,18 @@ def main() -> None:
             n_captured_steps=n_steps,
         )
 
+        # Real assistant-turn index of every extracted position, so that
+        # build_cache does not have to approximate step boundaries.
+        step_idx = map_positions_to_turns(
+            segments=traj.segments,
+            messages=traj.messages,
+            extraction_mask=traj.extraction_mask,
+            stride=stride,
+        )
+        n_turns = sum(1 for m in traj.messages if m["role"] == "assistant")
+
         labels: dict = {}
+        turn_labels: dict = {}
         for probe in probes:
             try:
                 raw = probe.compute_label(ctx)
@@ -138,11 +153,12 @@ def main() -> None:
                     stride=stride,
                     edit_labels=raw,
                 )
+                turn_labels[probe.name] = edit_labels_by_turn(sorted_edits, raw, n_turns)
             else:
                 labels[probe.name] = raw
 
         out_path = input_dir / f"{sample_id}_labels.pt"
-        torch.save({"labels": labels}, out_path)
+        torch.save({"labels": labels, "step_idx": step_idx, "turn_labels": turn_labels}, out_path)
         print(f"  Saved {out_path.name}  (n_steps={n_steps}, outcome={traj.outcome})")
         n_ok += 1
 

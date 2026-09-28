@@ -46,6 +46,22 @@ def map_edit_labels_to_positions(
         One entry per extracted position, carry-forwarded from the most recent
         edit whose effect is visible at that position.
     """
+    turns = map_positions_to_turns(segments, messages, extraction_mask, stride)
+    turn_labels = edit_labels_by_turn(sorted_edits, edit_labels, max(turns, default=-1) + 1)
+    return [turn_labels[t] for t in turns]
+
+
+def map_positions_to_turns(
+    segments: list[dict],
+    messages: list[dict],
+    extraction_mask: list[int],
+    stride: int,
+) -> list[int]:
+    """Return the assistant-turn index of every extracted position.
+
+    Uses the same stride/mask logic as extraction, so the result is aligned
+    1:1 with the activation rows.
+    """
     asst_message_indices = [
         i for i, m in enumerate(messages) if m["role"] == "assistant"
     ]
@@ -69,9 +85,20 @@ def map_edit_labels_to_positions(
                 extracted_positions.append(pos)
             stride_counter += 1
 
+    return [_turn_for_pos(pos) for pos in extracted_positions]
+
+
+def edit_labels_by_turn(
+    sorted_edits: list[dict],
+    edit_labels: list[bool | None],
+    n_turns: int,
+) -> list[bool | None]:
+    """Return the label in effect at each assistant turn 0..n_turns-1.
+
+    Turns before any applicable edit (and with no baseline) get None.
+    """
     labels: list[bool | None] = []
-    for pos in extracted_positions:
-        turn = _turn_for_pos(pos)
+    for turn in range(n_turns):
         current_label: bool | None = None
         found_any = False
         for i, edit in enumerate(sorted_edits):

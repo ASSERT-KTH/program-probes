@@ -166,3 +166,41 @@ def test_after_edit_filter_in_probe(tmp_path):
     # after split all end up in train — no val/test → no result produced.
     # The important thing: no crash, and filter was applied.
     assert isinstance(results, list)
+
+
+def test_after_edit_mask_uses_target_step():
+    """With a label shift, the filter keys on the target turn, not the source turn."""
+    from src.probe import _after_edit_mask
+
+    source = torch.tensor([0, 1, 2, 3])
+    target = source + 2
+    index = {"s": [3]}
+    sids = ["s"] * 4
+    assert _after_edit_mask(target, sids, index).tolist() == [False, True, False, False]
+    assert _after_edit_mask(source, sids, index).tolist() == [False, False, False, True]
+
+
+def test_shuffle_by_trajectory_moves_whole_sequences():
+    """Each trajectory receives a distinct other trajectory's label sequence, resampled to its length."""
+    from src.probe import _shuffle_by_trajectory
+
+    def resample(seq, n):
+        return tuple(seq[round(j * (len(seq) - 1) / max(n - 1, 1))] for j in range(n))
+
+    seqs = {"a": [1, 1, 1, 1], "b": [0, 0], "c": [0, 1, 1]}
+    sids = [sid for sid, seq in seqs.items() for _ in seq]
+    y = torch.tensor([v for seq in seqs.values() for v in seq])
+    spans = {"a": slice(0, 4), "b": slice(4, 6), "c": slice(6, 9)}
+
+    torch.manual_seed(0)
+    for _ in range(20):
+        out = _shuffle_by_trajectory(y, sids)
+        donors = []
+        for r, span in spans.items():
+            got = tuple(out[span].tolist())
+            matches = [d for d in seqs if resample(seqs[d], len(seqs[r])) == got]
+            assert matches, (r, got)
+            donors.append(matches)
+        # Some assignment of donors is a permutation of the trajectories.
+        import itertools
+        assert any(len(set(p)) == 3 for p in itertools.product(*donors))
