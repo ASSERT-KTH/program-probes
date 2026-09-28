@@ -173,3 +173,27 @@ def test_shuffle_labels_scores_against_real_test_labels(tmp_path, monkeypatch, u
     )
     assert calls == [unit, unit]  # train and val only
     assert results[0].test_auc < 0.2
+
+
+def _merge_one_layer(out: str, layer: int) -> None:
+    from src.probe import _merge_save
+    # ~16MB per layer, like real probe weights, so concurrent writes actually overlap.
+    weights = {layer: {0: {"w": torch.full((2000, 2000), float(layer))}}}
+    _merge_save(Path(out), {layer: [f"result_{layer}"]}, weights)
+
+
+def test_merge_save_keeps_all_layers_under_concurrency(tmp_path):
+    """Per-layer jobs merging into the same run must not lose each other's layers."""
+    import multiprocessing as mp
+
+    ctx = mp.get_context("spawn")
+    procs = [ctx.Process(target=_merge_one_layer, args=(str(tmp_path), L)) for L in range(8)]
+    for p in procs:
+        p.start()
+    for p in procs:
+        p.join()
+        assert p.exitcode == 0
+    results = torch.load(tmp_path / "results.pt", weights_only=False)
+    weights = torch.load(tmp_path / "weights.pt", weights_only=False)
+    assert sorted(results) == list(range(8))
+    assert sorted(weights) == list(range(8))
