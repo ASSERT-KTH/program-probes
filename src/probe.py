@@ -92,6 +92,13 @@ def _shuffle_by_trajectory(y: torch.Tensor, sample_ids: list[str]) -> torch.Tens
     return out
 
 
+def _shuffle_labels(y: torch.Tensor, sample_ids: list[str], unit: str) -> torch.Tensor:
+    """Shuffle labels per token or per trajectory (see _shuffle_by_trajectory)."""
+    if unit == "trajectory":
+        return _shuffle_by_trajectory(y, sample_ids)
+    return y[torch.randperm(len(y))]
+
+
 def _compute_ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> float:
     """Expected Calibration Error — weighted average of |acc - conf| across bins."""
     bin_boundaries = np.linspace(0, 1, n_bins + 1)
@@ -224,14 +231,12 @@ def train_probe_layer(
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
 
-        if shuffle_labels and shuffle_unit == "trajectory":
-            y_train = _shuffle_by_trajectory(y_train, [s for s, m in zip(bin_samples, train_mask.tolist()) if m])
-            y_val   = _shuffle_by_trajectory(y_val, [s for s, m in zip(bin_samples, val_mask.tolist()) if m])
-            y_test  = _shuffle_by_trajectory(y_test, [s for s, m in zip(bin_samples, test_mask.tolist()) if m])
-        elif shuffle_labels:
-            y_train = y_train[torch.randperm(len(y_train))]
-            y_val   = y_val[torch.randperm(len(y_val))]
-            y_test  = y_test[torch.randperm(len(y_test))]
+        # Null control: train and early-stop on shuffled labels, but score against the
+        # real test labels — shuffling y_test too would pin test AUC at ~0.5 regardless
+        # of what the probe learned.
+        if shuffle_labels:
+            y_train = _shuffle_labels(y_train, [s for s, m in zip(bin_samples, train_mask.tolist()) if m], shuffle_unit)
+            y_val   = _shuffle_labels(y_val, [s for s, m in zip(bin_samples, val_mask.tolist()) if m], shuffle_unit)
         rel_pos_val  = bin_rel_pos[val_mask]
         rel_pos_test = bin_rel_pos[test_mask]
         step_idx_val  = bin_step_idx[val_mask]  if bin_step_idx is not None else None
