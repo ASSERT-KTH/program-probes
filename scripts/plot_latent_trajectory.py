@@ -116,9 +116,15 @@ def _load_trajectory(activations_dir: Path, run_id: str, instance_id: str, layer
 
     if after_edit_only:
         T = len(H)
-        n_turns = d["n_turns"]
-        # Mirrors src/build_cache.py's own stride-step -> turn-index mapping.
-        step_to_turn = np.minimum((np.arange(T) * n_turns) // T, n_turns - 1)
+        # Real assistant-turn index of each captured position, written by
+        # run_attach_labels_swebench.py (same source as src/build_cache.py).
+        label_path = activations_dir / run_id / f"{instance_id}_labels.pt"
+        if not label_path.exists():
+            raise FileNotFoundError(f"--after-edit-only requires {label_path} (run_attach_labels_swebench.py)")
+        step_to_turn = torch.load(label_path, weights_only=False).get("step_idx")
+        if step_to_turn is None or len(step_to_turn) != T:
+            raise ValueError(f"{label_path} has no per-position turn indices matching {T} activations; "
+                             "re-run run_attach_labels_swebench.py.")
         edit_turns = set((edit_step_index or {}).get(instance_id, []))
         # One point per edit, not one point per stride-5 token within that
         # edit's turn (a single verbose turn can span dozens of captured

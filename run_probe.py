@@ -134,11 +134,17 @@ def main():
     elif args.mode == "baseline-persistence":
         layer = args.layer if args.layer is not None else model_cfg.probe_layers[0]
         cache_path = Path(args.cache_dir) / cache_run_id / args.probe / f"layer_{layer}.pt"
+        edit_step_index = None
+        if args.after_edit_only:
+            idx_path = Path(args.cache_dir) / (args.edit_index_run_id or cache_run_id) / "edit_step_index.pt"
+            edit_step_index = torch.load(str(idx_path), weights_only=False)
         results = compute_persistence_baseline(
             str(cache_path),
             seed=args.seed,
             n_eval_bins=args.n_eval_bins or 10,
             eval_bin_axis=args.eval_bin_axis,
+            after_edit_only=args.after_edit_only,
+            edit_step_index=edit_step_index,
         )
         out = Path(args.results_dir) / args.run_id / args.probe
         out.mkdir(parents=True, exist_ok=True)

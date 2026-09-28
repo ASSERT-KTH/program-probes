@@ -12,6 +12,11 @@
 #     --max-k 50 \
 #     --probes currently_compiles currently_correct currently_has_regressions currently_reduces_failing
 #
+# With --run-suffix after_edit, the baseline is restricted to the same
+# after-edit targets as the after-edit probes, using the edit index at
+# cache/<cache-base>/edit_step_index.pt (override with --edit-index-run-id).
+# --n-eval-bins must match the probe runs being compared against (default 10).
+#
 #SBATCH -J pp-baseline
 #SBATCH -p berzelius-cpu
 #SBATCH -n 4
@@ -30,6 +35,8 @@ CACHE_BASE=""
 RESULTS_BASE=""
 MAX_K=""
 RUN_SUFFIX=""
+EDIT_INDEX_RUN_ID=""
+N_EVAL_BINS=10
 PROBES=()
 
 while [[ $# -gt 0 ]]; do
@@ -41,6 +48,8 @@ while [[ $# -gt 0 ]]; do
         --results-base) RESULTS_BASE="$2";  shift 2 ;;
         --max-k)        MAX_K="$2";         shift 2 ;;
         --run-suffix)   RUN_SUFFIX="$2";    shift 2 ;;
+        --edit-index-run-id) EDIT_INDEX_RUN_ID="$2"; shift 2 ;;
+        --n-eval-bins)  N_EVAL_BINS="$2";   shift 2 ;;
         --probes)
             shift
             while [[ $# -gt 0 && "$1" != --* ]]; do
@@ -54,6 +63,11 @@ done
 SFX=""
 if [[ -n "$RUN_SUFFIX" ]]; then
     SFX="_${RUN_SUFFIX}"
+fi
+
+EXTRA_ARGS=(--n-bins 1 --n-eval-bins "$N_EVAL_BINS")  # --n-bins is unused by the baseline
+if [[ "$RUN_SUFFIX" == *after_edit* ]]; then
+    EXTRA_ARGS+=(--after-edit-only --edit-index-run-id "${EDIT_INDEX_RUN_ID:-$CACHE_BASE}")
 fi
 
 # k=0 has no y_original in the cache (label_shift=0 stores no shift), so the
@@ -73,6 +87,7 @@ for k in $(seq 1 "$MAX_K"); do
             --cache-run-id "${CACHE_BASE}_shift${k}_max${MAX_K}" \
             --results-dir "$RESULTS_DIR" \
             --layer 0 \
+            "${EXTRA_ARGS[@]}" \
             baseline-persistence
     done
 done

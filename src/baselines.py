@@ -1,7 +1,7 @@
 import torch
 from dataclasses import dataclass
 
-from src.probe import _split_groups, _bin_index, _clf_metrics
+from src.probe import _after_edit_mask, _split_groups, _bin_index, _clf_metrics
 
 
 @dataclass
@@ -18,13 +18,16 @@ def compute_persistence_baseline(
     seed: int,
     n_eval_bins: int = 10,
     eval_bin_axis: str = "position",
+    after_edit_only: bool = False,
+    edit_step_index: dict | None = None,
 ) -> list[BaselineResult]:
     """Naive persistence baseline: predict y_{t+k} = y_t.
 
     Reads the same cache used by the real probes and uses the un-shifted
     label ``y_original`` (the label at t) as a hard prediction for the
     shifted label ``y`` (the label at t+k), scored on the same test split
-    the probes are evaluated on.
+    the probes are evaluated on.  With ``after_edit_only``, applies the same
+    target-turn filter as the after-edit probes.
     """
     data = torch.load(cache_path, weights_only=False)
     if "y_original" not in data:
@@ -44,6 +47,10 @@ def compute_persistence_baseline(
     test_samples = {sid for sid, gid in zip(sample_ids, group_ids) if gid in test_groups}
 
     valid = (y >= 0) & (y_original >= 0)
+    if after_edit_only:
+        if edit_step_index is None or step_idx is None:
+            raise ValueError("after_edit_only requires edit_step_index and step_idx in cache")
+        valid = valid & _after_edit_mask(data.get("target_step_idx", step_idx), sample_ids, edit_step_index)
     test_mask = valid & torch.tensor(
         [sid in test_samples for sid in sample_ids], dtype=torch.bool
     )

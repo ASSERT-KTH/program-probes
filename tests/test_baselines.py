@@ -76,3 +76,18 @@ def test_persistence_baseline_bin_idx_unique(tmp_path):
     results = compute_persistence_baseline(cache_path, seed=0, n_eval_bins=5)
     bin_indices = [r.bin_idx for r in results]
     assert len(bin_indices) == len(set(bin_indices))
+
+
+def test_persistence_baseline_after_edit_filters_on_target_turn(tmp_path):
+    cache_path = _make_cache(tmp_path)
+    data = torch.load(cache_path, weights_only=False)
+    data["target_step_idx"] = data["step_idx"] + 2
+    torch.save(data, cache_path)
+
+    # Every trajectory has an edit taking effect at turn 5 → targets at turn 5
+    # come from source turn 3: exactly one token per trajectory survives.
+    edit_step_index = {sid: [5] for sid in set(data["sample_id"])}
+    results = compute_persistence_baseline(cache_path, seed=0, n_eval_bins=1,
+                                           after_edit_only=True, edit_step_index=edit_step_index)
+    _, _, test_groups = _split_groups(data["group_id"], seed=0)
+    assert results[0].n_test == len(test_groups)
