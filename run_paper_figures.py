@@ -1355,7 +1355,7 @@ def plot_tool_nll_correlation(
 # ---------------------------------------------------------------------------
 
 def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> list[dict]:
-    """Return one dict per trajectory JSON: {turns, n_tokens, instance_id}.
+    """Return one dict per trajectory JSON: {steps, n_tokens, instance_id}.
 
     Results are cached to cache_path (JSON) if provided, to avoid re-reading
     thousands of files on NFS on every run.
@@ -1368,12 +1368,12 @@ def _load_generation_stats(gen_dir: Path, cache_path: Path | None = None) -> lis
             d = json.loads(f.read_text())
         except Exception:
             continue
-        turns    = len(d.get("command_history", []))
+        n_steps  = len(d.get("command_history", []))
         n_tokens = len((d.get("tokenization") or {}).get("token_ids", []))
         records.append({
             "file":        f.name,
             "instance_id": (d.get("metadata") or {}).get("instance_id", f.stem),
-            "turns":       turns,
+            "steps":       n_steps,
             "n_tokens":    n_tokens,
         })
     if cache_path:
@@ -1493,22 +1493,22 @@ def _compute_probe_prevalences(label_dir: Path, cache_path: Path | None = None) 
     return result
 
 
-def plot_dataset_turns(
+def plot_dataset_steps(
     configs: list[dict],
     figures_dir: Path,
 ) -> None:
-    """Panel A: violin/box plots of trajectory turn counts per (model, dataset).
+    """Panel A: violin/box plots of trajectory step counts per (model, dataset).
 
     Each config dict: {gen_dir, label, color}.
     """
-    all_turns  = [c["turns"] for c in configs]
+    all_steps  = [c["steps"] for c in configs]
     all_labels = [c["label"] for c in configs]
     all_colors = [c["color"] for c in configs]
 
     fig, ax = plt.subplots(figsize=(max(3.5, 1.1 * len(configs)), 3.5))
 
-    for i, (turns, color) in enumerate(zip(all_turns, all_colors), start=1):
-        arr = np.array(turns)
+    for i, (steps, color) in enumerate(zip(all_steps, all_colors), start=1):
+        arr = np.array(steps)
         if not len(arr):
             continue
         if len(arr) >= 50:
@@ -1528,8 +1528,8 @@ def plot_dataset_turns(
         med = np.median(arr)
         ax.hlines(med, i - 0.3, i + 0.3, colors=color, linewidth=1.8, zorder=5)
 
-    ax.axhline(15,  color="#555555", linestyle="--", linewidth=0.9, label="15 turns")
-    ax.axhline(50, color="#222222", linestyle=":",  linewidth=0.9, label="50 turns")
+    ax.axhline(15,  color="#555555", linestyle="--", linewidth=0.9, label="15 steps")
+    ax.axhline(50, color="#222222", linestyle=":",  linewidth=0.9, label="50 steps")
     ax.set_xticks(range(1, len(all_labels) + 1))
     # Shorten the model name (e.g. "Qwen3.6-35B-A3B" -> "Qwen3.6") so the
     # horizontal tick labels don't overlap between adjacent ticks.
@@ -1538,13 +1538,13 @@ def plot_dataset_turns(
         parts[0] = parts[0].split("-")[0]
         return "\n".join(parts)
     ax.set_xticklabels([_short_label(l) for l in all_labels], fontsize=8)
-    ax.set_ylabel("Turns")
+    ax.set_ylabel("Steps")
     ax.set_ylim(top=100)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.legend(fontsize=7, frameon=False)
 
     figures_dir.mkdir(parents=True, exist_ok=True)
-    out = figures_dir / "dataset_turns_barplot.pdf"
+    out = figures_dir / "dataset_steps_barplot.pdf"
     fig.savefig(out, bbox_inches="tight")
     plt.close(fig)
     print(f"  [fig] {out}")
@@ -1668,9 +1668,9 @@ def build_dataset_stats_table(
     caption = (
         r"Dataset statistics per model and benchmark. "
         r"\#Traj.\ counts all agent runs; "
-        r"$\geq$50 counts trajectories reaching that turn threshold "
+        r"$\geq$50 counts trajectories reaching that step threshold "
         r"(the length filter used in the lookahead experiments). "
-        r"Med.\ steps is the median number of turns per trajectory. "
+        r"Med.\ steps is the median number of steps per trajectory. "
         r"\#Edits is the total number of code edits across all trajectories. "
         r"$\geq$2 edits counts trajectories with at least two edits. "
         r"Med.\ edits is the median number of edits per trajectory. "
@@ -1697,7 +1697,7 @@ def build_dataset_stats_table(
 
     rows = []
     tot_traj = tot_gt50 = tot_ge2 = tot_edits = tot_states = 0
-    all_turns: list[int] = []   # pooled across configs, for the total median
+    all_steps: list[int] = []   # pooled across configs, for the total median
     all_edits: list[int] = []
 
     i = 0
@@ -1716,9 +1716,9 @@ def build_dataset_stats_table(
             else:
                 stats    = cfg["gen_stats"]
                 n_traj   = len(stats)
-                gt50     = sum(1 for s in stats if s["turns"] >= 50)
-                turns    = sorted(s["turns"] for s in stats)
-                med_steps = turns[len(turns) // 2] if turns else 0
+                gt50     = sum(1 for s in stats if s["steps"] >= 50)
+                steps    = sorted(s["steps"] for s in stats)
+                med_steps = steps[len(steps) // 2] if steps else 0
                 es       = cfg["edit_stats"]
                 med_edits = es.get("median", 0)
                 n_states = cfg["n_states"]
@@ -1728,7 +1728,7 @@ def build_dataset_stats_table(
                 tot_ge2    += es.get("ge2", 0)
                 tot_edits  += es["total"]
                 tot_states += n_states
-                all_turns.extend(s["turns"] for s in stats)
+                all_steps.extend(s["steps"] for s in stats)
                 all_edits.extend(es.get("counts", []))
 
                 rows.append(
@@ -1749,7 +1749,7 @@ def build_dataset_stats_table(
     rows.append(r"\midrule")
     rows.append(
         rf"\multicolumn{{2}}{{l}}{{Total}} & "
-        rf"{tot_traj:,} & {tot_gt50:,} & {_median(all_turns)} & "
+        rf"{tot_traj:,} & {tot_gt50:,} & {_median(all_steps)} & "
         rf"{tot_edits:,} & {tot_ge2:,} & {_median(all_edits)} & {_fmt_states(tot_states)} \\"
     )
 
@@ -1825,7 +1825,7 @@ def build_agent_hparam_table(
         r"\caption{Agent hyperparameters used during trajectory generation, "
         r"following the recommended settings provided by each model vendor. "
         r"Temperature and top-$p$ control sampling; context is the maximum "
-        r"sequence length; max steps is the turn limit per trajectory; "
+        r"sequence length; max steps is the step limit per trajectory; "
         r"and step timeout is the wall-clock limit per tool call.}",
         r"\label{tab:agent_hparams}",
         r"\begin{tabular}{lrrrrr}",
@@ -1872,7 +1872,7 @@ def _generate_dataset_stats(
         ("qwen36_35b_a3b_full", "swebench_pro", "Qwen3.6-35B-A3B", "Pro",      _qwen_pro_color, False),
     ]
 
-    ds_configs_turns: list[dict] = []
+    ds_configs_steps: list[dict] = []
     ds_configs_prev:  list[dict] = []
     ds_configs_stats: list[dict] = []
 
@@ -1897,7 +1897,7 @@ def _generate_dataset_stats(
             )
         else:
             gen_stats = []
-        turns = [s["turns"] for s in gen_stats]
+        steps = [s["steps"] for s in gen_stats]
 
         ld = label_dir if (not placeholder and label_dir.exists()) else None
         edit_stats = (
@@ -1906,7 +1906,7 @@ def _generate_dataset_stats(
         )
         n_states = _load_n_states(str(rpt)) if not placeholder else 0
 
-        ds_configs_turns.append({"label": label_str, "turns": turns, "color": color})
+        ds_configs_steps.append({"label": label_str, "steps": steps, "color": color})
         ds_configs_prev.append({
             "label":     label_str,
             "label_dir": ld,
@@ -1921,8 +1921,8 @@ def _generate_dataset_stats(
             "n_states":       n_states,
         })
 
-    if any(c["turns"] for c in ds_configs_turns):
-        plot_dataset_turns(ds_configs_turns, figures_dir)
+    if any(c["steps"] for c in ds_configs_steps):
+        plot_dataset_steps(ds_configs_steps, figures_dir)
     all_gs = [c["gen_stats"] for c in ds_configs_stats if c["gen_stats"]]
     if all_gs:
         plot_trajectory_tokens_histogram(all_gs, figures_dir)

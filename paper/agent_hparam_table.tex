@@ -1,0 +1,14 @@
+\begin{table}[h]
+\centering
+\footnotesize
+\caption{Agent hyperparameters used during trajectory generation, following the recommended settings provided by each model vendor. Temperature and top-$p$ control sampling; context is the maximum sequence length; max steps is the step limit per trajectory; and step timeout is the wall-clock limit per tool call.}
+\label{tab:agent_hparams}
+\begin{tabular}{lrrrrr}
+\toprule
+Model & Temp. & Top-$p$ & Context & Max steps & Step timeout \\
+\midrule
+\texttt{Laguna-XS.2} & 0.7 & 0.95 & 256k & 100 & 180\,s \\
+\texttt{Qwen3.6-35B-A3B} & 0.6 & 0.95 & 256k & 100 & 180\,s \\
+\bottomrule
+\end{tabular}
+\end{table}
