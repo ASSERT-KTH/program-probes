@@ -9,3 +9,4 @@ prompt.md
 *.orig
 tmp/
 paper/figures/
+.hf_upload_stage/
