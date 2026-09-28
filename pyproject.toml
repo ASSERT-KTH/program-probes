@@ -18,6 +18,8 @@ dependencies = [
     "modal>=1.4.2",
     "vllm>=0.21.0",
     "swebench==4.1.0",
+    "huggingface-hub>=0.28",
+    "umap-learn>=0.5.12",
 ]
 
 [build-system]
