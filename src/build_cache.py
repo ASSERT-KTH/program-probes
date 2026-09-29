@@ -10,7 +10,6 @@ def build_cache(
     label_shift: int = 0,
     max_label_shift: int | None = None,
     cache_run_id: str | None = None,
-    group_by: str = "project",
 ) -> None:
     in_dir = Path(output_dir) / run_id
     pt_files = sorted(f for f in in_dir.glob("*.pt") if not f.stem.endswith("_labels"))
@@ -49,8 +48,9 @@ def build_cache(
                 else:
                     label = data.get("labels", {}).get(probe_name)
                 sample = data["sample_id"]
-                raw_group = data["group_id"]
-                group = raw_group.rsplit('-', 1)[0] if group_by == "project" else raw_group
+                # Splits are by task: group_id is the task (instance) id, shared by all
+                # runs of that task, so no task appears in more than one split.
+                group = data["group_id"]
 
                 acts = data["activations"][layer_idx]  # [T, hidden_dim] float16
                 T = acts.shape[0]
