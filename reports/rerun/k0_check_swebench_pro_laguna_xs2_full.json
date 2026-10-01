@@ -1,0 +1,60 @@
+{
+  "bench": "swebench_pro",
+  "run": "laguna_xs2_full",
+  "probes": {
+    "currently_compiles": {
+      "n_old": 8181945,
+      "n_new": 8181945,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": true,
+      "has_target_step_idx": true,
+      "n_groups": 434,
+      "n_samples": 6921,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.94901442527771,
+      "step_idx_mean_abs_change": 9.249603271484375
+    },
+    "currently_correct": {
+      "n_old": 8181945,
+      "n_new": 8181945,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": true,
+      "has_target_step_idx": true,
+      "n_groups": 434,
+      "n_samples": 6921,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.94901442527771,
+      "step_idx_mean_abs_change": 9.249603271484375
+    },
+    "currently_has_regressions": {
+      "n_old": 8181945,
+      "n_new": 8181945,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": true,
+      "has_target_step_idx": true,
+      "n_groups": 434,
+      "n_samples": 6921,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.94901442527771,
+      "step_idx_mean_abs_change": 9.249603271484375
+    },
+    "currently_reduces_failing": {
+      "n_old": 8181945,
+      "n_new": 8181945,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": true,
+      "has_target_step_idx": true,
+      "n_groups": 434,
+      "n_samples": 6921,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.94901442527771,
+      "step_idx_mean_abs_change": 9.249603271484375
+    }
+  },
+  "edit_step_index_identical": true,
+  "all_identical": true
+}

@@ -1,0 +1,30 @@
+{
+  "input_dir": "outputs/swebench/qwen36_35b_a3b_full",
+  "n_files": 4998,
+  "n_files_zero_rows": 1,
+  "n_errors": 0,
+  "errors_head": [],
+  "n_turns_total": 226346,
+  "n_turns_empty": 0,
+  "frac_turns_empty": 0.0,
+  "turn_len_mean": 18.984404407411663,
+  "turn_len_nonempty_mean": 18.984404407411663,
+  "turn_len_quantiles": {
+    "0": 2.0,
+    "10": 5.0,
+    "25": 7.0,
+    "50": 8.0,
+    "75": 20.0,
+    "90": 50.0,
+    "99": 126.0,
+    "100": 200.0
+  },
+  "turns_per_traj_quantiles": {
+    "0": 5.0,
+    "25": 23.0,
+    "50": 39.0,
+    "75": 67.0,
+    "100": 100.0
+  },
+  "trajs_with_any_empty_turn": 0
+}

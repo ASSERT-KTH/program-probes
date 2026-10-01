@@ -1,0 +1,30 @@
+{
+  "input_dir": "outputs/swebench/laguna_xs2_full",
+  "n_files": 4991,
+  "n_files_zero_rows": 1,
+  "n_errors": 0,
+  "errors_head": [],
+  "n_turns_total": 276687,
+  "n_turns_empty": 8476,
+  "frac_turns_empty": 0.030633893171706658,
+  "turn_len_mean": 28.584310068778077,
+  "turn_len_nonempty_mean": 29.48763100693111,
+  "turn_len_quantiles": {
+    "0": 0.0,
+    "10": 5.0,
+    "25": 7.0,
+    "50": 9.0,
+    "75": 32.0,
+    "90": 84.0,
+    "99": 200.0,
+    "100": 204.0
+  },
+  "turns_per_traj_quantiles": {
+    "0": 1.0,
+    "25": 36.0,
+    "50": 55.0,
+    "75": 77.0,
+    "100": 99.0
+  },
+  "trajs_with_any_empty_turn": 2978
+}

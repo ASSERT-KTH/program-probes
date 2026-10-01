@@ -1,0 +1,366 @@
+{
+  "bench": "swebench",
+  "pooled": "qwen36_35b_a3b_full_pooled",
+  "probe": "currently_correct",
+  "max_k": 15,
+  "n_boot": 1000,
+  "layer_rule": "best test AUC per k",
+  "rows": [
+    {
+      "k": 0,
+      "layer": 30,
+      "results_test_auc": 0.7804860293498748,
+      "n_test": 353824,
+      "n_instances": 73,
+      "probe_auc": 0.7804860293498748,
+      "ci95": {
+        "probe_auc": [
+          0.7029349093911614,
+          0.8827016757354148
+        ]
+      }
+    },
+    {
+      "k": 1,
+      "layer": 30,
+      "results_test_auc": 0.7755846501994657,
+      "n_test": 353824,
+      "n_instances": 73,
+      "probe_auc": 0.7755846501994655,
+      "n_orig_missing": 0,
+      "flip_rate": 0.020569548702179613,
+      "frac_edit_between": 0.09388283440354526,
+      "flip_rate_edit_between": 0.2190980793545668,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322297,
+      "n_orig1": 31527,
+      "n_edit_between": 33218,
+      "persistence_auc": 0.9079533853190702,
+      "probe_auc_persist_subset": 0.7755846501994655,
+      "probe_auc_orig0": 0.802564609900217,
+      "probe_auc_orig1": 0.5525409027402112,
+      "probe_auc_edit_between": 0.5287164566861533,
+      "persistence_auc_edit_between": 0.6302363372871561,
+      "ci95": {
+        "probe_auc": [
+          0.707024638182515,
+          0.8614459378531376
+        ],
+        "persistence_auc": [
+          0.8512374003148561,
+          0.9386385492347332
+        ],
+        "probe_auc_persist_subset": [
+          0.707024638182515,
+          0.8614459378531376
+        ],
+        "probe_auc_orig0": [
+          0.765059146316872,
+          0.8359604251716513
+        ],
+        "probe_auc_orig1": [
+          0.25278323103884953,
+          0.7902765129389104
+        ],
+        "probe_auc_edit_between": [
+          0.47932703375798813,
+          0.5754047854538753
+        ],
+        "persistence_auc_edit_between": [
+          0.5551777673260749,
+          0.6970507223319312
+        ],
+        "probe_minus_persistence": [
+          -0.22618163927473006,
+          -0.004272195823887026
+        ]
+      },
+      "probe_minus_persistence": -0.13236873511960467
+    },
+    {
+      "k": 2,
+      "layer": 30,
+      "results_test_auc": 0.7646022638414139,
+      "n_test": 353809,
+      "n_instances": 73,
+      "probe_auc": 0.7646022638414139,
+      "n_orig_missing": 0,
+      "flip_rate": 0.031146748669479862,
+      "frac_edit_between": 0.13206277963533997,
+      "flip_rate_edit_between": 0.23584804708400214,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322282,
+      "n_orig1": 31527,
+      "n_edit_between": 46725,
+      "persistence_auc": 0.8719593165864564,
+      "probe_auc_persist_subset": 0.7646022638414139,
+      "probe_auc_orig0": 0.7606037957151324,
+      "probe_auc_orig1": 0.5829550466574324,
+      "probe_auc_edit_between": 0.5069131105667344,
+      "persistence_auc_edit_between": 0.6170260391030117,
+      "ci95": {
+        "probe_auc": [
+          0.6984789418424661,
+          0.8400761467288875
+        ],
+        "persistence_auc": [
+          0.805333447186598,
+          0.9093345502064004
+        ],
+        "probe_auc_persist_subset": [
+          0.6984789418424661,
+          0.8400761467288875
+        ],
+        "probe_auc_orig0": [
+          0.7148732865918528,
+          0.8027136739784926
+        ],
+        "probe_auc_orig1": [
+          0.2862403777686229,
+          0.7487312437477216
+        ],
+        "probe_auc_edit_between": [
+          0.4568555014313044,
+          0.5564940226867496
+        ],
+        "persistence_auc_edit_between": [
+          0.5481567228000467,
+          0.6766013217260067
+        ],
+        "probe_minus_persistence": [
+          -0.20405405746617533,
+          0.019787977915445586
+        ]
+      },
+      "probe_minus_persistence": -0.10735705274504248
+    },
+    {
+      "k": 3,
+      "layer": 30,
+      "results_test_auc": 0.757945265424216,
+      "n_test": 353800,
+      "n_instances": 73,
+      "probe_auc": 0.7579452654242159,
+      "n_orig_missing": 0,
+      "flip_rate": 0.041986998304126624,
+      "frac_edit_between": 0.1707631430186546,
+      "flip_rate_edit_between": 0.2458785752118644,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322273,
+      "n_orig1": 31527,
+      "n_edit_between": 60416,
+      "persistence_auc": 0.8410101233023077,
+      "probe_auc_persist_subset": 0.7579452654242159,
+      "probe_auc_orig0": 0.744656517490011,
+      "probe_auc_orig1": 0.6154206572801995,
+      "probe_auc_edit_between": 0.5077549614471123,
+      "persistence_auc_edit_between": 0.6101323676008168,
+      "ci95": {
+        "probe_auc": [
+          0.6967589832067408,
+          0.8275278538796413
+        ],
+        "persistence_auc": [
+          0.7692061694192116,
+          0.8834933288538888
+        ],
+        "probe_auc_persist_subset": [
+          0.6967589832067408,
+          0.8275278538796413
+        ],
+        "probe_auc_orig0": [
+          0.6972061000435842,
+          0.7876172547709922
+        ],
+        "probe_auc_orig1": [
+          0.23185837314426286,
+          0.7382429310179176
+        ],
+        "probe_auc_edit_between": [
+          0.4526325738477142,
+          0.5616051564642777
+        ],
+        "persistence_auc_edit_between": [
+          0.5430752786601831,
+          0.6703447862338952
+        ],
+        "probe_minus_persistence": [
+          -0.17774155720923646,
+          0.041510782291133516
+        ]
+      },
+      "probe_minus_persistence": -0.08306485787809181
+    },
+    {
+      "k": 5,
+      "layer": 30,
+      "results_test_auc": 0.7470531809265131,
+      "n_test": 353744,
+      "n_instances": 73,
+      "probe_auc": 0.747053180926513,
+      "n_orig_missing": 0,
+      "flip_rate": 0.06710785200597041,
+      "frac_edit_between": 0.24527907187118367,
+      "flip_rate_edit_between": 0.27359795311527557,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322217,
+      "n_orig1": 31527,
+      "n_edit_between": 86766,
+      "persistence_auc": 0.7850012843023597,
+      "probe_auc_persist_subset": 0.747053180926513,
+      "probe_auc_orig0": 0.722439811199589,
+      "probe_auc_orig1": 0.6481722709472798,
+      "probe_auc_edit_between": 0.5119950049649299,
+      "persistence_auc_edit_between": 0.6042234241761383,
+      "ci95": {
+        "probe_auc": [
+          0.6917138234212107,
+          0.8053273422701964
+        ],
+        "persistence_auc": [
+          0.7099469392551965,
+          0.8330987087695626
+        ],
+        "probe_auc_persist_subset": [
+          0.6917138234212107,
+          0.8053273422701964
+        ],
+        "probe_auc_orig0": [
+          0.6773049613296187,
+          0.7647107545571864
+        ],
+        "probe_auc_orig1": [
+          0.38649805370761153,
+          0.723241541402953
+        ],
+        "probe_auc_edit_between": [
+          0.46002237498163306,
+          0.5667711530552817
+        ],
+        "persistence_auc_edit_between": [
+          0.5414338880603862,
+          0.6583796252388716
+        ],
+        "probe_minus_persistence": [
+          -0.13361860847360732,
+          0.07477283796870551
+        ]
+      },
+      "probe_minus_persistence": -0.03794810337584675
+    },
+    {
+      "k": 10,
+      "layer": 30,
+      "results_test_auc": 0.7028409922967366,
+      "n_test": 353575,
+      "n_instances": 73,
+      "probe_auc": 0.7028409922967365,
+      "n_orig_missing": 0,
+      "flip_rate": 0.14028141129887578,
+      "frac_edit_between": 0.4096443470267977,
+      "flip_rate_edit_between": 0.3424468378900856,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322048,
+      "n_orig1": 31527,
+      "n_edit_between": 144840,
+      "persistence_auc": 0.6918074156251466,
+      "probe_auc_persist_subset": 0.7028409922967365,
+      "probe_auc_orig0": 0.6701291616685128,
+      "probe_auc_orig1": 0.6559273564163673,
+      "probe_auc_edit_between": 0.5344759918159818,
+      "persistence_auc_edit_between": 0.5848090965078081,
+      "ci95": {
+        "probe_auc": [
+          0.6546095665231648,
+          0.7501081162408733
+        ],
+        "persistence_auc": [
+          0.6240041965115938,
+          0.7434804402423201
+        ],
+        "probe_auc_persist_subset": [
+          0.6546095665231648,
+          0.7501081162408733
+        ],
+        "probe_auc_orig0": [
+          0.6226839635797697,
+          0.7173124147687695
+        ],
+        "probe_auc_orig1": [
+          0.4050082112662057,
+          0.7391461189690016
+        ],
+        "probe_auc_edit_between": [
+          0.4760299720498386,
+          0.5928238221764509
+        ],
+        "persistence_auc_edit_between": [
+          0.5352054925188208,
+          0.6307055043327908
+        ],
+        "probe_minus_persistence": [
+          -0.06950687868806885,
+          0.09806741254778954
+        ]
+      },
+      "probe_minus_persistence": 0.011033576671589884
+    },
+    {
+      "k": 15,
+      "layer": 30,
+      "results_test_auc": 0.6742958111562741,
+      "n_test": 353537,
+      "n_instances": 73,
+      "probe_auc": 0.6742958111562742,
+      "n_orig_missing": 0,
+      "flip_rate": 0.20309048275003747,
+      "frac_edit_between": 0.5320772648973092,
+      "flip_rate_edit_between": 0.381693592544748,
+      "flip_rate_no_edit_between": 0.0,
+      "n_orig0": 322010,
+      "n_orig1": 31527,
+      "n_edit_between": 188109,
+      "persistence_auc": 0.6487124994771072,
+      "probe_auc_persist_subset": 0.6742958111562742,
+      "probe_auc_orig0": 0.6484813450985515,
+      "probe_auc_orig1": 0.5869147154272373,
+      "probe_auc_edit_between": 0.562463364869535,
+      "persistence_auc_edit_between": 0.57174777703333,
+      "ci95": {
+        "probe_auc": [
+          0.6241733191616587,
+          0.7189640597668412
+        ],
+        "persistence_auc": [
+          0.5893683103714185,
+          0.6977504202926363
+        ],
+        "probe_auc_persist_subset": [
+          0.6241733191616587,
+          0.7189640597668412
+        ],
+        "probe_auc_orig0": [
+          0.5978118592837806,
+          0.6953825510252405
+        ],
+        "probe_auc_orig1": [
+          0.4016211252081757,
+          0.6860549562038326
+        ],
+        "probe_auc_edit_between": [
+          0.5042319140871362,
+          0.6178794976076067
+        ],
+        "persistence_auc_edit_between": [
+          0.525797566011022,
+          0.6160209984170246
+        ],
+        "probe_minus_persistence": [
+          -0.04723372742955037,
+          0.10160129167827343
+        ]
+      },
+      "probe_minus_persistence": 0.025583311679167053
+    }
+  ]
+}
