@@ -95,6 +95,12 @@ On the paper's split, Verified validation was a single repository (flask, 1.8k�
 
 ## Other things to know
 
+- **What "after-edit" means.** A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
+  - At lookahead k, the source tokens come from turn N+1−k.
+  - Every extracted assistant token of turn N+1 is kept, not only the first.
+  - At k = 0, assistant message N+1 comes after the tool output of the edit command (and any test run), so those hidden states can already attend to the edit's observed result.
+  - An edit that leaves a label unchanged still contributes its turn N+1, and so does a turn N+1 that is itself an edit turn.
+
 - **Layer 0 on Qwen Pro.** The best layer for compiles (0.750) and has_regressions (0.840) is layer 0, the embedding layer, where each position sees only its own token. These two labels are therefore largely predictable from token identity, i.e. from which files and outputs appear, not necessarily from computed program state. For correct, layer 0 falls to 0.637 against 0.822 at layer 30.
 - **Best layer** is chosen by test AUC (the rule in `run_paper_figures.py`), so all "best layer" numbers are slightly optimistic. With the task split, validation-based selection is now possible.
 - **Multi-bin evals** (transfer, bineval, after-edit) are summarised as the n_test-weighted mean of per-bin AUCs, skipping single-class bins. `run_paper_figures._weighted_mean` keeps those bins, with their placeholder AUC of 0.5.
