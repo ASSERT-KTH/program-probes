@@ -110,7 +110,7 @@ def control_table() -> None:
 def persistence_tables() -> None:
     root = Path("reports/rerun/persistence")
     for max_k in (50, 15):
-        print(f"\n#### Persistence analysis, window max{max_k} (test split; 95% CI from 1000 instance-level bootstrap resamples)\n")
+        print(f"\n#### Persistence analysis, window max{max_k} (test split; 95% CI from 1000 task-level bootstrap resamples)\n")
         print("| Model / benchmark | Probe | k | layer | n_test | flip rate | pairs w/ edit between | persistence AUC | probe AUC (same tokens) | probe − persistence | probe AUC, y_t=0 | probe AUC, y_t=1 | probe AUC, edit between | persistence AUC, edit between |")
         print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
         for bench, pooled, name in COMBOS:
@@ -198,6 +198,73 @@ def persistence_check_tables() -> None:
             print(row)
 
 
+PHASE_PROBES = ["currently_correct", "currently_reduces_failing", "currently_has_regressions"]
+STRATUM_TITLE = {"yt0": "within y_t = 0", "all": "all test tokens", "yt1": "within y_t = 1"}
+
+
+def _a(d: dict, key: str) -> str:
+    v = d["auc"].get(key)
+    return "–" if v is None or v != v else f"{v:.3f}"
+
+
+def _d(d: dict, key: str) -> str:
+    v, c = d["auc"].get(key), d["ci95"].get(key)
+    if v is None or v != v:
+        return "–"
+    s = f"{v:+.3f}"
+    if c and c[0] is not None:
+        s += f" [{c[0]:+.2f}, {c[1]:+.2f}]"
+        if c[0] > 0 or c[1] < 0:
+            s = f"**{s}**"
+    return s
+
+
+def phase_tables(root: Path = Path("reports/rerun/phase")) -> None:
+    """Tables from scripts/rebuttal_phase_confound.py (E2, E16, E17)."""
+    for max_k, strata in ((15, ("yt0", "all", "yt1")), (50, ("yt0", "all"))):
+        for st in strata:
+            print(f"\n#### Phase confound, window max{max_k}, {STRATUM_TITLE[st]}: AUC for y_(t+k) (test split; "
+                  "differences with 95% task-bootstrap CI, bold if the CI excludes 0)\n")
+            print("| Model / benchmark | Probe | k | n (pos) | real, val-best layer | real, test-best layer | k=0 probe (E2) | "
+                  "traj-shuffle | position, causal | position, rel_pos (non-causal) | real − k=0 probe | real − traj-shuffle | "
+                  "real − position causal | real − position rel_pos |")
+            print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+            for bench, pooled, name in COMBOS:
+                for probe in PHASE_PROBES:
+                    f = root / f"lookahead_{bench}_{pooled}_{probe}_max{max_k}.json"
+                    if not f.exists():
+                        print(f"| {name} | {probe.removeprefix('currently_')} | – | missing |" + " |" * 10)
+                        continue
+                    for r in json.loads(f.read_text())["rows"]:
+                        L = r["layers"]
+                        n = r["n_test"] if st == "all" else r[f"n_{st}"]
+                        npos = "" if st == "all" else f" ({r[f'n_pos_{st}']:,})"
+                        print(f"| {name} | {probe.removeprefix('currently_')} | {r['k']} | {n:,}{npos} | "
+                              f"{_a(r, f'real_val|{st}')} (L{L['real_val']}) | {_a(r, f'real_test|{st}')} (L{L['real_test']}) | "
+                              f"{_a(r, f'k0|{st}')} (L{L['k0']}) | {_a(r, f'traj|{st}')} | {_a(r, f'pos_causal|{st}')} | "
+                              f"{_a(r, f'pos_rel|{st}')} | {_d(r, f'real_val-k0|{st}')} | {_d(r, f'real_val-traj|{st}')} | "
+                              f"{_d(r, f'real_val-pos_causal|{st}')} | {_d(r, f'real_val-pos_rel|{st}')} |")
+
+    print("\n#### k=0 selectivity (E17), pooled k=0 caches, all test tokens (layers chosen on validation AUC "
+          "against real labels; differences with 95% task-bootstrap CI, bold if the CI excludes 0)\n")
+    print("| Model / benchmark | Probe | real (val-best) | token shuffle (val-best) | traj shuffle (val-best) | real − token | real − traj | "
+          "real − token, same layer | real − traj, same layer | position, causal | position, rel_pos (non-causal) | "
+          "real − position causal | real − position rel_pos | real, test-best layer |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for bench, pooled, name in COMBOS:
+        for probe in PROBES:
+            f = root / f"k0_{bench}_{pooled}_{probe}.json"
+            if not f.exists():
+                continue
+            r = json.loads(f.read_text())
+            lv = r["val_best_layer"]
+            print(f"| {name} | {probe.removeprefix('currently_')} | {_a(r, 'real_valbest')} (L{lv['real']}) | "
+                  f"{_a(r, 'token_valbest')} (L{lv['token']}) | {_a(r, 'traj_valbest')} (L{lv['traj']}) | "
+                  f"{_d(r, 'real-token')} | {_d(r, 'real-traj')} | {_d(r, 'real-token_same_layer')} | {_d(r, 'real-traj_same_layer')} | "
+                  f"{_a(r, 'pos_causal')} | {_a(r, 'pos_rel')} | {_d(r, 'real-pos_causal')} | {_d(r, 'real-pos_rel')} | "
+                  f"{_a(r, 'real_testbest')} (L{r['real_test_best_layer']}) |")
+
+
 if __name__ == "__main__":
     print(f"† fewer than {MIN_POS} positive test tokens; ‡ test split has a single class, so AUC is undefined.")
     main_table()
@@ -205,3 +272,4 @@ if __name__ == "__main__":
     control_table()
     persistence_tables()
     persistence_check_tables()
+    phase_tables()

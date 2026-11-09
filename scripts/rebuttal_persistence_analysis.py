@@ -14,8 +14,8 @@ training (src.probe._split_groups(group_ids, seed=42)):
 
 Uncertainty: bootstrap over tasks (sample_id without the _runNN suffix), the
 same unit the train/val/test split uses.
-Resampling instances with replacement is implemented as multinomial instance
-weights, with a weighted AUC computed from one sort of the scores.
+Resampling tasks (SWE-bench instances) with replacement is implemented as
+multinomial task weights, with a weighted AUC computed from one sort of the scores.
 
 The layer is the one with the best test AUC for that k, the rule used by
 run_paper_figures.py, so the numbers line up with the figures.
