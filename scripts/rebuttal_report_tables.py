@@ -318,6 +318,55 @@ def e18_tables(root: Path = Path("reports/rerun/phase")) -> None:
               f"{r['last_edit_agreement']['agreement']:.3f} | {r['n_last_edit_in_last_turn']:,} |")
 
 
+def e11_tables(root: Path = Path("reports/rerun/lang")) -> None:
+    """Tables from scripts/rebuttal_per_language.py (E11)."""
+    pro = [(pooled, name) for bench, pooled, name in COMBOS if bench == "swebench_pro"]
+    print("\n#### E11: k=0 probes on Pro, pooled vs language-/repo-controlled (validation-best layer as in E17; "
+          "pooled AUC over all test tokens; 95% task-bootstrap CI; bold if a difference's CI excludes 0)\n")
+    print("| Model | Probe | layer | pooled AUC | same-language pairs | same-repo pairs | language-only baseline | repo-only baseline | "
+          "real − language-only | real − repo-only |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
+    ci = lambda r, k: (f"{r['auc'][k]:.3f} [{r['ci95'][k][0]:.3f}, {r['ci95'][k][1]:.3f}]"
+                       if r["auc"].get(k) == r["auc"].get(k) and r["ci95"].get(k) and r["ci95"][k][0] is not None else "–")
+    for pooled, name in pro:
+        for probe in PROBES:
+            f = root / f"lang_swebench_pro_{pooled}_{probe}.json"
+            if not f.exists():
+                continue
+            r = json.loads(f.read_text())
+            print(f"| {name} | {probe.removeprefix('currently_')} | L{r['layer']} | {ci(r, 'real|pooled')} | {ci(r, 'real|strat_lang')} | "
+                  f"{ci(r, 'real|strat_repo')} | {ci(r, 'lang_only|pooled')} | {ci(r, 'repo_only|pooled')} | "
+                  f"{_d(r, 'real-lang_only')} | {_d(r, 'real-repo_only')} |")
+    for probe in PROBES:
+        rows = [(name, json.loads((root / f"lang_swebench_pro_{pooled}_{probe}.json").read_text()))
+                for pooled, name in pro if (root / f"lang_swebench_pro_{pooled}_{probe}.json").exists()]
+        if not rows:
+            continue
+        has_t = any(r["transfer_pooled"] for _, r in rows)
+        print(f"\n#### E11: {probe.removeprefix('currently_')} on Pro by language (◦ = fewer than 20 test tasks with both classes)\n")
+        print("| Model | language | AUC | tokens | positives | positive rate | test tasks | tasks w/ both classes |"
+              + (" Verified-trained probe AUC |" if has_t else ""))
+        print("|---|---|---|---|---|---|---|---|" + ("---|" if has_t else ""))
+        for name, r in rows:
+            for l, c in r["counts_by_language"].items():
+                flag = "◦" if c["underpowered"] else ""
+                print(f"| {name} | {l} | {ci(r, f'real|lang={l}')}{flag} | {c['n']:,} | {c['n_pos']:,} | {c['pos_rate']:.2f} | "
+                      f"{c['n_tasks']} | {c['n_tasks_both_classes']} |" + (f" {ci(r, f'transfer|lang={l}')} |" if has_t else ""))
+            if r["transfer_pooled"]:
+                print(f"| {name} | **all (Verified-trained probe, L{r['transfer_layer']})** | pooled {ci(r, 'transfer|pooled')}; "
+                      f"same-language pairs {ci(r, 'transfer|strat_lang')} | | | | | | |")
+        if probe != "currently_compiles":
+            continue
+        print(f"\n#### E11: compiles on Pro by repository (◦ = fewer than 20 test tasks with both classes)\n")
+        print("| Model | repository | AUC | tokens | positive rate | test tasks | tasks w/ both classes |")
+        print("|---|---|---|---|---|---|---|")
+        for name, r in rows:
+            for rp, c in sorted(r["counts_by_repo"].items(), key=lambda kv: -kv[1]["n_tasks"]):
+                flag = "◦" if c["underpowered"] else ""
+                print(f"| {name} | {rp} | {ci(r, f'real|repo={rp}')}{flag} | {c['n']:,} | {c['pos_rate']:.2f} | {c['n_tasks']} | "
+                      f"{c['n_tasks_both_classes']} |")
+
+
 if __name__ == "__main__":
     print(f"† fewer than {MIN_POS} positive test tokens; ‡ test split has a single class, so AUC is undefined.")
     main_table()
@@ -327,3 +376,4 @@ if __name__ == "__main__":
     persistence_check_tables()
     phase_tables()
     e18_tables()
+    e11_tables()

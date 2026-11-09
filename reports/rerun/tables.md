@@ -1479,3 +1479,97 @@
 | Qwen3.6-35B-A3B / Verified | 4,998 | 476 | 2,902 | 99 | 24 | 1,497 | 0.973 | 0.974 | 50 |
 | Laguna XS.2 / Pro | 6,921 | 873 | 789 | 22 | 13 | 5,224 | 0.994 | 0.996 | 375 |
 | Qwen3.6-35B-A3B / Pro | 5,804 | 913 | 842 | 42 | 17 | 3,990 | 0.988 | 0.988 | 61 |
+
+#### E11: k=0 probes on Pro, pooled vs language-/repo-controlled (validation-best layer as in E17; pooled AUC over all test tokens; 95% task-bootstrap CI; bold if a difference's CI excludes 0)
+
+| Model | Probe | layer | pooled AUC | same-language pairs | same-repo pairs | language-only baseline | repo-only baseline | real − language-only | real − repo-only |
+|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | compiles | L10 | 0.786 [0.725, 0.843] | 0.646 [0.584, 0.700] | 0.649 [0.569, 0.714] | 0.778 [0.688, 0.856] | 0.833 [0.757, 0.897] | +0.008 [-0.04, +0.06] | -0.046 [-0.09, +0.00] |
+| Laguna XS.2 / Pro | correct | L20 | 0.794 [0.746, 0.839] | 0.785 [0.734, 0.830] | 0.781 [0.710, 0.833] | 0.562 [0.415, 0.697] | 0.573 [0.442, 0.695] | **+0.232 [+0.10, +0.37]** | **+0.221 [+0.11, +0.33]** |
+| Laguna XS.2 / Pro | has_regressions | L20 | 0.740 [0.677, 0.808] | 0.650 [0.569, 0.736] | 0.644 [0.539, 0.719] | 0.823 [0.752, 0.881] | 0.793 [0.706, 0.889] | **-0.084 [-0.16, -0.00]** | -0.053 [-0.16, +0.03] |
+| Laguna XS.2 / Pro | reduces_failing | L20 | 0.780 [0.733, 0.825] | 0.736 [0.693, 0.778] | 0.704 [0.665, 0.756] | 0.663 [0.533, 0.778] | 0.744 [0.656, 0.838] | **+0.117 [+0.03, +0.22]** | +0.036 [-0.03, +0.11] |
+| Qwen3.6-35B-A3B / Pro | compiles | L39 | 0.720 [0.651, 0.788] | 0.578 [0.512, 0.635] | 0.568 [0.486, 0.632] | 0.756 [0.656, 0.854] | 0.819 [0.737, 0.891] | -0.037 [-0.10, +0.02] | **-0.100 [-0.15, -0.05]** |
+| Qwen3.6-35B-A3B / Pro | correct | L30 | 0.822 [0.787, 0.861] | 0.811 [0.773, 0.855] | 0.815 [0.777, 0.857] | 0.506 [0.368, 0.667] | 0.538 [0.394, 0.708] | **+0.316 [+0.17, +0.46]** | **+0.284 [+0.12, +0.43]** |
+| Qwen3.6-35B-A3B / Pro | has_regressions | L20 | 0.818 [0.774, 0.859] | 0.711 [0.648, 0.776] | 0.696 [0.621, 0.766] | 0.831 [0.777, 0.884] | 0.791 [0.702, 0.864] | -0.013 [-0.06, +0.03] | +0.027 [-0.04, +0.11] |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | L20 | 0.830 [0.780, 0.866] | 0.783 [0.733, 0.821] | 0.783 [0.730, 0.820] | 0.716 [0.593, 0.814] | 0.744 [0.640, 0.834] | **+0.114 [+0.02, +0.21]** | +0.086 [-0.00, +0.17] |
+
+#### E11: compiles on Pro by language (◦ = fewer than 20 test tasks with both classes)
+
+| Model | language | AUC | tokens | positives | positive rate | test tasks | tasks w/ both classes | Verified-trained probe AUC |
+|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | go | 0.641 [0.567, 0.708]◦ | 579,874 | 168,885 | 0.29 | 45 | 17 | 0.453 [0.399, 0.516] |
+| Laguna XS.2 / Pro | js | 0.543 [0.412, 0.672]◦ | 165,454 | 141,234 | 0.85 | 21 | 10 | 0.451 [0.352, 0.585] |
+| Laguna XS.2 / Pro | python | 0.674 [0.564, 0.766]◦ | 445,819 | 373,792 | 0.84 | 33 | 19 | 0.470 [0.380, 0.607] |
+| Laguna XS.2 / Pro | ts | 0.602 [0.505, 0.693]◦ | 61,489 | 15,486 | 0.25 | 7 | 5 | 0.582 [0.418, 0.673] |
+| Laguna XS.2 / Pro | **all (Verified-trained probe, L10)** | pooled 0.516 [0.476, 0.553]; same-language pairs 0.459 [0.412, 0.514] | | | | | | |
+| Qwen3.6-35B-A3B / Pro | go | 0.564 [0.493, 0.645]◦ | 167,689 | 53,384 | 0.32 | 37 | 12 | 0.467 [0.408, 0.527] |
+| Qwen3.6-35B-A3B / Pro | js | 0.489 [0.410, 0.580]◦ | 108,383 | 84,612 | 0.78 | 20 | 6 | 0.523 [0.418, 0.631] |
+| Qwen3.6-35B-A3B / Pro | python | 0.686 [0.560, 0.733]◦ | 163,255 | 145,986 | 0.89 | 30 | 13 | 0.476 [0.429, 0.616] |
+| Qwen3.6-35B-A3B / Pro | ts | 0.534 [0.463, 0.730]◦ | 28,177 | 9,346 | 0.33 | 7 | 4 | 0.507 [0.200, 0.600] |
+| Qwen3.6-35B-A3B / Pro | **all (Verified-trained probe, L39)** | pooled 0.505 [0.464, 0.545]; same-language pairs 0.480 [0.444, 0.525] | | | | | | |
+
+#### E11: compiles on Pro by repository (◦ = fewer than 20 test tasks with both classes)
+
+| Model | repository | AUC | tokens | positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | flipt-io/flipt | 0.688 [0.578, 0.772]◦ | 304,372 | 0.39 | 21 | 8 |
+| Laguna XS.2 / Pro | ansible/ansible | 0.573 [0.529, 0.644]◦ | 240,229 | 0.90 | 16 | 10 |
+| Laguna XS.2 / Pro | gravitational/teleport | 0.560 [0.387, 0.726]◦ | 146,377 | 0.08 | 12 | 2 |
+| Laguna XS.2 / Pro | protonmail/webclients | 0.490 [0.353, 0.721]◦ | 69,632 | 0.87 | 11 | 4 |
+| Laguna XS.2 / Pro | qutebrowser/qutebrowser | 0.614 [0.529, 0.712]◦ | 116,955 | 0.97 | 10 | 6 |
+| Laguna XS.2 / Pro | internetarchive/openlibrary | 0.633 [0.491, 0.747]◦ | 88,635 | 0.51 | 7 | 3 |
+| Laguna XS.2 / Pro | tutao/tutanota | 0.602 [0.505, 0.693]◦ | 61,489 | 0.25 | 7 | 5 |
+| Laguna XS.2 / Pro | future-architect/vuls | 0.664 [0.394, 0.869]◦ | 63,831 | 0.30 | 6 | 4 |
+| Laguna XS.2 / Pro | navidrome/navidrome | 0.596 [0.362, 0.730]◦ | 65,294 | 0.29 | 6 | 3 |
+| Laguna XS.2 / Pro | NodeBB/NodeBB | 0.600 [0.541, 0.645]◦ | 43,490 | 0.99 | 5 | 4 |
+| Laguna XS.2 / Pro | element-hq/element-web | 0.465 [0.285, 0.648]◦ | 52,332 | 0.72 | 5 | 2 |
+| Qwen3.6-35B-A3B / Pro | flipt-io/flipt | 0.668 [0.601, 0.738]◦ | 73,946 | 0.43 | 14 | 7 |
+| Qwen3.6-35B-A3B / Pro | ansible/ansible | 0.576 [0.526, 0.628]◦ | 70,351 | 0.96 | 13 | 7 |
+| Qwen3.6-35B-A3B / Pro | gravitational/teleport | 0.504 [0.423, 0.639]◦ | 42,890 | 0.28 | 12 | 2 |
+| Qwen3.6-35B-A3B / Pro | future-architect/vuls | 0.501 [0.435, 0.605]◦ | 40,422 | 0.24 | 9 | 3 |
+| Qwen3.6-35B-A3B / Pro | internetarchive/openlibrary | 0.627 [0.517, 0.733]◦ | 56,045 | 0.75 | 9 | 2 |
+| Qwen3.6-35B-A3B / Pro | protonmail/webclients | 0.420 [0.315, 0.618]◦ | 60,528 | 0.72 | 9 | 2 |
+| Qwen3.6-35B-A3B / Pro | qutebrowser/qutebrowser | 0.604 [0.521, 0.716]◦ | 36,859 | 0.99 | 8 | 4 |
+| Qwen3.6-35B-A3B / Pro | element-hq/element-web | 0.504 [0.348, 0.577]◦ | 32,794 | 0.80 | 7 | 2 |
+| Qwen3.6-35B-A3B / Pro | tutao/tutanota | 0.534 [0.463, 0.730]◦ | 28,177 | 0.33 | 7 | 4 |
+| Qwen3.6-35B-A3B / Pro | NodeBB/NodeBB | 0.584 [0.392, 0.658]◦ | 15,061 | 1.00 | 4 | 2 |
+| Qwen3.6-35B-A3B / Pro | navidrome/navidrome | –◦ | 10,431 | 0.00 | 2 | 0 |
+
+#### E11: correct on Pro by language (◦ = fewer than 20 test tasks with both classes)
+
+| Model | language | AUC | tokens | positives | positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | go | 0.792 [0.720, 0.850]◦ | 579,874 | 26,093 | 0.04 | 45 | 10 |
+| Laguna XS.2 / Pro | js | 0.787 [0.715, 0.932]◦ | 165,454 | 3,192 | 0.02 | 21 | 4 |
+| Laguna XS.2 / Pro | python | 0.779 [0.689, 0.853]◦ | 445,819 | 33,211 | 0.07 | 33 | 10 |
+| Laguna XS.2 / Pro | ts | 0.737 [0.601, 0.844]◦ | 61,489 | 3,434 | 0.06 | 7 | 4 |
+| Qwen3.6-35B-A3B / Pro | go | 0.841 [0.786, 0.906]◦ | 167,689 | 11,152 | 0.07 | 37 | 8 |
+| Qwen3.6-35B-A3B / Pro | js | 0.849 [0.777, 0.930]◦ | 108,383 | 3,213 | 0.03 | 20 | 4 |
+| Qwen3.6-35B-A3B / Pro | python | 0.772 [0.725, 0.832]◦ | 163,255 | 11,548 | 0.07 | 30 | 13 |
+| Qwen3.6-35B-A3B / Pro | ts | 0.882 [0.840, 0.934]◦ | 28,177 | 1,223 | 0.04 | 7 | 2 |
+
+#### E11: has_regressions on Pro by language (◦ = fewer than 20 test tasks with both classes)
+
+| Model | language | AUC | tokens | positives | positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | go | 0.821 [0.786, 0.851]◦ | 579,874 | 89 | 0.00 | 45 | 1 |
+| Laguna XS.2 / Pro | js | 0.740 [0.649, 0.827]◦ | 165,454 | 4,746 | 0.03 | 21 | 2 |
+| Laguna XS.2 / Pro | python | 0.647 [0.560, 0.736]◦ | 445,819 | 65,629 | 0.15 | 33 | 12 |
+| Laguna XS.2 / Pro | ts | –◦ | 61,489 | 0 | 0.00 | 7 | 0 |
+| Qwen3.6-35B-A3B / Pro | go | –◦ | 167,689 | 0 | 0.00 | 37 | 0 |
+| Qwen3.6-35B-A3B / Pro | js | –◦ | 108,383 | 0 | 0.00 | 20 | 0 |
+| Qwen3.6-35B-A3B / Pro | python | 0.711 [0.648, 0.776]◦ | 163,255 | 7,805 | 0.05 | 30 | 9 |
+| Qwen3.6-35B-A3B / Pro | ts | –◦ | 28,177 | 0 | 0.00 | 7 | 0 |
+
+#### E11: reduces_failing on Pro by language (◦ = fewer than 20 test tasks with both classes)
+
+| Model | language | AUC | tokens | positives | positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Pro | go | 0.724 [0.533, 0.836]◦ | 579,874 | 39,677 | 0.07 | 45 | 6 |
+| Laguna XS.2 / Pro | js | 0.855 [0.718, 0.940]◦ | 165,454 | 12,362 | 0.07 | 21 | 6 |
+| Laguna XS.2 / Pro | python | 0.738 [0.693, 0.780] | 445,819 | 102,457 | 0.23 | 33 | 22 |
+| Laguna XS.2 / Pro | ts | 0.568 [0.505, 0.772]◦ | 61,489 | 5,217 | 0.08 | 7 | 1 |
+| Qwen3.6-35B-A3B / Pro | go | 0.776 [0.703, 0.848]◦ | 167,689 | 6,132 | 0.04 | 37 | 5 |
+| Qwen3.6-35B-A3B / Pro | js | 0.855 [0.779, 0.911]◦ | 108,383 | 5,117 | 0.05 | 20 | 6 |
+| Qwen3.6-35B-A3B / Pro | python | 0.775 [0.711, 0.822] | 163,255 | 34,977 | 0.21 | 30 | 20 |
+| Qwen3.6-35B-A3B / Pro | ts | 0.839 [0.812, 0.879]◦ | 28,177 | 1,514 | 0.05 | 7 | 1 |
