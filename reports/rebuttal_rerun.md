@@ -249,6 +249,37 @@ All rerun, eval-only. Script `scripts/rebuttal_per_language.py` (`slurm/per_lang
   - Reduces_failing loses 0.04–0.08 when stratified, and the probe beats the language-only baseline.
   - Has_regressions behaves like compiles: the language-only baseline matches or beats the probe. On Qwen/Pro all has_regressions positives are Python tokens, which likely explains why its best layer is layer 0 (see "Layer 0 on Qwen Pro").
 
+### E11b: repository controls on Verified
+
+All rerun, eval-only, the same script and setup as E11 with `--bench swebench`.
+- **Repository:** the `repo` field of `princeton-nlp/SWE-bench_Verified`; Verified is Python-only, so only the repository controls apply.
+- **Outputs:** `reports/rerun/lang/lang_swebench_*.json`; figure `reports/rerun/figures/e11b_verified_compiles_by_repo.{pdf,png}`. No figure is drawn for the other properties, which show no repository effect.
+- **Coverage:** all 11 test repositories occur in training (flask has no test task), so no fallback was needed.
+- **Power:** no repository has 20 test tasks with both classes, for any property.
+
+**Legacy context.** The submitted runs' repository split used seed 42 over 12 repositories:
+- train: matplotlib, seaborn, requests, xarray, pylint, pytest, scikit-learn, sympy;
+- validation: flask (1 task);
+- test: astropy (22 tasks), django (231) and sphinx (44).
+
+Their stored pooled test AUC (same AUC definition) therefore measures transfer to unseen repositories on a different, django-dominated test set. It is shown next to the task-split numbers, not as a paired comparison.
+
+| | pooled (task split) | same-repo pairs | repo-only baseline | real − repo-only | legacy split (test-best layer) |
+|---|---|---|---|---|---|
+| Laguna compiles | 0.691 | 0.709 | 0.692 | −0.001 [−0.14, +0.16] | 0.571 |
+| Qwen compiles | 0.736 | 0.733 | 0.785 | −0.050 [−0.19, +0.14] | 0.587 |
+| Laguna correct / reduces_failing / has_regressions | 0.788 / 0.773 / 0.695 | 0.752 / 0.765 / 0.694 | 0.574 / 0.450 / 0.507 | +0.22 / +0.32 / +0.19 (all CI > 0) | 0.727 / 0.708 / 0.678 |
+| Qwen correct / reduces_failing / has_regressions | 0.838 / 0.832 / 0.770 | 0.833 / 0.830 / 0.759 | 0.565 / 0.448 / 0.521 | +0.27 / +0.38 / +0.25 (all CI > 0) | 0.828 / 0.808 / 0.721 |
+
+- **Well-formedness.**
+  - Training positive rates differ by repository: lowest for pylint (0.41 Laguna / 0.64 Qwen), 0.74–1.00 for the others. So a score that knows only the repository already reaches the probe's pooled AUC (0.69/0.79).
+  - Unlike on Pro, the probe does not depend on that. Its AUC over same-repository pairs equals its pooled AUC (pooled − same-repo −0.02 and +0.00, CIs around 0).
+  - So repository base rates do not explain the task-split number; the probe ranks well within repositories.
+  - The jump from the legacy split (+0.12/+0.15) is the largest of the four properties. The task split trains on tasks from the test repositories (django among them), which the legacy split never did. These controls do not separate "repository-specific features learned in training" from "a generally better probe": the within-repository AUC rules out base rates only.
+- **Other properties.**
+  - The probe beats the repo-only baseline by 0.19–0.38 (CIs > 0), and stratifying by repository changes the AUC by at most 0.04.
+  - The legacy-to-task-split change is smaller (+0.01 to +0.07; Qwen has_regressions' legacy validation set was single-class, so its legacy layer choice is arbitrary).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
@@ -1867,3 +1898,124 @@ Result directories keep the original run IDs; the paper's results are in `result
 | Qwen3.6-35B-A3B / Pro | js | 0.855 [0.779, 0.911]◦ | 108,383 | 5,117 | 0.05 | 20 | 6 |
 | Qwen3.6-35B-A3B / Pro | python | 0.775 [0.711, 0.822] | 163,255 | 34,977 | 0.21 | 30 | 20 |
 | Qwen3.6-35B-A3B / Pro | ts | 0.839 [0.812, 0.879]◦ | 28,177 | 1,514 | 0.05 | 7 | 1 |
+
+#### E11b: k=0 probes on Verified, pooled vs repository-controlled, and the submitted runs' repository-split AUC (task split: validation-best layer as in E17, pooled AUC over all test tokens, 95% task-bootstrap CI; legacy: stored pooled test AUC of the submitted runs on their test repositories astropy, django, sphinx)
+
+| Model | Probe | layer | pooled AUC | same-repo pairs | repo-only baseline | real − repo-only | pooled − same-repo | legacy split, test-best layer | legacy split, val-best layer |
+|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | compiles | L10 | 0.691 [0.623, 0.783] | 0.709 [0.622, 0.779] | 0.692 [0.534, 0.833] | -0.001 [-0.14, +0.16] | -0.018 [-0.09, +0.07] | 0.571 (L30) | 0.566 (L20) |
+| Laguna XS.2 / Verified | correct | L20 | 0.788 [0.740, 0.838] | 0.752 [0.688, 0.824] | 0.574 [0.479, 0.665] | **+0.215 [+0.12, +0.32]** | +0.036 [-0.01, +0.07] | 0.727 (L20) | 0.727 (L20) |
+| Laguna XS.2 / Verified | has_regressions | L20 | 0.695 [0.629, 0.758] | 0.694 [0.630, 0.764] | 0.507 [0.330, 0.682] | **+0.188 [+0.05, +0.33]** | +0.002 [-0.06, +0.05] | 0.678 (L20) | 0.678 (L20) |
+| Laguna XS.2 / Verified | reduces_failing | L20 | 0.773 [0.721, 0.826] | 0.765 [0.706, 0.823] | 0.450 [0.368, 0.539] | **+0.323 [+0.22, +0.43]** | +0.008 [-0.04, +0.05] | 0.708 (L20) | 0.708 (L20) |
+| Qwen3.6-35B-A3B / Verified | compiles | L39 | 0.736 [0.666, 0.809] | 0.733 [0.653, 0.808] | 0.785 [0.595, 0.913] | -0.050 [-0.19, +0.14] | +0.003 [-0.06, +0.09] | 0.587 (L30) | 0.553 (L20) |
+| Qwen3.6-35B-A3B / Verified | correct | L30 | 0.838 [0.795, 0.879] | 0.833 [0.787, 0.883] | 0.565 [0.482, 0.643] | **+0.273 [+0.19, +0.37]** | +0.005 [-0.03, +0.04] | 0.828 (L30) | 0.820 (L20) |
+| Qwen3.6-35B-A3B / Verified | has_regressions | L30 | 0.770 [0.726, 0.809] | 0.759 [0.678, 0.806] | 0.521 [0.358, 0.767] | **+0.249 [+0.01, +0.41]** | +0.010 [-0.02, +0.08] | 0.721 (L30) | 0.594 (L10) |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | L30 | 0.832 [0.790, 0.870] | 0.830 [0.781, 0.879] | 0.448 [0.380, 0.531] | **+0.384 [+0.31, +0.46]** | +0.002 [-0.03, +0.03] | 0.808 (L30) | 0.807 (L20) |
+
+#### E11b: compiles on Verified by repository (◦ = fewer than 20 test tasks with both classes)
+
+| Model | repository | AUC | tokens | positives | positive rate | train positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | django/django | 0.720 [0.650, 0.797]◦ | 545,474 | 494,087 | 0.91 | 0.96 | 34 | 8 |
+| Laguna XS.2 / Verified | sympy/sympy | –◦ | 130,747 | 130,747 | 1.00 | 0.99 | 9 | 0 |
+| Laguna XS.2 / Verified | scikit-learn/scikit-learn | 0.565 [0.512, 0.701]◦ | 93,789 | 91,504 | 0.98 | 0.98 | 6 | 3 |
+| Laguna XS.2 / Verified | sphinx-doc/sphinx | 0.453 [0.402, 0.559]◦ | 94,724 | 94,249 | 0.99 | 0.90 | 6 | 1 |
+| Laguna XS.2 / Verified | astropy/astropy | 0.586 [0.473, 0.725]◦ | 87,976 | 59,963 | 0.68 | 0.96 | 5 | 3 |
+| Laguna XS.2 / Verified | pydata/xarray | 0.611 [0.494, 0.767]◦ | 62,974 | 55,703 | 0.88 | 0.95 | 5 | 2 |
+| Laguna XS.2 / Verified | matplotlib/matplotlib | 0.439 [0.368, 0.636]◦ | 41,319 | 41,287 | 1.00 | 0.97 | 4 | 1 |
+| Laguna XS.2 / Verified | pylint-dev/pylint | 0.724 [0.713, 0.807]◦ | 23,473 | 12,333 | 0.53 | 0.41 | 2 | 2 |
+| Laguna XS.2 / Verified | pytest-dev/pytest | 0.674 [0.639, 0.756]◦ | 23,097 | 11,164 | 0.48 | 0.74 | 2 | 1 |
+| Laguna XS.2 / Verified | mwaskom/seaborn | 0.634 [0.634, 0.634]◦ | 17,034 | 16,099 | 0.95 | 1.00 | 1 | 1 |
+| Laguna XS.2 / Verified | psf/requests | 0.477 [0.477, 0.477]◦ | 10,284 | 10,269 | 1.00 | 0.87 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | django/django | 0.749 [0.659, 0.840]◦ | 273,151 | 258,427 | 0.95 | 0.97 | 34 | 8 |
+| Qwen3.6-35B-A3B / Verified | sympy/sympy | 0.815 [0.777, 0.841]◦ | 79,054 | 79,029 | 1.00 | 1.00 | 9 | 1 |
+| Qwen3.6-35B-A3B / Verified | scikit-learn/scikit-learn | 0.696 [0.607, 0.747]◦ | 32,755 | 32,237 | 0.98 | 0.99 | 6 | 3 |
+| Qwen3.6-35B-A3B / Verified | sphinx-doc/sphinx | 0.617 [0.585, 0.651]◦ | 39,568 | 39,346 | 0.99 | 0.94 | 6 | 1 |
+| Qwen3.6-35B-A3B / Verified | astropy/astropy | 0.637 [0.607, 0.768]◦ | 49,438 | 38,068 | 0.77 | 0.93 | 5 | 3 |
+| Qwen3.6-35B-A3B / Verified | pydata/xarray | 0.611 [0.589, 0.833]◦ | 32,909 | 28,802 | 0.88 | 0.95 | 5 | 4 |
+| Qwen3.6-35B-A3B / Verified | matplotlib/matplotlib | 0.686 [0.596, 0.768]◦ | 20,532 | 20,263 | 0.99 | 0.98 | 4 | 3 |
+| Qwen3.6-35B-A3B / Verified | pylint-dev/pylint | 0.757 [0.755, 0.779]◦ | 14,364 | 8,802 | 0.61 | 0.64 | 2 | 2 |
+| Qwen3.6-35B-A3B / Verified | pytest-dev/pytest | 0.695 [0.678, 0.708]◦ | 20,903 | 9,292 | 0.44 | 0.81 | 2 | 1 |
+| Qwen3.6-35B-A3B / Verified | mwaskom/seaborn | –◦ | 1,306 | 1,306 | 1.00 | 1.00 | 1 | 0 |
+| Qwen3.6-35B-A3B / Verified | psf/requests | –◦ | 6,707 | 6,707 | 1.00 | 0.74 | 1 | 0 |
+
+#### E11b: correct on Verified by repository (◦ = fewer than 20 test tasks with both classes)
+
+| Model | repository | AUC | tokens | positives | positive rate | train positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | django/django | 0.742 [0.669, 0.822] | 545,474 | 234,398 | 0.43 | 0.40 | 34 | 29 |
+| Laguna XS.2 / Verified | sympy/sympy | 0.852 [0.665, 0.959]◦ | 130,747 | 44,017 | 0.34 | 0.28 | 9 | 7 |
+| Laguna XS.2 / Verified | scikit-learn/scikit-learn | 0.781 [0.644, 0.959]◦ | 93,789 | 33,394 | 0.36 | 0.36 | 6 | 6 |
+| Laguna XS.2 / Verified | sphinx-doc/sphinx | 0.780 [0.618, 0.866]◦ | 94,724 | 8,895 | 0.09 | 0.34 | 6 | 3 |
+| Laguna XS.2 / Verified | astropy/astropy | 0.867 [0.792, 0.971]◦ | 87,976 | 31,144 | 0.35 | 0.20 | 5 | 4 |
+| Laguna XS.2 / Verified | pydata/xarray | 0.845 [0.786, 0.959]◦ | 62,974 | 24,636 | 0.39 | 0.36 | 5 | 3 |
+| Laguna XS.2 / Verified | matplotlib/matplotlib | 0.768 [0.695, 0.990]◦ | 41,319 | 16,937 | 0.41 | 0.23 | 4 | 3 |
+| Laguna XS.2 / Verified | pylint-dev/pylint | –◦ | 23,473 | 0 | 0.00 | 0.06 | 2 | 0 |
+| Laguna XS.2 / Verified | pytest-dev/pytest | 0.796 [0.783, 0.933]◦ | 23,097 | 3,598 | 0.16 | 0.42 | 2 | 1 |
+| Laguna XS.2 / Verified | mwaskom/seaborn | 0.638 [0.638, 0.638]◦ | 17,034 | 98 | 0.01 | 0.05 | 1 | 1 |
+| Laguna XS.2 / Verified | psf/requests | 0.831 [0.831, 0.831]◦ | 10,284 | 2,879 | 0.28 | 0.13 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | django/django | 0.829 [0.773, 0.884] | 273,151 | 91,301 | 0.33 | 0.29 | 34 | 26 |
+| Qwen3.6-35B-A3B / Verified | sympy/sympy | 0.837 [0.707, 0.961]◦ | 79,054 | 25,545 | 0.32 | 0.23 | 9 | 7 |
+| Qwen3.6-35B-A3B / Verified | scikit-learn/scikit-learn | 0.907 [0.789, 0.992]◦ | 32,755 | 7,773 | 0.24 | 0.34 | 6 | 6 |
+| Qwen3.6-35B-A3B / Verified | sphinx-doc/sphinx | 0.902 [0.784, 0.963]◦ | 39,568 | 7,456 | 0.19 | 0.24 | 6 | 3 |
+| Qwen3.6-35B-A3B / Verified | astropy/astropy | 0.913 [0.865, 0.991]◦ | 49,438 | 8,817 | 0.18 | 0.15 | 5 | 4 |
+| Qwen3.6-35B-A3B / Verified | pydata/xarray | 0.900 [0.844, 0.990]◦ | 32,909 | 7,451 | 0.23 | 0.28 | 5 | 3 |
+| Qwen3.6-35B-A3B / Verified | matplotlib/matplotlib | 0.781 [0.711, 0.976]◦ | 20,532 | 6,199 | 0.30 | 0.18 | 4 | 3 |
+| Qwen3.6-35B-A3B / Verified | pylint-dev/pylint | –◦ | 14,364 | 0 | 0.00 | 0.03 | 2 | 0 |
+| Qwen3.6-35B-A3B / Verified | pytest-dev/pytest | 0.917 [0.910, 0.993]◦ | 20,903 | 873 | 0.04 | 0.27 | 2 | 1 |
+| Qwen3.6-35B-A3B / Verified | mwaskom/seaborn | –◦ | 1,306 | 0 | 0.00 | 0.00 | 1 | 0 |
+| Qwen3.6-35B-A3B / Verified | psf/requests | 0.819 [0.819, 0.819]◦ | 6,707 | 619 | 0.09 | 0.11 | 1 | 1 |
+
+#### E11b: has_regressions on Verified by repository (◦ = fewer than 20 test tasks with both classes)
+
+| Model | repository | AUC | tokens | positives | positive rate | train positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | django/django | 0.692 [0.618, 0.775]◦ | 545,474 | 64,561 | 0.12 | 0.05 | 34 | 13 |
+| Laguna XS.2 / Verified | sympy/sympy | –◦ | 130,747 | 0 | 0.00 | 0.09 | 9 | 0 |
+| Laguna XS.2 / Verified | scikit-learn/scikit-learn | 0.714 [0.606, 0.848]◦ | 93,789 | 25,219 | 0.27 | 0.15 | 6 | 2 |
+| Laguna XS.2 / Verified | sphinx-doc/sphinx | 0.628 [0.438, 0.817]◦ | 94,724 | 5,756 | 0.06 | 0.06 | 6 | 2 |
+| Laguna XS.2 / Verified | astropy/astropy | 0.621 [0.550, 0.759]◦ | 87,976 | 3,111 | 0.04 | 0.22 | 5 | 1 |
+| Laguna XS.2 / Verified | pydata/xarray | 0.744 [0.498, 0.764]◦ | 62,974 | 2,701 | 0.04 | 0.18 | 5 | 5 |
+| Laguna XS.2 / Verified | matplotlib/matplotlib | 0.794 [0.307, 0.866]◦ | 41,319 | 15,373 | 0.37 | 0.18 | 4 | 3 |
+| Laguna XS.2 / Verified | pylint-dev/pylint | –◦ | 23,473 | 0 | 0.00 | 0.00 | 2 | 0 |
+| Laguna XS.2 / Verified | pytest-dev/pytest | 0.697 [0.658, 0.884]◦ | 23,097 | 925 | 0.04 | 0.11 | 2 | 2 |
+| Laguna XS.2 / Verified | mwaskom/seaborn | 0.717 [0.717, 0.717]◦ | 17,034 | 4,181 | 0.25 | 0.00 | 1 | 1 |
+| Laguna XS.2 / Verified | psf/requests | 0.622 [0.622, 0.622]◦ | 10,284 | 3,858 | 0.38 | 0.39 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | django/django | 0.757 [0.640, 0.808]◦ | 273,151 | 21,551 | 0.08 | 0.03 | 34 | 11 |
+| Qwen3.6-35B-A3B / Verified | sympy/sympy | 0.811 [0.783, 0.845]◦ | 79,054 | 228 | 0.00 | 0.06 | 9 | 1 |
+| Qwen3.6-35B-A3B / Verified | scikit-learn/scikit-learn | 0.890 [0.822, 0.909]◦ | 32,755 | 5,399 | 0.16 | 0.06 | 6 | 2 |
+| Qwen3.6-35B-A3B / Verified | sphinx-doc/sphinx | 0.777 [0.694, 0.803]◦ | 39,568 | 689 | 0.02 | 0.05 | 6 | 1 |
+| Qwen3.6-35B-A3B / Verified | astropy/astropy | 0.715 [0.617, 0.869]◦ | 49,438 | 3,057 | 0.06 | 0.14 | 5 | 3 |
+| Qwen3.6-35B-A3B / Verified | pydata/xarray | 0.817 [0.741, 0.852]◦ | 32,909 | 1,276 | 0.04 | 0.12 | 5 | 1 |
+| Qwen3.6-35B-A3B / Verified | matplotlib/matplotlib | 0.709 [0.495, 0.731]◦ | 20,532 | 1,879 | 0.09 | 0.13 | 4 | 2 |
+| Qwen3.6-35B-A3B / Verified | pylint-dev/pylint | –◦ | 14,364 | 0 | 0.00 | 0.00 | 2 | 0 |
+| Qwen3.6-35B-A3B / Verified | pytest-dev/pytest | –◦ | 20,903 | 0 | 0.00 | 0.07 | 2 | 0 |
+| Qwen3.6-35B-A3B / Verified | mwaskom/seaborn | 0.664 [0.664, 0.664]◦ | 1,306 | 107 | 0.08 | 0.06 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | psf/requests | 0.697 [0.697, 0.697]◦ | 6,707 | 3,858 | 0.58 | 0.36 | 1 | 1 |
+
+#### E11b: reduces_failing on Verified by repository (◦ = fewer than 20 test tasks with both classes)
+
+| Model | repository | AUC | tokens | positives | positive rate | train positive rate | test tasks | tasks w/ both classes |
+|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | django/django | 0.758 [0.691, 0.822] | 545,474 | 235,376 | 0.43 | 0.39 | 34 | 25 |
+| Laguna XS.2 / Verified | sympy/sympy | 0.831 [0.657, 0.954]◦ | 130,747 | 41,886 | 0.32 | 0.39 | 9 | 8 |
+| Laguna XS.2 / Verified | scikit-learn/scikit-learn | 0.750 [0.562, 0.961]◦ | 93,789 | 34,540 | 0.37 | 0.39 | 6 | 6 |
+| Laguna XS.2 / Verified | sphinx-doc/sphinx | 0.796 [0.730, 0.936]◦ | 94,724 | 30,658 | 0.32 | 0.44 | 6 | 5 |
+| Laguna XS.2 / Verified | astropy/astropy | 0.864 [0.791, 0.963]◦ | 87,976 | 59,300 | 0.67 | 0.26 | 5 | 5 |
+| Laguna XS.2 / Verified | pydata/xarray | 0.876 [0.765, 0.967]◦ | 62,974 | 24,915 | 0.40 | 0.42 | 5 | 4 |
+| Laguna XS.2 / Verified | matplotlib/matplotlib | 0.714 [0.660, 0.990]◦ | 41,319 | 16,969 | 0.41 | 0.28 | 4 | 3 |
+| Laguna XS.2 / Verified | pylint-dev/pylint | 0.585 [0.566, 0.617]◦ | 23,473 | 369 | 0.02 | 0.27 | 2 | 1 |
+| Laguna XS.2 / Verified | pytest-dev/pytest | 0.766 [0.751, 0.932]◦ | 23,097 | 3,732 | 0.16 | 0.49 | 2 | 1 |
+| Laguna XS.2 / Verified | mwaskom/seaborn | 0.670 [0.670, 0.670]◦ | 17,034 | 3,494 | 0.21 | 0.24 | 1 | 1 |
+| Laguna XS.2 / Verified | psf/requests | 0.848 [0.848, 0.848]◦ | 10,284 | 2,894 | 0.28 | 0.29 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | django/django | 0.822 [0.762, 0.876] | 273,151 | 98,764 | 0.36 | 0.29 | 34 | 25 |
+| Qwen3.6-35B-A3B / Verified | sympy/sympy | 0.891 [0.804, 0.972]◦ | 79,054 | 19,488 | 0.25 | 0.33 | 9 | 9 |
+| Qwen3.6-35B-A3B / Verified | scikit-learn/scikit-learn | 0.896 [0.794, 0.988]◦ | 32,755 | 8,291 | 0.25 | 0.35 | 6 | 6 |
+| Qwen3.6-35B-A3B / Verified | sphinx-doc/sphinx | 0.922 [0.852, 0.963]◦ | 39,568 | 10,884 | 0.28 | 0.31 | 6 | 5 |
+| Qwen3.6-35B-A3B / Verified | astropy/astropy | 0.892 [0.820, 0.992]◦ | 49,438 | 20,187 | 0.41 | 0.22 | 5 | 5 |
+| Qwen3.6-35B-A3B / Verified | pydata/xarray | 0.869 [0.805, 0.987]◦ | 32,909 | 7,675 | 0.23 | 0.31 | 5 | 4 |
+| Qwen3.6-35B-A3B / Verified | matplotlib/matplotlib | 0.729 [0.372, 0.979]◦ | 20,532 | 6,468 | 0.32 | 0.21 | 4 | 4 |
+| Qwen3.6-35B-A3B / Verified | pylint-dev/pylint | –◦ | 14,364 | 0 | 0.00 | 0.11 | 2 | 0 |
+| Qwen3.6-35B-A3B / Verified | pytest-dev/pytest | 0.881 [0.564, 0.993]◦ | 20,903 | 888 | 0.04 | 0.36 | 2 | 2 |
+| Qwen3.6-35B-A3B / Verified | mwaskom/seaborn | 0.763 [0.763, 0.763]◦ | 1,306 | 138 | 0.11 | 0.26 | 1 | 1 |
+| Qwen3.6-35B-A3B / Verified | psf/requests | 0.836 [0.836, 0.836]◦ | 6,707 | 619 | 0.09 | 0.14 | 1 | 1 |

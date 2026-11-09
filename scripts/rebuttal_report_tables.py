@@ -367,6 +367,43 @@ def e11_tables(root: Path = Path("reports/rerun/lang")) -> None:
                       f"{c['n_tasks_both_classes']} |")
 
 
+def e11b_tables(root: Path = Path("reports/rerun/lang")) -> None:
+    """Tables from scripts/rebuttal_per_language.py on Verified (E11b, repository controls)."""
+    ver = [(pooled, name) for bench, pooled, name in COMBOS if bench == "swebench"]
+    ci = lambda r, k: (f"{r['auc'][k]:.3f} [{r['ci95'][k][0]:.3f}, {r['ci95'][k][1]:.3f}]"
+                       if r["auc"].get(k) == r["auc"].get(k) and r["ci95"].get(k) and r["ci95"][k][0] is not None else "–")
+    print("\n#### E11b: k=0 probes on Verified, pooled vs repository-controlled, and the submitted runs' repository-split AUC "
+          "(task split: validation-best layer as in E17, pooled AUC over all test tokens, 95% task-bootstrap CI; "
+          "legacy: stored pooled test AUC of the submitted runs on their test repositories astropy, django, sphinx)\n")
+    print("| Model | Probe | layer | pooled AUC | same-repo pairs | repo-only baseline | real − repo-only | pooled − same-repo | "
+          "legacy split, test-best layer | legacy split, val-best layer |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
+    for pooled, name in ver:
+        for probe in PROBES:
+            f = root / f"lang_swebench_{pooled}_{probe}.json"
+            if not f.exists():
+                continue
+            r = json.loads(f.read_text())
+            lg = r.get("legacy_split") or {}
+            leg = (f"{lg['test_auc_test_best']:.3f} (L{lg['test_best_layer']})", f"{lg['test_auc_val_best']:.3f} (L{lg['val_best_layer']})") if lg else ("–", "–")
+            print(f"| {name} | {probe.removeprefix('currently_')} | L{r['layer']} | {ci(r, 'real|pooled')} | {ci(r, 'real|strat_repo')} | "
+                  f"{ci(r, 'repo_only|pooled')} | {_d(r, 'real-repo_only')} | {_d(r, 'real_pooled-real_strat_repo')} | {leg[0]} | {leg[1]} |")
+    for probe in PROBES:
+        print(f"\n#### E11b: {probe.removeprefix('currently_')} on Verified by repository (◦ = fewer than 20 test tasks with both classes)\n")
+        print("| Model | repository | AUC | tokens | positives | positive rate | train positive rate | test tasks | tasks w/ both classes |")
+        print("|---|---|---|---|---|---|---|---|---|")
+        for pooled, name in ver:
+            f = root / f"lang_swebench_{pooled}_{probe}.json"
+            if not f.exists():
+                continue
+            r = json.loads(f.read_text())
+            for rp, c in sorted(r["counts_by_repo"].items(), key=lambda kv: -kv[1]["n_tasks"]):
+                flag = "◦" if c["underpowered"] else ""
+                tr = r["train_pos_rate_by_repo"].get(rp)
+                print(f"| {name} | {rp} | {ci(r, f'real|repo={rp}')}{flag} | {c['n']:,} | {c['n_pos']:,} | {c['pos_rate']:.2f} | "
+                      f"{'–' if tr is None else f'{tr:.2f}'} | {c['n_tasks']} | {c['n_tasks_both_classes']} |")
+
+
 if __name__ == "__main__":
     print(f"† fewer than {MIN_POS} positive test tokens; ‡ test split has a single class, so AUC is undefined.")
     main_table()
@@ -377,3 +414,4 @@ if __name__ == "__main__":
     phase_tables()
     e18_tables()
     e11_tables()
+    e11b_tables()

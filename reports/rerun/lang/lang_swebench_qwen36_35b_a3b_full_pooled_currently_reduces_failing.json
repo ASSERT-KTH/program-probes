@@ -1,0 +1,260 @@
+{
+  "bench": "swebench",
+  "pooled": "qwen36_35b_a3b_full_pooled",
+  "probe": "currently_reduces_failing",
+  "layer": 30,
+  "transfer_pooled": null,
+  "transfer_layer": null,
+  "auc_definition": "pooled AUC over all test tokens with y >= 0 (E17); no position bins",
+  "language_field": "python (Verified is Python-only)",
+  "repo_field": "repo (princeton-nlp/SWE-bench_Verified)",
+  "legacy_split": {
+    "test_best_layer": 30,
+    "test_auc_test_best": 0.8078104641271107,
+    "val_best_layer": 20,
+    "test_auc_val_best": 0.8073337186774772,
+    "val_auc_by_layer": {
+      "30": 0.9849707031759531,
+      "39": 0.9100994474561591,
+      "20": 0.9855185511768296,
+      "0": 0.8658202849853125,
+      "10": 0.9759090363614544
+    },
+    "n_test": 2115246,
+    "n_pos_test": 641943,
+    "note": "stored results.pt of the submitted runs: pooled test AUC on the old split's test set"
+  },
+  "n_boot": 1000,
+  "min_tasks_both_classes": 20,
+  "n_test": 570687,
+  "n_pos_test": 173402,
+  "n_test_tasks": 75,
+  "train_pos_rate_by_language": {
+    "python": 0.2909768334289245
+  },
+  "train_pos_rate_by_repo": {
+    "astropy/astropy": 0.215015638569479,
+    "django/django": 0.292830505347271,
+    "matplotlib/matplotlib": 0.2085053987497632,
+    "mwaskom/seaborn": 0.2577287176441821,
+    "pallets/flask": 0.6510615133369625,
+    "psf/requests": 0.1449593236560855,
+    "pydata/xarray": 0.30961121549356846,
+    "pylint-dev/pylint": 0.10560814289674839,
+    "pytest-dev/pytest": 0.36021088318106076,
+    "scikit-learn/scikit-learn": 0.35141958364222886,
+    "sphinx-doc/sphinx": 0.3137029874113588,
+    "sympy/sympy": 0.33038975976039725
+  },
+  "test_repos_without_train_rate": [],
+  "n_test_tokens_repo_fallback": 0,
+  "counts_by_language": {
+    "python": {
+      "n": 570687,
+      "n_pos": 173402,
+      "pos_rate": 0.30384781850646675,
+      "n_tasks": 75,
+      "n_tasks_both_classes": 62,
+      "underpowered": false
+    }
+  },
+  "counts_by_repo": {
+    "astropy/astropy": {
+      "n": 49438,
+      "n_pos": 20187,
+      "pos_rate": 0.4083296249848295,
+      "n_tasks": 5,
+      "n_tasks_both_classes": 5,
+      "underpowered": true
+    },
+    "django/django": {
+      "n": 273151,
+      "n_pos": 98764,
+      "pos_rate": 0.36157290289986127,
+      "n_tasks": 34,
+      "n_tasks_both_classes": 25,
+      "underpowered": false
+    },
+    "matplotlib/matplotlib": {
+      "n": 20532,
+      "n_pos": 6468,
+      "pos_rate": 0.31502045587375804,
+      "n_tasks": 4,
+      "n_tasks_both_classes": 4,
+      "underpowered": true
+    },
+    "mwaskom/seaborn": {
+      "n": 1306,
+      "n_pos": 138,
+      "pos_rate": 0.10566615620214395,
+      "n_tasks": 1,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    },
+    "psf/requests": {
+      "n": 6707,
+      "n_pos": 619,
+      "pos_rate": 0.09229163560459222,
+      "n_tasks": 1,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    },
+    "pydata/xarray": {
+      "n": 32909,
+      "n_pos": 7675,
+      "pos_rate": 0.23321887629523838,
+      "n_tasks": 5,
+      "n_tasks_both_classes": 4,
+      "underpowered": true
+    },
+    "pylint-dev/pylint": {
+      "n": 14364,
+      "n_pos": 0,
+      "pos_rate": 0.0,
+      "n_tasks": 2,
+      "n_tasks_both_classes": 0,
+      "underpowered": true
+    },
+    "pytest-dev/pytest": {
+      "n": 20903,
+      "n_pos": 888,
+      "pos_rate": 0.04248194039133139,
+      "n_tasks": 2,
+      "n_tasks_both_classes": 2,
+      "underpowered": true
+    },
+    "scikit-learn/scikit-learn": {
+      "n": 32755,
+      "n_pos": 8291,
+      "pos_rate": 0.2531216608151427,
+      "n_tasks": 6,
+      "n_tasks_both_classes": 6,
+      "underpowered": true
+    },
+    "sphinx-doc/sphinx": {
+      "n": 39568,
+      "n_pos": 10884,
+      "pos_rate": 0.27507076425394256,
+      "n_tasks": 6,
+      "n_tasks_both_classes": 5,
+      "underpowered": true
+    },
+    "sympy/sympy": {
+      "n": 79054,
+      "n_pos": 19488,
+      "pos_rate": 0.24651504035216434,
+      "n_tasks": 9,
+      "n_tasks_both_classes": 9,
+      "underpowered": true
+    }
+  },
+  "auc": {
+    "real|pooled": 0.8322550347916849,
+    "lang_only|pooled": 0.5,
+    "repo_only|pooled": 0.4477996431827383,
+    "real|strat_lang": 0.8322550347916849,
+    "real|strat_repo": 0.8304246395296374,
+    "real|lang=python": 0.8322550347916849,
+    "real|repo=astropy/astropy": 0.8924635975633908,
+    "real|repo=django/django": 0.8218493966875297,
+    "real|repo=matplotlib/matplotlib": 0.728667710749622,
+    "real|repo=mwaskom/seaborn": 0.7627059757792337,
+    "real|repo=psf/requests": 0.8362657331671829,
+    "real|repo=pydata/xarray": 0.8692805451721076,
+    "real|repo=pylint-dev/pylint": NaN,
+    "real|repo=pytest-dev/pytest": 0.881381193834354,
+    "real|repo=scikit-learn/scikit-learn": 0.8955871563316665,
+    "real|repo=sphinx-doc/sphinx": 0.9223201945507066,
+    "real|repo=sympy/sympy": 0.8906985603604165,
+    "real-lang_only": 0.33225503479168494,
+    "real-repo_only": 0.38445539160894665,
+    "real_pooled-real_strat_lang": 0.0,
+    "real_pooled-real_strat_repo": 0.001830395262047535
+  },
+  "ci95": {
+    "real|pooled": [
+      0.7895273578602556,
+      0.8702985691108758
+    ],
+    "lang_only|pooled": [
+      0.5,
+      0.5
+    ],
+    "repo_only|pooled": [
+      0.3804841997677145,
+      0.5307533534414084
+    ],
+    "real|strat_lang": [
+      0.7895273578602556,
+      0.8702985691108758
+    ],
+    "real|strat_repo": [
+      0.7812762529419871,
+      0.8794792738448619
+    ],
+    "real|lang=python": [
+      0.7895273578602556,
+      0.8702985691108758
+    ],
+    "real|repo=astropy/astropy": [
+      0.8199190573604815,
+      0.992063253204923
+    ],
+    "real|repo=django/django": [
+      0.7616691782908598,
+      0.8756147019931314
+    ],
+    "real|repo=matplotlib/matplotlib": [
+      0.37178116296356,
+      0.9793293274943138
+    ],
+    "real|repo=mwaskom/seaborn": [
+      0.7627059757792337,
+      0.7627059757792337
+    ],
+    "real|repo=psf/requests": [
+      0.8362657331671829,
+      0.8362657331671829
+    ],
+    "real|repo=pydata/xarray": [
+      0.8047631679246859,
+      0.9870877299904616
+    ],
+    "real|repo=pylint-dev/pylint": [
+      null,
+      null
+    ],
+    "real|repo=pytest-dev/pytest": [
+      0.5644140290846877,
+      0.9927862764660237
+    ],
+    "real|repo=scikit-learn/scikit-learn": [
+      0.7936875751366115,
+      0.9883113734379999
+    ],
+    "real|repo=sphinx-doc/sphinx": [
+      0.8522907844366335,
+      0.9631058041205284
+    ],
+    "real|repo=sympy/sympy": [
+      0.803997975609825,
+      0.9722255850498752
+    ],
+    "real-lang_only": [
+      0.28952735786025563,
+      0.37029856911087583
+    ],
+    "real-repo_only": [
+      0.30665147749547067,
+      0.4576017718971666
+    ],
+    "real_pooled-real_strat_lang": [
+      0.0,
+      0.0
+    ],
+    "real_pooled-real_strat_repo": [
+      -0.03290619248799066,
+      0.0328687366960808
+    ]
+  }
+}

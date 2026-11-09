@@ -1,4 +1,4 @@
-"""Rebuttal E11: per-language and per-repo AUC of the k=0 probes on SWE-bench Pro.
+"""Rebuttal E11/E11b: per-language and per-repo AUC of the k=0 probes on SWE-bench Pro (E11) and per-repo on Verified (E11b).
 
 Eval-only. For one (Pro run, probe):
   - probe: the rerun's pooled k=0 probe (<pooled>, task split) at its validation-best layer,
@@ -66,12 +66,32 @@ class Stratified:
         return num / den if den > 0 else float("nan")
 
 
-def pro_metadata() -> dict[str, tuple[str, str]]:
+def task_metadata(bench: str) -> dict[str, tuple[str, str]]:
+    """instance_id -> (language, repo). Pro: repo_language, repo. Verified: python-only, repo."""
     os.environ.setdefault("HF_DATASETS_OFFLINE", "1")
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
     from datasets import load_dataset
-    d = load_dataset("ScaleAI/SWE-bench_Pro", split="test")
-    return {r["instance_id"]: (r["repo_language"], r["repo"]) for r in d}
+    if bench == "swebench_pro":
+        d = load_dataset("ScaleAI/SWE-bench_Pro", split="test")
+        return {r["instance_id"]: (r["repo_language"], r["repo"]) for r in d}
+    d = load_dataset("princeton-nlp/SWE-bench_Verified", split="test")
+    return {r["instance_id"]: ("python", r["repo"]) for r in d}
+
+
+def legacy_split_auc(bench: str, pooled: str, probe: str) -> dict | None:
+    """Stored k=0 results of the submitted runs (old repository/base-commit split; different test set)."""
+    path = Path("results", bench, f"{pooled}_legacyturns", probe, "results.pt")
+    if not path.exists():
+        return None
+    res = torch.load(path, weights_only=False)
+    res = {L: v[0] for L, v in res.items() if v}
+    lt = max(res, key=lambda L: res[L].test_auc)
+    lv = max(res, key=lambda L: res[L].val_auc)
+    return {"test_best_layer": int(lt), "test_auc_test_best": float(res[lt].test_auc),
+            "val_best_layer": int(lv), "test_auc_val_best": float(res[lv].test_auc),
+            "val_auc_by_layer": {str(L): float(r.val_auc) for L, r in res.items()},
+            "n_test": int(res[lt].n_test), "n_pos_test": int(res[lt].n_pos_test),
+            "note": "stored results.pt of the submitted runs: pooled test AUC on the old split's test set"}
 
 
 def stratum_counts(name: str, values: np.ndarray, y: np.ndarray, tasks: np.ndarray) -> dict:
@@ -108,7 +128,7 @@ def main() -> None:
     in_tr, _, in_te = split_masks(gids, args.seed)
     valid = y_all >= 0
     test_idx, train_idx = np.flatnonzero(in_te & valid), np.flatnonzero(in_tr & valid)
-    md = pro_metadata()
+    md = task_metadata(args.bench)
     tasks_all = np.array([task(s) for s in sids])
     missing = sorted(set(tasks_all) - set(md))
     if missing:
@@ -168,7 +188,9 @@ def main() -> None:
     out = {"bench": args.bench, "pooled": args.pooled, "probe": args.probe, "layer": layer,
            "transfer_pooled": args.transfer_pooled, "transfer_layer": transfer_layer,
            "auc_definition": "pooled AUC over all test tokens with y >= 0 (E17); no position bins",
-           "language_field": "repo_language (ScaleAI/SWE-bench_Pro)", "repo_field": "repo (ScaleAI/SWE-bench_Pro)",
+           "language_field": "repo_language (ScaleAI/SWE-bench_Pro)" if args.bench == "swebench_pro" else "python (Verified is Python-only)",
+           "repo_field": "repo (ScaleAI/SWE-bench_Pro)" if args.bench == "swebench_pro" else "repo (princeton-nlp/SWE-bench_Verified)",
+           "legacy_split": legacy_split_auc(args.bench, args.pooled, args.probe),
            "n_boot": args.n_boot, "min_tasks_both_classes": MIN_TASKS,
            "n_test": int(len(y)), "n_pos_test": int((y == 1).sum()), "n_test_tasks": int(len(set(tasks))),
            "train_pos_rate_by_language": lang_rate, "train_pos_rate_by_repo": repo_rate,

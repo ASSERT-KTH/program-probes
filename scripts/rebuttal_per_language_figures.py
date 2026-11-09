@@ -13,7 +13,10 @@ stratified AUC is the main number.
   e11_compiles_transfer_by_language  fig C (single column, one panel per model): the Verified-trained
                                      probe on Pro next to the in-domain probe, per language
 
-Usage: uv run python scripts/rebuttal_per_language_figures.py
+  e11b_verified_<probe>_by_repo      E11b: fig B for SWE-bench Verified (default probe: compiles;
+                                     pass probe names to draw others)
+
+Usage: uv run python scripts/rebuttal_per_language_figures.py [currently_compiles ...]
 """
 from __future__ import annotations
 
@@ -104,13 +107,13 @@ def fig_language(data: dict) -> None:
     save(fig, "e11_compiles_by_language")
 
 
-def fig_repo(data: dict) -> None:
+def fig_repo(data: dict, models: list = MODELS, name: str = "e11_compiles_by_repo") -> None:
     repos = sorted({r for d in data.values() for r in d["counts_by_repo"]},
                    key=lambda r: -max(d["counts_by_repo"].get(r, {}).get("n_tasks", 0) for d in data.values()))
     fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, 0.32 * len(repos) + 1.0))
     off = 0.18
     handles = []
-    for i, (pooled, label, slug, marker) in enumerate(MODELS):
+    for i, (pooled, label, slug, marker) in enumerate(models):
         r = data[pooled]
         color = _style.COLORS[f"{slug}_verified"]
         for j, rp in enumerate(repos):
@@ -125,14 +128,14 @@ def fig_repo(data: dict) -> None:
         handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=label))
     ax.axvline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
     ax.set_yticks(range(len(repos)))
-    ax.set_yticklabels([f"{rp} (" + "/".join(str(data[p]["counts_by_repo"].get(rp, {}).get("n_tasks", 0)) for p, *_ in MODELS) + ")"
+    ax.set_yticklabels([f"{rp} (" + "/".join(str(data[p]["counts_by_repo"].get(rp, {}).get("n_tasks", 0)) for p, *_ in models) + ")"
                         for rp in repos], fontsize=7.5)
     ax.invert_yaxis()
     ax.set_xlabel("Test AUC")
     ax.set_ylabel("Repository (test tasks, Laguna/Qwen)", fontsize=8)
     ax.legend(handles=handles + ref_handles("same-repo pairs", "repo-only baseline"), loc="upper center",
               bbox_to_anchor=(0.4, -0.1), ncol=3, fontsize=7, frameon=False)
-    save(fig, "e11_compiles_by_repo")
+    save(fig, name)
 
 
 def fig_transfer(data: dict) -> None:
@@ -165,12 +168,20 @@ def fig_transfer(data: dict) -> None:
     save(fig, "e11_compiles_transfer_by_language")
 
 
+VERIFIED_MODELS = [("laguna_xs2_full_pooled", "Laguna XS.2", "laguna", "o"),
+                   ("qwen36_35b_a3b_full_pooled", "Qwen3.6-35B-A3B", "qwen", "s")]
+
+
 def main() -> None:
     _style.apply()
     data = {p: load(p) for p, *_ in MODELS}
     fig_language(data)
     fig_repo(data)
     fig_transfer(data)
+    # E11b: Verified (Python-only), repository controls
+    for probe in sys.argv[1:] or ["currently_compiles"]:
+        vdata = {p: json.loads((ROOT / f"lang_swebench_{p}_{probe}.json").read_text()) for p, *_ in VERIFIED_MODELS}
+        fig_repo(vdata, VERIFIED_MODELS, f"e11b_verified_{probe.removeprefix('currently_')}_by_repo")
 
 
 if __name__ == "__main__":
