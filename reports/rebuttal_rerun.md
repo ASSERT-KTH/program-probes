@@ -108,6 +108,7 @@ In the submitted runs (paper's split), Verified validation was a single reposito
 3. **Inconsistent split units** (repository vs base commit); now task on both (`ff6b081`).
 4. **Laguna Verified after-edit lookahead in the paper is undefined**: under the old approximate turns, every evaluation bin selected by the after-edit filter held a single class. Shown as n/a‡ in the legacy columns.
 5. **Qwen Pro has_regressions has very few positives** in the window-50 test set (legacy: 29 positives; flagged †).
+6. **Found, not fixed: the Qwen activations were extracted from text without the chat template** (affects the submitted runs and the rerun alike). `src/agents/trajectory.py::_tokenize_trajectory` catches any exception from `apply_chat_template` and falls back to `"\n".join(f"{role}: {content}")`. Every Qwen trajectory was tokenized this way (4,998/4,998 Verified, 5,804/5,804 Pro; 0 of the Laguna trajectories), and `run_extract_swebench.py` runs the model on these stored `token_ids`. So the Qwen hidden states were computed on `system: … user: … assistant: …` text: no Qwen chat-template tokens, and no reasoning, which the fallback drops (Qwen/Pro assistant messages do have `reasoning_content`; Qwen/Verified ones are empty). The exception itself was not reproduced here. All Qwen numbers in this report and in the paper are on this input.
 
 ## Persistence-baseline check
 
