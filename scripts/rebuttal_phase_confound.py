@@ -150,10 +150,10 @@ def bootstrap(metrics: dict[str, Metric], diffs: dict[str, tuple[str, str]], sid
     return point, {n: ci(b) for n, b in boots.items()}
 
 
-def run_lookahead(args) -> dict:
+def lookahead_context(args, ks: list[int], extra_label_ks: tuple[int, ...] = ()) -> dict:
+    """Load labels for every k (and extra_label_ks) and score every probe on the window's test tokens."""
     croot, rroot = Path("cache", args.bench), Path("results", args.bench)
     K, probe = args.max_k, args.probe
-    ks = [k for k in (args.ks or KS[K]) if k <= K]
     c0 = croot / f"{args.cache_prefix}_shift0_max{K}" / probe
     meta = torch.load(c0 / "layer_0.pt", weights_only=False, mmap=True)
     sids, gids = meta["sample_id"], meta["group_id"]
@@ -166,9 +166,9 @@ def run_lookahead(args) -> dict:
     log("tokens", len(sids), "test", len(test_idx))
 
     ylab, yorig = {}, {}
-    for k in ks:
+    for k in sorted(set(ks) | set(extra_label_ks)):
         d = torch.load(croot / f"{args.cache_prefix}_shift{k}_max{K}" / probe / "layer_0.pt", weights_only=False, mmap=True)
-        if len(d["y"]) != len(sids) or not np.array_equal(d["step_idx"].numpy(), step):
+        if len(d["y"]) != len(sids) or not np.array_equal(d["step_idx"].numpy(), step) or list(d["sample_id"]) != list(sids):
             raise ValueError(f"shift{k} cache does not share the shift0 token set")
         ylab[k], yorig[k] = d["y"].numpy().copy(), d["y_original"].numpy().copy()
         del d
@@ -203,19 +203,34 @@ def run_lookahead(args) -> dict:
         H = torch.load(c0 / f"layer_{L}.pt", weights_only=False, mmap=True)["H"]
         scores.update(score_layer(H, test_idx, probes))
         del H
+    return {"sids": sids, "in_tr": in_tr, "test_idx": test_idx, "feats": feats, "ylab": ylab, "yorig": yorig,
+            "layers": layers, "scores": scores}
 
+
+def lookahead_cell(ctx: dict, k: int, seed: int) -> dict:
+    """Test tokens with y_{t+k} >= 0 and every scorer's output on them (position baselines fit here)."""
+    test_idx, ylab = ctx["test_idx"], ctx["ylab"]
+    scores = ctx["scores"]
+    sub = ylab[k][test_idx] >= 0
+    tok = test_idx[sub]
+    sc = {"real_val": scores[f"real_val_{k}"][sub], "real_test": scores[f"real_test_{k}"][sub], "k0": scores["k0"][sub]}
+    if f"traj_{k}" in scores:
+        sc["traj"] = scores[f"traj_{k}"][sub]
+    trn = ctx["in_tr"] & (ylab[k] >= 0)
+    for name, X in ctx["feats"].items():
+        sc[name] = fit_position(X[trn], ylab[k][trn], X[tok], seed)
+    return {"tok": tok, "y": ylab[k][tok], "yo": ctx["yorig"][k][tok], "tsids": [ctx["sids"][i] for i in tok], "sc": sc}
+
+
+def run_lookahead(args) -> dict:
+    K, probe = args.max_k, args.probe
+    ks = [k for k in (args.ks or KS[K]) if k <= K]
+    ctx = lookahead_context(args, ks)
+    layers = ctx["layers"]
     rows = []
     for k in ks:
-        sub = ylab[k][test_idx] >= 0
-        tok = test_idx[sub]
-        y, yo = ylab[k][tok], yorig[k][tok]
-        tsids = [sids[i] for i in tok]
-        sc = {"real_val": scores[f"real_val_{k}"][sub], "real_test": scores[f"real_test_{k}"][sub], "k0": scores["k0"][sub]}
-        if f"traj_{k}" in scores:
-            sc["traj"] = scores[f"traj_{k}"][sub]
-        trn = in_tr & (ylab[k] >= 0)
-        for name, X in feats.items():
-            sc[name] = fit_position(X[trn], ylab[k][trn], X[tok], args.seed)
+        cell = lookahead_cell(ctx, k, args.seed)
+        y, yo, tsids, sc = cell["y"], cell["yo"], cell["tsids"], cell["sc"]
         ok = yo >= 0
         strata = {"all": np.ones(len(y), dtype=bool), "yt0": ok & (yo == 0), "yt1": ok & (yo == 1)}
         metrics = {f"{s}|{st}": Metric(v, y, m) for s, v in sc.items() for st, m in strata.items()}

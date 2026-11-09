@@ -908,3 +908,574 @@
 | Qwen3.6-35B-A3B / Pro | correct | 0.822 (L30) | 0.513 (L10) | 0.771 (L30) | **+0.308 [+0.27, +0.34]** | **+0.051 [+0.02, +0.08]** | **+0.305 [+0.27, +0.35]** | **+0.051 [+0.02, +0.08]** | 0.692 | 0.776 | **+0.130 [+0.05, +0.22]** | **+0.046 [+0.01, +0.08]** | 0.822 (L30) |
 | Qwen3.6-35B-A3B / Pro | has_regressions | 0.818 (L20) | 0.539 (L10) | 0.693 (L10) | **+0.279 [+0.22, +0.33]** | **+0.125 [+0.08, +0.23]** | **+0.296 [+0.23, +0.37]** | **+0.182 [+0.14, +0.26]** | 0.741 | 0.560 | **+0.077 [+0.02, +0.16]** | **+0.259 [+0.19, +0.33]** | 0.840 (L0) |
 | Qwen3.6-35B-A3B / Pro | reduces_failing | 0.830 (L20) | 0.507 (L20) | 0.761 (L30) | **+0.323 [+0.27, +0.36]** | **+0.069 [+0.03, +0.10]** | **+0.323 [+0.27, +0.36]** | **+0.074 [+0.04, +0.10]** | 0.762 | 0.718 | **+0.068 [+0.01, +0.13]** | **+0.112 [+0.06, +0.15]** | 0.836 (L30) |
+
+#### E18, window max15: within y_t = 0, by edit turn and eventual outcome (AUC for y_(t+k); strongest control = highest point AUC among k=0 probe, traj-shuffle and both position baselines; 95% task-bootstrap CI, bold if it excludes 0; ◦ = fewer than 20 test tasks with a positive token)
+
+| Model / benchmark | Probe | k | stratum | tokens | positives | tasks w/ positive | real | strongest control | real − strongest | strongest causal control | real − strongest causal | oracle y_T |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | correct | 2 | S0 y_t=0 | 522,132 | 38,097 | 58 | 0.646 | position rel_pos 0.491 | **+0.155 [+0.07, +0.24]** | position causal 0.483 | **+0.163 [+0.07, +0.26]** | 0.813 |
+| Laguna XS.2 / Verified | correct | 2 | S1 pre-edit (y_t+1=0) | 493,325 | 9,666 | 57 | 0.544 | position rel_pos 0.472 | +0.072 [-0.02, +0.16] | position causal 0.464 | +0.081 [-0.01, +0.18] | 0.816 |
+| Laguna XS.2 / Verified | correct | 2 | S2 outcome y_T=1 | 180,839 | 35,335 | 56 | 0.719 | position rel_pos 0.631 | **+0.087 [+0.02, +0.15]** | traj-shuffle 0.608 | **+0.111 [+0.04, +0.16]** | – |
+| Laguna XS.2 / Verified | correct | 2 | S3 pre-edit & y_T=1 | 154,403 | 9,011 | 55 | 0.621 | position rel_pos 0.617 | +0.004 [-0.07, +0.06] | position causal 0.554 | +0.067 [-0.02, +0.16] | – |
+| Laguna XS.2 / Verified | correct | 2 | S4 y_T=0 | 341,293 | 2,762 | 10◦ | 0.587◦ | traj-shuffle 0.606 | -0.019 [-0.13, +0.17] | traj-shuffle 0.606 | -0.019 [-0.13, +0.17] | – |
+| Laguna XS.2 / Verified | correct | 3 | S0 y_t=0 | 522,125 | 47,141 | 58 | 0.635 | position causal 0.498 | **+0.137 [+0.05, +0.23]** | position causal 0.498 | **+0.137 [+0.05, +0.23]** | 0.827 |
+| Laguna XS.2 / Verified | correct | 3 | S1 pre-edit (y_t+1=0) | 493,318 | 19,324 | 58 | 0.555 | position causal 0.477 | **+0.079 [+0.00, +0.17]** | position causal 0.477 | **+0.079 [+0.00, +0.17]** | 0.829 |
+| Laguna XS.2 / Verified | correct | 3 | S2 outcome y_T=1 | 180,832 | 44,416 | 56 | 0.709 | position rel_pos 0.630 | **+0.080 [+0.01, +0.14]** | traj-shuffle 0.585 | **+0.124 [+0.06, +0.18]** | – |
+| Laguna XS.2 / Verified | correct | 3 | S3 pre-edit & y_T=1 | 154,396 | 18,271 | 56 | 0.633 | position rel_pos 0.614 | +0.019 [-0.04, +0.08] | traj-shuffle 0.560 | **+0.073 [+0.01, +0.13]** | – |
+| Laguna XS.2 / Verified | correct | 3 | S4 y_T=0 | 341,293 | 2,725 | 10◦ | 0.593◦ | position causal 0.546 | +0.047 [-0.17, +0.26] | position causal 0.546 | +0.047 [-0.17, +0.26] | – |
+| Laguna XS.2 / Verified | correct | 5 | S0 y_t=0 | 522,125 | 64,820 | 58 | 0.618 | position causal 0.513 | **+0.105 [+0.03, +0.19]** | position causal 0.513 | **+0.105 [+0.03, +0.19]** | 0.841 |
+| Laguna XS.2 / Verified | correct | 5 | S1 pre-edit (y_t+1=0) | 493,239 | 37,039 | 58 | 0.554 | position causal 0.482 | +0.073 [-0.00, +0.16] | position causal 0.482 | +0.073 [-0.00, +0.16] | 0.844 |
+| Laguna XS.2 / Verified | correct | 5 | S2 outcome y_T=1 | 180,832 | 61,219 | 56 | 0.682 | position rel_pos 0.617 | +0.065 [-0.00, +0.12] | traj-shuffle 0.583 | **+0.099 [+0.03, +0.15]** | – |
+| Laguna XS.2 / Verified | correct | 5 | S3 pre-edit & y_T=1 | 154,317 | 35,180 | 56 | 0.621 | position rel_pos 0.594 | +0.027 [-0.04, +0.09] | traj-shuffle 0.553 | **+0.068 [+0.00, +0.13]** | – |
+| Laguna XS.2 / Verified | correct | 5 | S4 y_T=0 | 341,293 | 3,601 | 10◦ | 0.594◦ | traj-shuffle 0.519 | +0.076 [-0.06, +0.23] | traj-shuffle 0.519 | +0.076 [-0.06, +0.23] | – |
+| Laguna XS.2 / Verified | correct | 10 | S0 y_t=0 | 522,143 | 97,600 | 58 | 0.606 | position causal 0.551 | +0.054 [-0.03, +0.14] | position causal 0.551 | +0.054 [-0.03, +0.14] | 0.870 |
+| Laguna XS.2 / Verified | correct | 10 | S1 pre-edit (y_t+1=0) | 493,257 | 70,035 | 58 | 0.569 | position causal 0.519 | +0.050 [-0.03, +0.14] | position causal 0.519 | +0.050 [-0.03, +0.14] | 0.872 |
+| Laguna XS.2 / Verified | correct | 10 | S2 outcome y_T=1 | 180,850 | 92,535 | 56 | 0.648 | position rel_pos 0.623 | +0.026 [-0.05, +0.10] | k=0 probe 0.552 | **+0.096 [+0.06, +0.14]** | – |
+| Laguna XS.2 / Verified | correct | 10 | S3 pre-edit & y_T=1 | 154,335 | 66,639 | 56 | 0.613 | position rel_pos 0.605 | +0.008 [-0.07, +0.07] | k=0 probe 0.564 | **+0.049 [+0.02, +0.08]** | – |
+| Laguna XS.2 / Verified | correct | 10 | S4 y_T=0 | 341,293 | 5,065 | 10◦ | 0.584◦ | position causal 0.532 | +0.052 [-0.07, +0.21] | position causal 0.532 | +0.052 [-0.07, +0.21] | – |
+| Laguna XS.2 / Verified | correct | 15 | S0 y_t=0 | 522,200 | 122,830 | 59 | 0.604 | position causal 0.583 | +0.021 [-0.06, +0.11] | position causal 0.583 | +0.021 [-0.06, +0.11] | 0.896 |
+| Laguna XS.2 / Verified | correct | 15 | S1 pre-edit (y_t+1=0) | 493,314 | 95,381 | 59 | 0.576 | position causal 0.560 | +0.015 [-0.07, +0.11] | position causal 0.560 | +0.015 [-0.07, +0.11] | 0.898 |
+| Laguna XS.2 / Verified | correct | 15 | S2 outcome y_T=1 | 180,907 | 116,982 | 57 | 0.639 | position rel_pos 0.636 | +0.002 [-0.08, +0.08] | k=0 probe 0.575 | **+0.064 [+0.03, +0.11]** | – |
+| Laguna XS.2 / Verified | correct | 15 | S3 pre-edit & y_T=1 | 154,392 | 91,094 | 57 | 0.612 | position rel_pos 0.620 | -0.008 [-0.09, +0.07] | k=0 probe 0.582 | +0.030 [-0.00, +0.07] | – |
+| Laguna XS.2 / Verified | correct | 15 | S4 y_T=0 | 341,293 | 5,848 | 10◦ | 0.598◦ | k=0 probe 0.538 | +0.060 [-0.01, +0.22] | k=0 probe 0.538 | +0.060 [-0.01, +0.22] | – |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S0 y_t=0 | 498,553 | 40,409 | 62 | 0.660 | position rel_pos 0.471 | **+0.190 [+0.12, +0.26]** | traj-shuffle 0.455 | **+0.206 [+0.14, +0.27]** | 0.781 |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 468,885 | 11,199 | 62 | 0.539 | position rel_pos 0.450 | **+0.089 [+0.01, +0.17]** | position causal 0.443 | **+0.096 [+0.01, +0.18]** | 0.784 |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S2 outcome y_T=1 | 193,726 | 36,588 | 55 | 0.776 | position rel_pos 0.597 | **+0.179 [+0.10, +0.25]** | traj-shuffle 0.557 | **+0.219 [+0.15, +0.29]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S3 pre-edit & y_T=1 | 167,237 | 10,206 | 55 | 0.659 | position rel_pos 0.587 | +0.072 [-0.01, +0.14] | k=0 probe 0.548 | **+0.112 [+0.07, +0.16]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S4 y_T=0 | 304,827 | 3,821 | 15◦ | 0.611◦ | position causal 0.607 | +0.004 [-0.14, +0.19] | position causal 0.607 | +0.004 [-0.14, +0.19] | – |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S0 y_t=0 | 498,546 | 50,878 | 62 | 0.638 | position rel_pos 0.462 | **+0.176 [+0.11, +0.24]** | position causal 0.459 | **+0.179 [+0.11, +0.25]** | 0.801 |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 468,878 | 22,673 | 62 | 0.544 | position causal 0.468 | **+0.076 [+0.01, +0.15]** | position causal 0.468 | **+0.076 [+0.01, +0.15]** | 0.801 |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S2 outcome y_T=1 | 193,719 | 47,260 | 55 | 0.759 | position rel_pos 0.590 | **+0.169 [+0.10, +0.23]** | k=0 probe 0.561 | **+0.198 [+0.16, +0.24]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S3 pre-edit & y_T=1 | 167,230 | 21,057 | 55 | 0.669 | position rel_pos 0.573 | **+0.096 [+0.02, +0.16]** | k=0 probe 0.564 | **+0.105 [+0.07, +0.14]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S4 y_T=0 | 304,827 | 3,618 | 15◦ | 0.576◦ | position causal 0.616 | -0.041 [-0.18, +0.11] | position causal 0.616 | -0.041 [-0.18, +0.11] | – |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S0 y_t=0 | 498,546 | 68,856 | 62 | 0.606 | position causal 0.476 | **+0.131 [+0.06, +0.20]** | position causal 0.476 | **+0.131 [+0.06, +0.20]** | 0.820 |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 468,799 | 41,124 | 62 | 0.527 | position causal 0.465 | +0.062 [-0.00, +0.13] | position causal 0.465 | +0.062 [-0.00, +0.13] | 0.821 |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S2 outcome y_T=1 | 193,719 | 64,750 | 55 | 0.727 | position rel_pos 0.570 | **+0.157 [+0.08, +0.23]** | k=0 probe 0.554 | **+0.174 [+0.13, +0.22]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S3 pre-edit & y_T=1 | 167,151 | 38,754 | 55 | 0.654 | k=0 probe 0.550 | **+0.104 [+0.07, +0.14]** | k=0 probe 0.550 | **+0.104 [+0.07, +0.14]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S4 y_T=0 | 304,827 | 4,106 | 15◦ | 0.544◦ | position causal 0.572 | -0.028 [-0.17, +0.09] | position causal 0.572 | -0.028 [-0.17, +0.09] | – |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S0 y_t=0 | 498,564 | 102,039 | 62 | 0.572 | position causal 0.499 | **+0.073 [+0.00, +0.15]** | position causal 0.499 | **+0.073 [+0.00, +0.15]** | 0.858 |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 468,817 | 74,688 | 62 | 0.523 | position causal 0.482 | +0.041 [-0.03, +0.11] | position causal 0.482 | +0.041 [-0.03, +0.11] | 0.860 |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S2 outcome y_T=1 | 193,737 | 97,750 | 56 | 0.685 | position rel_pos 0.572 | **+0.113 [+0.03, +0.20]** | k=0 probe 0.560 | **+0.126 [+0.07, +0.18]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S3 pre-edit & y_T=1 | 167,169 | 71,792 | 56 | 0.638 | position rel_pos 0.557 | +0.082 [-0.00, +0.17] | k=0 probe 0.555 | **+0.083 [+0.03, +0.14]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S4 y_T=0 | 304,827 | 4,289 | 15◦ | 0.533◦ | position causal 0.513 | +0.020 [-0.10, +0.18] | position causal 0.513 | +0.020 [-0.10, +0.18] | – |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S0 y_t=0 | 498,621 | 128,607 | 62 | 0.557 | position causal 0.540 | +0.017 [-0.05, +0.09] | position causal 0.540 | +0.017 [-0.05, +0.09] | 0.888 |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 468,874 | 101,304 | 62 | 0.520 | position causal 0.517 | +0.003 [-0.07, +0.08] | position causal 0.517 | +0.003 [-0.07, +0.08] | 0.890 |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S2 outcome y_T=1 | 193,794 | 124,057 | 56 | 0.673 | position rel_pos 0.590 | +0.083 [-0.01, +0.18] | k=0 probe 0.581 | **+0.093 [+0.03, +0.16]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S3 pre-edit & y_T=1 | 167,226 | 98,149 | 56 | 0.639 | k=0 probe 0.578 | **+0.060 [+0.00, +0.12]** | k=0 probe 0.578 | **+0.060 [+0.00, +0.12]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S4 y_T=0 | 304,827 | 4,550 | 15◦ | 0.520◦ | position causal 0.517 | +0.003 [-0.10, +0.16] | position causal 0.517 | +0.003 [-0.10, +0.16] | – |
+| Laguna XS.2 / Verified | has_regressions | 2 | S0 y_t=0 | 640,080 | 11,431 | 29 | 0.654 | k=0 probe 0.535 | **+0.120 [+0.10, +0.14]** | k=0 probe 0.535 | **+0.120 [+0.10, +0.14]** | 0.688 |
+| Laguna XS.2 / Verified | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 631,458 | 2,809 | 29 | 0.570 | k=0 probe 0.504 | **+0.066 [+0.05, +0.09]** | k=0 probe 0.504 | **+0.066 [+0.05, +0.09]** | 0.665 |
+| Laguna XS.2 / Verified | has_regressions | 2 | S2 outcome y_T=1 | 27,876 | 4,722 | 14◦ | 0.748◦ | position causal 0.692 | +0.055 [-0.02, +0.13] | position causal 0.692 | +0.055 [-0.02, +0.13] | – |
+| Laguna XS.2 / Verified | has_regressions | 2 | S3 pre-edit & y_T=1 | 24,182 | 1,028 | 14◦ | 0.641◦ | position causal 0.652 | -0.011 [-0.12, +0.12] | position causal 0.652 | -0.011 [-0.12, +0.12] | – |
+| Laguna XS.2 / Verified | has_regressions | 2 | S4 y_T=0 | 612,204 | 6,709 | 23 | 0.648 | k=0 probe 0.532 | **+0.116 [+0.09, +0.14]** | k=0 probe 0.532 | **+0.116 [+0.09, +0.14]** | – |
+| Laguna XS.2 / Verified | has_regressions | 3 | S0 y_t=0 | 640,073 | 14,687 | 31 | 0.621 | k=0 probe 0.516 | **+0.105 [+0.08, +0.12]** | k=0 probe 0.516 | **+0.105 [+0.08, +0.12]** | 0.682 |
+| Laguna XS.2 / Verified | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 631,451 | 6,576 | 31 | 0.550 | k=0 probe 0.487 | **+0.063 [+0.05, +0.08]** | k=0 probe 0.487 | **+0.063 [+0.05, +0.08]** | 0.660 |
+| Laguna XS.2 / Verified | has_regressions | 3 | S2 outcome y_T=1 | 27,876 | 5,869 | 15◦ | 0.733◦ | position causal 0.680 | +0.053 [-0.02, +0.14] | position causal 0.680 | +0.053 [-0.02, +0.14] | – |
+| Laguna XS.2 / Verified | has_regressions | 3 | S3 pre-edit & y_T=1 | 24,182 | 2,338 | 15◦ | 0.663◦ | position causal 0.650 | +0.013 [-0.08, +0.12] | position causal 0.650 | +0.013 [-0.08, +0.12] | – |
+| Laguna XS.2 / Verified | has_regressions | 3 | S4 y_T=0 | 612,197 | 8,818 | 25 | 0.608 | k=0 probe 0.504 | **+0.103 [+0.07, +0.13]** | k=0 probe 0.504 | **+0.103 [+0.07, +0.13]** | – |
+| Laguna XS.2 / Verified | has_regressions | 5 | S0 y_t=0 | 640,073 | 19,751 | 32 | 0.584 | traj-shuffle 0.500 | **+0.084 [+0.02, +0.15]** | traj-shuffle 0.500 | **+0.084 [+0.02, +0.15]** | 0.689 |
+| Laguna XS.2 / Verified | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 631,372 | 12,313 | 32 | 0.534 | k=0 probe 0.465 | **+0.069 [+0.05, +0.09]** | k=0 probe 0.465 | **+0.069 [+0.05, +0.09]** | 0.670 |
+| Laguna XS.2 / Verified | has_regressions | 5 | S2 outcome y_T=1 | 27,876 | 8,107 | 15◦ | 0.707◦ | position causal 0.673 | +0.034 [-0.04, +0.13] | position causal 0.673 | +0.034 [-0.04, +0.13] | – |
+| Laguna XS.2 / Verified | has_regressions | 5 | S3 pre-edit & y_T=1 | 24,182 | 4,576 | 15◦ | 0.659◦ | position causal 0.647 | +0.012 [-0.07, +0.12] | position causal 0.647 | +0.012 [-0.07, +0.12] | – |
+| Laguna XS.2 / Verified | has_regressions | 5 | S4 y_T=0 | 612,197 | 11,644 | 26 | 0.564 | k=0 probe 0.471 | **+0.093 [+0.06, +0.12]** | k=0 probe 0.471 | **+0.093 [+0.06, +0.12]** | – |
+| Laguna XS.2 / Verified | has_regressions | 10 | S0 y_t=0 | 640,091 | 26,671 | 31 | 0.563 | k=0 probe 0.467 | **+0.096 [+0.06, +0.12]** | k=0 probe 0.467 | **+0.096 [+0.06, +0.12]** | 0.722 |
+| Laguna XS.2 / Verified | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 631,390 | 20,089 | 31 | 0.528 | k=0 probe 0.448 | **+0.080 [+0.05, +0.10]** | k=0 probe 0.448 | **+0.080 [+0.05, +0.10]** | 0.707 |
+| Laguna XS.2 / Verified | has_regressions | 10 | S2 outcome y_T=1 | 27,876 | 12,497 | 15◦ | 0.650◦ | position causal 0.655 | -0.005 [-0.09, +0.10] | position causal 0.655 | -0.005 [-0.09, +0.10] | – |
+| Laguna XS.2 / Verified | has_regressions | 10 | S3 pre-edit & y_T=1 | 24,182 | 8,803 | 15◦ | 0.602◦ | position causal 0.621 | -0.019 [-0.10, +0.09] | position causal 0.621 | -0.019 [-0.10, +0.09] | – |
+| Laguna XS.2 / Verified | has_regressions | 10 | S4 y_T=0 | 612,215 | 14,174 | 25 | 0.556 | k=0 probe 0.464 | **+0.092 [+0.05, +0.12]** | k=0 probe 0.464 | **+0.092 [+0.05, +0.12]** | – |
+| Laguna XS.2 / Verified | has_regressions | 15 | S0 y_t=0 | 640,148 | 28,471 | 28 | 0.557 | k=0 probe 0.449 | **+0.109 [+0.07, +0.14]** | k=0 probe 0.449 | **+0.109 [+0.07, +0.14]** | 0.772 |
+| Laguna XS.2 / Verified | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 631,447 | 22,851 | 28 | 0.536 | traj-shuffle 0.438 | **+0.099 [+0.02, +0.18]** | traj-shuffle 0.438 | **+0.099 [+0.02, +0.18]** | 0.760 |
+| Laguna XS.2 / Verified | has_regressions | 15 | S2 outcome y_T=1 | 27,876 | 16,018 | 16◦ | 0.628◦ | position causal 0.657 | -0.029 [-0.12, +0.07] | position causal 0.657 | -0.029 [-0.12, +0.07] | – |
+| Laguna XS.2 / Verified | has_regressions | 15 | S3 pre-edit & y_T=1 | 24,182 | 12,324 | 16◦ | 0.595◦ | position causal 0.623 | -0.028 [-0.13, +0.07] | position causal 0.623 | -0.028 [-0.13, +0.07] | – |
+| Laguna XS.2 / Verified | has_regressions | 15 | S4 y_T=0 | 612,272 | 12,453 | 22 | 0.545 | traj-shuffle 0.454 | +0.091 [-0.01, +0.19] | traj-shuffle 0.454 | +0.091 [-0.01, +0.19] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S0 y_t=0 | 322,282 | 10,668 | 40 | 0.761 | traj-shuffle 0.626 | **+0.135 [+0.07, +0.20]** | traj-shuffle 0.626 | **+0.135 [+0.07, +0.20]** | 0.783 |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S1 pre-edit (y_t+1=0) | 315,267 | 3,653 | 40 | 0.636 | traj-shuffle 0.550 | **+0.086 [+0.02, +0.15]** | traj-shuffle 0.550 | **+0.086 [+0.02, +0.15]** | 0.787 |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S2 outcome y_T=1 | 134,686 | 10,305 | 40 | 0.799 | traj-shuffle 0.690 | **+0.108 [+0.06, +0.16]** | traj-shuffle 0.690 | **+0.108 [+0.06, +0.16]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S3 pre-edit & y_T=1 | 127,937 | 3,556 | 40 | 0.679 | position rel_pos 0.625 | +0.055 [-0.05, +0.14] | traj-shuffle 0.613 | **+0.066 [+0.01, +0.12]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S4 y_T=0 | 187,324 | 363 | 3◦ | 0.715◦ | position causal 0.580 | +0.136 [-0.11, +0.25] | position causal 0.580 | +0.136 [-0.11, +0.25] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S0 y_t=0 | 322,273 | 14,364 | 42 | 0.745 | traj-shuffle 0.593 | **+0.151 [+0.09, +0.22]** | traj-shuffle 0.593 | **+0.151 [+0.09, +0.22]** | 0.787 |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S1 pre-edit (y_t+1=0) | 315,258 | 7,357 | 42 | 0.653 | position rel_pos 0.565 | +0.087 [-0.00, +0.18] | traj-shuffle 0.538 | **+0.115 [+0.04, +0.19]** | 0.790 |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S2 outcome y_T=1 | 134,686 | 13,898 | 42 | 0.779 | position rel_pos 0.669 | **+0.110 [+0.02, +0.20]** | traj-shuffle 0.659 | **+0.120 [+0.07, +0.17]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S3 pre-edit & y_T=1 | 127,937 | 7,157 | 42 | 0.692 | position rel_pos 0.640 | +0.052 [-0.02, +0.14] | traj-shuffle 0.601 | **+0.091 [+0.04, +0.14]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S4 y_T=0 | 187,324 | 466 | 3◦ | 0.698◦ | position causal 0.642 | +0.057 [-0.17, +0.18] | position causal 0.642 | +0.057 [-0.17, +0.18] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S0 y_t=0 | 322,217 | 23,111 | 47 | 0.722 | position rel_pos 0.583 | **+0.140 [+0.05, +0.23]** | traj-shuffle 0.574 | **+0.148 [+0.08, +0.22]** | 0.797 |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S1 pre-edit (y_t+1=0) | 315,202 | 16,096 | 47 | 0.664 | position rel_pos 0.567 | **+0.097 [+0.01, +0.18]** | traj-shuffle 0.540 | **+0.124 [+0.06, +0.19]** | 0.799 |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S2 outcome y_T=1 | 134,686 | 22,420 | 47 | 0.753 | position rel_pos 0.669 | **+0.084 [+0.01, +0.17]** | traj-shuffle 0.645 | **+0.108 [+0.06, +0.15]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S3 pre-edit & y_T=1 | 127,937 | 15,671 | 47 | 0.697 | position rel_pos 0.652 | +0.045 [-0.02, +0.12] | traj-shuffle 0.610 | **+0.087 [+0.04, +0.13]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S4 y_T=0 | 187,324 | 691 | 3◦ | 0.677◦ | position causal 0.702 | -0.025 [-0.17, +0.09] | position causal 0.702 | -0.025 [-0.17, +0.09] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S0 y_t=0 | 322,048 | 48,825 | 50 | 0.670 | position causal 0.571 | **+0.099 [+0.03, +0.17]** | position causal 0.571 | **+0.099 [+0.03, +0.17]** | 0.831 |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S1 pre-edit (y_t+1=0) | 315,033 | 41,977 | 50 | 0.641 | position causal 0.565 | **+0.076 [+0.00, +0.15]** | position causal 0.565 | **+0.076 [+0.00, +0.15]** | 0.830 |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S2 outcome y_T=1 | 134,686 | 47,807 | 50 | 0.699 | position rel_pos 0.677 | +0.021 [-0.05, +0.10] | position causal 0.583 | **+0.116 [+0.04, +0.20]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S3 pre-edit & y_T=1 | 127,937 | 41,087 | 50 | 0.670 | position rel_pos 0.667 | +0.003 [-0.06, +0.08] | position causal 0.576 | **+0.094 [+0.02, +0.17]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S4 y_T=0 | 187,324 | 1,018 | 3◦ | 0.599◦ | position causal 0.733 | **-0.135 [-0.21, -0.05]** | position causal 0.733 | **-0.135 [-0.21, -0.05]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S0 y_t=0 | 322,010 | 70,815 | 51 | 0.648 | position causal 0.590 | +0.058 [-0.01, +0.12] | position causal 0.590 | +0.058 [-0.01, +0.12] | 0.865 |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S1 pre-edit (y_t+1=0) | 314,995 | 63,953 | 51 | 0.629 | position causal 0.587 | +0.042 [-0.02, +0.10] | position causal 0.587 | +0.042 [-0.02, +0.10] | 0.865 |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S2 outcome y_T=1 | 134,686 | 69,913 | 51 | 0.672 | position rel_pos 0.694 | -0.022 [-0.09, +0.06] | position causal 0.585 | **+0.087 [+0.01, +0.16]** | – |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S3 pre-edit & y_T=1 | 127,937 | 63,205 | 51 | 0.653 | position rel_pos 0.686 | -0.033 [-0.10, +0.05] | position causal 0.582 | +0.071 [-0.00, +0.15] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S4 y_T=0 | 187,324 | 902 | 3◦ | 0.659◦ | position causal 0.777 | -0.118 [-0.24, +0.02] | position causal 0.777 | -0.118 [-0.24, +0.02] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S0 y_t=0 | 312,580 | 13,867 | 44 | 0.764 | traj-shuffle 0.621 | **+0.143 [+0.09, +0.19]** | traj-shuffle 0.621 | **+0.143 [+0.09, +0.19]** | 0.770 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 303,006 | 4,293 | 44 | 0.615 | traj-shuffle 0.531 | **+0.084 [+0.03, +0.13]** | traj-shuffle 0.531 | **+0.084 [+0.03, +0.13]** | 0.775 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S2 outcome y_T=1 | 136,499 | 13,212 | 41 | 0.825 | traj-shuffle 0.678 | **+0.147 [+0.10, +0.19]** | traj-shuffle 0.678 | **+0.147 [+0.10, +0.19]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S3 pre-edit & y_T=1 | 127,425 | 4,138 | 41 | 0.689 | position rel_pos 0.598 | **+0.091 [+0.03, +0.15]** | traj-shuffle 0.592 | **+0.098 [+0.05, +0.15]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S4 y_T=0 | 175,809 | 655 | 8◦ | 0.750◦ | traj-shuffle 0.656 | **+0.094 [+0.00, +0.21]** | traj-shuffle 0.656 | **+0.094 [+0.00, +0.21]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S0 y_t=0 | 312,571 | 18,412 | 47 | 0.741 | traj-shuffle 0.607 | **+0.134 [+0.08, +0.18]** | traj-shuffle 0.607 | **+0.134 [+0.08, +0.18]** | 0.779 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 302,997 | 8,957 | 47 | 0.625 | traj-shuffle 0.545 | **+0.081 [+0.02, +0.14]** | traj-shuffle 0.545 | **+0.081 [+0.02, +0.14]** | 0.780 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S2 outcome y_T=1 | 136,499 | 17,704 | 44 | 0.803 | traj-shuffle 0.665 | **+0.138 [+0.09, +0.18]** | traj-shuffle 0.665 | **+0.138 [+0.09, +0.18]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S3 pre-edit & y_T=1 | 127,425 | 8,630 | 44 | 0.697 | position rel_pos 0.621 | **+0.076 [+0.02, +0.13]** | traj-shuffle 0.603 | **+0.094 [+0.05, +0.14]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S4 y_T=0 | 175,809 | 708 | 8◦ | 0.720◦ | traj-shuffle 0.626 | +0.094 [-0.03, +0.24] | traj-shuffle 0.626 | +0.094 [-0.03, +0.24] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S0 y_t=0 | 312,515 | 28,326 | 52 | 0.709 | traj-shuffle 0.589 | **+0.120 [+0.07, +0.18]** | traj-shuffle 0.589 | **+0.120 [+0.07, +0.18]** | 0.790 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 302,941 | 18,991 | 52 | 0.632 | traj-shuffle 0.548 | **+0.084 [+0.03, +0.15]** | traj-shuffle 0.548 | **+0.084 [+0.03, +0.15]** | 0.788 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S2 outcome y_T=1 | 136,499 | 27,316 | 49 | 0.775 | position rel_pos 0.658 | **+0.117 [+0.05, +0.18]** | traj-shuffle 0.650 | **+0.126 [+0.08, +0.17]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S3 pre-edit & y_T=1 | 127,425 | 18,250 | 49 | 0.706 | position rel_pos 0.632 | **+0.074 [+0.01, +0.13]** | traj-shuffle 0.608 | **+0.098 [+0.06, +0.14]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S4 y_T=0 | 175,809 | 1,010 | 8◦ | 0.689◦ | traj-shuffle 0.606 | +0.083 [-0.10, +0.24] | traj-shuffle 0.606 | +0.083 [-0.10, +0.24] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S0 y_t=0 | 312,346 | 52,786 | 54 | 0.634 | position rel_pos 0.542 | **+0.092 [+0.01, +0.18]** | traj-shuffle 0.484 | **+0.150 [+0.08, +0.22]** | 0.821 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 302,772 | 43,729 | 54 | 0.587 | position rel_pos 0.528 | +0.060 [-0.02, +0.15] | traj-shuffle 0.462 | **+0.125 [+0.06, +0.20]** | 0.819 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S2 outcome y_T=1 | 136,499 | 51,222 | 51 | 0.710 | position rel_pos 0.660 | +0.050 [-0.02, +0.12] | k=0 probe 0.558 | **+0.152 [+0.11, +0.20]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S3 pre-edit & y_T=1 | 127,425 | 42,307 | 51 | 0.666 | position rel_pos 0.644 | +0.023 [-0.05, +0.09] | k=0 probe 0.534 | **+0.132 [+0.09, +0.18]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S4 y_T=0 | 175,809 | 1,564 | 8◦ | 0.629◦ | position causal 0.555 | +0.074 [-0.10, +0.24] | position causal 0.555 | +0.074 [-0.10, +0.24] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S0 y_t=0 | 312,308 | 71,216 | 54 | 0.594 | position rel_pos 0.529 | +0.065 [-0.02, +0.16] | position causal 0.465 | **+0.129 [+0.06, +0.20]** | 0.852 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 302,734 | 62,224 | 54 | 0.560 | position rel_pos 0.516 | +0.044 [-0.04, +0.14] | position causal 0.453 | **+0.107 [+0.04, +0.18]** | 0.851 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S2 outcome y_T=1 | 136,499 | 69,847 | 51 | 0.676 | position rel_pos 0.667 | +0.009 [-0.06, +0.09] | k=0 probe 0.549 | **+0.127 [+0.09, +0.18]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S3 pre-edit & y_T=1 | 127,425 | 60,942 | 51 | 0.645 | position rel_pos 0.654 | -0.009 [-0.08, +0.07] | k=0 probe 0.531 | **+0.114 [+0.07, +0.16]** | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S4 y_T=0 | 175,809 | 1,369 | 8◦ | 0.564◦ | position causal 0.599 | -0.035 [-0.37, +0.26] | position causal 0.599 | -0.035 [-0.37, +0.26] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S0 y_t=0 | 340,484 | 6,410 | 20 | 0.742 | position rel_pos 0.655 | +0.087 [-0.01, +0.19] | k=0 probe 0.616 | **+0.126 [+0.09, +0.15]** | 0.743 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 335,097 | 1,023 | 20 | 0.646 | position rel_pos 0.616 | +0.030 [-0.04, +0.12] | traj-shuffle 0.567 | **+0.079 [+0.00, +0.16]** | 0.748 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S2 outcome y_T=1 | 31,617 | 3,655 | 13◦ | 0.782◦ | position rel_pos 0.790 | -0.008 [-0.11, +0.12] | position causal 0.661 | +0.120 [-0.03, +0.23] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S3 pre-edit & y_T=1 | 28,556 | 594 | 13◦ | 0.702◦ | position rel_pos 0.758 | -0.056 [-0.17, +0.05] | position causal 0.627 | +0.075 [-0.08, +0.16] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S4 y_T=0 | 308,595 | 2,755 | 12◦ | 0.774◦ | k=0 probe 0.649 | **+0.125 [+0.08, +0.15]** | k=0 probe 0.649 | **+0.125 [+0.08, +0.15]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S0 y_t=0 | 340,475 | 7,785 | 22 | 0.739 | position rel_pos 0.647 | +0.092 [-0.01, +0.20] | k=0 probe 0.620 | **+0.119 [+0.08, +0.14]** | 0.740 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 335,088 | 2,398 | 22 | 0.689 | k=0 probe 0.605 | **+0.084 [+0.05, +0.12]** | k=0 probe 0.605 | **+0.084 [+0.05, +0.12]** | 0.732 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S2 outcome y_T=1 | 31,617 | 4,370 | 13◦ | 0.780◦ | position rel_pos 0.787 | -0.008 [-0.11, +0.11] | position causal 0.662 | +0.117 [-0.03, +0.21] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S3 pre-edit & y_T=1 | 28,556 | 1,309 | 13◦ | 0.748◦ | position rel_pos 0.752 | -0.004 [-0.13, +0.08] | k=0 probe 0.660 | **+0.088 [+0.03, +0.14]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S4 y_T=0 | 308,595 | 3,415 | 14◦ | 0.770◦ | k=0 probe 0.643 | **+0.127 [+0.08, +0.15]** | k=0 probe 0.643 | **+0.127 [+0.08, +0.15]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S0 y_t=0 | 340,419 | 10,516 | 22 | 0.687 | position rel_pos 0.609 | +0.078 [-0.03, +0.18] | k=0 probe 0.592 | **+0.095 [+0.06, +0.13]** | 0.744 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 335,032 | 5,270 | 22 | 0.644 | k=0 probe 0.557 | **+0.087 [+0.05, +0.13]** | k=0 probe 0.557 | **+0.087 [+0.05, +0.13]** | 0.735 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S2 outcome y_T=1 | 31,617 | 5,953 | 13◦ | 0.733◦ | position rel_pos 0.746 | -0.013 [-0.13, +0.11] | k=0 probe 0.653 | **+0.080 [+0.04, +0.12]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S3 pre-edit & y_T=1 | 28,556 | 2,892 | 13◦ | 0.711◦ | position rel_pos 0.684 | +0.027 [-0.11, +0.11] | k=0 probe 0.639 | **+0.072 [+0.02, +0.12]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S4 y_T=0 | 308,595 | 4,563 | 14◦ | 0.706◦ | k=0 probe 0.597 | **+0.109 [+0.07, +0.14]** | k=0 probe 0.597 | **+0.109 [+0.07, +0.14]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S0 y_t=0 | 340,250 | 16,611 | 23 | 0.619 | traj-shuffle 0.622 | -0.003 [-0.07, +0.08] | traj-shuffle 0.622 | -0.003 [-0.07, +0.08] | 0.783 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 334,863 | 11,890 | 23 | 0.594 | traj-shuffle 0.629 | -0.035 [-0.11, +0.05] | traj-shuffle 0.629 | -0.035 [-0.11, +0.05] | 0.782 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S2 outcome y_T=1 | 31,617 | 10,483 | 13◦ | 0.660◦ | position rel_pos 0.672 | -0.012 [-0.12, +0.09] | k=0 probe 0.633 | +0.027 [-0.01, +0.07] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S3 pre-edit & y_T=1 | 28,556 | 7,491 | 13◦ | 0.642◦ | position rel_pos 0.632 | +0.010 [-0.11, +0.10] | k=0 probe 0.614 | +0.028 [-0.01, +0.07] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S4 y_T=0 | 308,595 | 6,128 | 15◦ | 0.649◦ | traj-shuffle 0.606 | +0.044 [-0.02, +0.10] | traj-shuffle 0.606 | +0.044 [-0.02, +0.10] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S0 y_t=0 | 340,212 | 19,628 | 22 | 0.631 | traj-shuffle 0.666 | -0.035 [-0.11, +0.05] | traj-shuffle 0.666 | -0.035 [-0.11, +0.05] | 0.830 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 334,825 | 16,000 | 22 | 0.618 | traj-shuffle 0.659 | -0.041 [-0.13, +0.05] | traj-shuffle 0.659 | -0.041 [-0.13, +0.05] | 0.818 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S2 outcome y_T=1 | 31,617 | 14,037 | 13◦ | 0.666◦ | position rel_pos 0.652 | +0.014 [-0.07, +0.09] | traj-shuffle 0.638 | +0.028 [-0.09, +0.18] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S3 pre-edit & y_T=1 | 28,556 | 11,045 | 13◦ | 0.650◦ | position rel_pos 0.631 | +0.020 [-0.07, +0.09] | traj-shuffle 0.630 | +0.020 [-0.10, +0.17] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S4 y_T=0 | 308,595 | 5,591 | 14◦ | 0.650◦ | traj-shuffle 0.638 | +0.012 [-0.07, +0.12] | traj-shuffle 0.638 | +0.012 [-0.07, +0.12] | – |
+| Laguna XS.2 / Pro | correct | 2 | S0 y_t=0 | 774,234 | 8,609 | 21 | 0.727 | position causal 0.614 | **+0.113 [+0.01, +0.24]** | position causal 0.614 | **+0.113 [+0.01, +0.24]** | 0.922 |
+| Laguna XS.2 / Pro | correct | 2 | S1 pre-edit (y_t+1=0) | 768,058 | 2,684 | 20 | 0.676 | position causal 0.635 | +0.042 [-0.04, +0.18] | position causal 0.635 | +0.042 [-0.04, +0.18] | 0.912 |
+| Laguna XS.2 / Pro | correct | 2 | S2 outcome y_T=1 | 61,204 | 7,862 | 19◦ | 0.690◦ | position rel_pos 0.697 | -0.007 [-0.10, +0.08] | position causal 0.606 | +0.084 [-0.01, +0.16] | – |
+| Laguna XS.2 / Pro | correct | 2 | S3 pre-edit & y_T=1 | 55,518 | 2,397 | 19◦ | 0.640◦ | position rel_pos 0.701 | -0.061 [-0.16, +0.02] | position causal 0.631 | +0.009 [-0.07, +0.10] | – |
+| Laguna XS.2 / Pro | correct | 2 | S4 y_T=0 | 712,268 | 747 | 4◦ | 0.706◦ | position causal 0.662 | +0.044 [-0.12, +0.47] | position causal 0.662 | +0.044 [-0.12, +0.47] | – |
+| Laguna XS.2 / Pro | correct | 3 | S0 y_t=0 | 774,049 | 11,258 | 21 | 0.731 | position causal 0.615 | **+0.116 [+0.02, +0.24]** | position causal 0.615 | **+0.116 [+0.02, +0.24]** | 0.922 |
+| Laguna XS.2 / Pro | correct | 3 | S1 pre-edit (y_t+1=0) | 767,873 | 5,414 | 21 | 0.692 | position causal 0.612 | +0.080 [-0.01, +0.21] | position causal 0.612 | +0.080 [-0.01, +0.21] | 0.917 |
+| Laguna XS.2 / Pro | correct | 3 | S2 outcome y_T=1 | 61,204 | 10,258 | 19◦ | 0.685◦ | position rel_pos 0.686 | -0.001 [-0.11, +0.09] | traj-shuffle 0.607 | +0.079 [-0.01, +0.16] | – |
+| Laguna XS.2 / Pro | correct | 3 | S3 pre-edit & y_T=1 | 55,518 | 4,874 | 19◦ | 0.642◦ | position rel_pos 0.666 | -0.023 [-0.15, +0.07] | traj-shuffle 0.600 | +0.043 [-0.06, +0.14] | – |
+| Laguna XS.2 / Pro | correct | 3 | S4 y_T=0 | 712,091 | 1,000 | 4◦ | 0.739◦ | position causal 0.733 | +0.007 [-0.11, +0.47] | position causal 0.733 | +0.007 [-0.11, +0.47] | – |
+| Laguna XS.2 / Pro | correct | 5 | S0 y_t=0 | 774,148 | 15,717 | 21 | 0.720 | position causal 0.621 | **+0.099 [+0.01, +0.22]** | position causal 0.621 | **+0.099 [+0.01, +0.22]** | 0.920 |
+| Laguna XS.2 / Pro | correct | 5 | S1 pre-edit (y_t+1=0) | 767,774 | 10,624 | 20 | 0.687 | position causal 0.618 | +0.068 [-0.01, +0.18] | position causal 0.618 | +0.068 [-0.01, +0.18] | 0.919 |
+| Laguna XS.2 / Pro | correct | 5 | S2 outcome y_T=1 | 61,204 | 14,172 | 19◦ | 0.662◦ | position rel_pos 0.647 | +0.014 [-0.08, +0.10] | position causal 0.594 | +0.068 [-0.03, +0.16] | – |
+| Laguna XS.2 / Pro | correct | 5 | S3 pre-edit & y_T=1 | 55,518 | 9,539 | 18◦ | 0.627◦ | position rel_pos 0.627 | -0.000 [-0.09, +0.08] | position causal 0.592 | +0.035 [-0.05, +0.12] | – |
+| Laguna XS.2 / Pro | correct | 5 | S4 y_T=0 | 712,257 | 1,545 | 4◦ | 0.758◦ | position causal 0.757 | +0.001 [-0.07, +0.57] | position causal 0.757 | +0.001 [-0.07, +0.57] | – |
+| Laguna XS.2 / Pro | correct | 10 | S0 y_t=0 | 774,154 | 25,523 | 21 | 0.711 | position causal 0.601 | **+0.109 [+0.01, +0.21]** | position causal 0.601 | **+0.109 [+0.01, +0.21]** | 0.938 |
+| Laguna XS.2 / Pro | correct | 10 | S1 pre-edit (y_t+1=0) | 767,755 | 20,331 | 21 | 0.687 | position causal 0.588 | **+0.099 [+0.00, +0.20]** | position causal 0.588 | **+0.099 [+0.00, +0.20]** | 0.936 |
+| Laguna XS.2 / Pro | correct | 10 | S2 outcome y_T=1 | 61,204 | 23,618 | 20 | 0.651 | position rel_pos 0.640 | +0.011 [-0.09, +0.11] | position causal 0.585 | +0.066 [-0.01, +0.13] | – |
+| Laguna XS.2 / Pro | correct | 10 | S3 pre-edit & y_T=1 | 55,518 | 18,725 | 20 | 0.627 | position rel_pos 0.620 | +0.006 [-0.10, +0.11] | position causal 0.575 | +0.052 [-0.02, +0.12] | – |
+| Laguna XS.2 / Pro | correct | 10 | S4 y_T=0 | 712,341 | 1,905 | 5◦ | 0.720◦ | position causal 0.645 | **+0.075 [+0.02, +0.39]** | position causal 0.645 | **+0.075 [+0.02, +0.39]** | – |
+| Laguna XS.2 / Pro | correct | 15 | S0 y_t=0 | 774,170 | 31,461 | 25 | 0.689 | position causal 0.595 | +0.094 [-0.01, +0.20] | position causal 0.595 | +0.094 [-0.01, +0.20] | 0.959 |
+| Laguna XS.2 / Pro | correct | 15 | S1 pre-edit (y_t+1=0) | 767,771 | 26,274 | 25 | 0.668 | position causal 0.583 | +0.085 [-0.03, +0.20] | position causal 0.583 | +0.085 [-0.03, +0.20] | 0.955 |
+| Laguna XS.2 / Pro | correct | 15 | S2 outcome y_T=1 | 61,204 | 30,190 | 24 | 0.617 | position rel_pos 0.652 | -0.035 [-0.15, +0.08] | position causal 0.576 | +0.041 [-0.03, +0.11] | – |
+| Laguna XS.2 / Pro | correct | 15 | S3 pre-edit & y_T=1 | 55,518 | 25,003 | 24 | 0.595 | position rel_pos 0.639 | -0.044 [-0.15, +0.07] | position causal 0.565 | +0.030 [-0.04, +0.10] | – |
+| Laguna XS.2 / Pro | correct | 15 | S4 y_T=0 | 712,427 | 1,271 | 5◦ | 0.631◦ | traj-shuffle 0.571 | +0.060 [-0.14, +0.23] | traj-shuffle 0.571 | +0.060 [-0.14, +0.23] | – |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S0 y_t=0 | 732,224 | 15,810 | 29 | 0.756 | k=0 probe 0.659 | **+0.097 [+0.06, +0.14]** | k=0 probe 0.659 | **+0.097 [+0.06, +0.14]** | 0.803 |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 720,917 | 4,627 | 28 | 0.708 | k=0 probe 0.633 | **+0.075 [+0.03, +0.12]** | k=0 probe 0.633 | **+0.075 [+0.03, +0.12]** | 0.780 |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S2 outcome y_T=1 | 53,346 | 10,529 | 21 | 0.775 | k=0 probe 0.705 | **+0.070 [+0.03, +0.11]** | k=0 probe 0.705 | **+0.070 [+0.03, +0.11]** | – |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S3 pre-edit & y_T=1 | 45,556 | 2,863 | 21 | 0.702 | position causal 0.665 | +0.038 [-0.03, +0.11] | position causal 0.665 | +0.038 [-0.03, +0.11] | – |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S4 y_T=0 | 678,116 | 5,281 | 16◦ | 0.751◦ | k=0 probe 0.696 | **+0.055 [+0.02, +0.11]** | k=0 probe 0.696 | **+0.055 [+0.02, +0.11]** | – |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S0 y_t=0 | 732,038 | 20,356 | 29 | 0.729 | k=0 probe 0.632 | **+0.097 [+0.05, +0.14]** | k=0 probe 0.632 | **+0.097 [+0.05, +0.14]** | 0.820 |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 720,731 | 9,389 | 29 | 0.693 | k=0 probe 0.591 | **+0.102 [+0.05, +0.15]** | k=0 probe 0.591 | **+0.102 [+0.05, +0.15]** | 0.815 |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S2 outcome y_T=1 | 53,346 | 14,165 | 21 | 0.720 | k=0 probe 0.684 | +0.036 [-0.00, +0.07] | k=0 probe 0.684 | +0.036 [-0.00, +0.07] | – |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S3 pre-edit & y_T=1 | 45,556 | 6,441 | 21 | 0.661 | position causal 0.631 | +0.030 [-0.04, +0.11] | position causal 0.631 | +0.030 [-0.04, +0.11] | – |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S4 y_T=0 | 677,938 | 6,191 | 16◦ | 0.723◦ | k=0 probe 0.678 | +0.045 [-0.03, +0.14] | k=0 probe 0.678 | +0.045 [-0.03, +0.14] | – |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S0 y_t=0 | 732,138 | 26,885 | 29 | 0.722 | k=0 probe 0.611 | **+0.111 [+0.07, +0.16]** | k=0 probe 0.611 | **+0.111 [+0.07, +0.16]** | 0.840 |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 720,633 | 17,159 | 29 | 0.687 | k=0 probe 0.581 | **+0.106 [+0.05, +0.16]** | k=0 probe 0.581 | **+0.106 [+0.05, +0.16]** | 0.825 |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S2 outcome y_T=1 | 53,346 | 19,590 | 21 | 0.704 | k=0 probe 0.669 | +0.035 [-0.01, +0.07] | k=0 probe 0.669 | +0.035 [-0.01, +0.07] | – |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S3 pre-edit & y_T=1 | 45,556 | 11,985 | 21 | 0.656 | position causal 0.658 | -0.003 [-0.08, +0.07] | position causal 0.658 | -0.003 [-0.08, +0.07] | – |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S4 y_T=0 | 678,105 | 7,295 | 16◦ | 0.728◦ | k=0 probe 0.678 | +0.050 [-0.03, +0.15] | k=0 probe 0.678 | +0.050 [-0.03, +0.15] | – |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S0 y_t=0 | 732,143 | 36,120 | 31 | 0.695 | position causal 0.572 | **+0.123 [+0.03, +0.25]** | position causal 0.572 | **+0.123 [+0.03, +0.25]** | 0.875 |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 720,613 | 27,372 | 31 | 0.668 | position causal 0.558 | **+0.110 [+0.01, +0.25]** | position causal 0.558 | **+0.110 [+0.01, +0.25]** | 0.869 |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S2 outcome y_T=1 | 53,346 | 28,381 | 24 | 0.653 | position causal 0.654 | -0.001 [-0.07, +0.08] | position causal 0.654 | -0.001 [-0.07, +0.08] | – |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S3 pre-edit & y_T=1 | 45,556 | 21,143 | 24 | 0.625 | position causal 0.641 | -0.015 [-0.08, +0.06] | position causal 0.641 | -0.015 [-0.08, +0.06] | – |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S4 y_T=0 | 678,188 | 7,739 | 18◦ | 0.701◦ | k=0 probe 0.620 | +0.081 [-0.01, +0.18] | k=0 probe 0.620 | +0.081 [-0.01, +0.18] | – |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S0 y_t=0 | 732,153 | 40,499 | 33 | 0.676 | position causal 0.542 | **+0.134 [+0.03, +0.28]** | position causal 0.542 | **+0.134 [+0.03, +0.28]** | 0.907 |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 720,623 | 31,941 | 33 | 0.652 | position causal 0.522 | **+0.130 [+0.02, +0.28]** | position causal 0.522 | **+0.130 [+0.02, +0.28]** | 0.902 |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S2 outcome y_T=1 | 53,338 | 34,116 | 27 | 0.588 | position causal 0.629 | -0.041 [-0.12, +0.06] | position causal 0.629 | -0.041 [-0.12, +0.06] | – |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S3 pre-edit & y_T=1 | 45,548 | 26,533 | 27 | 0.555 | position causal 0.611 | -0.057 [-0.13, +0.04] | position causal 0.611 | -0.057 [-0.13, +0.04] | – |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S4 y_T=0 | 678,276 | 6,383 | 18◦ | 0.667◦ | k=0 probe 0.582 | +0.085 [-0.04, +0.23] | k=0 probe 0.582 | +0.085 [-0.04, +0.23] | – |
+| Laguna XS.2 / Pro | has_regressions | 2 | S0 y_t=0 | 769,086 | 8,813 | 14◦ | 0.793◦ | k=0 probe 0.665 | **+0.128 [+0.09, +0.17]** | k=0 probe 0.665 | **+0.128 [+0.09, +0.17]** | 0.866 |
+| Laguna XS.2 / Pro | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 762,758 | 2,842 | 14◦ | 0.739◦ | k=0 probe 0.619 | **+0.120 [+0.07, +0.19]** | k=0 probe 0.619 | **+0.120 [+0.07, +0.19]** | 0.838 |
+| Laguna XS.2 / Pro | has_regressions | 2 | S2 outcome y_T=1 | 34,064 | 6,773 | 10◦ | 0.682◦ | position causal 0.673 | +0.009 [-0.06, +0.08] | position causal 0.673 | +0.009 [-0.06, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 2 | S3 pre-edit & y_T=1 | 29,316 | 2,025 | 10◦ | 0.579◦ | position causal 0.659 | -0.080 [-0.16, +0.01] | position causal 0.659 | -0.080 [-0.16, +0.01] | – |
+| Laguna XS.2 / Pro | has_regressions | 2 | S4 y_T=0 | 734,260 | 2,040 | 10◦ | 0.802◦ | k=0 probe 0.672 | **+0.130 [+0.05, +0.18]** | k=0 probe 0.672 | **+0.130 [+0.05, +0.18]** | – |
+| Laguna XS.2 / Pro | has_regressions | 3 | S0 y_t=0 | 768,901 | 10,658 | 14◦ | 0.780◦ | k=0 probe 0.661 | **+0.119 [+0.09, +0.15]** | k=0 probe 0.661 | **+0.119 [+0.09, +0.15]** | 0.861 |
+| Laguna XS.2 / Pro | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 762,573 | 4,772 | 14◦ | 0.737◦ | k=0 probe 0.630 | **+0.107 [+0.07, +0.16]** | k=0 probe 0.630 | **+0.107 [+0.07, +0.16]** | 0.831 |
+| Laguna XS.2 / Pro | has_regressions | 3 | S2 outcome y_T=1 | 34,065 | 8,068 | 10◦ | 0.666◦ | position causal 0.656 | +0.010 [-0.04, +0.08] | position causal 0.656 | +0.010 [-0.04, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 3 | S3 pre-edit & y_T=1 | 29,317 | 3,320 | 10◦ | 0.586◦ | position causal 0.625 | -0.038 [-0.10, +0.08] | position causal 0.625 | -0.038 [-0.10, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 3 | S4 y_T=0 | 734,082 | 2,590 | 10◦ | 0.779◦ | k=0 probe 0.672 | **+0.107 [+0.04, +0.16]** | k=0 probe 0.672 | **+0.107 [+0.04, +0.16]** | – |
+| Laguna XS.2 / Pro | has_regressions | 5 | S0 y_t=0 | 769,000 | 14,209 | 14◦ | 0.763◦ | k=0 probe 0.646 | **+0.117 [+0.08, +0.15]** | k=0 probe 0.646 | **+0.117 [+0.08, +0.15]** | 0.866 |
+| Laguna XS.2 / Pro | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 762,474 | 8,397 | 14◦ | 0.728◦ | k=0 probe 0.617 | **+0.111 [+0.07, +0.16]** | k=0 probe 0.617 | **+0.111 [+0.07, +0.16]** | 0.847 |
+| Laguna XS.2 / Pro | has_regressions | 5 | S2 outcome y_T=1 | 34,064 | 10,833 | 10◦ | 0.627◦ | position causal 0.624 | +0.003 [-0.05, +0.07] | position causal 0.624 | +0.003 [-0.05, +0.07] | – |
+| Laguna XS.2 / Pro | has_regressions | 5 | S3 pre-edit & y_T=1 | 29,316 | 6,085 | 10◦ | 0.565◦ | position causal 0.601 | -0.036 [-0.09, +0.05] | position causal 0.601 | -0.036 [-0.09, +0.05] | – |
+| Laguna XS.2 / Pro | has_regressions | 5 | S4 y_T=0 | 734,249 | 3,376 | 10◦ | 0.767◦ | k=0 probe 0.660 | **+0.107 [+0.04, +0.18]** | k=0 probe 0.660 | **+0.107 [+0.04, +0.18]** | – |
+| Laguna XS.2 / Pro | has_regressions | 10 | S0 y_t=0 | 769,006 | 20,188 | 14◦ | 0.756◦ | k=0 probe 0.641 | **+0.114 [+0.07, +0.16]** | k=0 probe 0.641 | **+0.114 [+0.07, +0.16]** | 0.885 |
+| Laguna XS.2 / Pro | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 762,455 | 15,211 | 14◦ | 0.737◦ | k=0 probe 0.627 | **+0.111 [+0.06, +0.17]** | k=0 probe 0.627 | **+0.111 [+0.06, +0.17]** | 0.873 |
+| Laguna XS.2 / Pro | has_regressions | 10 | S2 outcome y_T=1 | 34,065 | 16,034 | 10◦ | 0.606◦ | position causal 0.613 | -0.007 [-0.10, +0.08] | position causal 0.613 | -0.007 [-0.10, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 10 | S3 pre-edit & y_T=1 | 29,317 | 11,698 | 10◦ | 0.576◦ | position causal 0.599 | -0.023 [-0.13, +0.08] | position causal 0.599 | -0.023 [-0.13, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 10 | S4 y_T=0 | 734,332 | 4,154 | 10◦ | 0.743◦ | k=0 probe 0.642 | **+0.101 [+0.02, +0.19]** | k=0 probe 0.642 | **+0.101 [+0.02, +0.19]** | – |
+| Laguna XS.2 / Pro | has_regressions | 15 | S0 y_t=0 | 769,022 | 25,079 | 15◦ | 0.744◦ | k=0 probe 0.626 | **+0.118 [+0.08, +0.17]** | k=0 probe 0.626 | **+0.118 [+0.08, +0.17]** | 0.896 |
+| Laguna XS.2 / Pro | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 762,471 | 19,894 | 15◦ | 0.729◦ | k=0 probe 0.609 | **+0.119 [+0.07, +0.18]** | k=0 probe 0.609 | **+0.119 [+0.07, +0.18]** | 0.886 |
+| Laguna XS.2 / Pro | has_regressions | 15 | S2 outcome y_T=1 | 34,063 | 20,323 | 12◦ | 0.564◦ | position causal 0.623 | -0.059 [-0.16, +0.01] | position causal 0.623 | -0.059 [-0.16, +0.01] | – |
+| Laguna XS.2 / Pro | has_regressions | 15 | S3 pre-edit & y_T=1 | 29,315 | 15,711 | 12◦ | 0.538◦ | position causal 0.605 | -0.066 [-0.18, +0.01] | position causal 0.605 | -0.066 [-0.18, +0.01] | – |
+| Laguna XS.2 / Pro | has_regressions | 15 | S4 y_T=0 | 734,420 | 4,756 | 10◦ | 0.728◦ | k=0 probe 0.600 | **+0.128 [+0.07, +0.22]** | k=0 probe 0.600 | **+0.128 [+0.07, +0.22]** | – |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S0 y_t=0 | 342,270 | 8,380 | 19◦ | 0.793◦ | k=0 probe 0.673 | **+0.121 [+0.08, +0.16]** | k=0 probe 0.673 | **+0.121 [+0.08, +0.16]** | 0.888 |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S1 pre-edit (y_t+1=0) | 334,942 | 1,169 | 19◦ | 0.723◦ | k=0 probe 0.658 | **+0.064 [+0.03, +0.09]** | k=0 probe 0.658 | **+0.064 [+0.03, +0.09]** | 0.826 |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S2 outcome y_T=1 | 50,911 | 7,583 | 17◦ | 0.783◦ | traj-shuffle 0.693 | **+0.090 [+0.03, +0.15]** | traj-shuffle 0.693 | **+0.090 [+0.03, +0.15]** | – |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S3 pre-edit & y_T=1 | 44,125 | 914 | 17◦ | 0.687◦ | traj-shuffle 0.637 | +0.050 [-0.02, +0.12] | traj-shuffle 0.637 | +0.050 [-0.02, +0.12] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S4 y_T=0 | 291,359 | 797 | 3◦ | 0.816◦ | position causal 0.740 | +0.077 [-0.13, +0.29] | position causal 0.740 | +0.077 [-0.13, +0.29] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S0 y_t=0 | 342,315 | 9,277 | 21 | 0.789 | k=0 probe 0.664 | **+0.125 [+0.08, +0.16]** | k=0 probe 0.664 | **+0.125 [+0.08, +0.16]** | 0.888 |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S1 pre-edit (y_t+1=0) | 334,929 | 2,072 | 21 | 0.708 | k=0 probe 0.627 | **+0.082 [+0.04, +0.12]** | k=0 probe 0.627 | **+0.082 [+0.04, +0.12]** | 0.851 |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S2 outcome y_T=1 | 50,911 | 8,388 | 19◦ | 0.780◦ | traj-shuffle 0.694 | +0.086 [-0.00, +0.18] | traj-shuffle 0.694 | +0.086 [-0.00, +0.18] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S3 pre-edit & y_T=1 | 44,125 | 1,719 | 19◦ | 0.678◦ | traj-shuffle 0.644 | +0.034 [-0.03, +0.09] | traj-shuffle 0.644 | +0.034 [-0.03, +0.09] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S4 y_T=0 | 291,404 | 889 | 3◦ | 0.817◦ | position causal 0.750 | +0.067 [-0.14, +0.29] | position causal 0.750 | +0.067 [-0.14, +0.29] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S0 y_t=0 | 342,321 | 11,665 | 23 | 0.773 | k=0 probe 0.665 | **+0.108 [+0.06, +0.15]** | k=0 probe 0.665 | **+0.108 [+0.06, +0.15]** | 0.903 |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S1 pre-edit (y_t+1=0) | 334,919 | 4,681 | 23 | 0.714 | k=0 probe 0.646 | **+0.069 [+0.02, +0.11]** | k=0 probe 0.646 | **+0.069 [+0.02, +0.11]** | 0.895 |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S2 outcome y_T=1 | 50,911 | 10,808 | 21 | 0.762 | k=0 probe 0.636 | **+0.126 [+0.06, +0.17]** | k=0 probe 0.636 | **+0.126 [+0.06, +0.17]** | – |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S3 pre-edit & y_T=1 | 44,125 | 4,265 | 21 | 0.694 | position rel_pos 0.635 | +0.059 [-0.05, +0.11] | k=0 probe 0.608 | **+0.086 [+0.03, +0.13]** | – |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S4 y_T=0 | 291,410 | 857 | 3◦ | 0.818◦ | position causal 0.799 | +0.019 [-0.16, +0.37] | position causal 0.799 | +0.019 [-0.16, +0.37] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S0 y_t=0 | 342,315 | 18,853 | 25 | 0.731 | k=0 probe 0.653 | **+0.078 [+0.03, +0.12]** | k=0 probe 0.653 | **+0.078 [+0.03, +0.12]** | 0.920 |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S1 pre-edit (y_t+1=0) | 334,913 | 11,798 | 25 | 0.692 | k=0 probe 0.641 | **+0.051 [+0.00, +0.10]** | k=0 probe 0.641 | **+0.051 [+0.00, +0.10]** | 0.915 |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S2 outcome y_T=1 | 50,911 | 17,780 | 23 | 0.714 | position rel_pos 0.665 | +0.049 [-0.09, +0.14] | k=0 probe 0.645 | **+0.070 [+0.01, +0.13]** | – |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S3 pre-edit & y_T=1 | 44,125 | 10,994 | 23 | 0.666 | position rel_pos 0.667 | -0.001 [-0.13, +0.10] | k=0 probe 0.628 | +0.038 [-0.02, +0.11] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S4 y_T=0 | 291,404 | 1,073 | 4◦ | 0.804◦ | position causal 0.709 | +0.095 [-0.03, +0.71] | position causal 0.709 | +0.095 [-0.03, +0.71] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S0 y_t=0 | 342,285 | 24,884 | 27 | 0.711 | k=0 probe 0.638 | **+0.073 [+0.02, +0.13]** | k=0 probe 0.638 | **+0.073 [+0.02, +0.13]** | 0.946 |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S1 pre-edit (y_t+1=0) | 334,883 | 18,116 | 27 | 0.688 | k=0 probe 0.623 | **+0.065 [+0.02, +0.13]** | k=0 probe 0.623 | **+0.065 [+0.02, +0.13]** | 0.945 |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S2 outcome y_T=1 | 50,911 | 24,286 | 25 | 0.672 | position rel_pos 0.705 | -0.033 [-0.15, +0.08] | k=0 probe 0.651 | +0.021 [-0.03, +0.07] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S3 pre-edit & y_T=1 | 44,125 | 17,641 | 25 | 0.645 | position rel_pos 0.700 | -0.055 [-0.17, +0.07] | k=0 probe 0.633 | +0.012 [-0.04, +0.08] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S4 y_T=0 | 291,374 | 598 | 5◦ | 0.800◦ | k=0 probe 0.597 | **+0.203 [+0.01, +0.29]** | k=0 probe 0.597 | **+0.203 [+0.01, +0.29]** | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S0 y_t=0 | 340,074 | 9,897 | 24 | 0.828 | k=0 probe 0.735 | **+0.093 [+0.08, +0.11]** | k=0 probe 0.735 | **+0.093 [+0.08, +0.11]** | 0.875 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 331,432 | 1,390 | 24 | 0.737 | k=0 probe 0.664 | **+0.072 [+0.05, +0.09]** | k=0 probe 0.664 | **+0.072 [+0.05, +0.09]** | 0.880 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S2 outcome y_T=1 | 55,901 | 8,824 | 20 | 0.780 | traj-shuffle 0.741 | +0.040 [-0.05, +0.13] | traj-shuffle 0.741 | +0.040 [-0.05, +0.13] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S3 pre-edit & y_T=1 | 48,195 | 1,253 | 20 | 0.685 | traj-shuffle 0.661 | +0.024 [-0.07, +0.11] | traj-shuffle 0.661 | +0.024 [-0.07, +0.11] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S4 y_T=0 | 284,173 | 1,073 | 6◦ | 0.786◦ | k=0 probe 0.673 | **+0.113 [+0.07, +0.13]** | k=0 probe 0.673 | **+0.113 [+0.07, +0.13]** | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S0 y_t=0 | 340,119 | 11,322 | 25 | 0.815 | k=0 probe 0.718 | **+0.097 [+0.08, +0.11]** | k=0 probe 0.718 | **+0.097 [+0.08, +0.11]** | 0.878 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 331,419 | 2,849 | 25 | 0.727 | k=0 probe 0.632 | **+0.095 [+0.07, +0.12]** | k=0 probe 0.632 | **+0.095 [+0.07, +0.12]** | 0.880 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S2 outcome y_T=1 | 55,901 | 10,134 | 21 | 0.765 | traj-shuffle 0.701 | +0.064 [-0.02, +0.16] | traj-shuffle 0.701 | +0.064 [-0.02, +0.16] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S3 pre-edit & y_T=1 | 48,195 | 2,563 | 21 | 0.673 | position rel_pos 0.632 | +0.041 [-0.06, +0.13] | traj-shuffle 0.622 | +0.051 [-0.02, +0.10] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S4 y_T=0 | 284,218 | 1,188 | 6◦ | 0.764◦ | k=0 probe 0.657 | **+0.107 [+0.06, +0.13]** | k=0 probe 0.657 | **+0.107 [+0.06, +0.13]** | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S0 y_t=0 | 340,125 | 14,938 | 27 | 0.797 | k=0 probe 0.702 | **+0.094 [+0.07, +0.12]** | k=0 probe 0.702 | **+0.094 [+0.07, +0.12]** | 0.887 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 331,409 | 6,669 | 27 | 0.740 | k=0 probe 0.646 | **+0.094 [+0.06, +0.12]** | k=0 probe 0.646 | **+0.094 [+0.06, +0.12]** | 0.889 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S2 outcome y_T=1 | 55,901 | 13,513 | 23 | 0.742 | k=0 probe 0.681 | **+0.061 [+0.03, +0.09]** | k=0 probe 0.681 | **+0.061 [+0.03, +0.09]** | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S3 pre-edit & y_T=1 | 48,195 | 6,049 | 23 | 0.685 | position rel_pos 0.631 | +0.054 [-0.02, +0.13] | k=0 probe 0.624 | **+0.061 [+0.01, +0.10]** | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S4 y_T=0 | 284,224 | 1,425 | 7◦ | 0.718◦ | traj-shuffle 0.608 | +0.110 [-0.10, +0.34] | traj-shuffle 0.608 | +0.110 [-0.10, +0.34] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S0 y_t=0 | 340,119 | 22,769 | 27 | 0.764 | k=0 probe 0.670 | **+0.094 [+0.05, +0.13]** | k=0 probe 0.670 | **+0.094 [+0.05, +0.13]** | 0.909 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 331,403 | 14,466 | 27 | 0.721 | k=0 probe 0.621 | **+0.100 [+0.04, +0.15]** | k=0 probe 0.621 | **+0.100 [+0.04, +0.15]** | 0.910 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S2 outcome y_T=1 | 55,901 | 21,129 | 23 | 0.680 | k=0 probe 0.659 | +0.021 [-0.04, +0.08] | k=0 probe 0.659 | +0.021 [-0.04, +0.08] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S3 pre-edit & y_T=1 | 48,195 | 13,447 | 23 | 0.635 | k=0 probe 0.608 | +0.027 [-0.06, +0.10] | k=0 probe 0.608 | +0.027 [-0.06, +0.10] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S4 y_T=0 | 284,218 | 1,640 | 7◦ | 0.688◦ | traj-shuffle 0.587 | +0.101 [-0.12, +0.34] | traj-shuffle 0.587 | +0.101 [-0.12, +0.34] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S0 y_t=0 | 340,089 | 28,729 | 29 | 0.732 | k=0 probe 0.653 | **+0.078 [+0.02, +0.14]** | k=0 probe 0.653 | **+0.078 [+0.02, +0.14]** | 0.930 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 331,373 | 20,861 | 29 | 0.710 | k=0 probe 0.614 | **+0.096 [+0.03, +0.17]** | k=0 probe 0.614 | **+0.096 [+0.03, +0.17]** | 0.928 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S2 outcome y_T=1 | 55,901 | 27,328 | 25 | 0.602 | k=0 probe 0.657 | -0.055 [-0.12, +0.02] | k=0 probe 0.657 | -0.055 [-0.12, +0.02] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S3 pre-edit & y_T=1 | 48,195 | 19,782 | 25 | 0.579 | k=0 probe 0.615 | -0.036 [-0.10, +0.05] | k=0 probe 0.615 | -0.036 [-0.10, +0.05] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S4 y_T=0 | 284,188 | 1,401 | 7◦ | 0.639◦ | traj-shuffle 0.520 | +0.119 [-0.02, +0.25] | traj-shuffle 0.520 | +0.119 [-0.02, +0.25] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S0 y_t=0 | 358,127 | 1,975 | 7◦ | 0.853◦ | position causal 0.774 | +0.079 [-0.04, +0.32] | position causal 0.774 | +0.079 [-0.04, +0.32] | 0.790 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 356,451 | 299 | 7◦ | 0.792◦ | position causal 0.829 | -0.037 [-0.13, +0.22] | position causal 0.829 | -0.037 [-0.13, +0.22] | 0.629 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S2 outcome y_T=1 | 7,129 | 1,180 | 2◦ | 0.902◦ | k=0 probe 0.854 | **+0.047 [+0.00, +0.06]** | k=0 probe 0.854 | **+0.047 [+0.00, +0.06]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S3 pre-edit & y_T=1 | 6,031 | 82 | 2◦ | 0.753◦ | position rel_pos 0.824 | -0.071 [-0.61, +0.02] | position causal 0.758 | -0.005 [-0.49, +0.08] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S4 y_T=0 | 350,998 | 795 | 5◦ | 0.864◦ | k=0 probe 0.798 | **+0.066 [+0.05, +0.10]** | k=0 probe 0.798 | **+0.066 [+0.05, +0.10]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S0 y_t=0 | 358,172 | 2,160 | 7◦ | 0.834◦ | position causal 0.773 | +0.062 [-0.06, +0.31] | position causal 0.773 | +0.062 [-0.06, +0.31] | 0.790 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 356,438 | 484 | 7◦ | 0.786◦ | position causal 0.767 | +0.019 [-0.10, +0.29] | position causal 0.767 | +0.019 [-0.10, +0.29] | 0.689 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S2 outcome y_T=1 | 7,129 | 1,289 | 2◦ | 0.877◦ | position causal 0.846 | +0.031 [-0.12, +0.08] | position causal 0.846 | +0.031 [-0.12, +0.08] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S3 pre-edit & y_T=1 | 6,031 | 191 | 2◦ | 0.800◦ | position rel_pos 0.838 | -0.038 [-0.53, +0.03] | position causal 0.796 | +0.005 [-0.45, +0.07] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S4 y_T=0 | 351,043 | 871 | 5◦ | 0.852◦ | k=0 probe 0.781 | **+0.072 [+0.04, +0.14]** | k=0 probe 0.781 | **+0.072 [+0.04, +0.14]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S0 y_t=0 | 358,178 | 2,591 | 8◦ | 0.822◦ | position causal 0.765 | +0.058 [-0.07, +0.30] | position causal 0.765 | +0.058 [-0.07, +0.30] | 0.779 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 356,428 | 1,014 | 8◦ | 0.761◦ | position causal 0.735 | +0.026 [-0.09, +0.25] | position causal 0.735 | +0.026 [-0.09, +0.25] | 0.685 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S2 outcome y_T=1 | 7,129 | 1,489 | 3◦ | 0.874◦ | position causal 0.844 | +0.030 [-0.26, +0.09] | position causal 0.844 | +0.030 [-0.26, +0.09] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S3 pre-edit & y_T=1 | 6,031 | 391 | 3◦ | 0.811◦ | position rel_pos 0.866 | -0.055 [-0.54, +0.02] | position causal 0.789 | +0.022 [-0.30, +0.07] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S4 y_T=0 | 351,049 | 1,102 | 5◦ | 0.806◦ | k=0 probe 0.737 | **+0.069 [+0.03, +0.20]** | k=0 probe 0.737 | **+0.069 [+0.03, +0.20]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S0 y_t=0 | 358,172 | 3,417 | 8◦ | 0.784◦ | position causal 0.743 | +0.040 [-0.09, +0.30] | position causal 0.743 | +0.040 [-0.09, +0.30] | 0.796 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 356,422 | 1,953 | 8◦ | 0.736◦ | position causal 0.677 | +0.059 [-0.05, +0.32] | position causal 0.677 | +0.059 [-0.05, +0.32] | 0.742 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S2 outcome y_T=1 | 7,129 | 2,070 | 3◦ | 0.799◦ | position rel_pos 0.834 | -0.036 [-0.43, +0.03] | position causal 0.832 | -0.033 [-0.17, +0.06] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S3 pre-edit & y_T=1 | 6,031 | 972 | 3◦ | 0.711◦ | position rel_pos 0.841 | **-0.130 [-0.52, -0.06]** | position causal 0.767 | -0.056 [-0.37, +0.06] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S4 y_T=0 | 351,043 | 1,347 | 5◦ | 0.786◦ | k=0 probe 0.726 | **+0.060 [+0.00, +0.20]** | k=0 probe 0.726 | **+0.060 [+0.00, +0.20]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S0 y_t=0 | 358,142 | 3,854 | 9◦ | 0.814◦ | position causal 0.709 | **+0.104 [+0.02, +0.32]** | position causal 0.709 | **+0.104 [+0.02, +0.32]** | 0.864 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 356,392 | 2,579 | 9◦ | 0.773◦ | position causal 0.656 | **+0.118 [+0.02, +0.33]** | position causal 0.656 | **+0.118 [+0.02, +0.33]** | 0.833 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S2 outcome y_T=1 | 7,129 | 2,849 | 4◦ | 0.687◦ | position causal 0.877 | -0.190 [-0.23, +0.02] | position causal 0.877 | -0.190 [-0.23, +0.02] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S3 pre-edit & y_T=1 | 6,031 | 1,751 | 4◦ | 0.621◦ | position causal 0.841 | -0.221 [-0.36, +0.02] | position causal 0.841 | -0.221 [-0.36, +0.02] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S4 y_T=0 | 351,013 | 1,005 | 5◦ | 0.778◦ | k=0 probe 0.680 | **+0.098 [+0.04, +0.23]** | k=0 probe 0.680 | **+0.098 [+0.04, +0.23]** | – |
+
+#### E18, window max50: within y_t = 0, by edit turn and eventual outcome (AUC for y_(t+k); strongest control = highest point AUC among k=0 probe, traj-shuffle and both position baselines; 95% task-bootstrap CI, bold if it excludes 0; ◦ = fewer than 20 test tasks with a positive token)
+
+| Model / benchmark | Probe | k | stratum | tokens | positives | tasks w/ positive | real | strongest control | real − strongest | strongest causal control | real − strongest causal | oracle y_T |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | correct | 2 | S0 y_t=0 | 168,064 | 2,905 | 15◦ | 0.767◦ | traj-shuffle 0.622 | **+0.145 [+0.07, +0.21]** | traj-shuffle 0.622 | **+0.145 [+0.07, +0.21]** | 0.876 |
+| Laguna XS.2 / Verified | correct | 2 | S1 pre-edit (y_t+1=0) | 165,909 | 750 | 15◦ | 0.636◦ | k=0 probe 0.556 | **+0.080 [+0.01, +0.18]** | k=0 probe 0.556 | **+0.080 [+0.01, +0.18]** | 0.873 |
+| Laguna XS.2 / Verified | correct | 2 | S3 pre-edit & y_T=1 | 38,952 | 735 | 15◦ | 0.721◦ | k=0 probe 0.652 | **+0.069 [+0.01, +0.17]** | k=0 probe 0.652 | **+0.069 [+0.01, +0.17]** | – |
+| Laguna XS.2 / Verified | correct | 3 | S0 y_t=0 | 168,064 | 3,544 | 16◦ | 0.745◦ | traj-shuffle 0.557 | **+0.188 [+0.10, +0.28]** | traj-shuffle 0.557 | **+0.188 [+0.10, +0.28]** | 0.877 |
+| Laguna XS.2 / Verified | correct | 3 | S1 pre-edit (y_t+1=0) | 165,909 | 1,389 | 16◦ | 0.622◦ | k=0 probe 0.540 | **+0.082 [+0.03, +0.17]** | k=0 probe 0.540 | **+0.082 [+0.03, +0.17]** | 0.875 |
+| Laguna XS.2 / Verified | correct | 3 | S3 pre-edit & y_T=1 | 38,952 | 1,364 | 16◦ | 0.702◦ | k=0 probe 0.634 | **+0.068 [+0.01, +0.15]** | k=0 probe 0.634 | **+0.068 [+0.01, +0.15]** | – |
+| Laguna XS.2 / Verified | correct | 5 | S0 y_t=0 | 168,064 | 5,309 | 19◦ | 0.716◦ | traj-shuffle 0.546 | **+0.170 [+0.09, +0.25]** | traj-shuffle 0.546 | **+0.170 [+0.09, +0.25]** | 0.882 |
+| Laguna XS.2 / Verified | correct | 5 | S1 pre-edit (y_t+1=0) | 165,909 | 3,154 | 19◦ | 0.627◦ | k=0 probe 0.534 | **+0.093 [+0.02, +0.18]** | k=0 probe 0.534 | **+0.093 [+0.02, +0.18]** | 0.882 |
+| Laguna XS.2 / Verified | correct | 5 | S3 pre-edit & y_T=1 | 38,952 | 3,114 | 19◦ | 0.709◦ | k=0 probe 0.632 | **+0.077 [+0.00, +0.17]** | k=0 probe 0.632 | **+0.077 [+0.00, +0.17]** | – |
+| Laguna XS.2 / Verified | correct | 10 | S0 y_t=0 | 168,064 | 9,232 | 28 | 0.669 | traj-shuffle 0.497 | **+0.172 [+0.09, +0.26]** | traj-shuffle 0.497 | **+0.172 [+0.09, +0.26]** | 0.872 |
+| Laguna XS.2 / Verified | correct | 10 | S1 pre-edit (y_t+1=0) | 165,909 | 7,209 | 28 | 0.616 | k=0 probe 0.497 | **+0.119 [+0.05, +0.19]** | k=0 probe 0.497 | **+0.119 [+0.05, +0.19]** | 0.867 |
+| Laguna XS.2 / Verified | correct | 10 | S3 pre-edit & y_T=1 | 38,952 | 6,770 | 28 | 0.705 | k=0 probe 0.605 | **+0.100 [+0.01, +0.18]** | k=0 probe 0.605 | **+0.100 [+0.01, +0.18]** | – |
+| Laguna XS.2 / Verified | correct | 15 | S0 y_t=0 | 168,064 | 13,585 | 34 | 0.654 | traj-shuffle 0.512 | **+0.142 [+0.07, +0.22]** | traj-shuffle 0.512 | **+0.142 [+0.07, +0.22]** | 0.878 |
+| Laguna XS.2 / Verified | correct | 15 | S1 pre-edit (y_t+1=0) | 165,909 | 11,436 | 34 | 0.620 | k=0 probe 0.497 | **+0.123 [+0.07, +0.18]** | k=0 probe 0.497 | **+0.123 [+0.07, +0.18]** | 0.873 |
+| Laguna XS.2 / Verified | correct | 15 | S3 pre-edit & y_T=1 | 38,952 | 10,664 | 34 | 0.712 | k=0 probe 0.611 | **+0.102 [+0.01, +0.18]** | k=0 probe 0.611 | **+0.102 [+0.01, +0.18]** | – |
+| Laguna XS.2 / Verified | correct | 25 | S0 y_t=0 | 168,064 | 21,412 | 38 | 0.600 | traj-shuffle 0.572 | +0.028 [-0.05, +0.12] | traj-shuffle 0.572 | +0.028 [-0.05, +0.12] | 0.886 |
+| Laguna XS.2 / Verified | correct | 25 | S1 pre-edit (y_t+1=0) | 165,909 | 19,400 | 38 | 0.577 | traj-shuffle 0.586 | -0.009 [-0.09, +0.08] | traj-shuffle 0.586 | -0.009 [-0.09, +0.08] | 0.883 |
+| Laguna XS.2 / Verified | correct | 25 | S3 pre-edit & y_T=1 | 38,952 | 17,730 | 38 | 0.669 | traj-shuffle 0.606 | +0.063 [-0.02, +0.16] | traj-shuffle 0.606 | +0.063 [-0.02, +0.16] | – |
+| Laguna XS.2 / Verified | correct | 50 | S0 y_t=0 | 166,737 | 36,008 | 39 | 0.504 | position causal 0.562 | -0.059 [-0.14, +0.03] | position causal 0.562 | -0.059 [-0.14, +0.03] | 0.961 |
+| Laguna XS.2 / Verified | correct | 50 | S1 pre-edit (y_t+1=0) | 164,582 | 33,859 | 39 | 0.493 | position causal 0.560 | -0.067 [-0.14, +0.02] | position causal 0.560 | -0.067 [-0.14, +0.02] | 0.961 |
+| Laguna XS.2 / Verified | correct | 50 | S3 pre-edit & y_T=1 | 38,952 | 32,798 | 39 | 0.770 | traj-shuffle 0.793 | -0.023 [-0.08, +0.05] | traj-shuffle 0.793 | -0.023 [-0.08, +0.05] | – |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S0 y_t=0 | 160,703 | 7,607 | 28 | 0.816 | traj-shuffle 0.650 | **+0.166 [+0.11, +0.23]** | traj-shuffle 0.650 | **+0.166 [+0.11, +0.23]** | 0.715 |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 155,361 | 2,265 | 28 | 0.712 | traj-shuffle 0.626 | +0.086 [-0.00, +0.18] | traj-shuffle 0.626 | +0.086 [-0.00, +0.18] | 0.705 |
+| Laguna XS.2 / Verified | reduces_failing | 2 | S3 pre-edit & y_T=1 | 67,516 | 1,913 | 24 | 0.732 | position causal 0.653 | +0.079 [-0.10, +0.28] | position causal 0.653 | +0.079 [-0.10, +0.28] | – |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S0 y_t=0 | 160,703 | 9,948 | 30 | 0.786 | traj-shuffle 0.631 | **+0.155 [+0.09, +0.23]** | traj-shuffle 0.631 | **+0.155 [+0.09, +0.23]** | 0.724 |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 155,361 | 4,606 | 30 | 0.691 | position causal 0.629 | +0.062 [-0.08, +0.22] | position causal 0.629 | +0.062 [-0.08, +0.22] | 0.725 |
+| Laguna XS.2 / Verified | reduces_failing | 3 | S3 pre-edit & y_T=1 | 67,516 | 4,046 | 25 | 0.719 | position causal 0.654 | +0.065 [-0.12, +0.27] | position causal 0.654 | +0.065 [-0.12, +0.27] | – |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S0 y_t=0 | 160,703 | 14,597 | 32 | 0.741 | traj-shuffle 0.630 | **+0.111 [+0.05, +0.19]** | traj-shuffle 0.630 | **+0.111 [+0.05, +0.19]** | 0.749 |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 155,361 | 9,355 | 32 | 0.667 | position causal 0.619 | +0.048 [-0.09, +0.20] | position causal 0.619 | +0.048 [-0.09, +0.20] | 0.754 |
+| Laguna XS.2 / Verified | reduces_failing | 5 | S3 pre-edit & y_T=1 | 67,516 | 8,583 | 27 | 0.701 | k=0 probe 0.646 | **+0.056 [+0.01, +0.12]** | k=0 probe 0.646 | **+0.056 [+0.01, +0.12]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S0 y_t=0 | 160,703 | 25,183 | 40 | 0.679 | traj-shuffle 0.603 | **+0.076 [+0.02, +0.15]** | traj-shuffle 0.603 | **+0.076 [+0.02, +0.15]** | 0.782 |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 155,361 | 20,162 | 40 | 0.634 | traj-shuffle 0.574 | +0.060 [-0.01, +0.14] | traj-shuffle 0.574 | +0.060 [-0.01, +0.14] | 0.782 |
+| Laguna XS.2 / Verified | reduces_failing | 10 | S3 pre-edit & y_T=1 | 67,516 | 18,771 | 34 | 0.691 | k=0 probe 0.635 | **+0.055 [+0.02, +0.11]** | k=0 probe 0.635 | **+0.055 [+0.02, +0.11]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S0 y_t=0 | 160,703 | 32,506 | 48 | 0.655 | k=0 probe 0.557 | **+0.098 [+0.05, +0.14]** | k=0 probe 0.557 | **+0.098 [+0.05, +0.14]** | 0.797 |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 155,361 | 27,394 | 48 | 0.621 | k=0 probe 0.547 | **+0.074 [+0.03, +0.12]** | k=0 probe 0.547 | **+0.074 [+0.03, +0.12]** | 0.798 |
+| Laguna XS.2 / Verified | reduces_failing | 15 | S3 pre-edit & y_T=1 | 67,516 | 25,499 | 42 | 0.683 | k=0 probe 0.632 | **+0.052 [+0.00, +0.10]** | k=0 probe 0.632 | **+0.052 [+0.00, +0.10]** | – |
+| Laguna XS.2 / Verified | reduces_failing | 25 | S0 y_t=0 | 160,703 | 44,518 | 53 | 0.589 | traj-shuffle 0.603 | -0.014 [-0.07, +0.05] | traj-shuffle 0.603 | -0.014 [-0.07, +0.05] | 0.830 |
+| Laguna XS.2 / Verified | reduces_failing | 25 | S1 pre-edit (y_t+1=0) | 155,361 | 39,830 | 53 | 0.566 | traj-shuffle 0.599 | -0.033 [-0.09, +0.03] | traj-shuffle 0.599 | -0.033 [-0.09, +0.03] | 0.833 |
+| Laguna XS.2 / Verified | reduces_failing | 25 | S3 pre-edit & y_T=1 | 67,516 | 37,185 | 47 | 0.654 | traj-shuffle 0.645 | +0.009 [-0.08, +0.08] | traj-shuffle 0.645 | +0.009 [-0.08, +0.08] | – |
+| Laguna XS.2 / Verified | reduces_failing | 50 | S0 y_t=0 | 159,376 | 62,266 | 50 | 0.545 | position causal 0.519 | +0.026 [-0.05, +0.10] | position causal 0.519 | +0.026 [-0.05, +0.10] | 0.918 |
+| Laguna XS.2 / Verified | reduces_failing | 50 | S1 pre-edit (y_t+1=0) | 154,034 | 57,458 | 50 | 0.543 | position causal 0.516 | +0.027 [-0.05, +0.11] | position causal 0.516 | +0.027 [-0.05, +0.11] | 0.918 |
+| Laguna XS.2 / Verified | reduces_failing | 50 | S3 pre-edit & y_T=1 | 67,516 | 55,326 | 48 | 0.651 | k=0 probe 0.510 | +0.140 [-0.06, +0.25] | k=0 probe 0.510 | +0.140 [-0.06, +0.25] | – |
+| Laguna XS.2 / Verified | has_regressions | 2 | S0 y_t=0 | 170,147 | 4,014 | 12◦ | 0.823◦ | k=0 probe 0.724 | **+0.099 [+0.06, +0.13]** | k=0 probe 0.724 | **+0.099 [+0.06, +0.13]** | 0.809 |
+| Laguna XS.2 / Verified | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 166,934 | 801 | 12◦ | 0.637◦ | traj-shuffle 0.616 | +0.020 [-0.09, +0.10] | traj-shuffle 0.616 | +0.020 [-0.09, +0.10] | 0.764 |
+| Laguna XS.2 / Verified | has_regressions | 2 | S3 pre-edit & y_T=1 | 27,697 | 544 | 7◦ | 0.636◦ | position causal 0.672 | -0.036 [-0.18, +0.18] | position causal 0.672 | -0.036 [-0.18, +0.18] | – |
+| Laguna XS.2 / Verified | has_regressions | 3 | S0 y_t=0 | 170,147 | 5,148 | 14◦ | 0.783◦ | k=0 probe 0.702 | **+0.081 [+0.05, +0.11]** | k=0 probe 0.702 | **+0.081 [+0.05, +0.11]** | 0.819 |
+| Laguna XS.2 / Verified | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 166,934 | 1,935 | 14◦ | 0.643◦ | k=0 probe 0.608 | **+0.035 [+0.01, +0.07]** | k=0 probe 0.608 | **+0.035 [+0.01, +0.07]** | 0.812 |
+| Laguna XS.2 / Verified | has_regressions | 3 | S3 pre-edit & y_T=1 | 27,697 | 1,386 | 8◦ | 0.653◦ | position causal 0.656 | -0.003 [-0.15, +0.17] | position causal 0.656 | -0.003 [-0.15, +0.17] | – |
+| Laguna XS.2 / Verified | has_regressions | 5 | S0 y_t=0 | 170,147 | 8,078 | 15◦ | 0.694◦ | k=0 probe 0.661 | +0.032 [-0.02, +0.09] | k=0 probe 0.661 | +0.032 [-0.02, +0.09] | 0.835 |
+| Laguna XS.2 / Verified | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 166,934 | 4,865 | 15◦ | 0.589◦ | k=0 probe 0.596 | -0.007 [-0.06, +0.06] | k=0 probe 0.596 | -0.007 [-0.06, +0.06] | 0.839 |
+| Laguna XS.2 / Verified | has_regressions | 5 | S3 pre-edit & y_T=1 | 27,697 | 3,655 | 8◦ | 0.597◦ | position causal 0.663 | -0.067 [-0.22, +0.07] | position causal 0.663 | -0.067 [-0.22, +0.07] | – |
+| Laguna XS.2 / Verified | has_regressions | 10 | S0 y_t=0 | 170,147 | 13,943 | 17◦ | 0.644◦ | k=0 probe 0.624 | +0.020 [-0.06, +0.09] | k=0 probe 0.624 | +0.020 [-0.06, +0.09] | 0.858 |
+| Laguna XS.2 / Verified | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 166,934 | 10,730 | 17◦ | 0.596◦ | k=0 probe 0.583 | +0.013 [-0.08, +0.10] | k=0 probe 0.583 | +0.013 [-0.08, +0.10] | 0.863 |
+| Laguna XS.2 / Verified | has_regressions | 10 | S3 pre-edit & y_T=1 | 27,697 | 8,454 | 10◦ | 0.643◦ | position causal 0.670 | -0.027 [-0.11, +0.05] | position causal 0.670 | -0.027 [-0.11, +0.05] | – |
+| Laguna XS.2 / Verified | has_regressions | 15 | S0 y_t=0 | 170,147 | 18,994 | 20 | 0.620 | k=0 probe 0.604 | +0.015 [-0.09, +0.10] | k=0 probe 0.604 | +0.015 [-0.09, +0.10] | 0.862 |
+| Laguna XS.2 / Verified | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 166,934 | 15,781 | 20 | 0.587 | k=0 probe 0.572 | +0.015 [-0.09, +0.11] | k=0 probe 0.572 | +0.015 [-0.09, +0.11] | 0.864 |
+| Laguna XS.2 / Verified | has_regressions | 15 | S3 pre-edit & y_T=1 | 27,697 | 12,374 | 10◦ | 0.653◦ | position causal 0.690 | -0.037 [-0.13, +0.03] | position causal 0.690 | -0.037 [-0.13, +0.03] | – |
+| Laguna XS.2 / Verified | has_regressions | 25 | S0 y_t=0 | 170,147 | 24,272 | 22 | 0.570 | traj-shuffle 0.548 | +0.022 [-0.08, +0.12] | traj-shuffle 0.548 | +0.022 [-0.08, +0.12] | 0.887 |
+| Laguna XS.2 / Verified | has_regressions | 25 | S1 pre-edit (y_t+1=0) | 166,934 | 21,343 | 22 | 0.552 | traj-shuffle 0.533 | +0.019 [-0.09, +0.12] | traj-shuffle 0.533 | +0.019 [-0.09, +0.12] | 0.884 |
+| Laguna XS.2 / Verified | has_regressions | 25 | S3 pre-edit & y_T=1 | 27,697 | 17,111 | 11◦ | 0.598◦ | position causal 0.627 | -0.029 [-0.11, +0.04] | position causal 0.627 | -0.029 [-0.11, +0.04] | – |
+| Laguna XS.2 / Verified | has_regressions | 50 | S0 y_t=0 | 169,767 | 28,941 | 18◦ | 0.563◦ | k=0 probe 0.505 | +0.058 [-0.05, +0.15] | k=0 probe 0.505 | +0.058 [-0.05, +0.15] | 0.959 |
+| Laguna XS.2 / Verified | has_regressions | 50 | S1 pre-edit (y_t+1=0) | 166,715 | 26,402 | 18◦ | 0.548◦ | k=0 probe 0.481 | +0.067 [-0.05, +0.16] | k=0 probe 0.481 | +0.067 [-0.05, +0.16] | 0.958 |
+| Laguna XS.2 / Verified | has_regressions | 50 | S3 pre-edit & y_T=1 | 27,697 | 24,080 | 14◦ | 0.500◦ | position rel_pos 0.499 | +0.001 [-0.22, +0.22] | k=0 probe 0.460 | +0.040 [-0.06, +0.15] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S0 y_t=0 | 58,726 | 1,085 | 6◦ | 0.833◦ | position causal 0.744 | +0.089 [-0.04, +0.20] | position causal 0.744 | +0.089 [-0.04, +0.20] | 0.657 |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S1 pre-edit (y_t+1=0) | 57,890 | 249 | 6◦ | 0.645◦ | position causal 0.668 | -0.022 [-0.14, +0.14] | position causal 0.668 | -0.022 [-0.14, +0.14] | 0.699 |
+| Qwen3.6-35B-A3B / Verified | correct | 2 | S3 pre-edit & y_T=1 | 19,877 | 184 | 5◦ | 0.705◦ | position causal 0.793 | -0.088 [-0.19, +0.06] | position causal 0.793 | -0.088 [-0.19, +0.06] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S0 y_t=0 | 58,726 | 1,291 | 6◦ | 0.832◦ | position causal 0.730 | +0.102 [-0.03, +0.21] | position causal 0.730 | +0.102 [-0.03, +0.21] | 0.661 |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S1 pre-edit (y_t+1=0) | 57,890 | 463 | 6◦ | 0.694◦ | position causal 0.651 | +0.044 [-0.09, +0.18] | position causal 0.651 | +0.044 [-0.09, +0.18] | 0.692 |
+| Qwen3.6-35B-A3B / Verified | correct | 3 | S3 pre-edit & y_T=1 | 19,877 | 335 | 5◦ | 0.732◦ | position causal 0.785 | -0.053 [-0.19, +0.08] | position causal 0.785 | -0.053 [-0.19, +0.08] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S0 y_t=0 | 58,726 | 1,782 | 7◦ | 0.784◦ | position causal 0.694 | +0.091 [-0.02, +0.23] | position causal 0.694 | +0.091 [-0.02, +0.23] | 0.677 |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S1 pre-edit (y_t+1=0) | 57,890 | 946 | 7◦ | 0.672◦ | position causal 0.605 | +0.067 [-0.04, +0.24] | position causal 0.605 | +0.067 [-0.04, +0.24] | 0.704 |
+| Qwen3.6-35B-A3B / Verified | correct | 5 | S3 pre-edit & y_T=1 | 19,877 | 704 | 6◦ | 0.714◦ | position causal 0.700 | +0.013 [-0.08, +0.12] | position causal 0.700 | +0.013 [-0.08, +0.12] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S0 y_t=0 | 58,726 | 3,329 | 9◦ | 0.679◦ | position causal 0.651 | +0.028 [-0.12, +0.23] | position causal 0.651 | +0.028 [-0.12, +0.23] | 0.689 |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S1 pre-edit (y_t+1=0) | 57,890 | 2,493 | 9◦ | 0.605◦ | position causal 0.599 | +0.006 [-0.14, +0.25] | position causal 0.599 | +0.006 [-0.14, +0.25] | 0.701 |
+| Qwen3.6-35B-A3B / Verified | correct | 10 | S3 pre-edit & y_T=1 | 19,877 | 1,816 | 8◦ | 0.642◦ | position causal 0.737 | -0.096 [-0.18, +0.09] | position causal 0.737 | -0.096 [-0.18, +0.09] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S0 y_t=0 | 58,726 | 5,010 | 14◦ | 0.626◦ | position causal 0.566 | +0.060 [-0.11, +0.23] | position causal 0.566 | +0.060 [-0.11, +0.23] | 0.739 |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S1 pre-edit (y_t+1=0) | 57,890 | 4,229 | 14◦ | 0.578◦ | position causal 0.524 | +0.054 [-0.11, +0.24] | position causal 0.524 | +0.054 [-0.11, +0.24] | 0.749 |
+| Qwen3.6-35B-A3B / Verified | correct | 15 | S3 pre-edit & y_T=1 | 19,877 | 3,404 | 13◦ | 0.598◦ | position causal 0.674 | -0.075 [-0.19, +0.08] | position causal 0.674 | -0.075 [-0.19, +0.08] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 25 | S0 y_t=0 | 58,726 | 8,350 | 20 | 0.550 | k=0 probe 0.520 | +0.030 [-0.02, +0.10] | k=0 probe 0.520 | +0.030 [-0.02, +0.10] | 0.801 |
+| Qwen3.6-35B-A3B / Verified | correct | 25 | S1 pre-edit (y_t+1=0) | 57,890 | 7,569 | 20 | 0.520 | traj-shuffle 0.505 | +0.016 [-0.08, +0.10] | traj-shuffle 0.505 | +0.016 [-0.08, +0.10] | 0.811 |
+| Qwen3.6-35B-A3B / Verified | correct | 25 | S3 pre-edit & y_T=1 | 19,877 | 6,689 | 19◦ | 0.540◦ | position causal 0.601 | -0.062 [-0.15, +0.01] | position causal 0.601 | -0.062 [-0.15, +0.01] | – |
+| Qwen3.6-35B-A3B / Verified | correct | 50 | S0 y_t=0 | 58,726 | 17,606 | 29 | 0.630 | position causal 0.517 | +0.113 [-0.02, +0.22] | position causal 0.517 | +0.113 [-0.02, +0.22] | 0.937 |
+| Qwen3.6-35B-A3B / Verified | correct | 50 | S1 pre-edit (y_t+1=0) | 57,890 | 16,959 | 29 | 0.630 | position rel_pos 0.509 | +0.121 [-0.02, +0.24] | position causal 0.506 | +0.124 [-0.01, +0.24] | 0.939 |
+| Qwen3.6-35B-A3B / Verified | correct | 50 | S3 pre-edit & y_T=1 | 19,877 | 16,362 | 29 | 0.521 | position rel_pos 0.589 | -0.068 [-0.21, +0.06] | k=0 probe 0.564 | -0.043 [-0.12, +0.09] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S0 y_t=0 | 56,911 | 1,717 | 10◦ | 0.898◦ | k=0 probe 0.730 | **+0.168 [+0.08, +0.25]** | k=0 probe 0.730 | **+0.168 [+0.08, +0.25]** | 0.673 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 55,601 | 407 | 10◦ | 0.777◦ | position causal 0.619 | **+0.158 [+0.01, +0.28]** | position causal 0.619 | **+0.158 [+0.01, +0.28]** | 0.667 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 2 | S3 pre-edit & y_T=1 | 27,155 | 334 | 8◦ | 0.742◦ | position causal 0.615 | +0.127 [-0.03, +0.26] | position causal 0.615 | +0.127 [-0.03, +0.26] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S0 y_t=0 | 56,911 | 2,099 | 10◦ | 0.875◦ | k=0 probe 0.695 | **+0.181 [+0.09, +0.26]** | k=0 probe 0.695 | **+0.181 [+0.09, +0.26]** | 0.670 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 55,601 | 796 | 10◦ | 0.771◦ | position causal 0.599 | **+0.172 [+0.00, +0.30]** | position causal 0.599 | **+0.172 [+0.00, +0.30]** | 0.658 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3 | S3 pre-edit & y_T=1 | 27,155 | 636 | 8◦ | 0.729◦ | position causal 0.596 | +0.134 [-0.03, +0.27] | position causal 0.596 | +0.134 [-0.03, +0.27] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S0 y_t=0 | 56,911 | 2,987 | 12◦ | 0.844◦ | k=0 probe 0.659 | **+0.185 [+0.09, +0.26]** | k=0 probe 0.659 | **+0.185 [+0.09, +0.26]** | 0.664 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 55,601 | 1,684 | 12◦ | 0.760◦ | position causal 0.610 | +0.151 [-0.00, +0.27] | position causal 0.610 | +0.151 [-0.00, +0.27] | 0.651 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 5 | S3 pre-edit & y_T=1 | 27,155 | 1,314 | 9◦ | 0.711◦ | position causal 0.580 | +0.131 [-0.04, +0.29] | position causal 0.580 | +0.131 [-0.04, +0.29] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S0 y_t=0 | 56,911 | 5,432 | 14◦ | 0.771◦ | k=0 probe 0.607 | **+0.165 [+0.10, +0.23]** | k=0 probe 0.607 | **+0.165 [+0.10, +0.23]** | 0.677 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 55,601 | 4,129 | 14◦ | 0.714◦ | position causal 0.568 | **+0.146 [+0.02, +0.25]** | position causal 0.568 | **+0.146 [+0.02, +0.25]** | 0.673 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 10 | S3 pre-edit & y_T=1 | 27,155 | 3,338 | 11◦ | 0.684◦ | position causal 0.576 | +0.108 [-0.03, +0.20] | position causal 0.576 | +0.108 [-0.03, +0.20] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S0 y_t=0 | 56,911 | 7,944 | 19◦ | 0.703◦ | position causal 0.575 | **+0.128 [+0.00, +0.24]** | position causal 0.575 | **+0.128 [+0.00, +0.24]** | 0.717 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 55,601 | 6,696 | 19◦ | 0.658◦ | position causal 0.552 | +0.106 [-0.02, +0.22] | position causal 0.552 | +0.106 [-0.02, +0.22] | 0.716 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 15 | S3 pre-edit & y_T=1 | 27,155 | 5,809 | 16◦ | 0.620◦ | position causal 0.577 | +0.043 [-0.08, +0.14] | position causal 0.577 | +0.043 [-0.08, +0.14] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 25 | S0 y_t=0 | 56,911 | 12,561 | 20 | 0.635 | position causal 0.564 | +0.071 [-0.01, +0.15] | position causal 0.564 | +0.071 [-0.01, +0.15] | 0.767 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 25 | S1 pre-edit (y_t+1=0) | 55,601 | 11,313 | 20 | 0.608 | position causal 0.547 | +0.061 [-0.02, +0.14] | position causal 0.547 | +0.061 [-0.02, +0.14] | 0.769 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 25 | S3 pre-edit & y_T=1 | 27,155 | 10,371 | 19◦ | 0.569◦ | traj-shuffle 0.592 | -0.023 [-0.11, +0.07] | traj-shuffle 0.592 | -0.023 [-0.11, +0.07] | – |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 50 | S0 y_t=0 | 56,911 | 24,595 | 29 | 0.551 | position causal 0.550 | +0.001 [-0.05, +0.06] | position causal 0.550 | +0.001 [-0.05, +0.06] | 0.914 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 50 | S1 pre-edit (y_t+1=0) | 55,601 | 23,381 | 29 | 0.540 | position causal 0.546 | -0.006 [-0.06, +0.05] | position causal 0.546 | -0.006 [-0.06, +0.05] | 0.916 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 50 | S3 pre-edit & y_T=1 | 27,155 | 22,679 | 29 | 0.451 | position rel_pos 0.609 | **-0.158 [-0.23, -0.05]** | traj-shuffle 0.593 | **-0.142 [-0.22, -0.03]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S0 y_t=0 | 59,290 | 381 | 4◦ | 0.826◦ | k=0 probe 0.680 | **+0.146 [+0.00, +0.20]** | k=0 probe 0.680 | **+0.146 [+0.00, +0.20]** | 0.715 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 59,027 | 118 | 4◦ | 0.738◦ | k=0 probe 0.600 | +0.138 [-0.01, +0.18] | k=0 probe 0.600 | +0.138 [-0.01, +0.18] | 0.665 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 2 | S3 pre-edit & y_T=1 | 10,132 | 59 | 3◦ | 0.798◦ | k=0 probe 0.660 | **+0.138 [+0.00, +0.19]** | k=0 probe 0.660 | **+0.138 [+0.00, +0.19]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S0 y_t=0 | 59,290 | 609 | 4◦ | 0.810◦ | k=0 probe 0.661 | **+0.148 [+0.02, +0.20]** | k=0 probe 0.661 | **+0.148 [+0.02, +0.20]** | 0.686 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 59,027 | 346 | 4◦ | 0.759◦ | k=0 probe 0.620 | **+0.139 [+0.03, +0.19]** | k=0 probe 0.620 | **+0.139 [+0.03, +0.19]** | 0.646 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 3 | S3 pre-edit & y_T=1 | 10,132 | 160 | 3◦ | 0.834◦ | k=0 probe 0.671 | **+0.162 [+0.04, +0.24]** | k=0 probe 0.671 | **+0.162 [+0.04, +0.24]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S0 y_t=0 | 59,290 | 895 | 5◦ | 0.749◦ | k=0 probe 0.640 | **+0.109 [+0.04, +0.16]** | k=0 probe 0.640 | **+0.109 [+0.04, +0.16]** | 0.686 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 59,027 | 632 | 5◦ | 0.700◦ | k=0 probe 0.609 | **+0.092 [+0.03, +0.13]** | k=0 probe 0.609 | **+0.092 [+0.03, +0.13]** | 0.664 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 5 | S3 pre-edit & y_T=1 | 10,132 | 314 | 4◦ | 0.798◦ | k=0 probe 0.672 | **+0.126 [+0.06, +0.17]** | k=0 probe 0.672 | **+0.126 [+0.06, +0.17]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S0 y_t=0 | 59,290 | 1,639 | 6◦ | 0.692◦ | k=0 probe 0.588 | **+0.104 [+0.02, +0.18]** | k=0 probe 0.588 | **+0.104 [+0.02, +0.18]** | 0.691 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 59,027 | 1,376 | 6◦ | 0.648◦ | k=0 probe 0.563 | **+0.085 [+0.02, +0.16]** | k=0 probe 0.563 | **+0.085 [+0.02, +0.16]** | 0.681 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 10 | S3 pre-edit & y_T=1 | 10,132 | 724 | 6◦ | 0.714◦ | k=0 probe 0.612 | **+0.103 [+0.04, +0.15]** | k=0 probe 0.612 | **+0.103 [+0.04, +0.15]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S0 y_t=0 | 59,290 | 2,562 | 9◦ | 0.650◦ | k=0 probe 0.561 | **+0.089 [+0.02, +0.17]** | k=0 probe 0.561 | **+0.089 [+0.02, +0.17]** | 0.700 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 59,027 | 2,299 | 9◦ | 0.624◦ | k=0 probe 0.544 | **+0.081 [+0.02, +0.16]** | k=0 probe 0.544 | **+0.081 [+0.02, +0.16]** | 0.695 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 15 | S3 pre-edit & y_T=1 | 10,132 | 1,258 | 6◦ | 0.693◦ | k=0 probe 0.589 | **+0.104 [+0.03, +0.16]** | k=0 probe 0.589 | **+0.104 [+0.03, +0.16]** | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 25 | S0 y_t=0 | 59,290 | 5,137 | 11◦ | 0.584◦ | position rel_pos 0.567 | +0.018 [-0.15, +0.23] | traj-shuffle 0.547 | +0.037 [-0.03, +0.12] | 0.727 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 25 | S1 pre-edit (y_t+1=0) | 59,027 | 4,874 | 11◦ | 0.570◦ | position rel_pos 0.560 | +0.010 [-0.16, +0.23] | traj-shuffle 0.535 | +0.035 [-0.03, +0.12] | 0.726 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 25 | S3 pre-edit & y_T=1 | 10,132 | 2,854 | 8◦ | 0.591◦ | position rel_pos 0.633 | -0.042 [-0.24, +0.28] | position causal 0.632 | -0.041 [-0.19, +0.22] | – |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 50 | S0 y_t=0 | 59,290 | 10,044 | 15◦ | 0.637◦ | position causal 0.575 | +0.062 [-0.00, +0.15] | position causal 0.575 | +0.062 [-0.00, +0.15] | 0.911 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 50 | S1 pre-edit (y_t+1=0) | 59,027 | 9,866 | 15◦ | 0.636◦ | position causal 0.578 | +0.058 [-0.01, +0.15] | position causal 0.578 | +0.058 [-0.01, +0.15] | 0.910 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 50 | S3 pre-edit & y_T=1 | 10,132 | 8,439 | 13◦ | 0.662◦ | position causal 0.794 | **-0.132 [-0.24, -0.07]** | position causal 0.794 | **-0.132 [-0.24, -0.07]** | – |
+| Laguna XS.2 / Pro | correct | 2 | S0 y_t=0 | 125,585 | 638 | 7◦ | 0.803◦ | position rel_pos 0.797 | +0.007 [-0.09, +0.13] | k=0 probe 0.739 | **+0.064 [+0.00, +0.11]** | 0.920 |
+| Laguna XS.2 / Pro | correct | 2 | S1 pre-edit (y_t+1=0) | 125,048 | 249 | 7◦ | 0.720◦ | position rel_pos 0.772 | -0.052 [-0.15, +0.21] | k=0 probe 0.714 | +0.006 [-0.02, +0.04] | 0.877 |
+| Laguna XS.2 / Pro | correct | 2 | S3 pre-edit & y_T=1 | 13,267 | 214 | 6◦ | 0.698◦ | position rel_pos 0.831 | -0.134 [-0.21, +0.00] | k=0 probe 0.715 | -0.017 [-0.05, +0.03] | – |
+| Laguna XS.2 / Pro | correct | 3 | S0 y_t=0 | 125,581 | 724 | 8◦ | 0.784◦ | position rel_pos 0.797 | -0.013 [-0.11, +0.10] | k=0 probe 0.731 | +0.053 [-0.01, +0.09] | 0.931 |
+| Laguna XS.2 / Pro | correct | 3 | S1 pre-edit (y_t+1=0) | 125,044 | 335 | 8◦ | 0.706◦ | position rel_pos 0.778 | -0.072 [-0.15, +0.10] | k=0 probe 0.703 | +0.003 [-0.03, +0.04] | 0.912 |
+| Laguna XS.2 / Pro | correct | 3 | S3 pre-edit & y_T=1 | 13,267 | 311 | 7◦ | 0.678◦ | position rel_pos 0.799 | -0.121 [-0.19, +0.07] | k=0 probe 0.692 | -0.014 [-0.06, +0.05] | – |
+| Laguna XS.2 / Pro | correct | 5 | S0 y_t=0 | 125,565 | 1,623 | 9◦ | 0.784◦ | position rel_pos 0.813 | -0.029 [-0.10, +0.03] | k=0 probe 0.741 | +0.043 [-0.01, +0.09] | 0.936 |
+| Laguna XS.2 / Pro | correct | 5 | S1 pre-edit (y_t+1=0) | 125,028 | 1,234 | 9◦ | 0.763◦ | position rel_pos 0.811 | -0.049 [-0.11, +0.02] | k=0 probe 0.736 | +0.027 [-0.03, +0.08] | 0.932 |
+| Laguna XS.2 / Pro | correct | 5 | S3 pre-edit & y_T=1 | 13,267 | 1,188 | 8◦ | 0.753◦ | position rel_pos 0.850 | **-0.098 [-0.17, -0.03]** | k=0 probe 0.751 | +0.001 [-0.03, +0.04] | – |
+| Laguna XS.2 / Pro | correct | 10 | S0 y_t=0 | 125,543 | 3,320 | 11◦ | 0.716◦ | position rel_pos 0.775 | -0.059 [-0.16, +0.04] | k=0 probe 0.712 | +0.003 [-0.06, +0.07] | 0.951 |
+| Laguna XS.2 / Pro | correct | 10 | S1 pre-edit (y_t+1=0) | 125,006 | 2,931 | 11◦ | 0.701◦ | position rel_pos 0.768 | -0.068 [-0.17, +0.05] | k=0 probe 0.707 | -0.006 [-0.07, +0.06] | 0.951 |
+| Laguna XS.2 / Pro | correct | 10 | S3 pre-edit & y_T=1 | 13,267 | 2,893 | 10◦ | 0.715◦ | position rel_pos 0.836 | **-0.121 [-0.24, -0.01]** | k=0 probe 0.747 | -0.032 [-0.10, +0.03] | – |
+| Laguna XS.2 / Pro | correct | 15 | S0 y_t=0 | 125,509 | 5,292 | 10◦ | 0.680◦ | position rel_pos 0.702 | -0.023 [-0.12, +0.06] | k=0 probe 0.675 | +0.005 [-0.07, +0.07] | 0.958 |
+| Laguna XS.2 / Pro | correct | 15 | S1 pre-edit (y_t+1=0) | 124,972 | 4,903 | 10◦ | 0.669◦ | position rel_pos 0.693 | -0.024 [-0.14, +0.07] | k=0 probe 0.668 | +0.001 [-0.07, +0.07] | 0.957 |
+| Laguna XS.2 / Pro | correct | 15 | S3 pre-edit & y_T=1 | 13,267 | 4,830 | 10◦ | 0.707◦ | position rel_pos 0.789 | -0.082 [-0.18, +0.00] | k=0 probe 0.736 | -0.029 [-0.08, +0.02] | – |
+| Laguna XS.2 / Pro | correct | 25 | S0 y_t=0 | 125,298 | 8,022 | 13◦ | 0.618◦ | position rel_pos 0.604 | +0.014 [-0.10, +0.11] | k=0 probe 0.590 | +0.028 [-0.06, +0.10] | 0.971 |
+| Laguna XS.2 / Pro | correct | 25 | S1 pre-edit (y_t+1=0) | 124,761 | 7,584 | 13◦ | 0.607◦ | position rel_pos 0.593 | +0.014 [-0.11, +0.12] | k=0 probe 0.581 | +0.026 [-0.06, +0.10] | 0.971 |
+| Laguna XS.2 / Pro | correct | 25 | S3 pre-edit & y_T=1 | 13,267 | 7,519 | 13◦ | 0.624◦ | position rel_pos 0.699 | -0.075 [-0.19, +0.04] | k=0 probe 0.642 | -0.018 [-0.10, +0.06] | – |
+| Laguna XS.2 / Pro | correct | 50 | S0 y_t=0 | 124,588 | 12,656 | 19◦ | 0.603◦ | k=0 probe 0.537 | +0.066 [-0.01, +0.14] | k=0 probe 0.537 | +0.066 [-0.01, +0.14] | 0.993 |
+| Laguna XS.2 / Pro | correct | 50 | S1 pre-edit (y_t+1=0) | 124,045 | 12,218 | 19◦ | 0.597◦ | k=0 probe 0.530 | +0.068 [-0.01, +0.15] | k=0 probe 0.530 | +0.068 [-0.01, +0.15] | 0.993 |
+| Laguna XS.2 / Pro | correct | 50 | S3 pre-edit & y_T=1 | 13,267 | 12,171 | 19◦ | 0.651◦ | position rel_pos 0.767 | -0.116 [-0.29, +0.05] | k=0 probe 0.641 | +0.009 [-0.18, +0.10] | – |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S0 y_t=0 | 122,895 | 2,931 | 14◦ | 0.864◦ | k=0 probe 0.814 | **+0.050 [+0.02, +0.12]** | k=0 probe 0.814 | **+0.050 [+0.02, +0.12]** | 0.882 |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 121,162 | 1,357 | 14◦ | 0.839◦ | k=0 probe 0.803 | **+0.035 [+0.02, +0.07]** | k=0 probe 0.803 | **+0.035 [+0.02, +0.07]** | 0.861 |
+| Laguna XS.2 / Pro | reduces_failing | 2 | S3 pre-edit & y_T=1 | 15,066 | 1,138 | 11◦ | 0.862◦ | position rel_pos 0.845 | +0.017 [-0.10, +0.10] | k=0 probe 0.844 | +0.018 [-0.00, +0.08] | – |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S0 y_t=0 | 122,891 | 3,722 | 16◦ | 0.870◦ | k=0 probe 0.808 | **+0.062 [+0.03, +0.14]** | k=0 probe 0.808 | **+0.062 [+0.03, +0.14]** | 0.878 |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 121,158 | 2,148 | 16◦ | 0.846◦ | k=0 probe 0.796 | **+0.050 [+0.03, +0.11]** | k=0 probe 0.796 | **+0.050 [+0.03, +0.11]** | 0.861 |
+| Laguna XS.2 / Pro | reduces_failing | 3 | S3 pre-edit & y_T=1 | 15,066 | 1,792 | 11◦ | 0.887◦ | k=0 probe 0.856 | **+0.031 [+0.00, +0.13]** | k=0 probe 0.856 | **+0.031 [+0.00, +0.13]** | – |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S0 y_t=0 | 122,875 | 4,951 | 16◦ | 0.843◦ | k=0 probe 0.779 | **+0.064 [+0.03, +0.14]** | k=0 probe 0.779 | **+0.064 [+0.03, +0.14]** | 0.868 |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 121,142 | 3,366 | 16◦ | 0.815◦ | k=0 probe 0.756 | **+0.059 [+0.03, +0.12]** | k=0 probe 0.756 | **+0.059 [+0.03, +0.12]** | 0.850 |
+| Laguna XS.2 / Pro | reduces_failing | 5 | S3 pre-edit & y_T=1 | 15,066 | 2,710 | 11◦ | 0.867◦ | k=0 probe 0.840 | **+0.027 [+0.00, +0.10]** | k=0 probe 0.840 | **+0.027 [+0.00, +0.10]** | – |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S0 y_t=0 | 122,853 | 7,704 | 21 | 0.774 | k=0 probe 0.722 | **+0.052 [+0.01, +0.13]** | k=0 probe 0.722 | **+0.052 [+0.01, +0.13]** | 0.850 |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 121,120 | 6,149 | 21 | 0.744 | k=0 probe 0.694 | **+0.050 [+0.01, +0.11]** | k=0 probe 0.694 | **+0.050 [+0.01, +0.11]** | 0.832 |
+| Laguna XS.2 / Pro | reduces_failing | 10 | S3 pre-edit & y_T=1 | 15,066 | 4,650 | 13◦ | 0.768◦ | k=0 probe 0.778 | -0.011 [-0.05, +0.05] | k=0 probe 0.778 | -0.011 [-0.05, +0.05] | – |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S0 y_t=0 | 122,819 | 9,565 | 24 | 0.732 | k=0 probe 0.660 | **+0.071 [+0.02, +0.15]** | k=0 probe 0.660 | **+0.071 [+0.02, +0.15]** | 0.878 |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 121,086 | 8,138 | 24 | 0.704 | k=0 probe 0.630 | **+0.074 [+0.03, +0.14]** | k=0 probe 0.630 | **+0.074 [+0.03, +0.14]** | 0.863 |
+| Laguna XS.2 / Pro | reduces_failing | 15 | S3 pre-edit & y_T=1 | 15,066 | 6,536 | 17◦ | 0.713◦ | position rel_pos 0.719 | -0.006 [-0.18, +0.09] | k=0 probe 0.712 | +0.001 [-0.06, +0.08] | – |
+| Laguna XS.2 / Pro | reduces_failing | 25 | S0 y_t=0 | 122,608 | 13,231 | 28 | 0.683 | k=0 probe 0.578 | **+0.105 [+0.04, +0.18]** | k=0 probe 0.578 | **+0.105 [+0.04, +0.18]** | 0.884 |
+| Laguna XS.2 / Pro | reduces_failing | 25 | S1 pre-edit (y_t+1=0) | 120,875 | 11,662 | 28 | 0.663 | k=0 probe 0.545 | **+0.118 [+0.06, +0.19]** | k=0 probe 0.545 | **+0.118 [+0.06, +0.19]** | 0.875 |
+| Laguna XS.2 / Pro | reduces_failing | 25 | S3 pre-edit & y_T=1 | 15,066 | 9,367 | 21 | 0.536 | position rel_pos 0.581 | -0.045 [-0.22, +0.11] | k=0 probe 0.577 | -0.041 [-0.12, +0.05] | – |
+| Laguna XS.2 / Pro | reduces_failing | 50 | S0 y_t=0 | 121,898 | 15,890 | 26 | 0.690 | k=0 probe 0.542 | **+0.147 [+0.07, +0.24]** | k=0 probe 0.542 | **+0.147 [+0.07, +0.24]** | 0.971 |
+| Laguna XS.2 / Pro | reduces_failing | 50 | S1 pre-edit (y_t+1=0) | 120,159 | 14,386 | 26 | 0.679 | traj-shuffle 0.539 | **+0.140 [+0.06, +0.22]** | traj-shuffle 0.539 | **+0.140 [+0.06, +0.22]** | 0.969 |
+| Laguna XS.2 / Pro | reduces_failing | 50 | S3 pre-edit & y_T=1 | 15,066 | 13,674 | 24 | 0.457 | k=0 probe 0.489 | -0.032 [-0.19, +0.09] | k=0 probe 0.489 | -0.032 [-0.19, +0.09] | – |
+| Laguna XS.2 / Pro | has_regressions | 2 | S0 y_t=0 | 123,977 | 1,449 | 5◦ | 0.730◦ | k=0 probe 0.742 | -0.011 [-0.08, +0.07] | k=0 probe 0.742 | -0.011 [-0.08, +0.07] | 0.618 |
+| Laguna XS.2 / Pro | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 122,875 | 454 | 5◦ | 0.678◦ | k=0 probe 0.673 | +0.005 [-0.10, +0.08] | k=0 probe 0.673 | +0.005 [-0.10, +0.08] | 0.675 |
+| Laguna XS.2 / Pro | has_regressions | 2 | S3 pre-edit & y_T=1 | 9,463 | 194 | 3◦ | 0.328◦ | k=0 probe 0.557 | -0.229 [-0.38, +0.05] | k=0 probe 0.557 | -0.229 [-0.38, +0.05] | – |
+| Laguna XS.2 / Pro | has_regressions | 3 | S0 y_t=0 | 123,973 | 1,338 | 5◦ | 0.778◦ | position causal 0.712 | +0.067 [-0.11, +0.18] | position causal 0.712 | +0.067 [-0.11, +0.18] | 0.652 |
+| Laguna XS.2 / Pro | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 122,871 | 712 | 5◦ | 0.743◦ | k=0 probe 0.655 | **+0.088 [+0.02, +0.14]** | k=0 probe 0.655 | **+0.088 [+0.02, +0.14]** | 0.638 |
+| Laguna XS.2 / Pro | has_regressions | 3 | S3 pre-edit & y_T=1 | 9,463 | 251 | 3◦ | 0.531◦ | k=0 probe 0.518 | +0.013 [-0.12, +0.31] | k=0 probe 0.518 | +0.013 [-0.12, +0.31] | – |
+| Laguna XS.2 / Pro | has_regressions | 5 | S0 y_t=0 | 123,957 | 1,626 | 5◦ | 0.786◦ | k=0 probe 0.661 | **+0.125 [+0.02, +0.18]** | k=0 probe 0.661 | **+0.125 [+0.02, +0.18]** | 0.655 |
+| Laguna XS.2 / Pro | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 122,855 | 1,223 | 5◦ | 0.788◦ | k=0 probe 0.651 | **+0.137 [+0.04, +0.18]** | k=0 probe 0.651 | **+0.137 [+0.04, +0.18]** | 0.613 |
+| Laguna XS.2 / Pro | has_regressions | 5 | S3 pre-edit & y_T=1 | 9,463 | 368 | 4◦ | 0.571◦ | k=0 probe 0.501 | +0.071 [-0.11, +0.28] | k=0 probe 0.501 | +0.071 [-0.11, +0.28] | – |
+| Laguna XS.2 / Pro | has_regressions | 10 | S0 y_t=0 | 123,935 | 2,571 | 9◦ | 0.680◦ | position causal 0.727 | -0.047 [-0.13, +0.27] | position causal 0.727 | -0.047 [-0.13, +0.27] | 0.787 |
+| Laguna XS.2 / Pro | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 122,833 | 2,168 | 9◦ | 0.666◦ | position causal 0.710 | -0.044 [-0.15, +0.27] | position causal 0.710 | -0.044 [-0.15, +0.27] | 0.787 |
+| Laguna XS.2 / Pro | has_regressions | 10 | S3 pre-edit & y_T=1 | 9,463 | 1,390 | 6◦ | 0.387◦ | position causal 0.678 | -0.291 [-0.42, +0.08] | position causal 0.678 | -0.291 [-0.42, +0.08] | – |
+| Laguna XS.2 / Pro | has_regressions | 15 | S0 y_t=0 | 123,901 | 3,871 | 13◦ | 0.682◦ | position causal 0.752 | -0.070 [-0.15, +0.20] | position causal 0.752 | -0.070 [-0.15, +0.20] | 0.856 |
+| Laguna XS.2 / Pro | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 122,799 | 3,468 | 13◦ | 0.677◦ | position causal 0.745 | -0.068 [-0.15, +0.22] | position causal 0.745 | -0.068 [-0.15, +0.22] | 0.864 |
+| Laguna XS.2 / Pro | has_regressions | 15 | S3 pre-edit & y_T=1 | 9,463 | 2,719 | 9◦ | 0.387◦ | position causal 0.702 | -0.315 [-0.42, +0.14] | position causal 0.702 | -0.315 [-0.42, +0.14] | – |
+| Laguna XS.2 / Pro | has_regressions | 25 | S0 y_t=0 | 123,690 | 6,495 | 13◦ | 0.699◦ | position causal 0.780 | -0.081 [-0.17, +0.17] | position causal 0.780 | -0.081 [-0.17, +0.17] | 0.890 |
+| Laguna XS.2 / Pro | has_regressions | 25 | S1 pre-edit (y_t+1=0) | 122,588 | 6,222 | 13◦ | 0.704◦ | position causal 0.777 | -0.073 [-0.17, +0.18] | position causal 0.777 | -0.073 [-0.17, +0.18] | 0.887 |
+| Laguna XS.2 / Pro | has_regressions | 25 | S3 pre-edit & y_T=1 | 9,463 | 5,053 | 10◦ | 0.335◦ | position causal 0.641 | -0.306 [-0.47, +0.26] | position causal 0.641 | -0.306 [-0.47, +0.26] | – |
+| Laguna XS.2 / Pro | has_regressions | 50 | S0 y_t=0 | 122,980 | 8,615 | 13◦ | 0.694◦ | position causal 0.753 | -0.060 [-0.17, +0.15] | position causal 0.753 | -0.060 [-0.17, +0.15] | 0.941 |
+| Laguna XS.2 / Pro | has_regressions | 50 | S1 pre-edit (y_t+1=0) | 121,872 | 8,357 | 13◦ | 0.700◦ | position causal 0.749 | -0.049 [-0.16, +0.16] | position causal 0.749 | -0.049 [-0.16, +0.16] | 0.939 |
+| Laguna XS.2 / Pro | has_regressions | 50 | S3 pre-edit & y_T=1 | 9,463 | 7,486 | 11◦ | 0.249◦ | position rel_pos 0.696 | **-0.447 [-0.53, -0.06]** | position causal 0.419 | -0.170 [-0.40, +0.24] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S0 y_t=0 | 64,121 | 837 | 5◦ | 0.765◦ | k=0 probe 0.758 | +0.006 [-0.01, +0.02] | k=0 probe 0.758 | +0.006 [-0.01, +0.02] | 0.827 |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S1 pre-edit (y_t+1=0) | 63,459 | 175 | 5◦ | 0.538◦ | k=0 probe 0.532 | +0.006 [-0.01, +0.06] | k=0 probe 0.532 | +0.006 [-0.01, +0.06] | 0.847 |
+| Qwen3.6-35B-A3B / Pro | correct | 2 | S3 pre-edit & y_T=1 | 9,739 | 148 | 4◦ | 0.531◦ | k=0 probe 0.526 | +0.005 [-0.01, +0.07] | k=0 probe 0.526 | +0.005 [-0.01, +0.07] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S0 y_t=0 | 64,121 | 968 | 5◦ | 0.724◦ | k=0 probe 0.717 | +0.007 [-0.01, +0.02] | k=0 probe 0.717 | +0.007 [-0.01, +0.02] | 0.834 |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S1 pre-edit (y_t+1=0) | 63,459 | 306 | 5◦ | 0.506◦ | k=0 probe 0.498 | +0.008 [-0.01, +0.05] | k=0 probe 0.498 | +0.008 [-0.01, +0.05] | 0.856 |
+| Qwen3.6-35B-A3B / Pro | correct | 3 | S3 pre-edit & y_T=1 | 9,739 | 264 | 4◦ | 0.511◦ | position rel_pos 0.506 | +0.005 [-0.27, +0.23] | k=0 probe 0.504 | +0.007 [-0.01, +0.06] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S0 y_t=0 | 64,108 | 1,224 | 5◦ | 0.657◦ | k=0 probe 0.660 | -0.003 [-0.02, +0.02] | k=0 probe 0.660 | -0.003 [-0.02, +0.02] | 0.847 |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S1 pre-edit (y_t+1=0) | 63,446 | 567 | 5◦ | 0.469◦ | k=0 probe 0.477 | -0.009 [-0.02, +0.04] | k=0 probe 0.477 | -0.009 [-0.02, +0.04] | 0.869 |
+| Qwen3.6-35B-A3B / Pro | correct | 5 | S3 pre-edit & y_T=1 | 9,739 | 502 | 4◦ | 0.477◦ | position rel_pos 0.500 | -0.024 [-0.27, +0.30] | k=0 probe 0.488 | -0.011 [-0.03, +0.04] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S0 y_t=0 | 64,100 | 1,746 | 6◦ | 0.671◦ | k=0 probe 0.597 | +0.074 [-0.02, +0.15] | k=0 probe 0.597 | +0.074 [-0.02, +0.15] | 0.867 |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S1 pre-edit (y_t+1=0) | 63,438 | 1,084 | 6◦ | 0.554◦ | k=0 probe 0.462 | +0.092 [-0.02, +0.25] | k=0 probe 0.462 | +0.092 [-0.02, +0.25] | 0.891 |
+| Qwen3.6-35B-A3B / Pro | correct | 10 | S3 pre-edit & y_T=1 | 9,739 | 1,000 | 5◦ | 0.529◦ | k=0 probe 0.477 | +0.051 [-0.07, +0.25] | k=0 probe 0.477 | +0.051 [-0.07, +0.25] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S0 y_t=0 | 64,101 | 2,180 | 9◦ | 0.664◦ | k=0 probe 0.567 | +0.097 [-0.00, +0.20] | k=0 probe 0.567 | +0.097 [-0.00, +0.20] | 0.876 |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S1 pre-edit (y_t+1=0) | 63,439 | 1,523 | 9◦ | 0.586◦ | traj-shuffle 0.461 | +0.125 [-0.10, +0.36] | traj-shuffle 0.461 | +0.125 [-0.10, +0.36] | 0.895 |
+| Qwen3.6-35B-A3B / Pro | correct | 15 | S3 pre-edit & y_T=1 | 9,739 | 1,407 | 9◦ | 0.544◦ | traj-shuffle 0.522 | +0.022 [-0.16, +0.23] | traj-shuffle 0.522 | +0.022 [-0.16, +0.23] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 25 | S0 y_t=0 | 64,099 | 3,370 | 14◦ | 0.656◦ | k=0 probe 0.498 | **+0.158 [+0.03, +0.25]** | k=0 probe 0.498 | **+0.158 [+0.03, +0.25]** | 0.925 |
+| Qwen3.6-35B-A3B / Pro | correct | 25 | S1 pre-edit (y_t+1=0) | 63,437 | 2,836 | 14◦ | 0.629◦ | traj-shuffle 0.462 | **+0.167 [+0.03, +0.29]** | traj-shuffle 0.462 | **+0.167 [+0.03, +0.29]** | 0.923 |
+| Qwen3.6-35B-A3B / Pro | correct | 25 | S3 pre-edit & y_T=1 | 9,739 | 2,729 | 14◦ | 0.562◦ | position rel_pos 0.559 | +0.003 [-0.16, +0.17] | traj-shuffle 0.493 | +0.069 [-0.07, +0.21] | – |
+| Qwen3.6-35B-A3B / Pro | correct | 50 | S0 y_t=0 | 64,079 | 8,216 | 22 | 0.656 | k=0 probe 0.492 | **+0.164 [+0.08, +0.24]** | k=0 probe 0.492 | **+0.164 [+0.08, +0.24]** | 0.974 |
+| Qwen3.6-35B-A3B / Pro | correct | 50 | S1 pre-edit (y_t+1=0) | 63,417 | 7,682 | 22 | 0.645 | k=0 probe 0.473 | **+0.171 [+0.08, +0.25]** | k=0 probe 0.473 | **+0.171 [+0.08, +0.25]** | 0.973 |
+| Qwen3.6-35B-A3B / Pro | correct | 50 | S3 pre-edit & y_T=1 | 9,739 | 7,573 | 21 | 0.595 | position rel_pos 0.630 | -0.034 [-0.20, +0.15] | k=0 probe 0.508 | +0.087 [-0.02, +0.18] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S0 y_t=0 | 65,951 | 1,033 | 6◦ | 0.909◦ | k=0 probe 0.827 | **+0.082 [+0.06, +0.18]** | k=0 probe 0.827 | **+0.082 [+0.06, +0.18]** | 0.667 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S1 pre-edit (y_t+1=0) | 65,080 | 162 | 6◦ | 0.884◦ | k=0 probe 0.760 | +0.124 [-0.08, +0.17] | k=0 probe 0.760 | +0.124 [-0.08, +0.17] | 0.541 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 2 | S3 pre-edit & y_T=1 | 7,884 | 33 | 4◦ | 0.653◦ | k=0 probe 0.667 | -0.014 [-0.25, +0.05] | k=0 probe 0.667 | -0.014 [-0.25, +0.05] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S0 y_t=0 | 65,951 | 1,116 | 6◦ | 0.894◦ | k=0 probe 0.821 | **+0.073 [+0.05, +0.15]** | k=0 probe 0.821 | **+0.073 [+0.05, +0.15]** | 0.666 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S1 pre-edit (y_t+1=0) | 65,080 | 245 | 6◦ | 0.858◦ | k=0 probe 0.752 | +0.106 [-0.03, +0.15] | k=0 probe 0.752 | +0.106 [-0.03, +0.15] | 0.578 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 3 | S3 pre-edit & y_T=1 | 7,884 | 68 | 4◦ | 0.629◦ | k=0 probe 0.643 | -0.014 [-0.21, +0.05] | k=0 probe 0.643 | -0.014 [-0.21, +0.05] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S0 y_t=0 | 65,938 | 1,317 | 6◦ | 0.887◦ | k=0 probe 0.790 | **+0.097 [+0.05, +0.16]** | k=0 probe 0.790 | **+0.097 [+0.05, +0.16]** | 0.655 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S1 pre-edit (y_t+1=0) | 65,067 | 446 | 6◦ | 0.853◦ | k=0 probe 0.693 | **+0.160 [+0.02, +0.21]** | k=0 probe 0.693 | **+0.160 [+0.02, +0.21]** | 0.585 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | S3 pre-edit & y_T=1 | 7,884 | 129 | 4◦ | 0.643◦ | k=0 probe 0.604 | +0.039 [-0.10, +0.11] | k=0 probe 0.604 | +0.039 [-0.10, +0.11] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S0 y_t=0 | 65,930 | 1,928 | 7◦ | 0.877◦ | k=0 probe 0.753 | **+0.123 [+0.07, +0.19]** | k=0 probe 0.753 | **+0.123 [+0.07, +0.19]** | 0.690 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S1 pre-edit (y_t+1=0) | 65,059 | 1,057 | 7◦ | 0.824◦ | k=0 probe 0.681 | **+0.143 [+0.05, +0.22]** | k=0 probe 0.681 | **+0.143 [+0.05, +0.22]** | 0.688 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | S3 pre-edit & y_T=1 | 7,884 | 519 | 5◦ | 0.738◦ | k=0 probe 0.694 | +0.045 [-0.12, +0.21] | k=0 probe 0.694 | +0.045 [-0.12, +0.21] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S0 y_t=0 | 65,931 | 2,412 | 9◦ | 0.860◦ | k=0 probe 0.721 | **+0.139 [+0.07, +0.22]** | k=0 probe 0.721 | **+0.139 [+0.07, +0.22]** | 0.704 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S1 pre-edit (y_t+1=0) | 65,060 | 1,541 | 9◦ | 0.818◦ | k=0 probe 0.654 | **+0.164 [+0.06, +0.26]** | k=0 probe 0.654 | **+0.164 [+0.06, +0.26]** | 0.709 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | S3 pre-edit & y_T=1 | 7,884 | 816 | 8◦ | 0.702◦ | k=0 probe 0.653 | +0.048 [-0.06, +0.23] | k=0 probe 0.653 | +0.048 [-0.06, +0.23] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 25 | S0 y_t=0 | 65,929 | 3,601 | 11◦ | 0.815◦ | k=0 probe 0.673 | **+0.142 [+0.06, +0.24]** | k=0 probe 0.673 | **+0.142 [+0.06, +0.24]** | 0.741 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 25 | S1 pre-edit (y_t+1=0) | 65,058 | 2,730 | 11◦ | 0.780◦ | k=0 probe 0.619 | **+0.161 [+0.05, +0.28]** | k=0 probe 0.619 | **+0.161 [+0.05, +0.28]** | 0.754 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 25 | S3 pre-edit & y_T=1 | 7,884 | 1,659 | 11◦ | 0.621◦ | position causal 0.698 | -0.076 [-0.20, +0.21] | position causal 0.698 | -0.076 [-0.20, +0.21] | – |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 50 | S0 y_t=0 | 65,909 | 7,029 | 18◦ | 0.706◦ | position rel_pos 0.565 | **+0.141 [+0.00, +0.31]** | k=0 probe 0.553 | +0.152 [-0.03, +0.34] | 0.919 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 50 | S1 pre-edit (y_t+1=0) | 65,038 | 6,592 | 18◦ | 0.701◦ | position rel_pos 0.574 | +0.127 [-0.01, +0.30] | k=0 probe 0.544 | +0.157 [-0.03, +0.36] | 0.914 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 50 | S3 pre-edit & y_T=1 | 7,884 | 5,709 | 16◦ | 0.469◦ | k=0 probe 0.649 | -0.180 [-0.33, +0.00] | k=0 probe 0.649 | -0.180 [-0.33, +0.00] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S0 y_t=0 | 66,736 | 113 | 1◦ | 0.916◦ | position causal 0.939 | -0.022 [-0.07, +0.03] | position causal 0.939 | -0.022 [-0.07, +0.03] | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S1 pre-edit (y_t+1=0) | 66,667 | 44 | 1◦ | 0.919◦ | position causal 0.909 | +0.010 [-0.06, +0.08] | position causal 0.909 | +0.010 [-0.06, +0.08] | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 2 | S3 pre-edit & y_T=1 | 890 | 0 | 0◦ | –◦ | – | – | – | – | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S0 y_t=0 | 66,736 | 119 | 1◦ | 0.921◦ | position causal 0.943 | -0.022 [-0.07, +0.03] | position causal 0.943 | -0.022 [-0.07, +0.03] | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S1 pre-edit (y_t+1=0) | 66,667 | 50 | 1◦ | 0.919◦ | position causal 0.913 | +0.006 [-0.06, +0.07] | position causal 0.913 | +0.006 [-0.06, +0.07] | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 3 | S3 pre-edit & y_T=1 | 890 | 0 | 0◦ | –◦ | – | – | – | – | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S0 y_t=0 | 66,723 | 243 | 1◦ | 0.947◦ | k=0 probe 0.912 | **+0.035 [+0.02, +0.05]** | k=0 probe 0.912 | **+0.035 [+0.02, +0.05]** | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S1 pre-edit (y_t+1=0) | 66,654 | 174 | 1◦ | 0.954◦ | k=0 probe 0.918 | **+0.036 [+0.02, +0.05]** | k=0 probe 0.918 | **+0.036 [+0.02, +0.05]** | 0.493 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 5 | S3 pre-edit & y_T=1 | 890 | 0 | 0◦ | –◦ | – | – | – | – | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S0 y_t=0 | 66,715 | 56 | 2◦ | 0.826◦ | traj-shuffle 0.810 | +0.016 [-0.08, +0.10] | traj-shuffle 0.810 | +0.016 [-0.08, +0.10] | 0.547 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S1 pre-edit (y_t+1=0) | 66,646 | 56 | 2◦ | 0.827◦ | traj-shuffle 0.810 | +0.017 [-0.08, +0.10] | traj-shuffle 0.810 | +0.017 [-0.08, +0.10] | 0.547 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 10 | S3 pre-edit & y_T=1 | 890 | 6 | 1◦ | 0.718◦ | position rel_pos 0.891 | **-0.173 [-0.18, -0.15]** | k=0 probe 0.614 | **+0.104 [+0.08, +0.11]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S0 y_t=0 | 66,716 | 89 | 2◦ | 0.711◦ | k=0 probe 0.579 | **+0.131 [+0.10, +0.16]** | k=0 probe 0.579 | **+0.131 [+0.10, +0.16]** | 0.651 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S1 pre-edit (y_t+1=0) | 66,647 | 89 | 2◦ | 0.711◦ | k=0 probe 0.580 | **+0.132 [+0.10, +0.16]** | k=0 probe 0.580 | **+0.132 [+0.10, +0.16]** | 0.651 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 15 | S3 pre-edit & y_T=1 | 890 | 28 | 1◦ | 0.561◦ | position rel_pos 0.869 | **-0.308 [-0.31, -0.23]** | traj-shuffle 0.571 | -0.010 [-0.02, +0.08] | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 25 | S0 y_t=0 | 66,714 | 320 | 4◦ | 0.754◦ | k=0 probe 0.654 | **+0.100 [+0.01, +0.19]** | k=0 probe 0.654 | **+0.100 [+0.01, +0.19]** | 0.631 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 25 | S1 pre-edit (y_t+1=0) | 66,645 | 320 | 4◦ | 0.754◦ | k=0 probe 0.654 | **+0.100 [+0.01, +0.19]** | k=0 probe 0.654 | **+0.100 [+0.01, +0.19]** | 0.631 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 25 | S3 pre-edit & y_T=1 | 890 | 88 | 1◦ | 0.409◦ | position rel_pos 0.693 | **-0.283 [-0.29, -0.20]** | traj-shuffle 0.602 | **-0.193 [-0.20, -0.07]** | – |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 50 | S0 y_t=0 | 66,694 | 759 | 4◦ | 0.841◦ | position rel_pos 0.664 | **+0.177 [+0.09, +0.47]** | k=0 probe 0.565 | **+0.275 [+0.18, +0.53]** | 0.850 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 50 | S1 pre-edit (y_t+1=0) | 66,625 | 759 | 4◦ | 0.841◦ | position rel_pos 0.664 | **+0.177 [+0.09, +0.47]** | k=0 probe 0.566 | **+0.275 [+0.18, +0.53]** | 0.850 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 50 | S3 pre-edit & y_T=1 | 890 | 535 | 2◦ | 0.574◦ | position rel_pos 0.693 | **-0.119 [-0.17, -0.06]** | k=0 probe 0.601 | -0.027 [-0.12, +0.07] | – |
+
+#### E18 (b): last-turn label y_T of `correct` vs the final-patch evaluation (all trajectories of each run)
+
+| Run | trajectories | y_T undefined (no labelled edit) | y_T=1, resolved | y_T=0, resolved | y_T=1, not resolved | y_T=0, not resolved | agreement (y_T defined) | last-edit label agreement | last edit issued in the last turn |
+|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | 4,991 | 316 | 2,806 | 63 | 43 | 1,763 | 0.977 | 0.980 | 92 |
+| Qwen3.6-35B-A3B / Verified | 4,998 | 476 | 2,902 | 99 | 24 | 1,497 | 0.973 | 0.974 | 50 |
+| Laguna XS.2 / Pro | 6,921 | 873 | 789 | 22 | 13 | 5,224 | 0.994 | 0.996 | 375 |
+| Qwen3.6-35B-A3B / Pro | 5,804 | 913 | 842 | 42 | 17 | 3,990 | 0.988 | 0.988 | 61 |

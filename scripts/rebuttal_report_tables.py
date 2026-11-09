@@ -265,6 +265,59 @@ def phase_tables(root: Path = Path("reports/rerun/phase")) -> None:
                   f"{_a(r, 'real_testbest')} (L{r['real_test_best_layer']}) |")
 
 
+E18_STRATA = {"S0": "y_t=0", "S1": "pre-edit (y_t+1=0)", "S2": "outcome y_T=1", "S3": "pre-edit & y_T=1", "S4": "y_T=0"}
+
+
+def e18_tables(root: Path = Path("reports/rerun/phase")) -> None:
+    """Tables from scripts/rebuttal_edit_outcome_strata.py (E18)."""
+    names = {"real_val": "real", "k0": "k=0 probe", "traj": "traj-shuffle", "pos_causal": "position causal",
+             "pos_rel": "position rel_pos"}
+    for max_k, strata in ((15, ["S0", "S1", "S2", "S3", "S4"]), (50, ["S0", "S1", "S3"])):
+        print(f"\n#### E18, window max{max_k}: within y_t = 0, by edit turn and eventual outcome (AUC for y_(t+k); "
+              "strongest control = highest point AUC among k=0 probe, traj-shuffle and both position baselines; "
+              "95% task-bootstrap CI, bold if it excludes 0; ◦ = fewer than 20 test tasks with a positive token)\n")
+        print("| Model / benchmark | Probe | k | stratum | tokens | positives | tasks w/ positive | real | strongest control | "
+              "real − strongest | strongest causal control | real − strongest causal | oracle y_T |")
+        print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for bench, pooled, name in COMBOS:
+            for probe in PHASE_PROBES:
+                f = root / f"e18_{bench}_{pooled}_{probe}_max{max_k}.json"
+                if not f.exists():
+                    continue
+                for r in json.loads(f.read_text())["rows"]:
+                    for st in strata:
+                        c = r["counts"][st]
+                        flag = "◦" if c["underpowered"] else ""
+                        o = r["strongest_control"].get(st)
+                        strongest = f"{names[o]} {_a(r, f'{o}|{st}')}" if o else "–"
+                        oracle = _a(r, f"oracle_yT|{st}") if st in ("S0", "S1") else "–"
+                        cc = [(r["auc"][f"{x}|{st}"], x) for x in ("k0", "traj", "pos_causal")
+                              if r["auc"].get(f"{x}|{st}") == r["auc"].get(f"{x}|{st}")]
+                        oc = max(cc)[1] if cc else None
+                        causal = f"{names[oc]} {_a(r, f'{oc}|{st}')}" if oc else "–"
+                        print(f"| {name} | {probe.removeprefix('currently_')} | {r['k']} | {st} {E18_STRATA[st]} | {c['n']:,} | "
+                              f"{c['n_pos']:,} | {c['n_tasks_pos']}{flag} | {_a(r, f'real_val|{st}')}{flag} | {strongest} | "
+                              f"{_d(r, f'real_val-{o}|{st}') if o else '–'} | {causal} | "
+                              f"{_d(r, f'real_val-{oc}|{st}') if oc else '–'} | {oracle} |")
+
+    print("\n#### E18 (b): last-turn label y_T of `correct` vs the final-patch evaluation (all trajectories of each run)\n")
+    print("| Run | trajectories | y_T undefined (no labelled edit) | y_T=1, resolved | y_T=0, resolved | y_T=1, not resolved | "
+          "y_T=0, not resolved | agreement (y_T defined) | last-edit label agreement | last edit issued in the last turn |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
+    for bench, pooled, name in COMBOS:
+        run = {"laguna_xs2_full_pooled": "laguna_xs2_full", "qwen36_35b_a3b_full_pooled": "qwen36_35b_a3b_full",
+               "laguna_xs2_pro_full_pooled": "laguna_xs2_full", "qwen36_35b_a3b_pro_full_pooled": "qwen36_35b_a3b_full"}[pooled]
+        f = root / f"e18_outcome_{bench}_{run}.json"
+        if not f.exists():
+            continue
+        r = json.loads(f.read_text())
+        cm = r["yT_vs_outcome"]
+        g = lambda k: cm.get(k, 0)
+        print(f"| {name} | {r['n_trajectories']:,} | {g('yT=none,outcome=0') + g('yT=none,outcome=1'):,} | {g('yT=1,outcome=1'):,} | "
+              f"{g('yT=0,outcome=1'):,} | {g('yT=1,outcome=0'):,} | {g('yT=0,outcome=0'):,} | {r['yT_agreement']['agreement']:.3f} | "
+              f"{r['last_edit_agreement']['agreement']:.3f} | {r['n_last_edit_in_last_turn']:,} |")
+
+
 if __name__ == "__main__":
     print(f"† fewer than {MIN_POS} positive test tokens; ‡ test split has a single class, so AUC is undefined.")
     main_table()
@@ -273,3 +326,4 @@ if __name__ == "__main__":
     persistence_tables()
     persistence_check_tables()
     phase_tables()
+    e18_tables()
