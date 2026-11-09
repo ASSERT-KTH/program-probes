@@ -1,18 +1,29 @@
 # Rebuttal rerun: real agent turns, task-level splits, persistence analysis
 
-Branch `rebuttal-rerun-turnfix` (no PR opened, by request). Runs completed 2026-10-01.
+Branch `rebuttal-rerun-turnfix` (PR #20). Runs completed 2026-10-01; persistence-baseline check added 2026-11-09.
 
 ## Summary
 
 - **Current-state probes (k=0) hold up**, and most AUCs rise slightly under the new task-level split: best-layer test AUC 0.69–0.84 across models, benchmarks and probes (see table below).
-- **Most of the lookahead ("programming horizon") signal is label persistence; a real horizon signal remains only for some probes.** Labels rarely change at short horizons:
+- **Most of the lookahead ("programming horizon") signal is label persistence.** A signal beyond persistence appears for some probes in the window-50 subset but, except for Qwen/Pro has_regressions, does not replicate at window 15. Labels rarely change at short horizons:
 
   | | flip rate, k ≤ 3 | flip rate, k = 10 | flip rate, k = 50 | persistence AUC, k = 1 |
   |---|---|---|---|---|
   | Verified | 0.3–5.6% | 1.4–14% | 3–42% | 0.85–0.93 |
   | Pro | 0.2–3.3% | 0.3–6.3% | 1.3–13% | 0.65–0.98 |
 
-  Probe AUC minus persistence AUC (same tokens, window 50, 95% task-bootstrap CI):
+  Probe AUC minus persistence AUC (same tokens, 95% task-bootstrap CI). **The answer depends on the window, and the window-50 advantages on Pro do not replicate at window 15** (see "Persistence-baseline check" below):
+
+  **Window 15** (tokens with at least 15 later turns):
+  - **Probe clearly better:** only Qwen/Pro has_regressions, at every k (+0.13 to +0.24); layer-0 caveat below.
+  - **Probe clearly worse:**
+    - Laguna/Verified, all four probes at nearly every k (−0.13 to −0.29);
+    - compiles on Pro for both models at every k (−0.13 to −0.18);
+    - Laguna/Pro correct, has_regressions and reduces_failing at short k (−0.12 to −0.15 at k = 1);
+    - Qwen/Verified reduces_failing at k = 1 (−0.08), and correct at k = 1 (−0.13, CI upper bound −0.00).
+  - **Everything else:** the CI includes 0.
+
+  **Window 50** (tokens with at least 50 later turns):
   - **Probe clearly better (CI above 0):**
     - Laguna/Verified compiles, k ≥ 5 (+0.08 to +0.18);
     - Qwen/Verified reduces_failing, k = 5–25 (+0.08 to +0.11);
@@ -22,6 +33,7 @@ Branch `rebuttal-rerun-turnfix` (no PR opened, by request). Runs completed 2026-
     - compiles on Pro for both models at every k (−0.19 to −0.29);
     - Laguna/Verified has_regressions, k = 1–5 (−0.10 to −0.13), and correct at k = 1 (−0.17).
   - **Everything else:** the CI includes 0; the probe is indistinguishable from "label stays the same".
+  - On Pro, window 50 leaves very few positive turns: Laguna/Pro correct has 33 positive test turns (559 tokens) at k = 1. Its persistence AUC is therefore low and noisy (0.739, CI [0.556, 0.861]) and the window-50 Pro advantages should not be claimed on their own.
   - **After-edit targets:** best-layer AUC for k ≥ 1 has a median of 0.62 (range 0.40–0.86), with 14 of 128 cells below 0.5. Turns right after an edit are where labels change, and there the probe anticipates weakly at best.
 - **The trajectory-level shuffle control is strong.** A probe trained on another trajectory's labels, which keep the trajectory-position structure but have no link to the hidden states, reaches **0.56–0.78 test AUC** for correct, has_regressions and reduces_failing (up to 0.68 for compiles on Verified). Much of the reported AUC is therefore available without reading program state from the hidden states.
 - **The paper's shuffled control was uninformative:** it shuffled the test labels as well, which pins AUC at ~0.5 by construction (fixed in `fa41d05`).
@@ -93,6 +105,25 @@ On the paper's split, Verified validation was a single repository (flask, 1.8k�
 4. **Laguna Verified after-edit lookahead in the paper is undefined**: under the old approximate turns, every evaluation bin selected by the after-edit filter held a single class. Shown as n/a‡ in the legacy columns.
 5. **Qwen Pro has_regressions has very few positives** in the window-50 test set (legacy: 29 positives; flagged †).
 
+## Persistence-baseline check
+
+A review comment asked whether the low persistence AUC on Pro at k = 1 (0.74 for Laguna/Pro correct, 0.75 for Qwen/Pro reduces_failing, against 0.93 on Verified) means the two compared labels disagree. `y_original` is the per-position `label[t]`; the target is `turn_label[step_idx[t] + k]` (`src/build_cache.py`).
+
+**No bug found.**
+- `label[t] == turn_label[step_idx[t]]` holds for all 24.5M extracted positions in every label file, for all 4 runs × 4 probes (0 mismatches, 0 length mismatches). Both come from `edit_labels_by_turn` over the same edits.
+- In every window-50 shift cache (k = 1…50), `y_original` and `y` equal the k = 0 cache's label for the source and target turn wherever that turn has extracted tokens: 0 mismatches over 153M lookups (38M per probe). `target_step_idx − step_idx = k`, the token set equals k = 0's, labels are constant within a turn, and `group_id` is the task id.
+- Labels do **not** flip more on Pro: the fraction of trajectories with any change in the correct label is 12–15% on Pro against 59% on Verified. Reverts (0→1→0) are not more common on Pro.
+
+**Why the token-level persistence AUC is low.** With hard 0/1 predictions, persistence AUC is balanced accuracy, (TPR + TNR) / 2. Almost every flip is 0→1, so TNR ≈ 1 and the AUC is set by TPR, i.e. by the number of 0→1 flip tokens relative to positive tokens. Two things make that ratio unfavourable:
+1. **Few positives in the window.** Window 50 keeps a token only if 50 later turns exist, which removes most turns after a task is solved. Laguna/Pro correct keeps 33 positive turns (559 tokens) out of 11,369 test turns at k = 1, against 537 tokens that flip 0→1: TPR 0.478, AUC 0.739.
+2. **Token weighting.** The turn before a flip is the turn that writes the fix; flipped turns hold about 30–100 tokens against 8–21 for an average turn.
+
+Counted per turn, persistence at k = 1 is 0.88–1.00 at window 50 and 0.95–1.00 at window 15 everywhere (table "Persistence at k=1 … tokens vs turns" below).
+
+**Consequence for the claims.** With so few positives, window-50 persistence on Pro is noisy, and the probe's apparent advantage there (Laguna/Pro correct, has_regressions, reduces_failing; Qwen/Pro reduces_failing) does not replicate at window 15, where persistence wins at short k or the CI includes 0. Only Qwen/Pro has_regressions beats persistence in both windows.
+
+The fraction of test tokens with y_{t+k} ≠ y_t for each k, and the fraction of trajectories with at least one flip, are in the table "Fraction of test tokens with y_{t+k} ≠ y_t" below. Scripts: `scripts/rebuttal_check_persistence_labels.py` (`slurm/check_persistence_labels.sh`) and `scripts/rebuttal_persistence_turn_level.py` (`slurm/persistence_turn_level.sh`); outputs in `reports/rerun/persistence_label_check_*.json` and `reports/rerun/persistence_turn_level_*.json`.
+
 ## Other things to know
 
 - **What "after-edit" means.** A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
@@ -124,6 +155,7 @@ On the paper's split, Verified validation was a single repository (flask, 1.8k�
 - `scripts/rebuttal_check_labels.py` (step 1)
 - `scripts/rebuttal_check_k0.py --task-groups` (step 2)
 - `scripts/rebuttal_persistence_analysis.py` (step 6; one job per run × probe × window; 1,000 task-level bootstrap resamples)
+- `scripts/rebuttal_check_persistence_labels.py` and `scripts/rebuttal_persistence_turn_level.py` (persistence-baseline check)
 - `scripts/rebuttal_report_tables.py` (the tables below)
 
 Result directories keep the original run IDs; the paper's results are in `results/*/*_legacyturns`.
@@ -524,3 +556,66 @@ Result directories keep the original run IDs; the paper's results are in `result
 | Qwen3.6-35B-A3B / Pro | reduces_failing | 5 | 20 | 360379 | 0.044 | 0.433 | 0.780 [0.679, 0.831] | 0.787 [0.702, 0.858] | 0.007 [-0.101, 0.136] | 0.797 [0.726, 0.851] | 0.459 [0.362, 0.605] | 0.647 [0.531, 0.763] | 0.724 [0.594, 0.795] |
 | Qwen3.6-35B-A3B / Pro | reduces_failing | 10 | 20 | 360478 | 0.067 | 0.545 | 0.722 [0.618, 0.787] | 0.760 [0.670, 0.836] | 0.038 [-0.079, 0.173] | 0.764 [0.691, 0.825] | 0.457 [0.217, 0.716] | 0.664 [0.552, 0.768] | 0.682 [0.561, 0.759] |
 | Qwen3.6-35B-A3B / Pro | reduces_failing | 15 | 20 | 360563 | 0.084 | 0.631 | 0.694 [0.598, 0.766] | 0.742 [0.639, 0.826] | 0.048 [-0.088, 0.190] | 0.749 [0.667, 0.815] | 0.495 [0.239, 0.784] | 0.674 [0.553, 0.778] | 0.664 [0.556, 0.742] |
+
+#### Label consistency (all label files and all window-50 shift caches)
+
+| Model / benchmark | Probe | positions checked | `label[t] != turn_label[step_idx[t]]` | cache `y_original` / `y` mismatches vs k=0 turn labels (k=1…50) | trajectories with any label change | label changes / trajectory | changes that revert |
+|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | compiles | 7,908,907 | 0 | 0 of 12,889,734 | 0.115 | 0.17 | 0.339 |
+| Laguna XS.2 / Verified | correct | 7,908,907 | 0 | 0 of 12,889,734 | 0.586 | 0.68 | 0.140 |
+| Laguna XS.2 / Verified | has_regressions | 7,908,907 | 0 | 0 of 12,889,734 | 0.139 | 0.28 | 0.496 |
+| Laguna XS.2 / Verified | reduces_failing | 7,908,907 | 0 | 0 of 12,889,734 | 0.624 | 0.77 | 0.195 |
+| Qwen3.6-35B-A3B / Verified | compiles | 4,297,044 | 0 | 0 of 7,372,077 | 0.102 | 0.14 | 0.275 |
+| Qwen3.6-35B-A3B / Verified | correct | 4,297,044 | 0 | 0 of 7,372,077 | 0.593 | 0.62 | 0.043 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 4,297,044 | 0 | 0 of 7,372,077 | 0.110 | 0.18 | 0.390 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 4,297,044 | 0 | 0 of 7,372,077 | 0.619 | 0.67 | 0.083 |
+| Laguna XS.2 / Pro | compiles | 8,181,945 | 0 | 0 of 9,422,640 | 0.174 | 0.38 | 0.541 |
+| Laguna XS.2 / Pro | correct | 8,181,945 | 0 | 0 of 9,422,640 | 0.125 | 0.16 | 0.232 |
+| Laguna XS.2 / Pro | has_regressions | 8,181,945 | 0 | 0 of 9,422,640 | 0.068 | 0.13 | 0.465 |
+| Laguna XS.2 / Pro | reduces_failing | 8,181,945 | 0 | 0 of 9,422,640 | 0.195 | 0.31 | 0.380 |
+| Qwen3.6-35B-A3B / Pro | compiles | 4,078,069 | 0 | 0 of 8,590,213 | 0.110 | 0.21 | 0.471 |
+| Qwen3.6-35B-A3B / Pro | correct | 4,078,069 | 0 | 0 of 8,590,213 | 0.154 | 0.18 | 0.124 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 4,078,069 | 0 | 0 of 8,590,213 | 0.046 | 0.07 | 0.351 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 4,078,069 | 0 | 0 of 8,590,213 | 0.166 | 0.22 | 0.232 |
+
+#### Fraction of test tokens with y_{t+k} ≠ y_t, window max50 (fraction of test trajectories with at least one such token in parentheses)
+
+| Model / benchmark | Probe | k=1 | k=2 | k=3 | k=5 | k=10 | k=15 | k=25 | k=50 |
+|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | compiles | 0.007 (0.04) | 0.011 (0.04) | 0.014 (0.04) | 0.021 (0.05) | 0.035 (0.07) | 0.042 (0.10) | 0.065 (0.13) | 0.084 (0.13) |
+| Laguna XS.2 / Verified | correct | 0.012 (0.08) | 0.016 (0.08) | 0.019 (0.09) | 0.030 (0.11) | 0.056 (0.17) | 0.079 (0.23) | 0.121 (0.33) | 0.202 (0.39) |
+| Laguna XS.2 / Verified | has_regressions | 0.018 (0.08) | 0.022 (0.09) | 0.028 (0.10) | 0.045 (0.11) | 0.077 (0.14) | 0.107 (0.17) | 0.139 (0.21) | 0.170 (0.22) |
+| Laguna XS.2 / Verified | reduces_failing | 0.030 (0.17) | 0.043 (0.18) | 0.056 (0.18) | 0.083 (0.21) | 0.142 (0.29) | 0.188 (0.37) | 0.252 (0.51) | 0.353 (0.59) |
+| Qwen3.6-35B-A3B / Verified | compiles | 0.003 (0.02) | 0.004 (0.02) | 0.005 (0.02) | 0.010 (0.03) | 0.014 (0.03) | 0.011 (0.04) | 0.017 (0.06) | 0.029 (0.07) |
+| Qwen3.6-35B-A3B / Verified | correct | 0.014 (0.06) | 0.018 (0.07) | 0.021 (0.07) | 0.031 (0.08) | 0.057 (0.09) | 0.086 (0.15) | 0.141 (0.25) | 0.302 (0.51) |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 0.004 (0.03) | 0.006 (0.03) | 0.010 (0.04) | 0.016 (0.05) | 0.028 (0.07) | 0.043 (0.10) | 0.088 (0.15) | 0.170 (0.22) |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 0.022 (0.11) | 0.029 (0.11) | 0.035 (0.11) | 0.051 (0.13) | 0.092 (0.18) | 0.134 (0.24) | 0.210 (0.32) | 0.419 (0.55) |
+| Laguna XS.2 / Pro | compiles | 0.014 (0.04) | 0.024 (0.05) | 0.033 (0.06) | 0.044 (0.06) | 0.061 (0.09) | 0.072 (0.12) | 0.085 (0.16) | 0.081 (0.13) |
+| Laguna XS.2 / Pro | correct | 0.005 (0.02) | 0.006 (0.02) | 0.006 (0.02) | 0.013 (0.03) | 0.027 (0.05) | 0.043 (0.06) | 0.064 (0.09) | 0.102 (0.13) |
+| Laguna XS.2 / Pro | has_regressions | 0.014 (0.02) | 0.020 (0.02) | 0.020 (0.02) | 0.022 (0.03) | 0.030 (0.04) | 0.041 (0.05) | 0.062 (0.06) | 0.078 (0.07) |
+| Laguna XS.2 / Pro | reduces_failing | 0.014 (0.04) | 0.025 (0.05) | 0.032 (0.05) | 0.042 (0.06) | 0.063 (0.10) | 0.078 (0.13) | 0.107 (0.17) | 0.129 (0.18) |
+| Qwen3.6-35B-A3B / Pro | compiles | 0.020 (0.03) | 0.024 (0.04) | 0.027 (0.04) | 0.032 (0.04) | 0.044 (0.06) | 0.055 (0.07) | 0.073 (0.11) | 0.112 (0.20) |
+| Qwen3.6-35B-A3B / Pro | correct | 0.010 (0.05) | 0.013 (0.05) | 0.015 (0.05) | 0.019 (0.05) | 0.027 (0.06) | 0.033 (0.08) | 0.051 (0.12) | 0.125 (0.23) |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 0.002 (0.00) | 0.003 (0.00) | 0.003 (0.00) | 0.005 (0.00) | 0.003 (0.01) | 0.003 (0.01) | 0.007 (0.02) | 0.013 (0.03) |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 0.013 (0.02) | 0.016 (0.03) | 0.017 (0.03) | 0.020 (0.03) | 0.029 (0.04) | 0.036 (0.06) | 0.054 (0.09) | 0.108 (0.19) |
+
+#### Persistence at k=1, window max50, test split: tokens vs turns
+
+| Model / benchmark | Probe | tokens y_t=1 | tokens y_{t+1}=1 | tokens 0→1 | tokens 1→0 | token TPR | token TNR | token persistence AUC | turns | turns y_t=1 | flipped turns | tokens / turn (all, flipped) | turn persistence AUC | turn persistence AUC, max15 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Laguna XS.2 / Verified | compiles | 177,511 | 176,567 | 172 | 1,116 | 0.999 | 0.793 | 0.896 | 8,523 | 8,418 | 18 | 21.3, 71.6 | 0.936 | 0.977 |
+| Laguna XS.2 / Verified | correct | 13,882 | 16,037 | 2,155 | 0 | 0.866 | 1.000 | 0.933 | 8,523 | 485 | 30 | 21.3, 71.8 | 0.971 | 0.968 |
+| Laguna XS.2 / Verified | has_regressions | 11,799 | 15,012 | 3,213 | 0 | 0.786 | 1.000 | 0.893 | 8,523 | 362 | 32 | 21.3, 100.4 | 0.959 | 0.975 |
+| Laguna XS.2 / Verified | reduces_failing | 21,243 | 26,382 | 5,342 | 203 | 0.798 | 0.999 | 0.898 | 8,523 | 610 | 69 | 21.3, 80.4 | 0.951 | 0.969 |
+| Qwen3.6-35B-A3B / Verified | compiles | 60,213 | 60,266 | 115 | 62 | 0.998 | 0.871 | 0.934 | 4,972 | 4,949 | 6 | 12.2, 29.5 | 0.920 | 0.961 |
+| Qwen3.6-35B-A3B / Verified | correct | 2,020 | 2,845 | 836 | 11 | 0.706 | 1.000 | 0.853 | 4,972 | 133 | 17 | 12.2, 49.8 | 0.946 | 0.954 |
+| Qwen3.6-35B-A3B / Verified | has_regressions | 1,456 | 1,719 | 263 | 0 | 0.847 | 1.000 | 0.924 | 4,972 | 116 | 8 | 12.2, 32.9 | 0.968 | 0.966 |
+| Qwen3.6-35B-A3B / Verified | reduces_failing | 3,835 | 5,124 | 1,310 | 21 | 0.744 | 1.000 | 0.872 | 4,972 | 198 | 28 | 12.2, 47.5 | 0.941 | 0.959 |
+| Laguna XS.2 / Pro | compiles | 76,793 | 76,276 | 621 | 1,138 | 0.992 | 0.977 | 0.985 | 11,369 | 6,527 | 42 | 11.1, 41.9 | 0.996 | 0.990 |
+| Laguna XS.2 / Pro | correct | 559 | 1,029 | 537 | 67 | 0.478 | 0.999 | 0.739 | 11,369 | 33 | 12 | 11.1, 50.3 | 0.884 | 0.956 |
+| Laguna XS.2 / Pro | has_regressions | 2,167 | 2,633 | 1,102 | 636 | 0.581 | 0.995 | 0.788 | 11,369 | 70 | 18 | 11.1, 96.6 | 0.921 | 0.966 |
+| Laguna XS.2 / Pro | reduces_failing | 3,249 | 4,898 | 1,733 | 84 | 0.646 | 0.999 | 0.823 | 11,369 | 147 | 30 | 11.1, 60.6 | 0.925 | 0.959 |
+| Qwen3.6-35B-A3B / Pro | compiles | 38,528 | 38,852 | 814 | 490 | 0.979 | 0.983 | 0.981 | 8,339 | 4,965 | 16 | 8.0, 81.5 | 0.998 | 0.996 |
+| Qwen3.6-35B-A3B / Pro | correct | 2,737 | 3,376 | 662 | 23 | 0.804 | 1.000 | 0.902 | 8,339 | 313 | 20 | 8.0, 34.2 | 0.973 | 0.958 |
+| Qwen3.6-35B-A3B / Pro | has_regressions | 122 | 99 | 69 | 92 | 0.303 | 0.999 | 0.651 | 8,339 | 5 | 2 | 8.0, 80.5 | 0.900 | 0.949 |
+| Qwen3.6-35B-A3B / Pro | reduces_failing | 907 | 1,762 | 871 | 16 | 0.506 | 1.000 | 0.753 | 8,339 | 71 | 10 | 8.0, 88.7 | 0.943 | 0.956 |

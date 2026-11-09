@@ -137,9 +137,71 @@ def persistence_tables() -> None:
                     )
 
 
+CHECK_PREFIX = {"laguna_xs2_full_pooled": "laguna_xs2_full", "qwen36_35b_a3b_full_pooled": "qwen36_35b_a3b_full",
+                "laguna_xs2_pro_full_pooled": "laguna_xs2_pro_full", "qwen36_35b_a3b_pro_full_pooled": "qwen36_35b_a3b_pro_full"}
+CHECK_KS = ["1", "2", "3", "5", "10", "15", "25", "50"]
+
+
+def _f(x, d: int = 3) -> str:
+    return "–" if x is None else f"{x:.{d}f}"
+
+
+def persistence_check_tables() -> None:
+    """Tables from scripts/rebuttal_check_persistence_labels.py and rebuttal_persistence_turn_level.py."""
+    root = Path("reports/rerun")
+    checks, turns = {}, {}
+    for _, pooled, name in COMBOS:
+        p = CHECK_PREFIX[pooled]
+        f = root / f"persistence_label_check_{p}.json"
+        if f.exists():
+            checks[name] = next(iter(json.loads(f.read_text()).values()))
+        f = root / f"persistence_turn_level_{p}.json"
+        if f.exists():
+            turns[name] = json.loads(f.read_text())["rows"]
+
+    print("\n#### Label consistency (all label files and all window-50 shift caches)\n")
+    print("| Model / benchmark | Probe | positions checked | `label[t] != turn_label[step_idx[t]]` | cache `y_original` / `y` mismatches vs k=0 turn labels (k=1…50) | trajectories with any label change | label changes / trajectory | changes that revert |")
+    print("|---|---|---|---|---|---|---|---|")
+    for name, c in checks.items():
+        for probe in PROBES:
+            a = c["label_files"]["probes"][probe]
+            ks = c["caches"][f"{probe}_max50"]["ks"].values()
+            bad = sum(r["y_original_mismatch"] + r["y_target_mismatch"] for r in ks)
+            chk = sum(r["y_original_checked"] + r["y_target_checked"] for r in ks)
+            print(f"| {name} | {probe.removeprefix('currently_')} | {a['n_positions']:,} | {a['n_label_vs_turn_label_mismatch'] + a['n_files_len_mismatch']} | "
+                  f"{bad} of {chk:,} | {a['frac_traj_any_label_change']:.3f} | {a['mean_label_changes_per_traj']:.2f} | {a['frac_changes_that_revert']:.3f} |")
+
+    print("\n#### Fraction of test tokens with y_{t+k} ≠ y_t, window max50 (fraction of test trajectories with at least one such token in parentheses)\n")
+    print("| Model / benchmark | Probe | " + " | ".join(f"k={k}" for k in CHECK_KS) + " |")
+    print("|---|---|" + "---|" * len(CHECK_KS))
+    for name, c in checks.items():
+        for probe in PROBES:
+            ks = c["caches"][f"{probe}_max50"]["ks"]
+            cells = [f"{ks[k]['test']['flip_rate']:.3f} ({ks[k]['test']['frac_traj_with_flip']:.2f})" for k in CHECK_KS]
+            print(f"| {name} | {probe.removeprefix('currently_')} | " + " | ".join(cells) + " |")
+
+    print("\n#### Persistence at k=1, window max50, test split: tokens vs turns\n")
+    print("| Model / benchmark | Probe | tokens y_t=1 | tokens y_{t+1}=1 | tokens 0→1 | tokens 1→0 | token TPR | token TNR | token persistence AUC | turns | turns y_t=1 | flipped turns | tokens / turn (all, flipped) | turn persistence AUC | turn persistence AUC, max15 |")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for name, c in checks.items():
+        for probe in PROBES:
+            t = c["caches"][f"{probe}_max50"]["ks"]["1"]["test"]
+            tl = turns.get(name, {}).get(f"{probe}_max50")
+            tl15 = turns.get(name, {}).get(f"{probe}_max15")
+            row = (f"| {name} | {probe.removeprefix('currently_')} | {t['tp'] + t['fp']:,} | {t['tp'] + t['fn']:,} | {t['fn']:,} | {t['fp']:,} | "
+                   f"{_f(t['tpr'])} | {_f(t['tnr'])} | {_f(t['balanced_acc'])} | ")
+            if tl:
+                row += (f"{tl['n_turns']:,} | {tl['n_pos_turns_t']:,} | {tl['n_flip_turns']} | {tl['tokens_per_turn']:.1f}, {_f(tl['tokens_per_flipped_turn'], 1)} | "
+                        f"{_f(tl['balanced_acc'])} | {_f(tl15['balanced_acc']) if tl15 else '–'} |")
+            else:
+                row += "– | – | – | – | – | – |"
+            print(row)
+
+
 if __name__ == "__main__":
     print(f"† fewer than {MIN_POS} positive test tokens; ‡ test split has a single class, so AUC is undefined.")
     main_table()
     lookahead_tables()
     control_table()
     persistence_tables()
+    persistence_check_tables()
