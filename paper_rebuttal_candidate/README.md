@@ -27,3 +27,14 @@ Cross-benchmark transfer, scored as one AUC pooled over the target benchmark's t
 k=0 real probe vs the trajectory-shuffle and token-shuffle probes.
 - Each is taken at its own best test layer. The values reproduce `paper_rebuttal/figures/auc_table.tex` (asserted).
 - CIs are paired task-bootstrap intervals (1000 resamples) for real − traj and real − token.
+
+## `lang/` (brief E11-TEST)
+
+E11 (Pro: language and repository controls) and E11b (Verified: repository controls) rerun with the real probe at its best TEST layer. The pooled AUC reproduces Table 5 (asserted).
+- **Transfer (fig C):** the Verified-trained compiles probe at its best pooled transfer layer on the Pro test tokens, from T-POOL: layer 31 for Laguna and layer 1 for Qwen. The pooled transfer AUC must reproduce T-POOL (asserted).
+- **`valbest/`:** Qwen/Pro compiles and has_regressions at the validation-best layer, for side-by-side comparison. These are identical to `reports/rerun/lang/`.
+- **`figures/`:**
+  - The three appendix figures, with the layer in the legend: `e11_compiles_by_language`, `e11_compiles_by_repo`, `e11_compiles_transfer_by_language`.
+  - Also `e11b_verified_compiles_by_repo`.
+
+Command: `scripts/rebuttal_per_language.py --layer-rule testbest [--transfer-layer-rule testbest]`, then `scripts/rebuttal_per_language_figures.py --root paper_rebuttal_candidate/lang --out paper_rebuttal_candidate/lang/figures --show-layer`.

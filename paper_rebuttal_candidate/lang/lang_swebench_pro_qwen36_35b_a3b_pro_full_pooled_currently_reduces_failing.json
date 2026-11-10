@@ -1,0 +1,304 @@
+{
+  "bench": "swebench_pro",
+  "pooled": "qwen36_35b_a3b_pro_full_pooled",
+  "probe": "currently_reduces_failing",
+  "layer": 30,
+  "layer_rule": "testbest",
+  "layer_1indexed": 31,
+  "transfer_pooled": null,
+  "transfer_layer": null,
+  "transfer_layer_rule": null,
+  "auc_definition": "pooled AUC over all test tokens with y >= 0 (E17); no position bins",
+  "language_field": "repo_language (ScaleAI/SWE-bench_Pro)",
+  "repo_field": "repo (ScaleAI/SWE-bench_Pro)",
+  "legacy_split": {
+    "test_best_layer": 20,
+    "test_auc_test_best": 0.8413493300611508,
+    "val_best_layer": 20,
+    "test_auc_val_best": 0.8413493300611508,
+    "val_auc_by_layer": {
+      "30": 0.8229598760846631,
+      "20": 0.8277319818735381,
+      "0": 0.764453537795464,
+      "39": 0.7880923490676095,
+      "10": 0.8156104479824684
+    },
+    "n_test": 488455,
+    "n_pos_test": 44111,
+    "note": "stored results.pt of the submitted runs: pooled test AUC on the old split's test set"
+  },
+  "n_boot": 1000,
+  "min_tasks_both_classes": 20,
+  "n_test": 467504,
+  "n_pos_test": 47740,
+  "n_test_tasks": 94,
+  "train_pos_rate_by_language": {
+    "go": 0.030137647393171787,
+    "js": 0.07539816807476096,
+    "python": 0.1485934590831325,
+    "ts": 0.0
+  },
+  "train_pos_rate_by_repo": {
+    "NodeBB/NodeBB": 0.24002185725060415,
+    "ansible/ansible": 0.16440292972371592,
+    "element-hq/element-web": 0.004429227070736504,
+    "flipt-io/flipt": 0.0,
+    "future-architect/vuls": 0.08752451569283723,
+    "gravitational/teleport": 0.041796875,
+    "internetarchive/openlibrary": 0.10544141692140514,
+    "navidrome/navidrome": 0.023623354219895785,
+    "protonmail/webclients": 0.047891554040342545,
+    "qutebrowser/qutebrowser": 0.20146658014276445,
+    "tutao/tutanota": 0.0
+  },
+  "test_repos_without_train_rate": [],
+  "n_test_tokens_repo_fallback": 0,
+  "counts_by_language": {
+    "go": {
+      "n": 167689,
+      "n_pos": 6132,
+      "pos_rate": 0.036567693766436676,
+      "n_tasks": 37,
+      "n_tasks_both_classes": 5,
+      "underpowered": true
+    },
+    "js": {
+      "n": 108383,
+      "n_pos": 5117,
+      "pos_rate": 0.0472122011754611,
+      "n_tasks": 20,
+      "n_tasks_both_classes": 6,
+      "underpowered": true
+    },
+    "python": {
+      "n": 163255,
+      "n_pos": 34977,
+      "pos_rate": 0.2142476493828673,
+      "n_tasks": 30,
+      "n_tasks_both_classes": 20,
+      "underpowered": false
+    },
+    "ts": {
+      "n": 28177,
+      "n_pos": 1514,
+      "pos_rate": 0.05373176704404301,
+      "n_tasks": 7,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    }
+  },
+  "counts_by_repo": {
+    "NodeBB/NodeBB": {
+      "n": 15061,
+      "n_pos": 4208,
+      "pos_rate": 0.2793971183852334,
+      "n_tasks": 4,
+      "n_tasks_both_classes": 4,
+      "underpowered": true
+    },
+    "ansible/ansible": {
+      "n": 70351,
+      "n_pos": 18935,
+      "pos_rate": 0.2691504029793464,
+      "n_tasks": 13,
+      "n_tasks_both_classes": 9,
+      "underpowered": true
+    },
+    "element-hq/element-web": {
+      "n": 32794,
+      "n_pos": 34,
+      "pos_rate": 0.0010367750198206989,
+      "n_tasks": 7,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    },
+    "flipt-io/flipt": {
+      "n": 73946,
+      "n_pos": 0,
+      "pos_rate": 0.0,
+      "n_tasks": 14,
+      "n_tasks_both_classes": 0,
+      "underpowered": true
+    },
+    "future-architect/vuls": {
+      "n": 40422,
+      "n_pos": 191,
+      "pos_rate": 0.004725149670971253,
+      "n_tasks": 9,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    },
+    "gravitational/teleport": {
+      "n": 42890,
+      "n_pos": 5941,
+      "pos_rate": 0.13851713686173933,
+      "n_tasks": 12,
+      "n_tasks_both_classes": 4,
+      "underpowered": true
+    },
+    "internetarchive/openlibrary": {
+      "n": 56045,
+      "n_pos": 11717,
+      "pos_rate": 0.2090641448835757,
+      "n_tasks": 9,
+      "n_tasks_both_classes": 5,
+      "underpowered": true
+    },
+    "navidrome/navidrome": {
+      "n": 10431,
+      "n_pos": 0,
+      "pos_rate": 0.0,
+      "n_tasks": 2,
+      "n_tasks_both_classes": 0,
+      "underpowered": true
+    },
+    "protonmail/webclients": {
+      "n": 60528,
+      "n_pos": 875,
+      "pos_rate": 0.014456119481892678,
+      "n_tasks": 9,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    },
+    "qutebrowser/qutebrowser": {
+      "n": 36859,
+      "n_pos": 4325,
+      "pos_rate": 0.11733904880761822,
+      "n_tasks": 8,
+      "n_tasks_both_classes": 6,
+      "underpowered": true
+    },
+    "tutao/tutanota": {
+      "n": 28177,
+      "n_pos": 1514,
+      "pos_rate": 0.05373176704404301,
+      "n_tasks": 7,
+      "n_tasks_both_classes": 1,
+      "underpowered": true
+    }
+  },
+  "auc": {
+    "real|pooled": 0.8358518094255664,
+    "lang_only|pooled": 0.7158369577424132,
+    "repo_only|pooled": 0.7439160904942349,
+    "real|strat_lang": 0.7860015065223236,
+    "real|strat_repo": 0.7881245616528275,
+    "real|lang=go": 0.7771613567096199,
+    "real|lang=js": 0.8566008550046095,
+    "real|lang=python": 0.7791201569886069,
+    "real|lang=ts": 0.8436513554299317,
+    "real|repo=NodeBB/NodeBB": 0.7366345916690344,
+    "real|repo=ansible/ansible": 0.7927398642403818,
+    "real|repo=element-hq/element-web": 0.6243670545141133,
+    "real|repo=flipt-io/flipt": NaN,
+    "real|repo=future-architect/vuls": 0.7104079959178154,
+    "real|repo=gravitational/teleport": 0.8131547996100786,
+    "real|repo=internetarchive/openlibrary": 0.7671925071364709,
+    "real|repo=navidrome/navidrome": NaN,
+    "real|repo=protonmail/webclients": 0.875120791434271,
+    "real|repo=qutebrowser/qutebrowser": 0.7684590349411252,
+    "real|repo=tutao/tutanota": 0.8436513554299317,
+    "real-lang_only": 0.12001485168315318,
+    "real-repo_only": 0.09193571893133146,
+    "real_pooled-real_strat_lang": 0.04985030290324277,
+    "real_pooled-real_strat_repo": 0.047727247772738846
+  },
+  "ci95": {
+    "real|pooled": [
+      0.7921670081484302,
+      0.8700431033629235
+    ],
+    "lang_only|pooled": [
+      0.5933053305035151,
+      0.8142532767242203
+    ],
+    "repo_only|pooled": [
+      0.6395167664076581,
+      0.8337446775613515
+    ],
+    "real|strat_lang": [
+      0.7472005352460482,
+      0.8229824288242207
+    ],
+    "real|strat_repo": [
+      0.7479378300409566,
+      0.8252395950521567
+    ],
+    "real|lang=go": [
+      0.7063146622100324,
+      0.8245607233362996
+    ],
+    "real|lang=js": [
+      0.7835603273061117,
+      0.914719141341727
+    ],
+    "real|lang=python": [
+      0.7263009416199245,
+      0.8225190641560508
+    ],
+    "real|lang=ts": [
+      0.8143118868936104,
+      0.892732193548429
+    ],
+    "real|repo=NodeBB/NodeBB": [
+      0.5885678922422438,
+      0.8555988314724862
+    ],
+    "real|repo=ansible/ansible": [
+      0.7395283018505145,
+      0.8453692292193574
+    ],
+    "real|repo=element-hq/element-web": [
+      0.5234506992175335,
+      0.7672148578630122
+    ],
+    "real|repo=flipt-io/flipt": [
+      null,
+      null
+    ],
+    "real|repo=future-architect/vuls": [
+      0.6257488405915228,
+      0.8135167332947256
+    ],
+    "real|repo=gravitational/teleport": [
+      0.7213334693679874,
+      0.875842315565419
+    ],
+    "real|repo=internetarchive/openlibrary": [
+      0.6235421911100176,
+      0.8415033503593476
+    ],
+    "real|repo=navidrome/navidrome": [
+      null,
+      null
+    ],
+    "real|repo=protonmail/webclients": [
+      0.7992854769299542,
+      0.9283804781222721
+    ],
+    "real|repo=qutebrowser/qutebrowser": [
+      0.5687487605755528,
+      0.9015662942708769
+    ],
+    "real|repo=tutao/tutanota": [
+      0.8143118868936104,
+      0.892732193548429
+    ],
+    "real-lang_only": [
+      0.0307648355428343,
+      0.21736796498950575
+    ],
+    "real-repo_only": [
+      0.009085543901335789,
+      0.17566537903086168
+    ],
+    "real_pooled-real_strat_lang": [
+      0.02036827064535861,
+      0.07930269677091394
+    ],
+    "real_pooled-real_strat_repo": [
+      0.009037901430773406,
+      0.08085276421024973
+    ]
+  }
+}

@@ -17,9 +17,12 @@ stratified AUC is the main number.
                                      pass probe names to draw others)
 
 Usage: uv run python scripts/rebuttal_per_language_figures.py [currently_compiles ...]
+       [--root DIR --out DIR --show-layer]   (E11-TEST: --root paper_rebuttal_candidate/lang
+                                              --out paper_rebuttal_candidate/lang/figures --show-layer)
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -39,6 +42,14 @@ MODELS = [("laguna_xs2_pro_full_pooled", "Laguna XS.2", "laguna", "o"),
           ("qwen36_35b_a3b_pro_full_pooled", "Qwen3.6-35B-A3B", "qwen", "s")]
 LANG_ORDER = ["python", "go", "js", "ts"]
 REF = "#555555"
+
+
+SHOW_LAYER = False
+
+
+def mlabel(label: str, r: dict, key: str = "layer") -> str:
+    """Model label, with the probe's (1-indexed) layer when --show-layer is set."""
+    return f"{label} (layer {r[key] + 1})" if SHOW_LAYER and r.get(key) is not None else label
 
 
 def load(pooled: str) -> dict:
@@ -95,7 +106,7 @@ def fig_language(data: dict) -> None:
         ax.axhline(r["auc"]["real|pooled"], color=color, linestyle="--", linewidth=1.0, alpha=0.8)
         ax.axhline(r["auc"]["real|strat_lang"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
         ax.axhline(r["auc"]["lang_only|pooled"], color=color, linestyle=":", linewidth=1.2, alpha=0.8)
-        handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=label))
+        handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=mlabel(label, r)))
     ax.axhline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
     ax.set_xticks(range(len(langs)))
     ax.set_xticklabels([f"{l}\n" + "/".join(str(data[p]["counts_by_language"].get(l, {}).get("n_tasks", 0)) for p, *_ in MODELS)
@@ -125,7 +136,7 @@ def fig_repo(data: dict, models: list = MODELS, name: str = "e11_compiles_by_rep
         ax.axvline(r["auc"]["real|pooled"], color=color, linestyle="--", linewidth=1.0, alpha=0.8)
         ax.axvline(r["auc"]["real|strat_repo"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
         ax.axvline(r["auc"]["repo_only|pooled"], color=color, linestyle=":", linewidth=1.2, alpha=0.8)
-        handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=label))
+        handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=mlabel(label, r)))
     ax.axvline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
     ax.set_yticks(range(len(repos)))
     ax.set_yticklabels([f"{rp} (" + "/".join(str(data[p]["counts_by_repo"].get(rp, {}).get("n_tasks", 0)) for p, *_ in models) + ")"
@@ -146,15 +157,16 @@ def fig_transfer(data: dict) -> None:
     for ax, (pooled, label, slug, marker) in zip(axes, MODELS):
         r = data[pooled]
         handles = []
-        for key, color, dx, mk, name in (("real", _style.COLORS[f"{slug}_verified"], -0.12, marker, "trained on Pro"),
-                                         ("transfer", _style.COLORS[f"{slug}_pro"], 0.12, "D", "trained on Verified")):
+        for key, color, dx, mk, name in (("real", _style.COLORS[f"{slug}_verified"], -0.12, marker, mlabel("trained on Pro", r)),
+                                         ("transfer", _style.COLORS[f"{slug}_pro"], 0.12, "D",
+                                          mlabel("trained on Verified", r, "transfer_layer"))):
             for j, l in enumerate(langs):
                 if l in r["counts_by_language"]:
                     v, lo, hi = point_ci(r, f"{key}|lang={l}")
                     dot(ax, j + dx, v, [[lo], [hi]], mk, color)
             ax.axhline(r["auc"][f"{key}|pooled"], color=color, linestyle="--", linewidth=1.0, alpha=0.8)
             handles += [Line2D([0], [0], color=color, marker=mk, linestyle="", label=name),
-                        Line2D([0], [0], color=color, linestyle="--", linewidth=1.0, label=f"pooled ({name})")]
+                        Line2D([0], [0], color=color, linestyle="--", linewidth=1.0, label="pooled")]
         ax.axhline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
         ax.text(0.01, 0.98, label, transform=ax.transAxes, ha="left", va="top", fontsize=8)
         ax.legend(handles=[handles[0], handles[2], handles[1], handles[3]], loc="lower left", ncol=2,
@@ -173,13 +185,21 @@ VERIFIED_MODELS = [("laguna_xs2_full_pooled", "Laguna XS.2", "laguna", "o"),
 
 
 def main() -> None:
+    global ROOT, OUT, SHOW_LAYER
+    ap = argparse.ArgumentParser()
+    ap.add_argument("probes", nargs="*", default=["currently_compiles"])
+    ap.add_argument("--root", default=str(ROOT))
+    ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--show-layer", action="store_true")
+    args = ap.parse_args()
+    ROOT, OUT, SHOW_LAYER = Path(args.root), Path(args.out), args.show_layer
     _style.apply()
     data = {p: load(p) for p, *_ in MODELS}
     fig_language(data)
     fig_repo(data)
     fig_transfer(data)
     # E11b: Verified (Python-only), repository controls
-    for probe in sys.argv[1:] or ["currently_compiles"]:
+    for probe in args.probes:
         vdata = {p: json.loads((ROOT / f"lang_swebench_{p}_{probe}.json").read_text()) for p, *_ in VERIFIED_MODELS}
         fig_repo(vdata, VERIFIED_MODELS, f"e11b_verified_{probe.removeprefix('currently_')}_by_repo")
 

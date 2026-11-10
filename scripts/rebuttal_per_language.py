@@ -18,6 +18,13 @@ Eval-only. For one (Pro run, probe):
     to the same Pro test tokens: pooled, per-language and language-stratified AUC.
 CIs: 1000 task-level bootstrap resamples (multinomial task weights), differences paired.
 
+Layer rules (E11-TEST): --layer-rule valbest (default, E11/E11b) or testbest (best layer on test,
+the paper's Table 5 convention; E17's real_test_best_layer), or --layer N. The real probe's pooled
+AUC must equal the stored results.pt test AUC at that layer (asserted). For the transfer probe,
+--transfer-layer-rule valbest (E11: Verified validation-best) or testbest (best pooled transfer
+layer on these Pro test tokens, from T-POOL's paper_rebuttal_candidate/transfer/json, whose pooled
+AUC it must reproduce), or --transfer-layer N.
+
 Usage:
     uv run python scripts/rebuttal_per_language.py --pooled laguna_xs2_pro_full_pooled \
         --cache-prefix laguna_xs2_full --probe currently_compiles \
@@ -113,6 +120,10 @@ def main() -> None:
     ap.add_argument("--cache-prefix", required=True)
     ap.add_argument("--probe", required=True)
     ap.add_argument("--transfer-pooled", default=None, help="Verified pooled run id (results/swebench/<id>)")
+    ap.add_argument("--layer-rule", choices=["valbest", "testbest"], default="valbest")
+    ap.add_argument("--layer", type=int, default=None, help="explicit layer (overrides --layer-rule)")
+    ap.add_argument("--transfer-layer-rule", choices=["valbest", "testbest"], default="valbest")
+    ap.add_argument("--transfer-layer", type=int, default=None)
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--output", required=True)
@@ -120,7 +131,12 @@ def main() -> None:
 
     phase = Path("reports/rerun/phase")
     e17 = json.loads((phase / f"k0_{args.bench}_{args.pooled}_{args.probe}.json").read_text())
-    layer = int(e17["val_best_layer"]["real"])
+    if args.layer is not None:
+        layer, layer_rule = args.layer, "explicit"
+    elif args.layer_rule == "testbest":
+        layer, layer_rule = int(e17["real_test_best_layer"]), "testbest"
+    else:
+        layer, layer_rule = int(e17["val_best_layer"]["real"]), "valbest"
     cdir = Path("cache", args.bench, args.cache_prefix, args.probe)
     meta = torch.load(cdir / "layer_0.pt", weights_only=False, mmap=True)
     sids, gids, y_all = meta["sample_id"], meta["group_id"], meta["y"].numpy().copy()
@@ -141,10 +157,18 @@ def main() -> None:
     H = torch.load(cdir / f"layer_{layer}.pt", weights_only=False, mmap=True)["H"]
     sc = {"real": score_layer(H, test_idx, {"real": load_probe(Path("results", args.bench, args.pooled, args.probe, "weights.pt"), layer)})["real"]}
     del H
-    transfer_layer = None
+    transfer_layer = transfer_rule = tpool = None
     if args.transfer_pooled:
         e17v = json.loads((phase / f"k0_swebench_{args.transfer_pooled}_{args.probe}.json").read_text())
-        transfer_layer = int(e17v["val_best_layer"]["real"])
+        model = "laguna" if "laguna" in args.transfer_pooled else "qwen"
+        tpool = Path("paper_rebuttal_candidate/transfer/json") / f"transfer_{model}_v2p_{args.probe}.json"
+        tpool = json.loads(tpool.read_text()) if tpool.exists() else None
+        if args.transfer_layer is not None:
+            transfer_layer, transfer_rule = args.transfer_layer, "explicit"
+        elif args.transfer_layer_rule == "testbest":
+            transfer_layer, transfer_rule = int(tpool["best_layer_test"]["transfer_pooled"]), "testbest"
+        else:
+            transfer_layer, transfer_rule = int(e17v["val_best_layer"]["real"]), "valbest"
         H = torch.load(cdir / f"layer_{transfer_layer}.pt", weights_only=False, mmap=True)["H"]
         sc["transfer"] = score_layer(H, test_idx, {"t": load_probe(
             Path("results", "swebench", args.transfer_pooled, args.probe, "weights.pt"), transfer_layer)})["t"]
@@ -183,10 +207,17 @@ def main() -> None:
         for l in np.unique(lang):
             diffs[f"real-transfer|lang={l}"] = (f"real|lang={l}", f"transfer|lang={l}")
     point, cis = bootstrap(metrics, diffs, [sids[i] for i in test_idx], args.n_boot, args.seed)
-    if abs(point["real|pooled"] - e17["auc"]["real_valbest"]) > 1e-6:
-        raise ValueError(f"pooled AUC {point['real|pooled']:.6f} != E17 {e17['auc']['real_valbest']:.6f}")
+    stored = e17["stored_test_auc"]["real"][str(layer)]
+    if abs(point["real|pooled"] - stored) > 1e-3:
+        raise ValueError(f"pooled AUC {point['real|pooled']:.6f} != stored test AUC {stored:.6f} at layer {layer}")
+    if "transfer" in sc and tpool is not None:
+        tp = tpool["layers"][str(transfer_layer)]["transfer_pooled"]
+        if abs(point["transfer|pooled"] - tp) > 1e-3:
+            raise ValueError(f"transfer pooled {point['transfer|pooled']:.6f} != T-POOL {tp:.6f} at layer {transfer_layer}")
     out = {"bench": args.bench, "pooled": args.pooled, "probe": args.probe, "layer": layer,
+           "layer_rule": layer_rule, "layer_1indexed": layer + 1,
            "transfer_pooled": args.transfer_pooled, "transfer_layer": transfer_layer,
+           "transfer_layer_rule": transfer_rule if args.transfer_pooled else None,
            "auc_definition": "pooled AUC over all test tokens with y >= 0 (E17); no position bins",
            "language_field": "repo_language (ScaleAI/SWE-bench_Pro)" if args.bench == "swebench_pro" else "python (Verified is Python-only)",
            "repo_field": "repo (ScaleAI/SWE-bench_Pro)" if args.bench == "swebench_pro" else "repo (princeton-nlp/SWE-bench_Verified)",

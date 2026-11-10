@@ -296,6 +296,14 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
   - Compiles does not transfer: −0.16 to −0.25.
 - Output: `paper_rebuttal_candidate/transfer/` (`scripts/rebuttal_transfer_pooled.py`, `scripts/paper_rebuttal_candidate_transfer.py`).
 
+**E11/E11b at the best test layers (E11-TEST)**
+- Setup: the same analysis as E11/E11b, with the real probe at its best test layer, which reproduces Table 5 (asserted). Laguna's layers are unchanged, so its numbers equal E11's.
+- Qwen/Pro compiles and has_regressions peak at layer 1. There, the same-language AUC is 0.539 [0.475, 0.593] and 0.623 [0.593, 0.681], against 0.578 and 0.711 at the validation-best layers (40 and 21). The language-only scores (0.756 / 0.831) match the pooled AUCs (0.750 / 0.840).
+  - So the layer-1 peaks are mostly the task's language, and more so than at the deeper layers.
+  - For Qwen/Pro has_regressions, every test task with both classes is a Python task.
+- Verified (repository controls): same-repo AUC stays within 0.04 of pooled for every property.
+- Output: `paper_rebuttal_candidate/lang/`.
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
