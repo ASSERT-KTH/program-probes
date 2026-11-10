@@ -38,3 +38,18 @@ E11 (Pro: language and repository controls) and E11b (Verified: repository contr
   - Also `e11b_verified_compiles_by_repo`.
 
 Command: `scripts/rebuttal_per_language.py --layer-rule testbest [--transfer-layer-rule testbest]`, then `scripts/rebuttal_per_language_figures.py --root paper_rebuttal_candidate/lang --out paper_rebuttal_candidate/lang/figures --show-layer`.
+
+## `counts/` (brief E14, reviewer wokJ-Q3)
+
+Population after filtering: tasks, trajectories and hidden states (y ≥ 0) per split. Covers the 4 runs × 3 filters (k = 0, k_max = 15, k_max = 50), plus the legacy (submitted) populations rebuilt from `snapshots/`. No probes are involved.
+- **Checks:**
+  - The counts equal the stored n_train / n_val / n_test.
+  - The windowed test counts equal the lookahead figures' "n = … h_t" labels.
+  - The legacy counts equal the stored `*_legacyturns` counts (48 of 48).
+- **Splits:** like training, each population is split over its own tasks, so the windowed test sets are different task samples from the k = 0 one.
+- **Files:**
+  - `json/counts_<run>.json`: per filter and probe, the per-split counts, positive rates and overlap with the k = 0 test tasks. Also trajectory lengths and the legacy populations.
+  - `summary.json`: compact tables and the decomposition of the submitted max50 test count.
+  - `counts_table.tex`: the candidate appendix table (test split, plus train / val / test states).
+
+Command: `sbatch -A <account> slurm/population_counts.sh --run <run> --output paper_rebuttal_candidate/counts/json/counts_<run>.json`, then `uv run python scripts/paper_rebuttal_candidate_counts.py`.

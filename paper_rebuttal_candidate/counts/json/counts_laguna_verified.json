@@ -1,0 +1,1620 @@
+{
+  "run": "laguna_verified",
+  "bench": "swebench",
+  "cache": "laguna_xs2_full",
+  "pooled": "laguna_xs2_full_pooled",
+  "length": {
+    "turns_label_files": {
+      "n": 4991,
+      "median": 55.0,
+      "mean": 55.43718693648567,
+      "frac_ge15": 0.9777599679422961,
+      "frac_ge16": 0.9729513123622521,
+      "frac_ge50": 0.5684231616910439,
+      "frac_ge51": 0.5519935884592266,
+      "n_ge15": 4880,
+      "n_ge16": 4856,
+      "n_ge50": 2837,
+      "n_ge51": 2755
+    },
+    "steps_generations": {
+      "n": 4991,
+      "median": 55.0,
+      "mean": 55.43718693648567,
+      "frac_ge15": 0.9777599679422961,
+      "frac_ge16": 0.9729513123622521,
+      "frac_ge50": 0.5684231616910439,
+      "frac_ge51": 0.5519935884592266,
+      "n_ge15": 4880,
+      "n_ge16": 4856,
+      "n_ge50": 2837,
+      "n_ge51": 2755
+    },
+    "n_label_files": 4991,
+    "n_generations": 4991,
+    "turns_equal_steps": 4991,
+    "n_common": 4991
+  },
+  "rerun": {
+    "k0": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 350,
+          "trajectories": 3296,
+          "states": 5260077,
+          "tasks_with_rows": 350,
+          "trajectories_with_rows": 3495,
+          "rows": 5555326,
+          "n_pos": 4959166,
+          "pos_rate": 0.9427934229860133,
+          "trajectories_in_split": 3496,
+          "frac_trajectories_kept": 0.9427917620137299
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 683,
+          "states": 1087617,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 745,
+          "rows": 1169069,
+          "n_pos": 1009355,
+          "pos_rate": 0.9280426841434071,
+          "trajectories_in_split": 745,
+          "frac_trajectories_kept": 0.9167785234899329
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 706,
+          "states": 1130891,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 750,
+          "rows": 1184512,
+          "n_pos": 1017405,
+          "pos_rate": 0.8996490377940933,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.9413333333333334
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4685,
+          "states": 7478585,
+          "generations": 4991,
+          "frac_generations_kept": 0.938689641354438
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 5260077,
+          "val": 1087617,
+          "test": 1130891,
+          "n_pos_test": 1017405
+        }
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 350,
+          "trajectories": 3291,
+          "states": 5254768,
+          "tasks_with_rows": 350,
+          "trajectories_with_rows": 3495,
+          "rows": 5555326,
+          "n_pos": 1802295,
+          "pos_rate": 0.3429827920090858,
+          "trajectories_in_split": 3496,
+          "frac_trajectories_kept": 0.9413615560640732
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 683,
+          "states": 1087617,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 745,
+          "rows": 1169069,
+          "n_pos": 430889,
+          "pos_rate": 0.39617714691844647,
+          "trajectories_in_split": 745,
+          "frac_trajectories_kept": 0.9167785234899329
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 706,
+          "states": 1130891,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 750,
+          "rows": 1184512,
+          "n_pos": 399996,
+          "pos_rate": 0.35369987027927535,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.9413333333333334
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 5254768,
+          "val": 1087617,
+          "test": 1130891,
+          "n_pos_test": 399996
+        }
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 350,
+          "trajectories": 3291,
+          "states": 5254768,
+          "tasks_with_rows": 350,
+          "trajectories_with_rows": 3495,
+          "rows": 5555326,
+          "n_pos": 2010273,
+          "pos_rate": 0.3825617039610502,
+          "trajectories_in_split": 3496,
+          "frac_trajectories_kept": 0.9413615560640732
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 683,
+          "states": 1087617,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 745,
+          "rows": 1169069,
+          "n_pos": 551104,
+          "pos_rate": 0.5067077840820804,
+          "trajectories_in_split": 745,
+          "frac_trajectories_kept": 0.9167785234899329
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 706,
+          "states": 1130891,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 750,
+          "rows": 1184512,
+          "n_pos": 454133,
+          "pos_rate": 0.40157097368358224,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.9413333333333334
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 5254768,
+          "val": 1087617,
+          "test": 1130891,
+          "n_pos_test": 454133
+        }
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 350,
+          "trajectories": 3291,
+          "states": 5254768,
+          "tasks_with_rows": 350,
+          "trajectories_with_rows": 3495,
+          "rows": 5555326,
+          "n_pos": 441304,
+          "pos_rate": 0.08398163344223761,
+          "trajectories_in_split": 3496,
+          "frac_trajectories_kept": 0.9413615560640732
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 683,
+          "states": 1087617,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 745,
+          "rows": 1169069,
+          "n_pos": 88302,
+          "pos_rate": 0.08118850661583996,
+          "trajectories_in_split": 745,
+          "frac_trajectories_kept": 0.9167785234899329
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 706,
+          "states": 1130891,
+          "tasks_with_rows": 75,
+          "trajectories_with_rows": 750,
+          "rows": 1184512,
+          "n_pos": 125685,
+          "pos_rate": 0.11113803187044552,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.9413333333333334
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 5254768,
+          "val": 1087617,
+          "test": 1130891,
+          "n_pos_test": 125685
+        }
+      }
+    },
+    "max15": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3184,
+          "states": 3353097,
+          "tasks_with_rows": 348,
+          "trajectories_with_rows": 3391,
+          "rows": 3567760,
+          "n_pos": 3179492,
+          "pos_rate": 0.9482254763283019,
+          "trajectories_in_split": 3477,
+          "frac_trajectories_kept": 0.9157319528329019
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 655,
+          "states": 685934,
+          "tasks_with_rows": 74,
+          "trajectories_with_rows": 716,
+          "rows": 735972,
+          "n_pos": 635052,
+          "pos_rate": 0.9258208515688098,
+          "trajectories_in_split": 735,
+          "frac_trajectories_kept": 0.891156462585034
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 716,
+          "states": 719160,
+          "tasks_with_rows": 76,
+          "trajectories_with_rows": 749,
+          "rows": 745527,
+          "n_pos": 643255,
+          "pos_rate": 0.8944532510150731,
+          "trajectories_in_split": 759,
+          "frac_trajectories_kept": 0.9433465085638999
+        },
+        "split_groups": {
+          "train": 348,
+          "val": 74,
+          "test": 76
+        },
+        "generations_unassigned": 20,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4555,
+          "states": 4758191,
+          "generations": 4991,
+          "frac_generations_kept": 0.9126427569625326
+        },
+        "test_tasks_shared_with_k0_test": 62,
+        "test_tasks_not_in_k0_test": 14,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 3353097,
+          "val": 685934,
+          "test": 719160,
+          "n_pos_test": 643255
+        },
+        "figure_n_test": 719160
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3178,
+          "states": 3351681,
+          "tasks_with_rows": 348,
+          "trajectories_with_rows": 3391,
+          "rows": 3567760,
+          "n_pos": 809260,
+          "pos_rate": 0.24144899231161915,
+          "trajectories_in_split": 3477,
+          "frac_trajectories_kept": 0.914006327293644
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 655,
+          "states": 685934,
+          "tasks_with_rows": 74,
+          "trajectories_with_rows": 716,
+          "rows": 735972,
+          "n_pos": 189040,
+          "pos_rate": 0.27559502809308184,
+          "trajectories_in_split": 735,
+          "frac_trajectories_kept": 0.891156462585034
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 716,
+          "states": 719160,
+          "tasks_with_rows": 76,
+          "trajectories_with_rows": 749,
+          "rows": 745527,
+          "n_pos": 196941,
+          "pos_rate": 0.27384865676622727,
+          "trajectories_in_split": 759,
+          "frac_trajectories_kept": 0.9433465085638999
+        },
+        "split_groups": {
+          "train": 348,
+          "val": 74,
+          "test": 76
+        },
+        "generations_unassigned": 20,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4549,
+          "states": 4756775,
+          "generations": 4991,
+          "frac_generations_kept": 0.9114405930675216
+        },
+        "test_tasks_shared_with_k0_test": 62,
+        "test_tasks_not_in_k0_test": 14,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 3351681,
+          "val": 685934,
+          "test": 719160,
+          "n_pos_test": 196941
+        },
+        "figure_n_test": 719160
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3178,
+          "states": 3351681,
+          "tasks_with_rows": 348,
+          "trajectories_with_rows": 3391,
+          "rows": 3567760,
+          "n_pos": 985308,
+          "pos_rate": 0.2939742773849898,
+          "trajectories_in_split": 3477,
+          "frac_trajectories_kept": 0.914006327293644
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 655,
+          "states": 685934,
+          "tasks_with_rows": 74,
+          "trajectories_with_rows": 716,
+          "rows": 735972,
+          "n_pos": 266153,
+          "pos_rate": 0.38801546504474194,
+          "trajectories_in_split": 735,
+          "frac_trajectories_kept": 0.891156462585034
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 716,
+          "states": 719160,
+          "tasks_with_rows": 76,
+          "trajectories_with_rows": 749,
+          "rows": 745527,
+          "n_pos": 220520,
+          "pos_rate": 0.3066355192168641,
+          "trajectories_in_split": 759,
+          "frac_trajectories_kept": 0.9433465085638999
+        },
+        "split_groups": {
+          "train": 348,
+          "val": 74,
+          "test": 76
+        },
+        "generations_unassigned": 20,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4549,
+          "states": 4756775,
+          "generations": 4991,
+          "frac_generations_kept": 0.9114405930675216
+        },
+        "test_tasks_shared_with_k0_test": 62,
+        "test_tasks_not_in_k0_test": 14,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 3351681,
+          "val": 685934,
+          "test": 719160,
+          "n_pos_test": 220520
+        },
+        "figure_n_test": 719160
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3178,
+          "states": 3351681,
+          "tasks_with_rows": 348,
+          "trajectories_with_rows": 3391,
+          "rows": 3567760,
+          "n_pos": 286608,
+          "pos_rate": 0.08551171785143037,
+          "trajectories_in_split": 3477,
+          "frac_trajectories_kept": 0.914006327293644
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 655,
+          "states": 685934,
+          "tasks_with_rows": 74,
+          "trajectories_with_rows": 716,
+          "rows": 735972,
+          "n_pos": 56832,
+          "pos_rate": 0.08285345237296883,
+          "trajectories_in_split": 735,
+          "frac_trajectories_kept": 0.891156462585034
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 716,
+          "states": 719160,
+          "tasks_with_rows": 76,
+          "trajectories_with_rows": 749,
+          "rows": 745527,
+          "n_pos": 78993,
+          "pos_rate": 0.10984064742199233,
+          "trajectories_in_split": 759,
+          "frac_trajectories_kept": 0.9433465085638999
+        },
+        "split_groups": {
+          "train": 348,
+          "val": 74,
+          "test": 76
+        },
+        "generations_unassigned": 20,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4549,
+          "states": 4756775,
+          "generations": 4991,
+          "frac_generations_kept": 0.9114405930675216
+        },
+        "test_tasks_shared_with_k0_test": 62,
+        "test_tasks_not_in_k0_test": 14,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 3351681,
+          "val": 685934,
+          "test": 719160,
+          "n_pos_test": 78993
+        },
+        "figure_n_test": 719160
+      }
+    },
+    "max50": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 288,
+          "trajectories": 1760,
+          "states": 663280,
+          "tasks_with_rows": 290,
+          "trajectories_with_rows": 1924,
+          "rows": 716401,
+          "n_pos": 645551,
+          "pos_rate": 0.9732707152333856,
+          "trajectories_in_split": 2896,
+          "frac_trajectories_kept": 0.6077348066298343
+        },
+        "val": {
+          "tasks": 62,
+          "trajectories": 380,
+          "states": 128422,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 412,
+          "rows": 137051,
+          "n_pos": 120408,
+          "pos_rate": 0.9375963619940508,
+          "trajectories_in_split": 620,
+          "frac_trajectories_kept": 0.6129032258064516
+        },
+        "test": {
+          "tasks": 63,
+          "trajectories": 384,
+          "states": 181946,
+          "tasks_with_rows": 63,
+          "trajectories_with_rows": 419,
+          "rows": 197673,
+          "n_pos": 177511,
+          "pos_rate": 0.9756246358809757,
+          "trajectories_in_split": 625,
+          "frac_trajectories_kept": 0.6144
+        },
+        "split_groups": {
+          "train": 290,
+          "val": 62,
+          "test": 63
+        },
+        "generations_unassigned": 850,
+        "all": {
+          "tasks": 413,
+          "trajectories": 2524,
+          "states": 973648,
+          "generations": 4991,
+          "frac_generations_kept": 0.5057102785013023
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "test_tasks_not_in_k0_test": 49,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 663280,
+          "val": 128422,
+          "test": 181946,
+          "n_pos_test": 177511
+        },
+        "figure_n_test": 181946
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 288,
+          "trajectories": 1760,
+          "states": 663280,
+          "tasks_with_rows": 290,
+          "trajectories_with_rows": 1924,
+          "rows": 716401,
+          "n_pos": 54821,
+          "pos_rate": 0.08265136895428778,
+          "trajectories_in_split": 2896,
+          "frac_trajectories_kept": 0.6077348066298343
+        },
+        "val": {
+          "tasks": 62,
+          "trajectories": 380,
+          "states": 128422,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 412,
+          "rows": 137051,
+          "n_pos": 13970,
+          "pos_rate": 0.10878198439519708,
+          "trajectories_in_split": 620,
+          "frac_trajectories_kept": 0.6129032258064516
+        },
+        "test": {
+          "tasks": 63,
+          "trajectories": 384,
+          "states": 181946,
+          "tasks_with_rows": 63,
+          "trajectories_with_rows": 419,
+          "rows": 197673,
+          "n_pos": 13882,
+          "pos_rate": 0.07629736295384344,
+          "trajectories_in_split": 625,
+          "frac_trajectories_kept": 0.6144
+        },
+        "split_groups": {
+          "train": 290,
+          "val": 62,
+          "test": 63
+        },
+        "generations_unassigned": 850,
+        "all": {
+          "tasks": 413,
+          "trajectories": 2524,
+          "states": 973648,
+          "generations": 4991,
+          "frac_generations_kept": 0.5057102785013023
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "test_tasks_not_in_k0_test": 49,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 663280,
+          "val": 128422,
+          "test": 181946,
+          "n_pos_test": 13882
+        },
+        "figure_n_test": 181946
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 288,
+          "trajectories": 1760,
+          "states": 663280,
+          "tasks_with_rows": 290,
+          "trajectories_with_rows": 1924,
+          "rows": 716401,
+          "n_pos": 79071,
+          "pos_rate": 0.11921209745507176,
+          "trajectories_in_split": 2896,
+          "frac_trajectories_kept": 0.6077348066298343
+        },
+        "val": {
+          "tasks": 62,
+          "trajectories": 380,
+          "states": 128422,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 412,
+          "rows": 137051,
+          "n_pos": 14121,
+          "pos_rate": 0.10995779539331267,
+          "trajectories_in_split": 620,
+          "frac_trajectories_kept": 0.6129032258064516
+        },
+        "test": {
+          "tasks": 63,
+          "trajectories": 384,
+          "states": 181946,
+          "tasks_with_rows": 63,
+          "trajectories_with_rows": 419,
+          "rows": 197673,
+          "n_pos": 21243,
+          "pos_rate": 0.11675442164158596,
+          "trajectories_in_split": 625,
+          "frac_trajectories_kept": 0.6144
+        },
+        "split_groups": {
+          "train": 290,
+          "val": 62,
+          "test": 63
+        },
+        "generations_unassigned": 850,
+        "all": {
+          "tasks": 413,
+          "trajectories": 2524,
+          "states": 973648,
+          "generations": 4991,
+          "frac_generations_kept": 0.5057102785013023
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "test_tasks_not_in_k0_test": 49,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 663280,
+          "val": 128422,
+          "test": 181946,
+          "n_pos_test": 21243
+        },
+        "figure_n_test": 181946
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 288,
+          "trajectories": 1760,
+          "states": 663280,
+          "tasks_with_rows": 290,
+          "trajectories_with_rows": 1924,
+          "rows": 716401,
+          "n_pos": 24183,
+          "pos_rate": 0.036459715353998313,
+          "trajectories_in_split": 2896,
+          "frac_trajectories_kept": 0.6077348066298343
+        },
+        "val": {
+          "tasks": 62,
+          "trajectories": 380,
+          "states": 128422,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 412,
+          "rows": 137051,
+          "n_pos": 8115,
+          "pos_rate": 0.06319010761396023,
+          "trajectories_in_split": 620,
+          "frac_trajectories_kept": 0.6129032258064516
+        },
+        "test": {
+          "tasks": 63,
+          "trajectories": 384,
+          "states": 181946,
+          "tasks_with_rows": 63,
+          "trajectories_with_rows": 419,
+          "rows": 197673,
+          "n_pos": 11799,
+          "pos_rate": 0.06484891121541557,
+          "trajectories_in_split": 625,
+          "frac_trajectories_kept": 0.6144
+        },
+        "split_groups": {
+          "train": 290,
+          "val": 62,
+          "test": 63
+        },
+        "generations_unassigned": 850,
+        "all": {
+          "tasks": 413,
+          "trajectories": 2524,
+          "states": 973648,
+          "generations": 4991,
+          "frac_generations_kept": 0.5057102785013023
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "test_tasks_not_in_k0_test": 49,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 663280,
+          "val": 128422,
+          "test": 181946,
+          "n_pos_test": 11799
+        },
+        "figure_n_test": 181946
+      }
+    }
+  },
+  "legacy": {
+    "currently_compiles": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 202,
+          "trajectories": 1896,
+          "states": 2761598,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 2517167,
+          "pos_rate": 0.9114892898966468,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9423459244532804,
+          "rows_in_window": 2946225
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 3555,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 3461,
+          "pos_rate": 0.9735583684950774,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 3555
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2779,
+          "states": 4713432,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 4465298,
+          "pos_rate": 0.9473559817984009,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9363207547169812,
+          "rows_in_window": 4959127
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4685,
+          "states": 7478585,
+          "generations": 4991,
+          "frac_generations_kept": 0.938689641354438
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 2761598,
+          "val": 3555,
+          "test": 4713432,
+          "n_pos_test": 4465298
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 200,
+          "trajectories": 1820,
+          "states": 1996563,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 1832130,
+          "pos_rate": 0.9176419677215294,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.904572564612326,
+          "rows_in_window": 2141680
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 1814,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 1747,
+          "pos_rate": 0.9630650496141124,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 1814
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2720,
+          "states": 3465919,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 3292139,
+          "pos_rate": 0.9498603400714212,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9164420485175202,
+          "rows_in_window": 3655030
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4550,
+          "states": 5464296,
+          "generations": 4991,
+          "frac_generations_kept": 0.9116409537166901
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 1996563,
+          "val": 1814,
+          "test": 3465919,
+          "n_pos_test": 3292139
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 162,
+          "trajectories": 901,
+          "states": 607960,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 577106,
+          "pos_rate": 0.9492499506546483,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.44781312127236583,
+          "rows_in_window": 667167
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 1,
+          "states": 25,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 25,
+          "pos_rate": 1.0,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 0.1,
+          "rows_in_window": 25
+        },
+        "test": {
+          "tasks": 248,
+          "trajectories": 1535,
+          "states": 1062176,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 1022350,
+          "pos_rate": 0.962505272195945,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.5171832884097035,
+          "rows_in_window": 1132980
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 411,
+          "trajectories": 2437,
+          "states": 1670161,
+          "generations": 4991,
+          "frac_generations_kept": 0.48827890202364255
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 607960,
+          "val": 25,
+          "test": 1062176,
+          "n_pos_test": 1022350
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_correct": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 202,
+          "trajectories": 1891,
+          "states": 2757805,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 855661,
+          "pos_rate": 0.3102688551220989,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9398608349900597,
+          "rows_in_window": 2946225
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 3555,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 2030,
+          "pos_rate": 0.5710267229254571,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 3555
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2779,
+          "states": 4711916,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 1775489,
+          "pos_rate": 0.3768082877538564,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9363207547169812,
+          "rows_in_window": 4959127
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 2757805,
+          "val": 3555,
+          "test": 4711916,
+          "n_pos_test": 1775489
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 200,
+          "trajectories": 1815,
+          "states": 1994464,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 430480,
+          "pos_rate": 0.21583743802846278,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9020874751491054,
+          "rows_in_window": 2141680
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 1814,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 439,
+          "pos_rate": 0.24200661521499447,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 1814
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2720,
+          "states": 3465265,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 1061467,
+          "pos_rate": 0.30631625575533183,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9164420485175202,
+          "rows_in_window": 3655030
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4545,
+          "states": 5461543,
+          "generations": 4991,
+          "frac_generations_kept": 0.9106391504708475
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 1994464,
+          "val": 1814,
+          "test": 3465265,
+          "n_pos_test": 1061467
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 162,
+          "trajectories": 901,
+          "states": 607960,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 43362,
+          "pos_rate": 0.07132377130074347,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.44781312127236583,
+          "rows_in_window": 667167
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 1,
+          "states": 25,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 0,
+          "pos_rate": 0.0,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 0.1,
+          "rows_in_window": 25
+        },
+        "test": {
+          "tasks": 248,
+          "trajectories": 1535,
+          "states": 1062176,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 164467,
+          "pos_rate": 0.1548396875847317,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.5171832884097035,
+          "rows_in_window": 1132980
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 411,
+          "trajectories": 2437,
+          "states": 1670161,
+          "generations": 4991,
+          "frac_generations_kept": 0.48827890202364255
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 607960,
+          "val": 25,
+          "test": 1062176,
+          "n_pos_test": 164467
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_reduces_failing": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 202,
+          "trajectories": 1891,
+          "states": 2757805,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 1083761,
+          "pos_rate": 0.39297956164413367,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9398608349900597,
+          "rows_in_window": 2946225
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 3555,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 2124,
+          "pos_rate": 0.5974683544303797,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 3555
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2779,
+          "states": 4711916,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 1929625,
+          "pos_rate": 0.4095202461164418,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9363207547169812,
+          "rows_in_window": 4959127
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 2757805,
+          "val": 3555,
+          "test": 4711916,
+          "n_pos_test": 1929625
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 200,
+          "trajectories": 1815,
+          "states": 1994464,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 594144,
+          "pos_rate": 0.2978965777271487,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9020874751491054,
+          "rows_in_window": 2141680
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 1814,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 506,
+          "pos_rate": 0.278941565600882,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 1814
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2720,
+          "states": 3465265,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 1207845,
+          "pos_rate": 0.34855775820896817,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9164420485175202,
+          "rows_in_window": 3655030
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4545,
+          "states": 5461543,
+          "generations": 4991,
+          "frac_generations_kept": 0.9106391504708475
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 1994464,
+          "val": 1814,
+          "test": 3465265,
+          "n_pos_test": 1207845
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 162,
+          "trajectories": 901,
+          "states": 607960,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 82433,
+          "pos_rate": 0.13558951246792553,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.44781312127236583,
+          "rows_in_window": 667167
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 1,
+          "states": 25,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 0,
+          "pos_rate": 0.0,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 0.1,
+          "rows_in_window": 25
+        },
+        "test": {
+          "tasks": 248,
+          "trajectories": 1535,
+          "states": 1062176,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 211157,
+          "pos_rate": 0.19879662127557016,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.5171832884097035,
+          "rows_in_window": 1132980
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 411,
+          "trajectories": 2437,
+          "states": 1670161,
+          "generations": 4991,
+          "frac_generations_kept": 0.48827890202364255
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 607960,
+          "val": 25,
+          "test": 1062176,
+          "n_pos_test": 211157
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_has_regressions": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 202,
+          "trajectories": 1891,
+          "states": 2757805,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 339969,
+          "pos_rate": 0.12327521343967394,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9398608349900597,
+          "rows_in_window": 2946225
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 3555,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 315,
+          "pos_rate": 0.08860759493670886,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 3555
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2779,
+          "states": 4711916,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 315007,
+          "pos_rate": 0.06685327157784647,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9363207547169812,
+          "rows_in_window": 4959127
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 499,
+          "trajectories": 4680,
+          "states": 7473276,
+          "generations": 4991,
+          "frac_generations_kept": 0.9376878381085955
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 2757805,
+          "val": 3555,
+          "test": 4711916,
+          "n_pos_test": 315007
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 200,
+          "trajectories": 1815,
+          "states": 1994464,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 247855,
+          "pos_rate": 0.12427148346623454,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.9020874751491054,
+          "rows_in_window": 2141680
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 10,
+          "states": 1814,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 277,
+          "pos_rate": 0.15270121278941565,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 1.0,
+          "rows_in_window": 1814
+        },
+        "test": {
+          "tasks": 296,
+          "trajectories": 2720,
+          "states": 3465265,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 228724,
+          "pos_rate": 0.06600476442638586,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.9164420485175202,
+          "rows_in_window": 3655030
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 497,
+          "trajectories": 4545,
+          "states": 5461543,
+          "generations": 4991,
+          "frac_generations_kept": 0.9106391504708475
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 1994464,
+          "val": 1814,
+          "test": 3465265,
+          "n_pos_test": 228724
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 162,
+          "trajectories": 901,
+          "states": 607960,
+          "tasks_with_rows": 202,
+          "trajectories_with_rows": 2012,
+          "rows": 2946225,
+          "n_pos": 49857,
+          "pos_rate": 0.08200703993683794,
+          "trajectories_in_split": 2012,
+          "frac_trajectories_kept": 0.44781312127236583,
+          "rows_in_window": 667167
+        },
+        "val": {
+          "tasks": 1,
+          "trajectories": 1,
+          "states": 25,
+          "tasks_with_rows": 1,
+          "trajectories_with_rows": 10,
+          "rows": 3555,
+          "n_pos": 0,
+          "pos_rate": 0.0,
+          "trajectories_in_split": 10,
+          "frac_trajectories_kept": 0.1,
+          "rows_in_window": 25
+        },
+        "test": {
+          "tasks": 248,
+          "trajectories": 1535,
+          "states": 1062176,
+          "tasks_with_rows": 297,
+          "trajectories_with_rows": 2968,
+          "rows": 4959127,
+          "n_pos": 51311,
+          "pos_rate": 0.048307436808965744,
+          "trajectories_in_split": 2968,
+          "frac_trajectories_kept": 0.5171832884097035,
+          "rows_in_window": 1132980
+        },
+        "split_groups": {
+          "train": 8,
+          "val": 1,
+          "test": 3
+        },
+        "generations_unassigned": 1,
+        "all": {
+          "tasks": 411,
+          "trajectories": 2437,
+          "states": 1670161,
+          "generations": 4991,
+          "frac_generations_kept": 0.48827890202364255
+        },
+        "test_tasks_shared_with_k0_test": 297,
+        "test_groups": [
+          "astropy__astropy",
+          "django__django",
+          "sphinx-doc__sphinx"
+        ],
+        "stored": {
+          "layer": 0,
+          "train": 607960,
+          "val": 25,
+          "test": 1062176,
+          "n_pos_test": 51311
+        },
+        "matches_stored": true
+      }
+    }
+  }
+}

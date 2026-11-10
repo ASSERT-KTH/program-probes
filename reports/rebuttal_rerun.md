@@ -304,6 +304,14 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - Verified (repository controls): same-repo AUC stays within 0.04 of pooled for every property.
 - Output: `paper_rebuttal_candidate/lang/`.
 
+**Population counts after filtering (E14, wokJ-Q3)**
+- Counting only. Kept states are those with a defined label (y ≥ 0). All counts reproduce the stored n_train / n_val / n_test of the pooled runs, and the windowed test counts equal the lookahead figures' "n = … h_t" (asserted).
+- Each population is split over its own tasks, as `run_final` does. A window that removes every trajectory of a task changes the 70/15/15 split, so the k_max = 50 test set shares only 9–18 tasks with the k = 0 test set (14 of 63 for Laguna Verified).
+- k_max = 50 keeps 32–53% of all trajectories (Qwen Verified 32%, Laguna Verified 51%). Turns ≥ 50: 57% / 60% (Laguna V / P) and 40% / 55% (Qwen V / P), which matches wokJ-2b's 40–60%.
+- Submitted Fig 6 (1.1M vs 145k): the legacy populations were rebuilt from `snapshots/` with the legacy window rule and match every stored legacy count (48 of 48). Laguna Verified max50 test: 248 tasks, 1,535 trajectories, 1,062,176 states. Laguna Pro: 53 tasks, 302 trajectories, 144,545 states. The 7.3× ratio is 5.2× more trajectories in test (the repository split put astropy / django / sphinx, 297 of 500 tasks, in test) × 1.45× more states per kept trajectory × 0.97 from the window. The window keeps a similar share on both benchmarks (52% vs 53% of test trajectories).
+- The legacy Laguna Verified max50 validation set was 1 trajectory and 25 states, since the repository split put a 1-task repository in validation.
+- Output: `paper_rebuttal_candidate/counts/` (`scripts/rebuttal_population_counts.py`, `scripts/paper_rebuttal_candidate_counts.py`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
