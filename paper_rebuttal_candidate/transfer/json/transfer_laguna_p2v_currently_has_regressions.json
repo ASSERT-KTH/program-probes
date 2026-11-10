@@ -1,0 +1,146 @@
+{
+  "model": "laguna",
+  "direction": "p2v",
+  "probe": "currently_has_regressions",
+  "source": "swebench_pro",
+  "target": "swebench",
+  "source_weights": "results/swebench_pro/laguna_xs2_pro_full_pooled/currently_has_regressions/weights.pt",
+  "indist_weights": "results/swebench/laguna_xs2_full_pooled/currently_has_regressions/weights.pt",
+  "target_cache": "cache/swebench/laguna_xs2_full/currently_has_regressions",
+  "stored_transfer_run": "results/swebench/laguna_xs2_full_pro_transfer",
+  "normalization": "h - mean, mean = the probe's own training mean stored with its weights (source training mean for the transfer probe); no std scaling; as src/probe.py::run_eval",
+  "layer_pairing": "source layer L -> target layer L (same index)",
+  "n_test": 1130891,
+  "n_pos_test": 125685,
+  "n_test_tasks_in_split": 75,
+  "n_test_tasks_with_valid_tokens": 75,
+  "test_tasks_without_valid_tokens": [],
+  "n_boot": 1000,
+  "layers": {
+    "0": {
+      "indist_pooled": 0.5860995243596938,
+      "transfer_pooled": 0.5417472275408536,
+      "transfer_binned": 0.537228799220253,
+      "transfer_binned_submitted_mean": 0.537228799220253,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1130891,
+      "n_pos_test": 125685,
+      "delta_pooled": -0.04435229681884023,
+      "delta_pooled_ci95": [
+        -0.11875417893997398,
+        0.030548627198549845
+      ],
+      "transfer_pooled_ci95": [
+        0.4835524793897663,
+        0.602377584950304
+      ],
+      "indist_pooled_ci95": [
+        0.4758121387437287,
+        0.6953110870180245
+      ]
+    },
+    "10": {
+      "indist_pooled": 0.684825362107938,
+      "transfer_pooled": 0.6347108235387455,
+      "transfer_binned": 0.6213407028309541,
+      "transfer_binned_submitted_mean": 0.6213407028309541,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1130891,
+      "n_pos_test": 125685,
+      "delta_pooled": -0.05011453856919246,
+      "delta_pooled_ci95": [
+        -0.09533379759029365,
+        -0.003042865311579181
+      ],
+      "transfer_pooled_ci95": [
+        0.5690734334278498,
+        0.6945789587967801
+      ],
+      "indist_pooled_ci95": [
+        0.6032199649917473,
+        0.7610578341224045
+      ]
+    },
+    "20": {
+      "indist_pooled": 0.6954518796587461,
+      "transfer_pooled": 0.6453043072911406,
+      "transfer_binned": 0.6344707455131267,
+      "transfer_binned_submitted_mean": 0.6344707455131267,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1130891,
+      "n_pos_test": 125685,
+      "delta_pooled": -0.050147572367605475,
+      "delta_pooled_ci95": [
+        -0.08493105943214711,
+        -0.02052773397477936
+      ],
+      "transfer_pooled_ci95": [
+        0.5813512954617356,
+        0.7005056017242246
+      ],
+      "indist_pooled_ci95": [
+        0.6286260472053077,
+        0.7583217903018858
+      ]
+    },
+    "30": {
+      "indist_pooled": 0.6769794121691483,
+      "transfer_pooled": 0.6286335538721003,
+      "transfer_binned": 0.6083151087685623,
+      "transfer_binned_submitted_mean": 0.6083151087685623,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1130891,
+      "n_pos_test": 125685,
+      "delta_pooled": -0.04834585829704796,
+      "delta_pooled_ci95": [
+        -0.07954001572109808,
+        -0.016969063316582416
+      ],
+      "transfer_pooled_ci95": [
+        0.5656960352600965,
+        0.6864062909593962
+      ],
+      "indist_pooled_ci95": [
+        0.6060362120170012,
+        0.747716848207757
+      ]
+    },
+    "39": {
+      "indist_pooled": 0.6171800884145217,
+      "transfer_pooled": 0.5535050915553037,
+      "transfer_binned": 0.5397252860577544,
+      "transfer_binned_submitted_mean": 0.5397252860577544,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1130891,
+      "n_pos_test": 125685,
+      "delta_pooled": -0.06367499685921796,
+      "delta_pooled_ci95": [
+        -0.15564916670003665,
+        0.016799112623323956
+      ],
+      "transfer_pooled_ci95": [
+        0.5051487759581464,
+        0.5991326478731885
+      ],
+      "indist_pooled_ci95": [
+        0.5286091497629728,
+        0.7095229062007113
+      ]
+    }
+  },
+  "best_layer_test": {
+    "indist_pooled": 20,
+    "transfer_pooled": 20,
+    "transfer_binned": 20
+  },
+  "delta_best": -0.050147572367605475,
+  "delta_best_ci95": [
+    -0.08493105943214711,
+    -0.02052773397477936
+  ]
+}

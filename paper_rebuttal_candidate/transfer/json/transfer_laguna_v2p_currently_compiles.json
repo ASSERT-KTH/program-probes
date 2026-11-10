@@ -1,0 +1,151 @@
+{
+  "model": "laguna",
+  "direction": "v2p",
+  "probe": "currently_compiles",
+  "source": "swebench",
+  "target": "swebench_pro",
+  "source_weights": "results/swebench/laguna_xs2_full_pooled/currently_compiles/weights.pt",
+  "indist_weights": "results/swebench_pro/laguna_xs2_pro_full_pooled/currently_compiles/weights.pt",
+  "target_cache": "cache/swebench_pro/laguna_xs2_full/currently_compiles",
+  "stored_transfer_run": "results/swebench_pro/laguna_xs2_full_verified_transfer",
+  "normalization": "h - mean, mean = the probe's own training mean stored with its weights (source training mean for the transfer probe); no std scaling; as src/probe.py::run_eval",
+  "layer_pairing": "source layer L -> target layer L (same index)",
+  "n_test": 1252636,
+  "n_pos_test": 699397,
+  "n_test_tasks_in_split": 110,
+  "n_test_tasks_with_valid_tokens": 106,
+  "test_tasks_without_valid_tokens": [
+    "instance_element-hq__element-web-72a8f8f03b1a01bb70ef8a5bb61759416991b32c-vnan",
+    "instance_element-hq__element-web-776ffa47641c7ec6d142ab4a47691c30ebf83c2e",
+    "instance_future-architect__vuls-d18e7a751d07260d75ce3ba0cd67c4a6aebfd967",
+    "instance_gravitational__teleport-4f771403dc4177dc26ee0370f7332f3fe54bee0f-vee9b09fb20c43af7e520f57e9239bbcf46b7113d"
+  ],
+  "n_boot": 1000,
+  "layers": {
+    "0": {
+      "indist_pooled": 0.7460734798403733,
+      "transfer_pooled": 0.4806549281096514,
+      "transfer_binned": 0.480589812807144,
+      "transfer_binned_submitted_mean": 0.480589812807144,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1252636,
+      "n_pos_test": 699397,
+      "delta_pooled": -0.26541855173072193,
+      "delta_pooled_ci95": [
+        -0.3287931285590071,
+        -0.19719768608611532
+      ],
+      "transfer_pooled_ci95": [
+        0.4368868842077766,
+        0.5204534246142478
+      ],
+      "indist_pooled_ci95": [
+        0.6729917045696066,
+        0.8071843313469694
+      ]
+    },
+    "10": {
+      "indist_pooled": 0.7864391447522684,
+      "transfer_pooled": 0.5159575585901143,
+      "transfer_binned": 0.515035247718723,
+      "transfer_binned_submitted_mean": 0.515035247718723,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1252636,
+      "n_pos_test": 699397,
+      "delta_pooled": -0.2704815861621541,
+      "delta_pooled_ci95": [
+        -0.32398434674833737,
+        -0.21350026584427978
+      ],
+      "transfer_pooled_ci95": [
+        0.47618353621802545,
+        0.55346916994011
+      ],
+      "indist_pooled_ci95": [
+        0.7249929645228907,
+        0.8426777894170957
+      ]
+    },
+    "20": {
+      "indist_pooled": 0.7708359447372912,
+      "transfer_pooled": 0.5152545248011439,
+      "transfer_binned": 0.5146941301003771,
+      "transfer_binned_submitted_mean": 0.5146941301003771,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1252636,
+      "n_pos_test": 699397,
+      "delta_pooled": -0.25558141993614736,
+      "delta_pooled_ci95": [
+        -0.3013701808489483,
+        -0.20565380881411732
+      ],
+      "transfer_pooled_ci95": [
+        0.4829837540377835,
+        0.5492772243931459
+      ],
+      "indist_pooled_ci95": [
+        0.7166414576394099,
+        0.8195406563441633
+      ]
+    },
+    "30": {
+      "indist_pooled": 0.7700154904577665,
+      "transfer_pooled": 0.5384122594458198,
+      "transfer_binned": 0.537942416280666,
+      "transfer_binned_submitted_mean": 0.537942416280666,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1252636,
+      "n_pos_test": 699397,
+      "delta_pooled": -0.2316032310119467,
+      "delta_pooled_ci95": [
+        -0.2749068194758785,
+        -0.18422598141920402
+      ],
+      "transfer_pooled_ci95": [
+        0.5049346855736978,
+        0.5691626267632238
+      ],
+      "indist_pooled_ci95": [
+        0.7130539578200579,
+        0.8226040062582404
+      ]
+    },
+    "39": {
+      "indist_pooled": 0.7771420590616733,
+      "transfer_pooled": 0.49733233621208206,
+      "transfer_binned": 0.49642582580795674,
+      "transfer_binned_submitted_mean": 0.49642582580795674,
+      "n_bins": 10,
+      "n_single_class_bins": 0,
+      "n_test": 1252636,
+      "n_pos_test": 699397,
+      "delta_pooled": -0.27980972284959127,
+      "delta_pooled_ci95": [
+        -0.3332120543125483,
+        -0.224474977178811
+      ],
+      "transfer_pooled_ci95": [
+        0.4618978552357959,
+        0.5336961566171241
+      ],
+      "indist_pooled_ci95": [
+        0.7141395830346368,
+        0.8313796378371442
+      ]
+    }
+  },
+  "best_layer_test": {
+    "indist_pooled": 10,
+    "transfer_pooled": 30,
+    "transfer_binned": 30
+  },
+  "delta_best": -0.24802688530644856,
+  "delta_best_ci95": [
+    -0.29571318073642633,
+    -0.19859777920377122
+  ]
+}

@@ -280,6 +280,22 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
   - The probe beats the repo-only baseline by 0.19–0.38 (CIs > 0), and stratifying by repository changes the AUC by at most 0.04.
   - The legacy-to-task-split change is smaller (+0.01 to +0.07; Qwen has_regressions' legacy validation set was single-class, so its legacy layer choice is arbitrary).
 
+## Candidate analyses for the revision (not yet in `paper_rebuttal/`)
+
+**k=0 selectivity at the best test layers (SEL-CI)**
+- Setup: the real probe and each shuffle control are each taken at their own best test layer, as in Table 5 and Figure 3. The selected AUCs reproduce `paper_rebuttal/figures/auc_table.tex`.
+- Result: real − trajectory shuffle is +0.05 to +0.31, and real − token shuffle is +0.17 to +0.32. Both CIs (paired task bootstrap, 1000 resamples) exclude 0 in all 16 run × property cells.
+- Output: `paper_rebuttal_candidate/selectivity/` (`scripts/rebuttal_selectivity_testbest.py`).
+
+**Pooled transfer AUC (T-POOL)**
+- What changed: transfer probes were re-scored with one pooled AUC over the target's task-split test tokens. The token set matches the in-dist rows (asserted). The binned values reproduce the current `tab:transfer` (asserted).
+- How the probe is applied: the target hidden state is centred on the source training mean, with no std scaling. Source layer L is applied to target layer L. This is the same as the submitted `run_eval`.
+- Pooled minus binned: −0.028 to +0.093 per cell (median +0.025). Pooled is lower in 13 of 80 cells, mostly compiles and Qwen Verified→Pro has_regressions.
+- Transfer − in-dist, both pooled: the CI is below 0 in 70 of 80 cells and never above 0.
+  - At the best test layers, correct transfers almost fully: Verified→Pro −0.016 (Laguna) and −0.001 (Qwen), both CIs including 0.
+  - Compiles does not transfer: −0.16 to −0.25.
+- Output: `paper_rebuttal_candidate/transfer/` (`scripts/rebuttal_transfer_pooled.py`, `scripts/paper_rebuttal_candidate_transfer.py`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
