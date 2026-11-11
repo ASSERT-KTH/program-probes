@@ -101,3 +101,18 @@ How much of the probes' signal a predictor that sees only the task prompt can ex
 - **Files:** `json/horizon_<run>_<probe>.json`, `json/k0_<run>_<probe>.json`, `summary.json` (72 horizon cells, Table 1 recounts, 16 k=0 cells). `json_testgrid/` holds the first test job (Qwen/Verified correct, grid 1e-4..1e2), superseded.
 
 Commands: `sbatch -A <account> slurm/prompt_only.sh {horizon,k0} --run <run> --probe <probe> --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_prompt_only.py`.
+
+## `text_baseline/` (brief E9; wokJ-1b, wokJ-Q1, 1nZa-W2)
+
+Does a classifier on the visible text, above all the latest tool output, explain what the probes decode? CPU only.
+- **Text** (`scripts/rebuttal_text_extract.py`): per trajectory, all messages and a class for every command (AE0's `classify`: `runs_project`, and `strict`), in `tmp/e9_text_<bench>_<run>.jsonl.gz` (not committed; about 0.5 GB).
+- **A1** (`text_a1`, the only baseline run): TF-IDF of the most recent tool output before assistant turn t, i.e. the observation of command t − 1; empty at turn 0. Word 1–2-grams; tokens may be one character long, so "1 failed" keeps the "1"; sublinear tf, min_df 3, 200k features; no char n-grams.
+  - The vectorizer is fit once per run (`features` mode, `tmp/e9_feat_*`, not committed) on the turns of tasks that are in the training split of both the k=0 cache and the window-15 cache. The two caches have different task splits (each is split over its own task set, as in training), so only 47–66% of trajectories qualify. This keeps every validation and test text out of the vocabulary and idf of either split.
+  - Logistic regression per turn: the probe's split, population and target, every token weighted by one, C on pooled validation AUC (grid 1e-3..1e2; never at an edge in the horizon fits).
+- **A2 (all context, last 32k characters) was not run.** Building it took 20 minutes and 275M non-zeros for the smallest run, about 10× A1, and fitting it would add roughly 10–15 core-hours for k=0 and far more for the horizon.
+- **Evaluation:** k=0 as in PO (test-best layer, all test tokens); horizon as in PO (window 15, y_t = 0, validation-best layer, E18 strata), with the same E16/E18 reproduction checks.
+- **Part B** (k=0): test tokens split by whether the current program version has already been run. The version is the one created by the last edit at or before the turn (`edit_step_index.pt`), or the original repository before any edit. "Already run" means some command from the edit command itself through command t − 1 ran tests, scripts, builds or interpreters (AE0's `runs_project`; the `strict` variant also counts Python editor scripts).
+  - The `*_post_edit` subsets drop the phase before the first edit (the original repository, also the start of the trajectory), which is almost single-class for correct and reduces_failing. `pre_first_edit` is that phase.
+- **Files:** `json/horizon_*.json`, `json/k0_*.json` (with part B), `summary.json` (also the Table 1 recount with PO, E9 and both). `json_partb_v1/` holds the first k=0 run, before the post-edit subsets were added; its other numbers are identical (checked).
+
+Commands: `sbatch ... slurm/text_baseline.sh features --run <run> --kinds text_a1` per run, then `sbatch ... slurm/text_baseline.sh {horizon,k0} --run <run> --probe <probe> --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_text_baseline.py`.

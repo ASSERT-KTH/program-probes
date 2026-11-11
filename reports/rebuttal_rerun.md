@@ -357,6 +357,38 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
   - TF-IDF of the prompt reaches 0.51–0.86 and is above the probe in 4 Pro cells (Laguna compiles 0.83 vs 0.79 and has_regressions 0.83 vs 0.74; Qwen compiles 0.78 vs 0.75 and has_regressions 0.86 vs 0.84), none significantly. The probe − TF-IDF CI is > 0 in 5 of 16 cells (correct and reduces_failing on Verified, Qwen/Pro correct). Compare E11: on Pro, the repository alone predicts compiles with 0.83.
 - Output: `paper_rebuttal_candidate/prompt_only/` (`scripts/rebuttal_prompt_only.py`, `scripts/rebuttal_prompt_texts.py`, `scripts/rebuttal_prompt_cache_check.py`, `scripts/paper_rebuttal_candidate_prompt_only.py`, `slurm/prompt_only.sh`).
 
+**Text-only baseline and AUC relative to tool outputs (E9; wokJ-1b, wokJ-Q1, 1nZa-W2)**
+- **Baseline:** TF-IDF (word 1–2-grams) + logistic regression on the most recent tool output before each assistant turn, trained like the probe it is compared with (split, population, target; C on validation). Every token of the turn gets the turn's score. The all-context variant (A2) was not run: it costs about 10× A1.
+- **k = 0 (Table 6 layer):** text 0.55–0.81, probe 0.69–0.84. Probe − text CI > 0 in 12 of 16 cells (+0.05 to +0.18).
+  - Not significant: Laguna/Verified compiles (text 0.703 vs probe 0.691), Laguna/Pro has_regressions (0.801 vs 0.740), Qwen/Pro compiles (0.727 vs 0.750) and has_regressions (0.807 vs 0.840).
+- **Horizon, y_t = 0, window 15 (72 settings):** text 0.46–0.88; probe − text CI > 0 in 51/72, CI < 0 in 0/72 (by run: Laguna/Verified 15, Qwen/Verified 16, Laguna/Pro 8, Qwen/Pro 12 of 18).
+- **Table 1 recount (E18 strata, k ≥ 2, 60 settings, powered in brackets).** Each row reads old / + prompt-only (PO) / + text (E9) / + both.
+  - "beats all baselines":
+    - S0: 45 [38/49] / 20 [18] / 32 [31] / 18 [17]
+    - S1: 38 [31/49] / 8 [6] / 18 [17] / 5 [4]
+    - S2: 17 [15/35] in all four
+    - S3: 6 [6/35] in all four
+    - S4: 23 [4/5] / 13 [0] / 6 [0] / 5 [0]
+  - "beats baselines available at step t":
+    - S0: 49 [42] / 23 [21] / 35 [34] / 20 [19]
+    - S1: 42 [35] / 8 [6] / 20 [19] / 5 [4]
+    - S2: 27 [24] / 25 [22] / 27 [24] / 25 [22]
+    - S3: 21 [19] / 19 [17] / 21 [19] / 19 [17]
+    - S4: 23 [4] / 13 [0] / 6 [0] / 5 [0]
+  - With both added, at most 1 of 60 settings per stratum has a CI below 0.
+  - The latest tool output removes less of the probe's lead than the prompt does. Neither changes S2 or S3 (fixed outcome), where the strongest control remains the position baselines.
+- **Part B (k = 0, current program version not yet run vs already run; AE0 command rule):**
+  - **Shares of test tokens:**
+    - Not yet run: 17–24% on Verified and 54–64% on Pro.
+    - After the first edit only: not yet run 10–38%, already run 27–63%, before the first edit 21–43%.
+  - **The probe is not better once the version has been run.** Over all test tokens, its AUC on already-run minus not-yet-run states is −0.15 to +0.02 (CI < 0 in 10/16 cells, 14/16 with the strict rule; never > 0).
+    - That comparison mixes in the pre-first-edit phase, where correct and reduces_failing are almost single-class. After the first edit only, the difference is −0.15 to +0.10 (CI < 0 in 3, CI > 0 in 2 of 16). It is negative mainly on Pro: Qwen correct −0.15, has_regressions −0.07; Laguna reduces_failing −0.09.
+  - **Probe vs text:**
+    - Probe − text, over all tokens: CI > 0 in 12/16 cells for not yet run and 9/16 for already run.
+    - After the first edit only: 8/16 and 7/16. One cell has the text significantly better: Laguna/Pro has_regressions, already run (−0.11 [−0.22, −0.01]).
+  - Reading: the probes do not depend on having seen the newest program version run, and they stay ahead of the text of the latest tool output in most cells either way.
+- Output: `paper_rebuttal_candidate/text_baseline/` (`scripts/rebuttal_text_baseline.py`, `scripts/rebuttal_text_extract.py`, `scripts/paper_rebuttal_candidate_text_baseline.py`, `slurm/text_baseline.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
