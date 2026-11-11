@@ -324,6 +324,22 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - Chosen configs vary a lot across layers (lr up to 2.4 decades, weight decay up to 3.4), but the objective is flat near the top. The best trial beats the 5th best by a median of 0.007 validation AUC (IQR 0.003–0.014) and the median trial by 0.035.
 - Output: `paper_rebuttal_candidate/hparams/` (`scripts/rebuttal_hparam_provenance.py`, `scripts/paper_rebuttal_candidate_hparams.py`).
 
+**k=0 AUC right after an edit, before any execution (AE0; HaQJ-Q3, wokJ-1b, 1nZa-W2)**
+- **States:** the assistant tokens of turn N+1 after each real edit at command N (E5's selection). The k=0 pooled weights are taken at the `tab:auc_roc` best layer, on the task-split test set.
+- **Filter:** edits whose command also ran something are dropped, keeping Python scripts that only rewrite files (`scripts/after_edit_cmd_filter.py`). E5 had no such filter.
+  - Of all edits, primary drops 3.3% (Laguna Verified), 1.2% (Qwen Verified), 3.6% (Laguna Pro) and 2.7% (Qwen Pro). In the test split: 3.5%, 0.5%, 4.2% and 1.8%.
+  - Strict, which also drops the editor scripts, drops 73%, 41%, 46% and 36%.
+- **Checks:** the recomputed all-token AUCs equal the stored ones, and the unfiltered selection equals E5's stored n_test and n_pos (asserted / checked).
+- **Result:** after-edit AUC is 0.58–0.81, against 0.69–0.84 on all tokens.
+  - Verified: 0.58–0.65, which is 0.05–0.26 below the all-token AUC.
+  - Pro: 0.66–0.81, which is −0.16 to +0.02.
+  - The 95% CI lies above 0.5 in 14 of 16 cells. The two exceptions are has_regressions on Verified (Laguna [0.49, 0.64], Qwen [0.49, 0.70]).
+  - The filter barely matters: primary and no filter differ by at most 0.021 in any cell.
+- **Caveat (label-changed subset):** on states where the edit changed the label relative to the turn before, AUC is below 0.5 in 12 of 16 cells (0.22–0.74).
+  - There the probe tends to report the pre-edit status.
+  - So most of the after-edit signal comes from edits that leave the label unchanged (persistence). The probe does not anticipate the effect of a fresh edit before it is executed.
+- Output: `paper_rebuttal_candidate/after_edit_k0/` (`scripts/rebuttal_after_edit_k0.py`, `scripts/after_edit_cmd_filter.py`, `scripts/paper_rebuttal_candidate_after_edit.py`, `slurm/after_edit_k0.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.

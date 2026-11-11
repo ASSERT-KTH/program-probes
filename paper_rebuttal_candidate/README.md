@@ -66,3 +66,22 @@ Probe hyperparameters of the rerun, from the 80 task-split sweeps. Metadata only
 - `hparam_table.tex`: candidate `tab:probe-hparams`, in the format of `paper/hparam_table.tex`, at the middle probed layer (21).
 
 Commands: `uv run python scripts/rebuttal_hparam_provenance.py` (uses sacct, the job logs and W&B), then `uv run python scripts/paper_rebuttal_candidate_hparams.py`.
+
+## `after_edit_k0/` (brief AE0; HaQJ-Q3, wokJ-1b, 1nZa-W2)
+
+k = 0 probe AUC on the states right after an edit, before anything has run on the new program version. Eval only: the rerun's k = 0 pooled weights, the k = 0 pooled caches and their task-level test split.
+- **States:** for each real edit at command N (from `edit_step_index.pt`, the same selection as the E5 `*_after_edit` runs), the assistant tokens of turn N + 1, the first turn whose label reflects the new version. Their context ends with command N and its output.
+- **Filter on command N** (`scripts/after_edit_cmd_filter.py`):
+  - *primary* drops the edit if the command also runs anything (interpreter, test runner, build / lint / type-check, package manager, script). It keeps Python scripts that only rewrite files: stdlib file/text imports, and no subprocess, exec, pytest, `ast.parse` or compile, judged on code tokens only.
+  - *strict* also drops those editor scripts.
+  - *none* is E5's selection. E5 had no command filter.
+- **Probe and metric:** each property at its best all-token test layer (`tab:auc_roc`). AUC is pooled over the selected test tokens, with a 95% task-level bootstrap CI (1000 resamples). All five layers are in the JSON.
+- **Checks:**
+  - The all-token test AUC recomputed with the loaded weights equals the stored one (16 of 16).
+  - The unfiltered selection equals the stored E5 after-edit n_test and n_pos at every layer (80 of 80).
+- **Files:**
+  - `json/ae0_<run>.json`: per property and layer, n edits / states / test tasks / trajectories, positive rate and AUC for each filter. Also the label-changed subset (states whose label differs from the turn before the edit), CIs at the best layer, filter counts with reasons, and example commands.
+  - `summary.json`: the 16 cells and the filter counts.
+  - `after_edit_table.tex`: candidate `tab:after_edit_k0`.
+
+Commands: `sbatch -A <account> slurm/after_edit_k0.sh <run>` (laguna_verified, laguna_pro, qwen_verified, qwen_pro), then `uvx python@3.12 scripts/paper_rebuttal_candidate_after_edit.py`.

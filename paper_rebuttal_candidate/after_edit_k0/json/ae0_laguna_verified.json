@@ -1,0 +1,1392 @@
+{
+ "run": "laguna_verified",
+ "bench": "swebench",
+ "cache": "laguna_xs2_full",
+ "pooled": "laguna_xs2_full_pooled",
+ "alignment": {
+  "trajectories_with_edits": 4685,
+  "command_history_longer_than_assistant_turns": 0
+ },
+ "filter": {
+  "all_splits": {
+   "edits": 14545,
+   "edits_with_next_turn": 14453,
+   "dropped_primary": 480,
+   "dropped_strict": 10576,
+   "python_editor_scripts": 10096,
+   "dropped_primary_by_reason": {
+    "python": 476,
+    "python+run": 3,
+    "run": 1
+   },
+   "dropped_primary_share": 0.03300103128222757,
+   "dropped_strict_share": 0.7271227225850808
+  },
+  "test_split": {
+   "edits": 2153,
+   "edits_with_next_turn": 2133,
+   "dropped_primary": 75,
+   "dropped_strict": 1662,
+   "python_editor_scripts": 1587,
+   "dropped_primary_by_reason": {
+    "python": 75
+   },
+   "dropped_primary_share": 0.03483511379470506,
+   "dropped_strict_share": 0.7719461216906642
+  },
+  "examples": {
+   "dropped:python": [
+    {
+     "sample_id": "sympy__sympy-12489_run04",
+     "edit_turn": 43,
+     "cmd": "cd /testbed && cat > /tmp/fix_permutation13.py << 'EOF'\n# Read the file\nwith open('sympy/combinatorics/permutations.py', 'r') as f:\n    content = f.read()\n\n# Fix the classmethod calls - they should use cls._af_new\n# But we need to be more careful about which ones are in classmethods\n\n# Let's restore [...] new_lines)\n\n# Write the file back\nwith open('sympy/combinatorics/permutations.py', 'w') as f:\n    f.write(content)\n\nprint(\"Fixed all _af_new calls appropriately\")\nEOF\npython3 /tmp/fix_permutation13.py"
+    },
+    {
+     "sample_id": "django__django-14500_run09",
+     "edit_turn": 75,
+     "cmd": "cat > /tmp/fix_executor11.py << 'EOF'\n\"\"\"\nProposed fix for the issue.\n\"\"\"\nimport os\nimport sys\nsys.path.insert(0, '/testbed/tests')\n\n# Read the current executor.py\nwith open('/testbed/django/db/migrations/executor.py', 'r') as f:\n    content = f.read()\n\n# Find the check_replacements method and modif [...] replacements)\n    with open('/testbed/django/db/migrations/executor.py', 'w') as f:\n        f.write(content)\n    print(\"Fixed!\")\nelse:\n    print(\"Pattern not found!\")\nEOF\npython /tmp/fix_executor11.py"
+    },
+    {
+     "sample_id": "sphinx-doc__sphinx-10449",
+     "edit_turn": 48,
+     "cmd": "cd /testbed && cat > /tmp/debug_sphinx.py << 'EOF'\nimport sys\nimport os\nsys.path.insert(0, '/testbed')\n\n# Create a simple test\nos.makedirs('/tmp/test_debug', exist_ok=True)\nos.chdir('/tmp/test_debug')\n\n# Create sample package\nwith open('sample.py', 'w') as f:\n    f.write('''\nclass Square:\n    \"\"\"A c [...] sult = main(['-b', 'text', '.', '_build'])\nprint(f\"Result: {result}\")\n\n# Check output\nwith open('_build/index.txt', 'r') as f:\n    print(\"Output:\")\n    print(f.read())\nEOF\npython3 /tmp/debug_sphinx.py"
+    },
+    {
+     "sample_id": "sympy__sympy-15599",
+     "edit_turn": 31,
+     "cmd": "cd /testbed && git checkout -- ./sympy/core/mod.py && python -c \"from sympy.core.tests.test_arit import test_Mod; test_Mod(); print('test_Mod passed')\""
+    },
+    {
+     "sample_id": "django__django-15127_run07",
+     "edit_turn": 42,
+     "cmd": "cat > /tmp/cleanup.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Read the original file\nwith open('/testbed/django/contrib/messages/storage/base.py', 'r') as f:\n    content = f.read()\n\n# Remove the LEVEL_TAGS global variable\ncontent = content.replace('LEVEL_TAGS = utils.get_level_tags()\\n\\n', '')\n\n# Write the modified file\nwith open('/testbed/django/contrib/messages/storage/base.py', 'w') as f:\n    f.write(content)\n\nprint(\"Cleanup applied!\")\nEOF\npython /tmp/cleanup.py"
+    },
+    {
+     "sample_id": "astropy__astropy-14369_run02",
+     "edit_turn": 31,
+     "cmd": "rm -f /testbed/astropy/units/format/cds_parsetab.py && python3 /tmp/test_grammar.py"
+    },
+    {
+     "sample_id": "django__django-13297_run09",
+     "edit_turn": 64,
+     "cmd": "cat > /tmp/apply_fix.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Read the file\nwith open('/testbed/django/views/generic/base.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the _wrap_url_kwargs_with_deprecation_warning function\nold_func = '''# RemovedInDjango40Warning\ndef _wr [...] = content.replace(old_func, new_func)\n\n# Write back\nwith open('/testbed/django/views/generic/base.py', 'w') as f:\n    f.write(content)\n\nprint('Fix applied successfully!')\nEOF\npython3 /tmp/apply_fix.py"
+    },
+    {
+     "sample_id": "django__django-15957_run08",
+     "edit_turn": 71,
+     "cmd": "cat > /tmp/apply_fix4.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Read the file\nwith open('/testbed/django/db/models/fields/related_descriptors.py', 'r') as f:\n    content = f.read()\n\n# Fix ManyToManyDescriptor.get_prefetch_queryset (the one with _next_is_sticky)\nold_code = '''        d [...] et_prefetch_queryset (with _next_is_sticky) to fix\")\n\n# Save the file\nwith open('/testbed/django/db/models/fields/related_descriptors.py', 'w') as f:\n    f.write(content)\nEOF\npython /tmp/apply_fix4.py"
+    }
+   ],
+   "dropped:python+run": [
+    {
+     "sample_id": "sphinx-doc__sphinx-10673_run03",
+     "edit_turn": 57,
+     "cmd": "cd /testbed && cat > /tmp/debug_toctree2.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Add debug output to the toctree code\nwith open('/testbed/sphinx/environment/adapters/toctree.py', 'r') as f:\n    content = f.read()\n\n# Add debug print\nold_line = \"                        std = self.env. [...] /toctree.py', 'w') as f:\n    f.write(content)\nEOF\npython /tmp/debug_toctree2.py\n\ncd /tmp/test_toctree && rm -rf _build && sphinx-build -b html . _build/html 2>&1 | grep -E \"(DEBUG|WARNING)\" | head -20"
+    },
+    {
+     "sample_id": "sphinx-doc__sphinx-10673_run03",
+     "edit_turn": 60,
+     "cmd": "cd /testbed && cat > /tmp/debug_toctree3.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Add debug output to the toctree code\nwith open('/testbed/sphinx/environment/adapters/toctree.py', 'r') as f:\n    content = f.read()\n\n# Add debug print\nold_line = \"                        std = self.env. [...] /sphinx/environment/adapters/toctree.py', 'w') as f:\n    f.write(content)\nEOF\npython /tmp/debug_toctree3.py\n\ncd /tmp/test_toctree && rm -rf _build && sphinx-build -b html . _build/html 2>&1 | head -30"
+    },
+    {
+     "sample_id": "sphinx-doc__sphinx-10673_run03",
+     "edit_turn": 52,
+     "cmd": "cd /testbed && cat > /tmp/debug_toctree.py << 'EOF'\nimport sys\nsys.path.insert(0, '/testbed')\n\n# Add debug output to the toctree code\nwith open('/testbed/sphinx/environment/adapters/toctree.py', 'r') as f:\n    content = f.read()\n\n# Add debug print\nold_line = \"                        std = self.env.g [...] e.py', 'w') as f:\n    f.write(content)\nEOF\npython /tmp/debug_toctree.py\n\ncd /tmp/test_toctree && sphinx-build -b html . _build/html 2>&1 | grep -E \"(DEBUG|WARNING|genindex|modindex|search)\" | head -20"
+    }
+   ],
+   "dropped:run": [
+    {
+     "sample_id": "sphinx-doc__sphinx-10673_run03",
+     "edit_turn": 66,
+     "cmd": "cd /testbed && git checkout sphinx/environment/adapters/toctree.py && cd /tmp/test_toctree && rm -rf _build && sphinx-build -b html . _build/html 2>&1 | head -30"
+    }
+   ],
+   "kept": [
+    {
+     "sample_id": "django__django-15104_run07",
+     "edit_turn": 4,
+     "cmd": "sed -i \"s/del deconstruction\\[2\\]\\['to'\\]/deconstruction[2].pop('to', None)/\" /testbed/django/db/migrations/autodetector.py"
+    },
+    {
+     "sample_id": "psf__requests-2317_run06",
+     "edit_turn": 26,
+     "cmd": "cd /testbed && sed -i '328,332s/.*/    def prepare_method(self, method):\\\n        \"\"\"Prepares the given HTTP method.\"\"\"\\\n        self.method = to_native_string(method)\\\n        if self.method is not None:\\\n            self.method = self.method.upper()/' requests/models.py"
+    },
+    {
+     "sample_id": "sympy__sympy-16886",
+     "edit_turn": 12,
+     "cmd": "sed -i 's/\"----.\": \"1\"/\".----\": \"1\"/' /testbed/sympy/crypto/crypto.py"
+    },
+    {
+     "sample_id": "sympy__sympy-18211_run05",
+     "edit_turn": 53,
+     "cmd": "sed -i 's/# make sure iter_solutions gets a default value/# Eq(cos(x)**2 + sin(x)**2, 1) is an identity (always true)\\n    # and should return Reals, not raise NotImplementedError/' /testbed/sympy/solvers/tests/test_inequalities.py\nsed -i 's/raises(NotImplementedError, lambda: isolve(/assert isolve( [...] sympy/solvers/tests/test_inequalities.py\nsed -i 's/Eq(cos(x)\\*\\*2 + sin(x)\\*\\*2, 1), x))/Eq(cos(x)**2 + sin(x)**2, 1), x, relational=False) == Reals/' /testbed/sympy/solvers/tests/test_inequalities.py"
+    },
+    {
+     "sample_id": "django__django-13315",
+     "edit_turn": 53,
+     "cmd": "sed -i 's/formfield.queryset = formfield.queryset.complex_filter(limit_choices_to)/formfield.queryset = formfield.queryset.complex_filter(limit_choices_to).distinct()/g' /testbed/django/forms/models.py"
+    },
+    {
+     "sample_id": "django__django-17084_run09",
+     "edit_turn": 76,
+     "cmd": "cd /testbed && sed -i '/contains_over_clause = False/a\\    contains_column_references = False' ./django/db/models/expressions.py && sed -n '810,830p' ./django/db/models/expressions.py"
+    },
+    {
+     "sample_id": "django__django-11790_run01",
+     "edit_turn": 29,
+     "cmd": "cd /testbed && sed -i '194a\\        self.fields[\"username\"].widget.attrs[\"maxlength\"] = self.fields[\"username\"].max_length' django/contrib/auth/forms.py"
+    },
+    {
+     "sample_id": "django__django-13933_run01",
+     "edit_turn": 84,
+     "cmd": "git -C /testbed checkout tests/model_forms/test_modelchoicefield.py"
+    }
+   ],
+   "python_editor_kept": [
+    {
+     "sample_id": "django__django-13794_run02",
+     "edit_turn": 43,
+     "cmd": "cat > /tmp/fix_add2.py << 'ENDOFFILE'\n# Read the file\nwith open('/testbed/django/template/defaultfilters.py', 'r', encoding='utf-8') as f:\n    content = f.read()\n\n# Add the import if not already present\nif 'from django.utils.functional import Promise' not in content:\n    content = content.replace(\n  [...] , new_add)\n\n# Write back\nwith open('/testbed/django/template/defaultfilters.py', 'w', encoding='utf-8') as f:\n    f.write(content)\n\nprint(\"Fix applied successfully\")\nENDOFFILE\npython3 /tmp/fix_add2.py"
+    },
+    {
+     "sample_id": "django__django-12419_run05",
+     "edit_turn": 32,
+     "cmd": "cat > /tmp/patch_security_check.py << 'EOF'\nimport sys\n\nwith open('/testbed/django/core/checks/security/base.py', 'r') as f:\n    content = f.read()\n\n# Replace the check_referrer_policy function\nold_func = '''@register(Tags.security, deploy=True)\ndef check_referrer_policy(app_configs, **kwargs):\n     [...]  = content.replace(old_func, new_func)\n\nwith open('/testbed/django/core/checks/security/base.py', 'w') as f:\n    f.write(content)\n\nprint(\"Patched successfully\")\nEOF\npython /tmp/patch_security_check.py"
+    },
+    {
+     "sample_id": "django__django-16100_run06",
+     "edit_turn": 9,
+     "cmd": "cat > /tmp/fix.py << 'EOF'\nimport sys\n\n# Read the file\nwith open('/testbed/django/contrib/admin/options.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the section\nold_code = '''            formset = cl.formset = FormSet(\n                request.POST, request.FILES, queryset=modified_obje [...] ngo/contrib/admin/options.py', 'w') as f:\n        f.write(content)\n    print(\"Successfully patched the file\")\nelse:\n    print(\"Could not find the code to patch\")\n    sys.exit(1)\nEOF\npython /tmp/fix.py"
+    },
+    {
+     "sample_id": "sympy__sympy-13615",
+     "edit_turn": 47,
+     "cmd": "cat > /tmp/fix4.py << 'EOF'\nimport sys\n\n# Read the file\nwith open('/testbed/sympy/sets/sets.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the Interval._complement method\nold_code = '''    def _complement(self, other):\n        if other == S.Reals:\n            a = Interval(S.NegativeInfin [...] ement(self, other)'''\n\ncontent = content.replace(old_code, new_code)\n\n# Write the file\nwith open('/testbed/sympy/sets/sets.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done!\")\nEOF\npython3 /tmp/fix4.py"
+    },
+    {
+     "sample_id": "sympy__sympy-21612_run06",
+     "edit_turn": 62,
+     "cmd": "cd /testbed && python3 << 'EOF'\nwith open('./sympy/parsing/latex/_parse_latex_antlr.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the problematic code\nold_code = '''    expr_top = convert_expr(frac.upper)\n    expr_bot = convert_expr(frac.lower)\n    inverse_denom = sympy.Pow(expr_bot, -1 [...] expr_top, inverse_denom, evaluate=False)'''\n\ncontent = content.replace(old_code, new_code)\n\nwith open('./sympy/parsing/latex/_parse_latex_antlr.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done!\")\nEOF"
+    },
+    {
+     "sample_id": "django__django-13810",
+     "edit_turn": 33,
+     "cmd": "cd /testbed && cat > /tmp/fix3.py << 'EOF'\nimport sys\n\n# Read the file\nwith open('./django/core/handlers/base.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the problematic section - save original state before adaptation\nold_code = '''            try:\n                # Adapt handler, if  [...]   continue'''\n\ncontent = content.replace(old_code, new_code)\n\n# Write the file back\nwith open('./django/core/handlers/base.py', 'w') as f:\n    f.write(content)\n\nprint(\"Fixed!\")\nEOF\npython /tmp/fix3.py"
+    },
+    {
+     "sample_id": "matplotlib__matplotlib-24637_run07",
+     "edit_turn": 16,
+     "cmd": "cat > /tmp/fix_offsetbox.py << 'EOF'\nimport re\n\n# Read the file\nwith open('/testbed/lib/matplotlib/offsetbox.py', 'r') as f:\n    content = f.read()\n\n# Find the draw method in AnnotationBbox class and add open_group call\n# The draw method starts around line 1449\nold_draw = '''    def draw(self, rende [...] content.replace(old_draw, new_draw)\n\n# Write back\nwith open('/testbed/lib/matplotlib/offsetbox.py', 'w') as f:\n    f.write(content)\n\nprint(\"File updated successfully\")\nEOF\npython /tmp/fix_offsetbox.py"
+    },
+    {
+     "sample_id": "django__django-12708_run06",
+     "edit_turn": 23,
+     "cmd": "cd /testbed && cat > /tmp/fix_schema.py << 'EOF'\n# Read the file\nwith open('django/db/backends/base/schema.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the _delete_composed_index method\nold_method = '''    def _delete_composed_index(self, model, fields, constraint_kwargs, sql):\n        [...] e_composed_index(self, model, fields, constraint_kwargs, sql):\" in content:\n        print(\"Found the method signature\")\n    else:\n        print(\"Method not found at all\")\nEOF\npython /tmp/fix_schema.py"
+    }
+   ]
+  }
+ },
+ "probes": {
+  "currently_compiles": {
+   "best_layer_all_states": 11,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.6591918528038696,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6167077937222141,
+      "n_test": 62048,
+      "n_pos_test": 56360,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.9125105736530461,
+      "auc": 0.6328519695283814,
+      "label_changed_by_edit": {
+       "n_states": 2269,
+       "n_edits": 115,
+       "pos_rate": 0.1868664609960335,
+       "auc": 0.39267206115457376
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.8937465412285556,
+      "auc": 0.5895054179566563,
+      "label_changed_by_edit": {
+       "n_states": 554,
+       "n_edits": 33,
+       "pos_rate": 0.04332129963898917,
+       "auc": 0.4416666666666667
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.9083290355853533,
+      "auc": 0.6207738107270021,
+      "label_changed_by_edit": {
+       "n_states": 2332,
+       "n_edits": 117,
+       "pos_rate": 0.18181818181818182,
+       "auc": 0.3900835854989913
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.6909625002846291,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6233822683885484,
+      "n_test": 62048,
+      "n_pos_test": 56360,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.9125105736530461,
+      "auc": 0.6423378968781341,
+      "label_changed_by_edit": {
+       "n_states": 2269,
+       "n_edits": 115,
+       "pos_rate": 0.1868664609960335,
+       "auc": 0.44174656133353785
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.8937465412285556,
+      "auc": 0.614765737874097,
+      "label_changed_by_edit": {
+       "n_states": 554,
+       "n_edits": 33,
+       "pos_rate": 0.04332129963898917,
+       "auc": 0.36053459119496856
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.9083290355853533,
+      "auc": 0.6312832308427139,
+      "label_changed_by_edit": {
+       "n_states": 2332,
+       "n_edits": 117,
+       "pos_rate": 0.18181818181818182,
+       "auc": 0.4436502462323484
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.6646185816546095,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6045570993730416,
+      "n_test": 62048,
+      "n_pos_test": 56360,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.9125105736530461,
+      "auc": 0.6286046329445824,
+      "label_changed_by_edit": {
+       "n_states": 2269,
+       "n_edits": 115,
+       "pos_rate": 0.1868664609960335,
+       "auc": 0.4759625709464642
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.8937465412285556,
+      "auc": 0.4991609907120743,
+      "label_changed_by_edit": {
+       "n_states": 554,
+       "n_edits": 33,
+       "pos_rate": 0.04332129963898917,
+       "auc": 0.25770440251572324
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.9083290355853533,
+      "auc": 0.6121833275063162,
+      "label_changed_by_edit": {
+       "n_states": 2332,
+       "n_edits": 117,
+       "pos_rate": 0.18181818181818182,
+       "auc": 0.47345956449507537
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.6854457006061686,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6046817274633017,
+      "n_test": 62048,
+      "n_pos_test": 56360,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.9125105736530461,
+      "auc": 0.6227058406474086,
+      "label_changed_by_edit": {
+       "n_states": 2269,
+       "n_edits": 115,
+       "pos_rate": 0.1868664609960335,
+       "auc": 0.45110254640282255
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.8937465412285556,
+      "auc": 0.5245063854489165,
+      "label_changed_by_edit": {
+       "n_states": 554,
+       "n_edits": 33,
+       "pos_rate": 0.04332129963898917,
+       "auc": 0.42499999999999993
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.9083290355853533,
+      "auc": 0.6121848684840971,
+      "label_changed_by_edit": {
+       "n_states": 2332,
+       "n_edits": 117,
+       "pos_rate": 0.18181818181818182,
+       "auc": 0.44931902911277244
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.6504508888332646,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.619609423028336,
+      "n_test": 62048,
+      "n_pos_test": 56360,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.9125105736530461,
+      "auc": 0.6346363774914703,
+      "label_changed_by_edit": {
+       "n_states": 2269,
+       "n_edits": 115,
+       "pos_rate": 0.1868664609960335,
+       "auc": 0.4767263639617529
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.8937465412285556,
+      "auc": 0.5870067724458203,
+      "label_changed_by_edit": {
+       "n_states": 554,
+       "n_edits": 33,
+       "pos_rate": 0.04332129963898917,
+       "auc": 0.4618710691823899
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.9083290355853533,
+      "auc": 0.6198502253820377,
+      "label_changed_by_edit": {
+       "n_states": 2332,
+       "n_edits": 117,
+       "pos_rate": 0.18181818181818182,
+       "auc": 0.47318947529765437
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.6909625002846291,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.6423378968781341,
+     "ci95": [
+      0.5657201821478953,
+      0.7041257431180619
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.614765737874097,
+     "ci95": [
+      0.4795070626888691,
+      0.7708941817081066
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.6312832308427139,
+     "ci95": [
+      0.5534769395505854,
+      0.6961343482798176
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 11
+  },
+  "currently_correct": {
+   "best_layer_all_states": 21,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.6858740101828535,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5673034273640637,
+      "n_test": 62048,
+      "n_pos_test": 23845,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.3864691767224265,
+      "auc": 0.579933169772362,
+      "label_changed_by_edit": {
+       "n_states": 10559,
+       "n_edits": 510,
+       "pos_rate": 0.8685481579695047,
+       "auc": 0.3405403403222223
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.5276148312119535,
+      "auc": 0.4980895828061912,
+      "label_changed_by_edit": {
+       "n_states": 1877,
+       "n_edits": 119,
+       "pos_rate": 0.9461907298881194,
+       "auc": 0.3880507983230756
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.38429925219185146,
+      "auc": 0.5783540590379037,
+      "label_changed_by_edit": {
+       "n_states": 10719,
+       "n_edits": 516,
+       "pos_rate": 0.8705103087974625,
+       "auc": 0.34320358341952717
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.7702067962111017,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6251556983716107,
+      "n_test": 62048,
+      "n_pos_test": 23845,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.3864691767224265,
+      "auc": 0.6314615635194465,
+      "label_changed_by_edit": {
+       "n_states": 10559,
+       "n_edits": 510,
+       "pos_rate": 0.8685481579695047,
+       "auc": 0.5569872471080216
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.5276148312119535,
+      "auc": 0.5732094271594249,
+      "label_changed_by_edit": {
+       "n_states": 1877,
+       "n_edits": 119,
+       "pos_rate": 0.9461907298881194,
+       "auc": 0.6452814200338952
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.38429925219185146,
+      "auc": 0.6336715275105469,
+      "label_changed_by_edit": {
+       "n_states": 10719,
+       "n_edits": 516,
+       "pos_rate": 0.8705103087974625,
+       "auc": 0.5584301978129361
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.7882650570514762,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6440665208961641,
+      "n_test": 62048,
+      "n_pos_test": 23845,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.3864691767224265,
+      "auc": 0.6470510007629389,
+      "label_changed_by_edit": {
+       "n_states": 10559,
+       "n_edits": 510,
+       "pos_rate": 0.8685481579695047,
+       "auc": 0.569084056779656
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.5276148312119535,
+      "auc": 0.6212224428764689,
+      "label_changed_by_edit": {
+       "n_states": 1877,
+       "n_edits": 119,
+       "pos_rate": 0.9461907298881194,
+       "auc": 0.7292893140665418
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.38429925219185146,
+      "auc": 0.6532629540636914,
+      "label_changed_by_edit": {
+       "n_states": 10719,
+       "n_edits": 516,
+       "pos_rate": 0.8705103087974625,
+       "auc": 0.5695009847562755
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.7667975045504085,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6320273851488962,
+      "n_test": 62048,
+      "n_pos_test": 23845,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.3864691767224265,
+      "auc": 0.6330822277097818,
+      "label_changed_by_edit": {
+       "n_states": 10559,
+       "n_edits": 510,
+       "pos_rate": 0.8685481579695047,
+       "auc": 0.6031258238835171
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.5276148312119535,
+      "auc": 0.6138220552930576,
+      "label_changed_by_edit": {
+       "n_states": 1877,
+       "n_edits": 119,
+       "pos_rate": 0.9461907298881194,
+       "auc": 0.7386885648024262
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.38429925219185146,
+      "auc": 0.6405725119860652,
+      "label_changed_by_edit": {
+       "n_states": 10719,
+       "n_edits": 516,
+       "pos_rate": 0.8705103087974625,
+       "auc": 0.6035203608436073
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.7243650064819354,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.616349029513028,
+      "n_test": 62048,
+      "n_pos_test": 23845,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.3864691767224265,
+      "auc": 0.6189718172921674,
+      "label_changed_by_edit": {
+       "n_states": 10559,
+       "n_edits": 510,
+       "pos_rate": 0.8685481579695047,
+       "auc": 0.5865873491713793
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.5276148312119535,
+      "auc": 0.5651437591580195,
+      "label_changed_by_edit": {
+       "n_states": 1877,
+       "n_edits": 119,
+       "pos_rate": 0.9461907298881194,
+       "auc": 0.6035980287217911
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.38429925219185146,
+      "auc": 0.6247123352312427,
+      "label_changed_by_edit": {
+       "n_states": 10719,
+       "n_edits": 516,
+       "pos_rate": 0.8705103087974625,
+       "auc": 0.5864893431056405
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.7882650570514762,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.6470510007629389,
+     "ci95": [
+      0.5763725143039894,
+      0.7143386549774348
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.6212224428764689,
+     "ci95": [
+      0.47477134321465003,
+      0.7596767654049593
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.6532629540636914,
+     "ci95": [
+      0.5832353372636444,
+      0.7214874333852376
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 21
+  },
+  "currently_reduces_failing": {
+   "best_layer_all_states": 21,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.6707866927416806,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5710977942160569,
+      "n_test": 62048,
+      "n_pos_test": 30753,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.4829699449306886,
+      "auc": 0.5896307597768571,
+      "label_changed_by_edit": {
+       "n_states": 10778,
+       "n_edits": 525,
+       "pos_rate": 0.8817034700315457,
+       "auc": 0.22877184294742836
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.6924183729939125,
+      "auc": 0.6333558502800967,
+      "label_changed_by_edit": {
+       "n_states": 1936,
+       "n_edits": 126,
+       "pos_rate": 0.9245867768595041,
+       "auc": 0.12372388459478076
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.4956324136152656,
+      "auc": 0.5809658729026534,
+      "label_changed_by_edit": {
+       "n_states": 11149,
+       "n_edits": 536,
+       "pos_rate": 0.8856399677101086,
+       "auc": 0.22996207111566525
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.7406050190017013,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5797850756043066,
+      "n_test": 62048,
+      "n_pos_test": 30753,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.4829699449306886,
+      "auc": 0.6074302102317173,
+      "label_changed_by_edit": {
+       "n_states": 10778,
+       "n_edits": 525,
+       "pos_rate": 0.8817034700315457,
+       "auc": 0.3182842157172245
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.6924183729939125,
+      "auc": 0.7026061601948851,
+      "label_changed_by_edit": {
+       "n_states": 1936,
+       "n_edits": 126,
+       "pos_rate": 0.9245867768595041,
+       "auc": 0.3533251702762684
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.4956324136152656,
+      "auc": 0.5886308567871805,
+      "label_changed_by_edit": {
+       "n_states": 11149,
+       "n_edits": 536,
+       "pos_rate": 0.8856399677101086,
+       "auc": 0.31507615563948893
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.7731628555852047,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6044765025418701,
+      "n_test": 62048,
+      "n_pos_test": 30753,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.4829699449306886,
+      "auc": 0.6261017513611079,
+      "label_changed_by_edit": {
+       "n_states": 10778,
+       "n_edits": 525,
+       "pos_rate": 0.8817034700315457,
+       "auc": 0.36971292863141253
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.6924183729939125,
+      "auc": 0.734163860484507,
+      "label_changed_by_edit": {
+       "n_states": 1936,
+       "n_edits": 126,
+       "pos_rate": 0.9245867768595041,
+       "auc": 0.5563442259126044
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.4956324136152656,
+      "auc": 0.6117769729379827,
+      "label_changed_by_edit": {
+       "n_states": 11149,
+       "n_edits": 536,
+       "pos_rate": 0.8856399677101086,
+       "auc": 0.3661498806530917
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.7468903150859549,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5901425606797178,
+      "n_test": 62048,
+      "n_pos_test": 30753,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.4829699449306886,
+      "auc": 0.6041589845176305,
+      "label_changed_by_edit": {
+       "n_states": 10778,
+       "n_edits": 525,
+       "pos_rate": 0.8817034700315457,
+       "auc": 0.4653508799078929
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.6924183729939125,
+      "auc": 0.6996427582094058,
+      "label_changed_by_edit": {
+       "n_states": 1936,
+       "n_edits": 126,
+       "pos_rate": 0.9245867768595041,
+       "auc": 0.6299915818474019
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.4956324136152656,
+      "auc": 0.5967786453192052,
+      "label_changed_by_edit": {
+       "n_states": 11149,
+       "n_edits": 536,
+       "pos_rate": 0.8856399677101086,
+       "auc": 0.46174762795537494
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.6930276613598152,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5746600471415221,
+      "n_test": 62048,
+      "n_pos_test": 30753,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.4829699449306886,
+      "auc": 0.5910190107865255,
+      "label_changed_by_edit": {
+       "n_states": 10778,
+       "n_edits": 525,
+       "pos_rate": 0.8817034700315457,
+       "auc": 0.4493824653927656
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.6924183729939125,
+      "auc": 0.6695396672522913,
+      "label_changed_by_edit": {
+       "n_states": 1936,
+       "n_edits": 126,
+       "pos_rate": 0.9245867768595041,
+       "auc": 0.670563250937476
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.4956324136152656,
+      "auc": 0.5804516239242227,
+      "label_changed_by_edit": {
+       "n_states": 11149,
+       "n_edits": 536,
+       "pos_rate": 0.8856399677101086,
+       "auc": 0.4457293664883414
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.7731628555852047,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.6261017513611079,
+     "ci95": [
+      0.54339909303145,
+      0.7072824867581453
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.734163860484507,
+     "ci95": [
+      0.6163810472885044,
+      0.8119479250334006
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.6117769729379827,
+     "ci95": [
+      0.5238184793442204,
+      0.699098615046524
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 21
+  },
+  "currently_has_regressions": {
+   "best_layer_all_states": 21,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.5860995243596938,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5699214868427426,
+      "n_test": 62048,
+      "n_pos_test": 11675,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.1867350285704421,
+      "auc": 0.5614606516033208,
+      "label_changed_by_edit": {
+       "n_states": 6856,
+       "n_edits": 223,
+       "pos_rate": 0.47885064177362896,
+       "auc": 0.46000518833546933
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.08002213613724406,
+      "auc": 0.5711318901699555,
+      "label_changed_by_edit": {
+       "n_states": 430,
+       "n_edits": 28,
+       "pos_rate": 0.5767441860465117,
+       "auc": 0.5049627791563275
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.188160778751934,
+      "auc": 0.579033708746881,
+      "label_changed_by_edit": {
+       "n_states": 7066,
+       "n_edits": 225,
+       "pos_rate": 0.4656099632040759,
+       "auc": 0.4487935722657256
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.6848253621079381,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6257581792043703,
+      "n_test": 62048,
+      "n_pos_test": 11675,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.1867350285704421,
+      "auc": 0.5884571900088792,
+      "label_changed_by_edit": {
+       "n_states": 6856,
+       "n_edits": 223,
+       "pos_rate": 0.47885064177362896,
+       "auc": 0.3715680239287464
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.08002213613724406,
+      "auc": 0.4740658076376769,
+      "label_changed_by_edit": {
+       "n_states": 430,
+       "n_edits": 28,
+       "pos_rate": 0.5767441860465117,
+       "auc": 0.4541829138603332
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.188160778751934,
+      "auc": 0.6054247255516672,
+      "label_changed_by_edit": {
+       "n_states": 7066,
+       "n_edits": 225,
+       "pos_rate": 0.4656099632040759,
+       "auc": 0.35406365913657206
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.6954518796587461,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6143169262327154,
+      "n_test": 62048,
+      "n_pos_test": 11675,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.1867350285704421,
+      "auc": 0.5786961575514787,
+      "label_changed_by_edit": {
+       "n_states": 6856,
+       "n_edits": 223,
+       "pos_rate": 0.47885064177362896,
+       "auc": 0.37357903673769466
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.08002213613724406,
+      "auc": 0.49033409345351486,
+      "label_changed_by_edit": {
+       "n_states": 430,
+       "n_edits": 28,
+       "pos_rate": 0.5767441860465117,
+       "auc": 0.4833392414037575
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.188160778751934,
+      "auc": 0.5991223052048846,
+      "label_changed_by_edit": {
+       "n_states": 7066,
+       "n_edits": 225,
+       "pos_rate": 0.4656099632040759,
+       "auc": 0.3574594865668951
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.6769794121691483,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.609430432759211,
+      "n_test": 62048,
+      "n_pos_test": 11675,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.1867350285704421,
+      "auc": 0.5846109570642702,
+      "label_changed_by_edit": {
+       "n_states": 6856,
+       "n_edits": 223,
+       "pos_rate": 0.47885064177362896,
+       "auc": 0.3857081988402714
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.08002213613724406,
+      "auc": 0.5051313936291013,
+      "label_changed_by_edit": {
+       "n_states": 430,
+       "n_edits": 28,
+       "pos_rate": 0.5767441860465117,
+       "auc": 0.44780219780219777
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.188160778751934,
+      "auc": 0.6029109897976938,
+      "label_changed_by_edit": {
+       "n_states": 7066,
+       "n_edits": 225,
+       "pos_rate": 0.4656099632040759,
+       "auc": 0.37048262744062643
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.6171800884145217,
+     "all_states_stored_n_test": 1130891,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5638562083167092,
+      "n_test": 62048,
+      "n_pos_test": 11675,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2044,
+      "n_states": 57927,
+      "n_test_tasks": 75,
+      "n_trajectories": 691,
+      "pos_rate": 0.1867350285704421,
+      "auc": 0.547657519482323,
+      "label_changed_by_edit": {
+       "n_states": 6856,
+       "n_edits": 223,
+       "pos_rate": 0.47885064177362896,
+       "auc": 0.4452295574169114
+      }
+     },
+     "strict": {
+      "n_edits": 487,
+      "n_states": 9035,
+      "n_test_tasks": 59,
+      "n_trajectories": 251,
+      "pos_rate": 0.08002213613724406,
+      "auc": 0.5336888991835697,
+      "label_changed_by_edit": {
+       "n_states": 430,
+       "n_edits": 28,
+       "pos_rate": 0.5767441860465117,
+       "auc": 0.4733472172988302
+      }
+     },
+     "none": {
+      "n_edits": 2119,
+      "n_states": 62048,
+      "n_test_tasks": 75,
+      "n_trajectories": 703,
+      "pos_rate": 0.188160778751934,
+      "auc": 0.568022736254777,
+      "label_changed_by_edit": {
+       "n_states": 7066,
+       "n_edits": 225,
+       "pos_rate": 0.4656099632040759,
+       "auc": 0.4252531988949565
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.6954518796587461,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.5786961575514787,
+     "ci95": [
+      0.48571631978394586,
+      0.6444224679263947
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.49033409345351486,
+     "ci95": [
+      0.28513999070226914,
+      0.6043963091363782
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.5991223052048846,
+     "ci95": [
+      0.4934147580995456,
+      0.669415076814994
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 11,
+   "best_after_edit_layer_ci_primary": {
+    "auc": 0.5884571900088792,
+    "ci95": [
+     0.48085835359634305,
+     0.6560454456138336
+    ],
+    "n_boot_valid": 1000
+   }
+  }
+ }
+}
