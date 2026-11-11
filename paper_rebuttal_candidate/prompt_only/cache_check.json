@@ -1,0 +1,74 @@
+{
+ "swebench/laguna_xs2_full": {
+  "n_tasks_checked": 500,
+  "tokens_between_prompt_end_and_first_cached_token_p5_med_p95_min_max": [
+   30.0,
+   81.0,
+   160.95,
+   25,
+   243
+  ],
+  "first_cached_token_position_p5_med_p95_min_max": [
+   316.0,
+   611.5,
+   1776.05,
+   264,
+   8227
+  ],
+  "n_with_think_block_before_content": 500
+ },
+ "swebench/qwen36_35b_a3b_full": {
+  "n_tasks_checked": 500,
+  "tokens_between_prompt_end_and_first_cached_token_p5_med_p95_min_max": [
+   4.0,
+   4.0,
+   4.0,
+   4,
+   4
+  ],
+  "first_cached_token_position_p5_med_p95_min_max": [
+   261.25,
+   517.5,
+   1619.1,
+   216,
+   8121
+  ],
+  "n_with_think_block_before_content": 0
+ },
+ "swebench_pro/laguna_xs2_full": {
+  "n_tasks_checked": 726,
+  "tokens_between_prompt_end_and_first_cached_token_p5_med_p95_min_max": [
+   30.0,
+   36.0,
+   120.0,
+   25,
+   231
+  ],
+  "first_cached_token_position_p5_med_p95_min_max": [
+   350.7,
+   464.5,
+   717.65,
+   292,
+   3131
+  ],
+  "n_with_think_block_before_content": 726
+ },
+ "swebench_pro/qwen36_35b_a3b_full": {
+  "n_tasks_checked": 694,
+  "tokens_between_prompt_end_and_first_cached_token_p5_med_p95_min_max": [
+   4.0,
+   4.0,
+   4.0,
+   4,
+   4
+  ],
+  "first_cached_token_position_p5_med_p95_min_max": [
+   307.0,
+   415.0,
+   676.25,
+   249,
+   3123
+  ],
+  "n_with_think_block_before_content": 0
+ }
+}

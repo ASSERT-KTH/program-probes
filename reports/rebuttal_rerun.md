@@ -340,6 +340,23 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
   - So most of the after-edit signal comes from edits that leave the label unchanged (persistence). The probe does not anticipate the effect of a fresh edit before it is executed.
 - Output: `paper_rebuttal_candidate/after_edit_k0/` (`scripts/rebuttal_after_edit_k0.py`, `scripts/after_edit_cmd_filter.py`, `scripts/paper_rebuttal_candidate_after_edit.py`, `slurm/after_edit_k0.sh`).
 
+**Prompt-only baseline (PO; HaQJ-Q2, wokJ-1b)**
+- **Predictor:** logistic regression from one vector per trajectory to the probe's own target, trained on the probe's population, C chosen on validation. Every token of the trajectory gets that score.
+  - Primary: the hidden state of the first cached token (first `content` token of turn 1) at the probe's layer. For Qwen its context is the prompt only. For Laguna it also includes the turn-1 `<think>` block (median 81 tokens on Verified, 36 on Pro), so it is prompt + opening reasoning, a stronger baseline than prompt-only.
+  - Secondary: TF-IDF of the task prompt text.
+- **Horizon, within y_t = 0, window 15 (72 settings):** prompt-only (hidden state) reaches 0.45–0.80 (Laguna/Verified 0.51–0.60, Qwen/Verified 0.47–0.61, Laguna/Pro 0.60–0.75, Qwen/Pro 0.45–0.80); the probe 0.56–0.87.
+  - Probe − prompt-only: CI > 0 in 26/72, CI < 0 in 0/72. By run: Qwen/Verified 14/18, Qwen/Pro 7/18, Laguna/Verified 5/18, Laguna/Pro 0/18.
+  - TF-IDF variant: CI > 0 in 18/72, CI < 0 in 2/72 (Laguna/Pro reduces_failing, k = 10, 15).
+- **Table 1 recount (E18 strata, k ≥ 2, 60 settings; powered settings in brackets).** Old → with prompt-only (hidden state) added:
+  - "beats all baselines": S0 45 → 20 (38 → 18 of 49), S1 38 → 8 (31 → 6 of 49), S2 17 → 17 (15 → 15 of 35), S3 6 → 6 (6 → 6 of 35), S4 23 → 13 (4 → 0 of 5).
+  - "beats baselines available at step t": S0 49 → 23 (42 → 21), S1 42 → 8 (35 → 6), S2 27 → 25 (24 → 22), S3 21 → 19 (19 → 17), S4 23 → 13 (4 → 0).
+  - With the TF-IDF variant also added: all baselines S0 10, S1 3, S2 17, S3 6, S4 0; at step t S0 10, S1 3, S2 25, S3 19, S4 0 (over 60).
+  - CIs below 0: at most 1 of 60 per stratum with the old or the old + prompt-only sets (unpowered cells only), up to 5 of 60 with TF-IDF also added.
+  - Reading: the prompt explains most of what the probe adds over the old controls in S0 and S1, where the eventual outcome varies. Once the outcome is fixed (S2, S3) it adds almost nothing. This matches E18: the y_t = 0 signal is mostly *whether* the trajectory ends up passing, which the task (and for Laguna the opening reasoning) partly predicts.
+- **k = 0 (Table 6 layer, all test tokens):** prompt-only (hidden state) 0.48–0.77. The probe is ahead by +0.02 to +0.35, with CI > 0 in 11 of 16 cells; not in Qwen/Verified compiles or Laguna/Pro compiles, correct, reduces_failing, or Qwen/Pro compiles.
+  - TF-IDF of the prompt reaches 0.51–0.86 and is above the probe in 4 Pro cells (Laguna compiles 0.83 vs 0.79 and has_regressions 0.83 vs 0.74; Qwen compiles 0.78 vs 0.75 and has_regressions 0.86 vs 0.84), none significantly. The probe − TF-IDF CI is > 0 in 5 of 16 cells (correct and reduces_failing on Verified, Qwen/Pro correct). Compare E11: on Pro, the repository alone predicts compiles with 0.83.
+- Output: `paper_rebuttal_candidate/prompt_only/` (`scripts/rebuttal_prompt_only.py`, `scripts/rebuttal_prompt_texts.py`, `scripts/rebuttal_prompt_cache_check.py`, `scripts/paper_rebuttal_candidate_prompt_only.py`, `slurm/prompt_only.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.

@@ -85,3 +85,19 @@ k = 0 probe AUC on the states right after an edit, before anything has run on th
   - `after_edit_table.tex`: candidate `tab:after_edit_k0`.
 
 Commands: `sbatch -A <account> slurm/after_edit_k0.sh <run>` (laguna_verified, laguna_pro, qwen_verified, qwen_pro), then `uvx python@3.12 scripts/paper_rebuttal_candidate_after_edit.py`.
+
+## `prompt_only/` (brief PO; HaQJ-Q2, wokJ-1b)
+
+How much of the probes' signal a predictor that sees only the task prompt can explain. Eval of the rerun probes plus small CPU logistic regressions; no GPU.
+- **Cache check** (`cache_check.json`, `scripts/rebuttal_prompt_cache_check.py`): every cached trajectory's first row is in turn 1 (one exception: one Laguna/Verified trajectory in the k=0 cache). That row is the first `content` token of turn 1 (stride 5 starts at the first assistant token).
+  - Qwen: the tokens between the end of the task prompt and that token are the 4-token plain-text header `assistant:`. This is a prompt-only state.
+  - Laguna: every task has the turn-1 `<think>` block before it. The gap is 25–243 tokens (median 81 on Verified, 36 on Pro), about 25 of them template. So for Laguna this state is **prompt + turn-1 reasoning**, before any action or tool output. That is more than the prompt, so it is a stronger baseline than a pure prompt-only one. A clean Laguna prompt state needs one forward pass per task prompt (not done; GPU).
+- **Predictors** (`scripts/rebuttal_prompt_only.py`): one score per trajectory, given to all its tokens.
+  - `prompt_hs` (primary): logistic regression on the first cached token's hidden state at the layer of the probe it is compared with. Standardised on the training trajectories.
+  - `prompt_tfidf` (secondary): TF-IDF (word 1–2-grams) of the task prompt text (first user message, `scripts/rebuttal_prompt_texts.py`).
+  - Training: the probe's split, population and target (train split, y ≥ 0 of that cache). Every token is weighted by one. C is chosen on pooled validation AUC (grid 1e-7..1e2 for `prompt_hs`; at a grid edge in 3 of 88 fits; `prompt_tfidf` picks the upper edge C = 100 in 28 of 88 fits, so it may be slightly under-fit).
+- **Horizon** (Table 1 / E16 / E18 setup): window 15, k ∈ {1, 2, 3, 5, 10, 15}, test tokens with y_t = 0, the k-step probe at its validation-best layer. Paired 95% task bootstrap (1000) of probe − prompt-only. The E18 strata are recomputed with prompt-only added to the controls; every pre-existing AUC and count reproduces E16/E18 (asserted: counts exactly, probe and shuffle AUCs within 1e-6, refit position baselines within 1e-3; largest difference seen 7e-6).
+- **k=0** (Table 6 setup): all test tokens, the k=0 probe at its test-best layer (recomputed AUC equals results.pt).
+- **Files:** `json/horizon_<run>_<probe>.json`, `json/k0_<run>_<probe>.json`, `summary.json` (72 horizon cells, Table 1 recounts, 16 k=0 cells). `json_testgrid/` holds the first test job (Qwen/Verified correct, grid 1e-4..1e2), superseded.
+
+Commands: `sbatch -A <account> slurm/prompt_only.sh {horizon,k0} --run <run> --probe <probe> --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_prompt_only.py`.
