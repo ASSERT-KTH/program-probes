@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\caption{Chosen hyperparameters for each model and benchmark, selected by a 20-trial random search (learning rate and weight decay log-uniform in $[10^{-4}, 10^{-1}]$ and $[10^{-5}, 10^{-1}]$, batch size $\in \{256, 512, 1024\}$, patience $\in \{10, 25, 50\}$) maximising validation AUC on the task-level split. Sweeps were run independently per probe and per layer on the $k{=}0$ data and reused for every horizon and control; the table shows the middle probed layer (21) as representative.}
+\label{tab:probe-hparams}
+\begin{tabular}{lllrrrr}
+\toprule
+Dataset & Model & Probe & Learning rate & Weight decay & Batch size & Patience \\
+\midrule
+\multirow{8}{*}{\textsc{Verified}} & \multirow{4}{*}{Laguna-XS.2} & \Syntactic{} & $1.41 \times 10^{-3}$ & $1.55 \times 10^{-4}$ & 1024 & 25 \\
+ &  & \Semantic{} & $6.00 \times 10^{-4}$ & $2.74 \times 10^{-3}$ & 512 & 25 \\
+ &  & \Regressions{} & $6.17 \times 10^{-4}$ & $7.76 \times 10^{-4}$ & 256 & 50 \\
+ &  & \RedFail{} & $2.14 \times 10^{-4}$ & $4.70 \times 10^{-4}$ & 1024 & 25 \\
+ & \multirow{4}{*}{Qwen3.6-35B-A3B} & \Syntactic{} & $6.72 \times 10^{-4}$ & $6.48 \times 10^{-5}$ & 256 & 10 \\
+ &  & \Semantic{} & $8.98 \times 10^{-4}$ & $3.92 \times 10^{-5}$ & 1024 & 25 \\
+ &  & \Regressions{} & $2.02 \times 10^{-3}$ & $2.04 \times 10^{-4}$ & 256 & 25 \\
+ &  & \RedFail{} & $1.28 \times 10^{-3}$ & $2.43 \times 10^{-5}$ & 1024 & 25 \\
+\midrule
+\multirow{8}{*}{\textsc{Pro}} & \multirow{4}{*}{Laguna-XS.2} & \Syntactic{} & $1.70 \times 10^{-4}$ & $1.18 \times 10^{-3}$ & 256 & 25 \\
+ &  & \Semantic{} & $2.29 \times 10^{-4}$ & $2.34 \times 10^{-3}$ & 256 & 10 \\
+ &  & \Regressions{} & $1.33 \times 10^{-4}$ & $8.60 \times 10^{-5}$ & 256 & 50 \\
+ &  & \RedFail{} & $1.73 \times 10^{-4}$ & $3.24 \times 10^{-3}$ & 512 & 25 \\
+ & \multirow{4}{*}{Qwen3.6-35B-A3B} & \Syntactic{} & $2.32 \times 10^{-3}$ & $3.18 \times 10^{-4}$ & 512 & 10 \\
+ &  & \Semantic{} & $3.05 \times 10^{-4}$ & $3.46 \times 10^{-5}$ & 256 & 25 \\
+ &  & \Regressions{} & $1.04 \times 10^{-3}$ & $1.59 \times 10^{-4}$ & 256 & 25 \\
+ &  & \RedFail{} & $2.84 \times 10^{-4}$ & $2.83 \times 10^{-5}$ & 256 & 10 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -48,7 +48,7 @@ Branch `rebuttal-rerun-turnfix` (PR #20). Runs completed 2026-10-01; persistence
 |---|---|---|
 | Turn index per position | `int(i*K/T)` (even split) | real turn (`step_idx`, `turn_labels` from `run_attach_labels_swebench.py`) |
 | Train/val/test unit | `--group-by project`: **repository** on Verified (12 groups; val = 1 repo), **base commit** on Pro (434 groups for 726 tasks) | **task** on both (`--group-by` removed, `ff6b081`); 70/15/15 of tasks |
-| Hyperparameters | per-(probe, layer) W&B sweeps on the old split | new per-(probe, layer) sweeps on the task split (4 agents × 20 runs), reused for every k and control |
+| Hyperparameters | per-(probe, layer) W&B sweeps on the old split | new per-(probe, layer) sweeps on the task split (20 random-search trials each, run as 4 agents × 5), reused for every k and control |
 | Lookahead protocol | Verified and Laguna Pro: train for each k; **Qwen Pro: k=0 weights evaluated at every k**; Laguna Pro after-edit used k=0 weights | all four: train for each k; after-edit = eval of that k's weights on after-edit targets |
 | Shuffled control | token shuffle of train **and test** labels | token and trajectory shuffles of train/val only, scored on real test labels |
 
@@ -62,7 +62,7 @@ Everything in this section describes the submitted runs (`*_legacyturns`). The r
 - Caches: built 06-09 to 06-14 with the `--group-by` default `project` (default since `91522df`, 06-02); Laguna Pro lookahead caches also passed it explicitly.
 - Hyperparameters: Verified (both models) lookahead and controls used `final --from-sweep <S>` with the k=0 sweep for each (probe, layer); Laguna Pro lookahead used typed-in per-(probe, layer) values (constant across k); Qwen Pro lookahead was eval-only with the k=0 weights; Qwen Pro shuffled used typed-in values and `--n-eval-bins 1`.
 - After-edit runs: always eval-only (`eval --after-edit-only --edit-index-run-id <run>`), never retrained. The rerun does the same.
-- Sweeps: `slurm/probe_sweep_coordinator.sh ... --n-agents 4 --count 20`.
+- Sweeps: `slurm/probe_sweep_coordinator.sh ... --n-agents 4 --count 20`, i.e. 20 trials per sweep in total (`--count` is split across the agents). A few June sweeps ran 24–30 trials.
 - Label dirs: `labels/<bench>/<run>` (not `generations/.../labels`).
 
 ## Step 1: re-attached labels
@@ -311,6 +311,18 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - Submitted Fig 6 (1.1M vs 145k): the legacy populations were rebuilt from `snapshots/` with the legacy window rule and match every stored legacy count (48 of 48). Laguna Verified max50 test: 248 tasks, 1,535 trajectories, 1,062,176 states. Laguna Pro: 53 tasks, 302 trajectories, 144,545 states. The 7.3× ratio is 5.2× more trajectories in test (the repository split put astropy / django / sphinx, 297 of 500 tasks, in test) × 1.45× more states per kept trajectory × 0.97 from the window. The window keeps a similar share on both benchmarks (52% vs 53% of test trajectories).
 - The legacy Laguna Verified max50 validation set was 1 trajectory and 25 states, since the repository split put a 1-task repository in validation.
 - Output: `paper_rebuttal_candidate/counts/` (`scripts/rebuttal_population_counts.py`, `scripts/paper_rebuttal_candidate_counts.py`).
+
+**Probe hyperparameters (HP)**
+- The 80 task-split sweeps (4 runs × 4 properties × 5 layers) each ran 20 random-search trials, all finished (checked on W&B).
+  - Search space: lr and weight decay log-uniform in [1e-4, 1e-1] and [1e-5, 1e-1], batch size {256, 512, 1024}, patience {10, 25, 50}.
+  - Objective: maximise `mean_val_auc`. With one pooled bin this is the validation AUC over all validation tokens.
+  - Not swept: Adam, unweighted cross-entropy, at most 1000 epochs with early stopping on validation loss.
+- Every completed rerun training job (5,768) used `final --from-sweep` with the sweep of its own benchmark, model, property and layer, and logged that sweep's best config (checked). This covers k=0, both lookahead windows, and the token and trajectory shuffles.
+  - All transfer, after-edit, bin and step evaluations are eval-only runs of these weights.
+  - The only exceptions are the `*_shuffled_v2` jobs of 2026-09-28: old-split sweeps, and typed-in values for Qwen Pro. They are from the discarded first pass, and no results directory remains.
+  - The position baselines (E16) are sklearn logistic regressions with default settings, not swept.
+- Chosen configs vary a lot across layers (lr up to 2.4 decades, weight decay up to 3.4), but the objective is flat near the top. The best trial beats the 5th best by a median of 0.007 validation AUC (IQR 0.003–0.014) and the median trial by 0.035.
+- Output: `paper_rebuttal_candidate/hparams/` (`scripts/rebuttal_hparam_provenance.py`, `scripts/paper_rebuttal_candidate_hparams.py`).
 
 ## Other things to know
 

@@ -55,3 +55,14 @@ Population after filtering: tasks, trajectories and hidden states (y ≥ 0) per 
   - `counts_table.tex`: the candidate appendix table (test split, plus train / val / test states).
 
 Command: `sbatch -A <account> slurm/population_counts.sh --run <run> --output paper_rebuttal_candidate/counts/json/counts_<run>.json`, then `uv run python scripts/paper_rebuttal_candidate_counts.py`.
+
+## `hparams/` (brief HP)
+
+Probe hyperparameters of the rerun, from the 80 task-split sweeps. Metadata only.
+- `json/sweeps.json`: per sweep, the coordinator and worker jobs, the W&B search space, metric and method, the best config, and all 20 trials with their mean validation AUC.
+- `json/final_jobs.json`: every completed rerun training/eval job and its hyperparameter source. Fields are in `job_fields`; `by_run_family` gives the counts.
+- `json/hparams_per_layer.json`: chosen config per benchmark × model × property × layer (1-indexed).
+- `json/layer_variation.json`: spread of each hyperparameter over layers, and how flat the objective is in each sweep (best minus 2nd / 5th / median / worst trial).
+- `hparam_table.tex`: candidate `tab:probe-hparams`, in the format of `paper/hparam_table.tex`, at the middle probed layer (21).
+
+Commands: `uv run python scripts/rebuttal_hparam_provenance.py` (uses sacct, the job logs and W&B), then `uv run python scripts/paper_rebuttal_candidate_hparams.py`.
