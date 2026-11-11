@@ -37,7 +37,9 @@ E11 (Pro: language and repository controls) and E11b (Verified: repository contr
   - The three appendix figures, with the layer in the legend: `e11_compiles_by_language`, `e11_compiles_by_repo`, `e11_compiles_transfer_by_language`.
   - Also `e11b_verified_compiles_by_repo`.
 
-Command: `scripts/rebuttal_per_language.py --layer-rule testbest [--transfer-layer-rule testbest]`, then `scripts/rebuttal_per_language_figures.py --root paper_rebuttal_candidate/lang --out paper_rebuttal_candidate/lang/figures --show-layer`.
+- **`figures_nostrat/`** (FIG-NOSTRAT): the same figures without the stratified (same-language / same-repo pairs) lines. The dashed line is labelled "AUC over all tokens". The transfer figure has no stratified line and is identical to `figures/`.
+
+Command: `scripts/rebuttal_per_language.py --layer-rule testbest [--transfer-layer-rule testbest]`, then `scripts/rebuttal_per_language_figures.py --root paper_rebuttal_candidate/lang --out paper_rebuttal_candidate/lang/figures --show-layer` (add `--out .../figures_nostrat --no-strat` for FIG-NOSTRAT).
 
 ## `counts/` (brief E14, reviewer wokJ-Q3)
 

@@ -17,8 +17,9 @@ stratified AUC is the main number.
                                      pass probe names to draw others)
 
 Usage: uv run python scripts/rebuttal_per_language_figures.py [currently_compiles ...]
-       [--root DIR --out DIR --show-layer]   (E11-TEST: --root paper_rebuttal_candidate/lang
-                                              --out paper_rebuttal_candidate/lang/figures --show-layer)
+       [--root DIR --out DIR --show-layer --no-strat]   (E11-TEST: --root paper_rebuttal_candidate/lang
+                                              --out paper_rebuttal_candidate/lang/figures --show-layer;
+                                              FIG-NOSTRAT: --out .../figures_nostrat --no-strat)
 """
 from __future__ import annotations
 
@@ -45,6 +46,7 @@ REF = "#555555"
 
 
 SHOW_LAYER = False
+NO_STRAT = False
 
 
 def mlabel(label: str, r: dict, key: str = "layer") -> str:
@@ -82,6 +84,9 @@ def dot(ax, x, y, err, marker, color, horizontal=False, size=4.5):
 
 
 def ref_handles(strat_label: str, baseline_label: str) -> list:
+    if NO_STRAT:  # FIG-NOSTRAT: no stratified line; the dashed line is the AUC over all test tokens
+        return [Line2D([0], [0], color=REF, linestyle="--", linewidth=1.0, label="AUC over all tokens"),
+                Line2D([0], [0], color=REF, linestyle=":", linewidth=1.2, label=baseline_label)]
     return [Line2D([0], [0], color=REF, linestyle="--", linewidth=1.0, label="pooled AUC"),
             Line2D([0], [0], color=REF, linestyle="-.", linewidth=1.0, label=strat_label),
             Line2D([0], [0], color=REF, linestyle=":", linewidth=1.2, label=baseline_label)]
@@ -104,7 +109,8 @@ def fig_language(data: dict) -> None:
                 v, lo, hi = point_ci(r, f"real|lang={l}")
                 dot(ax, j + (i - 0.5) * 2 * width, v, [[lo], [hi]], marker, color)
         ax.axhline(r["auc"]["real|pooled"], color=color, linestyle="--", linewidth=1.0, alpha=0.8)
-        ax.axhline(r["auc"]["real|strat_lang"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
+        if not NO_STRAT:
+            ax.axhline(r["auc"]["real|strat_lang"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
         ax.axhline(r["auc"]["lang_only|pooled"], color=color, linestyle=":", linewidth=1.2, alpha=0.8)
         handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=mlabel(label, r)))
     ax.axhline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
@@ -134,7 +140,8 @@ def fig_repo(data: dict, models: list = MODELS, name: str = "e11_compiles_by_rep
             if v == v:
                 dot(ax, v, j + (i - 0.5) * 2 * off, [[lo], [hi]], marker, color, horizontal=True)
         ax.axvline(r["auc"]["real|pooled"], color=color, linestyle="--", linewidth=1.0, alpha=0.8)
-        ax.axvline(r["auc"]["real|strat_repo"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
+        if not NO_STRAT:
+            ax.axvline(r["auc"]["real|strat_repo"], color=color, linestyle="-.", linewidth=1.0, alpha=0.8)
         ax.axvline(r["auc"]["repo_only|pooled"], color=color, linestyle=":", linewidth=1.2, alpha=0.8)
         handles.append(Line2D([0], [0], color=color, marker=marker, linestyle="", label=mlabel(label, r)))
     ax.axvline(0.5, color=_style.COLORS["baseline"], linewidth=0.6, zorder=0)
@@ -185,14 +192,15 @@ VERIFIED_MODELS = [("laguna_xs2_full_pooled", "Laguna XS.2", "laguna", "o"),
 
 
 def main() -> None:
-    global ROOT, OUT, SHOW_LAYER
+    global ROOT, OUT, SHOW_LAYER, NO_STRAT
     ap = argparse.ArgumentParser()
     ap.add_argument("probes", nargs="*", default=["currently_compiles"])
     ap.add_argument("--root", default=str(ROOT))
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--show-layer", action="store_true")
+    ap.add_argument("--no-strat", action="store_true", help="omit the stratified (same-language/-repo pairs) lines")
     args = ap.parse_args()
-    ROOT, OUT, SHOW_LAYER = Path(args.root), Path(args.out), args.show_layer
+    ROOT, OUT, SHOW_LAYER, NO_STRAT = Path(args.root), Path(args.out), args.show_layer, args.no_strat
     _style.apply()
     data = {p: load(p) for p, *_ in MODELS}
     fig_language(data)
