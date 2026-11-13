@@ -132,3 +132,10 @@ Edit-indexed horizon: from the hidden state at turn t, predict the label after t
 - **Files:** `json/ei_<run>_<property>.json`, `summary.json` (headline counts per m and population, and every cell). `json_timing/` holds the cost-estimate run (Qwen/Verified correct, layer 21, k = 0 weight decay only), not used in the summary.
 
 Commands: `sbatch ... slurm/edit_indexed.sh --run <run> --probe <property> --k0-val-layer --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_edit_indexed.py`.
+
+## `table1_k1/` (brief T1K1)
+
+Table 1 at k = 1, window 15, strata S0 (y_t = 0) and S2 (y_t = 0 and y_T = 1), 12 settings (4 runs x correct, reduces_failing, has_regressions). E18 and PO stopped S1-S4 at k >= 2. Same setup as E18/PO: k = 1 probe at its validation-best layer, controls k0, traj, pos_causal, pos_rel, PO's prompt_hs and prompt_tfidf (refit on y_{t+1} at that layer), oracle_yT (defined where y_T >= 0), and the paired task bootstrap (1000, seed 42). Each file has one row in the PO/E18 format (`auc`, `ci95` with `real_val-<control>|S0/S2`, `counts`). `real_val-oracle_yT|<stratum>` is an extra key; E18 has no such paired difference. Check (asserted, passed in all 12): every S0 AUC, CI and count equals PO's k = 1 row (max abs diff 0), and the pre-existing scorers match E16.
+- **Files:** `json/k1_<run>_<property>.json`.
+
+Command: `sbatch ... slurm/table1_k1.sh --run <run> --probe <property> --output paper_rebuttal_candidate/table1_k1/json/k1_<run>_<property>.json` (`scripts/rebuttal_table1_k1.py`; about 3 min per job on 2 cores).

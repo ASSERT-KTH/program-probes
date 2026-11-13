@@ -401,6 +401,12 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - **Cost:** 48 CPU core-hours (estimate was ~21; the Laguna jobs took 2–2.8 h each), over the ~20 budget.
 - Output: `paper_rebuttal_candidate/edit_indexed/` (`scripts/rebuttal_edit_indexed.py`, `scripts/paper_rebuttal_candidate_edit_indexed.py`, `slurm/edit_indexed.sh`).
 
+**Table 1 at k = 1 (T1K1)**
+- Table 1 now shows only S0 and S2, so k = 1 no longer has to be excluded (only S1 needed k >= 2). The k = 1 S0/S2 cells were computed with the E18/PO setup: same probe layer, controls, prompt_hs refit, oracle_yT, paired bootstrap.
+- S0 reproduces PO's k = 1 numbers exactly (AUCs, CIs, counts; asserted) and E16.
+- Cost: about 1.1 CPU core-hours (12 jobs, 2 cores, about 3 min each). No summary counts; the table is computed from the JSON.
+- Output: `paper_rebuttal_candidate/table1_k1/` (`scripts/rebuttal_table1_k1.py`, `slurm/table1_k1.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
