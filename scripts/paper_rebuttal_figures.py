@@ -22,6 +22,7 @@ Inputs beyond results/: reports/rerun/lookahead_refs/*.json (scripts/rebuttal_pa
 and reports/rerun/phase/lookahead_*_max15.json (E16, scripts/rebuttal_phase_confound.py).
 
 Usage (compute node): uv run python scripts/paper_rebuttal_figures.py
+       uv run python scripts/paper_rebuttal_figures.py --fig3 paper_rebuttal_candidate/fig3   (barplot only)
 """
 from __future__ import annotations
 
@@ -189,7 +190,13 @@ def build_auc_table() -> tuple[str, dict]:
 # A3: summary barplot with token- and trajectory-shuffle markers
 # ---------------------------------------------------------------------------
 
-def plot_summary_barplot() -> None:
+TOK_OVERLAP = 0.01  # |token - trajectory shuffle AUC| below this: token circle drawn smaller on top
+
+
+def plot_summary_barplot(out_dir: Path = FIGS) -> list[dict]:
+    """Bars: best-layer test AUC. Token shuffle: black-filled circle; trajectory shuffle: white-filled circle.
+    Returns the bars where the two circles overlap (|difference| < TOK_OVERLAP)."""
+    overlaps = []
     series = []
     for i, model in enumerate(("laguna", "qwen")):
         label = rpf.MODEL_LABELS[rpf._model_key(POOLED["Verified"][i])]
@@ -211,12 +218,18 @@ def plot_summary_barplot() -> None:
             ax.bar(xc, v, width=bw, color=color, hatch=_style.HATCH[dataset], edgecolor=ec, linewidth=0.6, zorder=3)
             tok = rpf._best_layer_mean(rpf._load(RES[ds], run + "_shuffled", probe), "test_auc")
             trj = rpf._best_layer_mean(rpf._load(RES[ds], run + "_shuffled_traj", probe), "test_auc")
-            ax.hlines(tok, xc - bw / 2, xc + bw / 2, colors="black", linewidth=1.6, zorder=4)
             ax.plot(xc, trj, marker="o", markersize=3.6, markerfacecolor="white", markeredgecolor="black",
                     markeredgewidth=0.9, linestyle="", zorder=5)
+            close = abs(tok - trj) < TOK_OVERLAP
+            if close:
+                overlaps.append({"series": label, "probe": probe, "token_shuffle": tok, "traj_shuffle": trj,
+                                 "diff": tok - trj})
+            ax.plot(xc, tok, marker="o", markersize=2.2 if close else 3.6, markerfacecolor="black",
+                    markeredgecolor="black", markeredgewidth=0.9, linestyle="", zorder=6)
         handles.append(mpatches.Patch(facecolor=color, hatch=_style.HATCH[dataset], edgecolor=ec, linewidth=0.6,
                                       label=label))
-    handles.append(Line2D([0], [0], color="black", linewidth=1.6, label="Token shuffle"))
+    handles.append(Line2D([0], [0], marker="o", markersize=3.6, markerfacecolor="black", markeredgecolor="black",
+                          markeredgewidth=0.9, linestyle="", label="Token shuffle"))
     handles.append(Line2D([0], [0], marker="o", markersize=3.6, markerfacecolor="white", markeredgecolor="black",
                           markeredgewidth=0.9, linestyle="", label="Trajectory shuffle (aligned by relative position)"))
     ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"], linewidth=1.0, zorder=2)
@@ -230,10 +243,13 @@ def plot_summary_barplot() -> None:
     ax.set_ylim(0.45, 1.0)
     ax.legend(handles=handles, ncol=4, loc="lower center", bbox_to_anchor=(0.5, 1.0), fontsize=6.6,
               columnspacing=1.0, handlelength=1.6, frameon=False)
-    FIGS.mkdir(parents=True, exist_ok=True)
-    fig.savefig(FIGS / "auc_summary_barplot.pdf")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / "auc_summary_barplot.pdf")
     plt.close(fig)
-    print("  [fig]", FIGS / "auc_summary_barplot.pdf")
+    print("  [fig]", out_dir / "auc_summary_barplot.pdf")
+    for o in overlaps:
+        print(f"  [overlap] {o['series']} {o['probe']}: token {o['token_shuffle']:.4f} traj {o['traj_shuffle']:.4f}")
+    return overlaps
 
 
 # ---------------------------------------------------------------------------
@@ -427,5 +443,18 @@ def main() -> None:
     os._exit(0)  # the interpreter otherwise hangs at exit on the compute nodes
 
 
+def main_fig3(out_dir: Path) -> None:
+    """Brief FIG3: only the summary barplot (same data and conventions as main), written to out_dir."""
+    _style.apply()
+    rpf._weighted_mean = weighted_mean_drop_single
+    overlaps = plot_summary_barplot(out_dir)
+    (out_dir / "overlaps.json").write_text(json.dumps({"threshold": TOK_OVERLAP, "overlaps": overlaps}, indent=1,
+                                                      default=float))
+    print("[done]", flush=True)
+    os._exit(0)
+
+
 if __name__ == "__main__":
+    if len(sys.argv) == 3 and sys.argv[1] == "--fig3":
+        main_fig3(Path(sys.argv[2]))
     main()

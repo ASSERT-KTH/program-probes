@@ -116,3 +116,7 @@ Does a classifier on the visible text, above all the latest tool output, explain
 - **Files:** `json/horizon_*.json`, `json/k0_*.json` (with part B), `summary.json` (also the Table 1 recount with PO, E9 and both). `json_partb_v1/` holds the first k=0 run, before the post-edit subsets were added; its other numbers are identical (checked).
 
 Commands: `sbatch ... slurm/text_baseline.sh features --run <run> --kinds text_a1` per run, then `sbatch ... slurm/text_baseline.sh {horizon,k0} --run <run> --probe <probe> --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_text_baseline.py`.
+
+## `fig3/` (brief FIG3)
+
+`auc_summary_barplot.pdf` redrawn (`scripts/paper_rebuttal_figures.py --fig3 paper_rebuttal_candidate/fig3`, compute node) with the token shuffle as a black-filled circle (same size as the trajectory-shuffle circle, zorder 6) instead of a black tick; legend handle to match. Same data, size, colours and legend order as `paper_rebuttal/figures/figures/auc_summary_barplot.pdf`. Where token and trajectory shuffle are within 0.01 AUC, the token circle would be drawn smaller (`overlaps.json` lists those bars): none are. The closest pair, Laguna-XS.2 (Pro) regression, is about 0.012 apart (circles touch, both visible).
