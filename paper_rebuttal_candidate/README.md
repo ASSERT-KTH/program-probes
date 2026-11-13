@@ -120,3 +120,15 @@ Commands: `sbatch ... slurm/text_baseline.sh features --run <run> --kinds text_a
 ## `fig3/` (brief FIG3)
 
 `auc_summary_barplot.pdf` redrawn (`scripts/paper_rebuttal_figures.py --fig3 paper_rebuttal_candidate/fig3`, compute node) with the token shuffle as a black-filled circle (same size as the trajectory-shuffle circle, zorder 6) instead of a black tick; legend handle to match. Same data, size, colours and legend order as `paper_rebuttal/figures/figures/auc_summary_barplot.pdf`. Where token and trajectory shuffle are within 0.01 AUC, the token circle would be drawn smaller (`overlaps.json` lists those bars): none are. The closest pair, Laguna-XS.2 (Pro) regression, is about 0.012 apart (circles touch, both visible).
+
+## `edit_indexed/` (brief EI; HaQJ-W1c, HaQJ-Q3)
+
+Edit-indexed horizon: from the hidden state at turn t, predict the label after the m-th future edit (m = 1, 2, 3; edit written in a turn > t). CPU only.
+- **Edits and targets:** `edit_step_index.pt` (AE0's real edits). Outcome of edit e = turn label of turn N_e + 1 (`outputs/<bench>/<run>/<sid>_labels.pt`). A token whose e_m has an undefined outcome is excluded for that m (e_m is not renumbered). Cache labels were checked against the turn labels (0 mismatches).
+- **Tokens:** pooled k = 0 cache, its task split (Table 6 test tasks), y_t ≥ 0, no window exclusion.
+- **Probe:** linear, trained as `src/probe.py` (pooled, mean-centred, Adam, CE, early stop on validation loss), only at the k = 0 probe's validation-best layer (E17 `val_best_layer`), with that layer's k = 0 sweep hyperparameters; weight decay chosen on validation AUC from {k = 0 value, 1e-2, 1e-1}.
+- **Baselines** (fit on train tokens with the same target): persistence (A only), k = 0 probe (Table 6 layer), `pos_causal` and `pos_rel` (E16 splines), `edits_so_far`, `observable` (step, edits so far, turns since the last edit), `traj` (trajectory shuffle at the selected layer and weight decay), `prompt_hs` (PO, refit), `yT` (oracle).
+- **Populations:** A all tokens with Target_m; B y_t = 0; C y_t = 0 and y_T = 1. Paired task bootstrap, 1000 resamples.
+- **Files:** `json/ei_<run>_<property>.json`, `summary.json` (headline counts per m and population, and every cell). `json_timing/` holds the cost-estimate run (Qwen/Verified correct, layer 21, k = 0 weight decay only), not used in the summary.
+
+Commands: `sbatch ... slurm/edit_indexed.sh --run <run> --probe <property> --k0-val-layer --output ...`, then `uvx python@3.12 scripts/paper_rebuttal_candidate_edit_indexed.py`.

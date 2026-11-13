@@ -389,6 +389,18 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
   - Reading: the probes do not depend on having seen the newest program version run, and they stay ahead of the text of the latest tool output in most cells either way.
 - Output: `paper_rebuttal_candidate/text_baseline/` (`scripts/rebuttal_text_baseline.py`, `scripts/rebuttal_text_extract.py`, `scripts/paper_rebuttal_candidate_text_baseline.py`, `slurm/text_baseline.sh`).
 
+**Edit-indexed horizon (EI; HaQJ-W1c, HaQJ-Q3)**
+- **Question:** from the hidden state at turn t, can a probe predict the label after the m-th future edit (m = 1, 2, 3; edit written in a turn after t, so the state precedes the target edit)? Edits and outcomes as in AE0 (outcome = label of turn N_e + 1). Tokens: pooled k = 0 caches, Table 6 test tasks, y_t ≥ 0.
+- **Probe:** new linear probes trained as in `src/probe.py`, at the k = 0 probe's validation-best layer only (5 layers did not fit the budget), with that layer's k = 0 sweep hyperparameters. Weight decay (the analogue of C) chosen on validation from {k = 0 value, 1e-2, 1e-1}. With the k = 0 value alone the first test probes early-stopped after 1–2 epochs; the grid picked a larger value in 10 of 36 fits.
+- **Baselines:** persistence y_t, the k = 0 probe (Table 6 layer), E16 position splines (causal, relative), edits so far, observable features (step, edits so far, turns since last edit), trajectory shuffle, prompt-only (PO), y_T oracle. Populations: A all, B y_t = 0, C y_t = 0 and y_T = 1. Properties: correct, reduces_failing, has_regressions (compiles not run).
+- **Result: the probe never beats all step-t baselines in A or C, and in B only in 1 of 12 (m = 1) and 2 of 12 (m = 3) settings.**
+  - A: probe 0.54–0.75. Persistence is the strongest baseline in 8 of 12 (m = 1, 2) and is significantly better than the probe in 3–4 of 12 per m (all Laguna/Verified and one Qwen/Verified); the probe is never significantly better than persistence.
+  - B: probe 0.51–0.75, ahead of the k = 0 probe (CI > 0) in 10, 9 and 8 of 12 for m = 1, 2, 3, and of the trajectory shuffle in 9, 8, 7. The strongest baseline is mostly prompt-only or causal position, which the probe does not beat.
+  - C (eventually solved, not yet holding; does the probe know which edit fixes it?): probe 0.37–0.66, at chance; it beats no baseline in more than 2 of 12 settings per m.
+  - Target edits change the label in 1–35% of cases (A); median distance to e_m: 3–9 turns (m = 1), 7–16 (m = 2), 11–23 (m = 3).
+- **Cost:** 48 CPU core-hours (estimate was ~21; the Laguna jobs took 2–2.8 h each), over the ~20 budget.
+- Output: `paper_rebuttal_candidate/edit_indexed/` (`scripts/rebuttal_edit_indexed.py`, `scripts/paper_rebuttal_candidate_edit_indexed.py`, `slurm/edit_indexed.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.
