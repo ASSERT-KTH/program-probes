@@ -416,6 +416,19 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - Cost: about 1 CPU core-hour.
 - Output: `paper_rebuttal_candidate/per_unit_auc/` (`scripts/rebuttal_per_unit_auc.py`, `slurm/per_unit_auc.sh`).
 
+**Per-trajectory-weighted horizon (E12H; 1nZa-W4)**
+- The Section 4.2 numbers (72 settings, S0 and S2) recomputed with every trajectory given total weight 1. Unweighted numbers reproduce PO, E18 and T1K1 (asserted).
+- **Result: weighting by trajectory leaves the conclusions unchanged, and most counts go up.**
+  - S0, unweighted → weighted:
+    - Probe beats k0 / traj / pos_rel / pos_causal in 72/70/66/62 → 71/70/67/67 settings.
+    - Gap to the strongest of the four: median 0.105 (IQR 0.086–0.124) → 0.109 (0.084–0.138).
+    - Beats all four (strict): 56 → 62. With prompt_hs added: median 0.078 → 0.069, strict 17 → 23.
+    - Oracle y_T higher than the probe: 65 → 52.
+    - No baseline is significantly better than the probe in any setting, under either weighting.
+  - S2: median gap 0.038 (IQR −0.001–0.086) → 0.056 (0.010–0.103); strict 23 → 30; with prompt_hs 23 → 27. One setting has a baseline significantly better under each weighting, and it is a different setting in each.
+- Cost: about 9 CPU core-hours.
+- Output: `paper_rebuttal_candidate/per_traj_horizon/` (`scripts/rebuttal_per_traj_horizon.py`, `scripts/paper_rebuttal_candidate_per_traj_horizon.py`, `slurm/per_traj_horizon.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.

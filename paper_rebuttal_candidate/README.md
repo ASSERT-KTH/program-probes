@@ -149,3 +149,14 @@ Per-trajectory and per-version AUC of the 16 k = 0 cells of the AUC table (Table
 - **Files:** `json/pu_<run>_<property>.json` (`auc`, `ci95`, `counts`: test tokens, tasks, trajectories, versions, label shares).
 
 Command: `sbatch ... slurm/per_unit_auc.sh --run <run> --probe <property> --output ...` (`scripts/rebuttal_per_unit_auc.py`; 1–3 min per job on 2 cores).
+
+## `per_traj_horizon/` (brief E12H; 1nZa-W4)
+
+Per-trajectory-weighted version of the Section 4.2 horizon numbers. Setup as in E16, E18, PO and T1K1: window 15, k in {1, 2, 3, 5, 10, 15}, correct / reduces_failing / has_regressions, 4 runs (72 settings).
+- **Scorers:** the k-step probe at its val-best layer (real_val), k0, traj, pos_causal, pos_rel, prompt_hs (PO refit), oracle_yT.
+- **Strata and weights:** S0 (y_t = 0) and S2 (y_t = 0, y_T = 1). Each test state is weighted 1 / (that subset's test states in its trajectory); for oracle_yT the subset is also restricted to y_T ≥ 0.
+- **Bootstrap:** task-level, 1000 resamples, seed 42 (same draws as PO). Paired CIs of probe − each baseline, both weightings.
+- **Checks (asserted):** every unweighted AUC, CI and count reproduces PO, E18 (including oracle_yT) and T1K1 (max abs diff 6.4e-6, for a refit position baseline). The weighted AUCs match sklearn.
+- **Files:** `json/pth_<run>_<property>.json` (`w:<scorer>|<stratum>` are the weighted keys); `summary.json` from `scripts/paper_rebuttal_candidate_per_traj_horizon.py` (counts, gap medians and IQR, strict counts, oracle count, per weighting and stratum, plus every cell).
+
+Command: `sbatch ... slurm/per_traj_horizon.sh --run <run> --probe <property> --output ...` (`scripts/rebuttal_per_traj_horizon.py`), then `uvx python@3.12 scripts/paper_rebuttal_candidate_per_traj_horizon.py`.
