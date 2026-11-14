@@ -1,0 +1,1262 @@
+{
+ "cells": {
+  "laguna_verified|currently_compiles": {
+   "layer": 11,
+   "all_states_auc": 0.6909625002846291,
+   "primary": {
+    "auc": 0.6423378968781341,
+    "n_edits": 2044,
+    "n_states": 57927,
+    "n_test_tasks": 75,
+    "n_trajectories": 691,
+    "pos_rate": 0.9125105736530461,
+    "ci95": [
+     0.5657201821478953,
+     0.7041257431180619
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2269,
+     "n_edits": 115,
+     "pos_rate": 0.1868664609960335,
+     "auc": 0.44174656133353785
+    }
+   },
+   "strict": {
+    "auc": 0.614765737874097,
+    "n_edits": 487,
+    "n_states": 9035,
+    "n_test_tasks": 59,
+    "n_trajectories": 251,
+    "pos_rate": 0.8937465412285556,
+    "ci95": [
+     0.4795070626888691,
+     0.7708941817081066
+    ],
+    "label_changed_by_edit": {
+     "n_states": 554,
+     "n_edits": 33,
+     "pos_rate": 0.04332129963898917,
+     "auc": 0.36053459119496856
+    }
+   },
+   "none": {
+    "auc": 0.6312832308427139,
+    "n_edits": 2119,
+    "n_states": 62048,
+    "n_test_tasks": 75,
+    "n_trajectories": 703,
+    "pos_rate": 0.9083290355853533,
+    "ci95": [
+     0.5534769395505854,
+     0.6961343482798176
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2332,
+     "n_edits": 117,
+     "pos_rate": 0.18181818181818182,
+     "auc": 0.4436502462323484
+    }
+   },
+   "best_after_edit_layer_primary": 11,
+   "auc_at_best_after_edit_layer_primary": 0.6423378968781341,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.5657201821478953,
+    0.7041257431180619
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.6328519695283814,
+    "11": 0.6423378968781341,
+    "21": 0.6286046329445824,
+    "31": 0.6227058406474086,
+    "40": 0.6346363774914703
+   }
+  },
+  "laguna_verified|currently_correct": {
+   "layer": 21,
+   "all_states_auc": 0.7882650570514762,
+   "primary": {
+    "auc": 0.6470510007629389,
+    "n_edits": 2044,
+    "n_states": 57927,
+    "n_test_tasks": 75,
+    "n_trajectories": 691,
+    "pos_rate": 0.3864691767224265,
+    "ci95": [
+     0.5763725143039894,
+     0.7143386549774348
+    ],
+    "label_changed_by_edit": {
+     "n_states": 10559,
+     "n_edits": 510,
+     "pos_rate": 0.8685481579695047,
+     "auc": 0.569084056779656
+    }
+   },
+   "strict": {
+    "auc": 0.6212224428764689,
+    "n_edits": 487,
+    "n_states": 9035,
+    "n_test_tasks": 59,
+    "n_trajectories": 251,
+    "pos_rate": 0.5276148312119535,
+    "ci95": [
+     0.47477134321465003,
+     0.7596767654049593
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1877,
+     "n_edits": 119,
+     "pos_rate": 0.9461907298881194,
+     "auc": 0.7292893140665418
+    }
+   },
+   "none": {
+    "auc": 0.6532629540636914,
+    "n_edits": 2119,
+    "n_states": 62048,
+    "n_test_tasks": 75,
+    "n_trajectories": 703,
+    "pos_rate": 0.38429925219185146,
+    "ci95": [
+     0.5832353372636444,
+     0.7214874333852376
+    ],
+    "label_changed_by_edit": {
+     "n_states": 10719,
+     "n_edits": 516,
+     "pos_rate": 0.8705103087974625,
+     "auc": 0.5695009847562755
+    }
+   },
+   "best_after_edit_layer_primary": 21,
+   "auc_at_best_after_edit_layer_primary": 0.6470510007629389,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.5763725143039894,
+    0.7143386549774348
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.579933169772362,
+    "11": 0.6314615635194465,
+    "21": 0.6470510007629389,
+    "31": 0.6330822277097818,
+    "40": 0.6189718172921674
+   }
+  },
+  "laguna_verified|currently_reduces_failing": {
+   "layer": 21,
+   "all_states_auc": 0.7731628555852047,
+   "primary": {
+    "auc": 0.6261017513611079,
+    "n_edits": 2044,
+    "n_states": 57927,
+    "n_test_tasks": 75,
+    "n_trajectories": 691,
+    "pos_rate": 0.4829699449306886,
+    "ci95": [
+     0.54339909303145,
+     0.7072824867581453
+    ],
+    "label_changed_by_edit": {
+     "n_states": 10778,
+     "n_edits": 525,
+     "pos_rate": 0.8817034700315457,
+     "auc": 0.36971292863141253
+    }
+   },
+   "strict": {
+    "auc": 0.734163860484507,
+    "n_edits": 487,
+    "n_states": 9035,
+    "n_test_tasks": 59,
+    "n_trajectories": 251,
+    "pos_rate": 0.6924183729939125,
+    "ci95": [
+     0.6163810472885044,
+     0.8119479250334006
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1936,
+     "n_edits": 126,
+     "pos_rate": 0.9245867768595041,
+     "auc": 0.5563442259126044
+    }
+   },
+   "none": {
+    "auc": 0.6117769729379827,
+    "n_edits": 2119,
+    "n_states": 62048,
+    "n_test_tasks": 75,
+    "n_trajectories": 703,
+    "pos_rate": 0.4956324136152656,
+    "ci95": [
+     0.5238184793442204,
+     0.699098615046524
+    ],
+    "label_changed_by_edit": {
+     "n_states": 11149,
+     "n_edits": 536,
+     "pos_rate": 0.8856399677101086,
+     "auc": 0.3661498806530917
+    }
+   },
+   "best_after_edit_layer_primary": 21,
+   "auc_at_best_after_edit_layer_primary": 0.6261017513611079,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.54339909303145,
+    0.7072824867581453
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.5896307597768571,
+    "11": 0.6074302102317173,
+    "21": 0.6261017513611079,
+    "31": 0.6041589845176305,
+    "40": 0.5910190107865255
+   }
+  },
+  "laguna_verified|currently_has_regressions": {
+   "layer": 21,
+   "all_states_auc": 0.6954518796587461,
+   "primary": {
+    "auc": 0.5786961575514787,
+    "n_edits": 2044,
+    "n_states": 57927,
+    "n_test_tasks": 75,
+    "n_trajectories": 691,
+    "pos_rate": 0.1867350285704421,
+    "ci95": [
+     0.48571631978394586,
+     0.6444224679263947
+    ],
+    "label_changed_by_edit": {
+     "n_states": 6856,
+     "n_edits": 223,
+     "pos_rate": 0.47885064177362896,
+     "auc": 0.37357903673769466
+    }
+   },
+   "strict": {
+    "auc": 0.49033409345351486,
+    "n_edits": 487,
+    "n_states": 9035,
+    "n_test_tasks": 59,
+    "n_trajectories": 251,
+    "pos_rate": 0.08002213613724406,
+    "ci95": [
+     0.28513999070226914,
+     0.6043963091363782
+    ],
+    "label_changed_by_edit": {
+     "n_states": 430,
+     "n_edits": 28,
+     "pos_rate": 0.5767441860465117,
+     "auc": 0.4833392414037575
+    }
+   },
+   "none": {
+    "auc": 0.5991223052048846,
+    "n_edits": 2119,
+    "n_states": 62048,
+    "n_test_tasks": 75,
+    "n_trajectories": 703,
+    "pos_rate": 0.188160778751934,
+    "ci95": [
+     0.4934147580995456,
+     0.669415076814994
+    ],
+    "label_changed_by_edit": {
+     "n_states": 7066,
+     "n_edits": 225,
+     "pos_rate": 0.4656099632040759,
+     "auc": 0.3574594865668951
+    }
+   },
+   "best_after_edit_layer_primary": 11,
+   "auc_at_best_after_edit_layer_primary": 0.5884571900088792,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.48085835359634305,
+    0.6560454456138336
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.5614606516033208,
+    "11": 0.5884571900088792,
+    "21": 0.5786961575514787,
+    "31": 0.5846109570642702,
+    "40": 0.547657519482323
+   }
+  },
+  "qwen_verified|currently_compiles": {
+   "layer": 11,
+   "all_states_auc": 0.7811382886866578,
+   "primary": {
+    "auc": 0.6154850517615613,
+    "n_edits": 1417,
+    "n_states": 21112,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.8568586585827965,
+    "ci95": [
+     0.5326372069793506,
+     0.7112682376249984
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1740,
+     "n_edits": 128,
+     "pos_rate": 0.2959770114942529,
+     "auc": 0.41842203289082625
+    }
+   },
+   "strict": {
+    "auc": 0.5083632755922778,
+    "n_edits": 748,
+    "n_states": 8245,
+    "n_test_tasks": 71,
+    "n_trajectories": 428,
+    "pos_rate": 0.8930260764099455,
+    "ci95": [
+     0.3890558095190877,
+     0.6483187029053689
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1019,
+     "n_edits": 71,
+     "pos_rate": 0.2787046123650638,
+     "auc": 0.2680272108843537
+    }
+   },
+   "none": {
+    "auc": 0.6155137324006241,
+    "n_edits": 1424,
+    "n_states": 21269,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.856175654708731,
+    "ci95": [
+     0.5243821336930401,
+     0.7098219701065374
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1747,
+     "n_edits": 129,
+     "pos_rate": 0.294791070406411,
+     "auc": 0.4178035556676334
+    }
+   },
+   "best_after_edit_layer_primary": 1,
+   "auc_at_best_after_edit_layer_primary": 0.7057889371438271,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.4737303752725625,
+    0.789328177421425
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.7057889371438271,
+    "11": 0.6154850517615613,
+    "21": 0.5987544079733694,
+    "31": 0.6242987668466988,
+    "40": 0.6619554261928098
+   }
+  },
+  "qwen_verified|currently_correct": {
+   "layer": 31,
+   "all_states_auc": 0.8378327947770139,
+   "primary": {
+    "auc": 0.6433163574409457,
+    "n_edits": 1417,
+    "n_states": 21112,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.4557597574838954,
+    "ci95": [
+     0.5812455446113255,
+     0.6994793426104239
+    ],
+    "label_changed_by_edit": {
+     "n_states": 7094,
+     "n_edits": 463,
+     "pos_rate": 0.9613758105441218,
+     "auc": 0.7411210052015327
+    }
+   },
+   "strict": {
+    "auc": 0.7037972637007082,
+    "n_edits": 748,
+    "n_states": 8245,
+    "n_test_tasks": 71,
+    "n_trajectories": 428,
+    "pos_rate": 0.5553668890236507,
+    "ci95": [
+     0.6439978437459651,
+     0.7534411318623397
+    ],
+    "label_changed_by_edit": {
+     "n_states": 3247,
+     "n_edits": 263,
+     "pos_rate": 0.9898367724052972,
+     "auc": 0.6087477136014784
+    }
+   },
+   "none": {
+    "auc": 0.6435038478707382,
+    "n_edits": 1424,
+    "n_states": 21269,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.45239550519535476,
+    "ci95": [
+     0.5818052114881379,
+     0.6966451107716987
+    ],
+    "label_changed_by_edit": {
+     "n_states": 7126,
+     "n_edits": 465,
+     "pos_rate": 0.957058658433904,
+     "auc": 0.7142957085082322
+    }
+   },
+   "best_after_edit_layer_primary": 31,
+   "auc_at_best_after_edit_layer_primary": 0.6433163574409457,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.5812455446113255,
+    0.6994793426104239
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.5152235394337643,
+    "11": 0.6159410350048183,
+    "21": 0.6244786027595955,
+    "31": 0.6433163574409457,
+    "40": 0.638403551550615
+   }
+  },
+  "qwen_verified|currently_reduces_failing": {
+   "layer": 31,
+   "all_states_auc": 0.8322550347916849,
+   "primary": {
+    "auc": 0.5759382978361882,
+    "n_edits": 1417,
+    "n_states": 21112,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.4866426676771504,
+    "ci95": [
+     0.5170923457544849,
+     0.633881626561842
+    ],
+    "label_changed_by_edit": {
+     "n_states": 6908,
+     "n_edits": 500,
+     "pos_rate": 0.9365952518818761,
+     "auc": 0.5570328103717193
+    }
+   },
+   "strict": {
+    "auc": 0.6277531014247144,
+    "n_edits": 748,
+    "n_states": 8245,
+    "n_test_tasks": 71,
+    "n_trajectories": 428,
+    "pos_rate": 0.5547604608853851,
+    "ci95": [
+     0.5599160661573985,
+     0.6844517847913625
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2848,
+     "n_edits": 282,
+     "pos_rate": 0.9389044943820225,
+     "auc": 0.5832000790928396
+    }
+   },
+   "none": {
+    "auc": 0.5765488905490249,
+    "n_edits": 1424,
+    "n_states": 21269,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.4830504490102967,
+    "ci95": [
+     0.520032351034522,
+     0.6328116363800493
+    ],
+    "label_changed_by_edit": {
+     "n_states": 6940,
+     "n_edits": 502,
+     "pos_rate": 0.9322766570605188,
+     "auc": 0.5447578019665231
+    }
+   },
+   "best_after_edit_layer_primary": 31,
+   "auc_at_best_after_edit_layer_primary": 0.5759382978361882,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.5170923457544849,
+    0.633881626561842
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.4665507815150716,
+    "11": 0.5422052840202083,
+    "21": 0.5613181481045484,
+    "31": 0.5759382978361882,
+    "40": 0.5582638312201753
+   }
+  },
+  "qwen_verified|currently_has_regressions": {
+   "layer": 21,
+   "all_states_auc": 0.7716114372866317,
+   "primary": {
+    "auc": 0.6181084692126765,
+    "n_edits": 1417,
+    "n_states": 21112,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.10051155740810913,
+    "ci95": [
+     0.4913473219848293,
+     0.6997145902967352
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2091,
+     "n_edits": 127,
+     "pos_rate": 0.583452893352463,
+     "auc": 0.34787224031168246
+    }
+   },
+   "strict": {
+    "auc": 0.6286061146037019,
+    "n_edits": 748,
+    "n_states": 8245,
+    "n_test_tasks": 71,
+    "n_trajectories": 428,
+    "pos_rate": 0.0724075197089145,
+    "ci95": [
+     0.5169613568681656,
+     0.7264459040647409
+    ],
+    "label_changed_by_edit": {
+     "n_states": 507,
+     "n_edits": 52,
+     "pos_rate": 0.7080867850098619,
+     "auc": 0.4181284348415268
+    }
+   },
+   "none": {
+    "auc": 0.6087938881857456,
+    "n_edits": 1424,
+    "n_states": 21269,
+    "n_test_tasks": 75,
+    "n_trajectories": 665,
+    "pos_rate": 0.10390709483285533,
+    "ci95": [
+     0.4782469231070496,
+     0.6883174995718009
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2179,
+     "n_edits": 130,
+     "pos_rate": 0.6002753556677375,
+     "auc": 0.33705853232075333
+    }
+   },
+   "best_after_edit_layer_primary": 21,
+   "auc_at_best_after_edit_layer_primary": 0.6181084692126765,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.4913473219848293,
+    0.6997145902967352
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.5639898895147454,
+    "11": 0.576362404142465,
+    "21": 0.6181084692126765,
+    "31": 0.5959601486768918,
+    "40": 0.5898697737139295
+   }
+  },
+  "laguna_pro|currently_compiles": {
+   "layer": 11,
+   "all_states_auc": 0.7864391447522684,
+   "primary": {
+    "auc": 0.8082964557152553,
+    "n_edits": 5228,
+    "n_states": 166362,
+    "n_test_tasks": 106,
+    "n_trajectories": 928,
+    "pos_rate": 0.5421129825320686,
+    "ci95": [
+     0.7356093025129005,
+     0.8695736468431557
+    ],
+    "label_changed_by_edit": {
+     "n_states": 14545,
+     "n_edits": 434,
+     "pos_rate": 0.44125128910278444,
+     "auc": 0.47002390916129166
+    }
+   },
+   "strict": {
+    "auc": 0.753229893406232,
+    "n_edits": 3027,
+    "n_states": 79753,
+    "n_test_tasks": 98,
+    "n_trajectories": 711,
+    "pos_rate": 0.4590046769400524,
+    "ci95": [
+     0.6766666655566599,
+     0.8140875709485748
+    ],
+    "label_changed_by_edit": {
+     "n_states": 10335,
+     "n_edits": 313,
+     "pos_rate": 0.451088534107402,
+     "auc": 0.5084705276402791
+    }
+   },
+   "none": {
+    "auc": 0.8135518312859017,
+    "n_edits": 5454,
+    "n_states": 175456,
+    "n_test_tasks": 106,
+    "n_trajectories": 945,
+    "pos_rate": 0.5580259438263724,
+    "ci95": [
+     0.7472082685702068,
+     0.8670478578634667
+    ],
+    "label_changed_by_edit": {
+     "n_states": 15565,
+     "n_edits": 461,
+     "pos_rate": 0.472277545775779,
+     "auc": 0.51130475168113
+    }
+   },
+   "best_after_edit_layer_primary": 11,
+   "auc_at_best_after_edit_layer_primary": 0.8082964557152553,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.7356093025129005,
+    0.8695736468431557
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.7698586154300141,
+    "11": 0.8082964557152553,
+    "21": 0.7784430201291022,
+    "31": 0.7800925832588612,
+    "40": 0.7939940283578601
+   }
+  },
+  "laguna_pro|currently_correct": {
+   "layer": 21,
+   "all_states_auc": 0.7939589177726336,
+   "primary": {
+    "auc": 0.7233749579408999,
+    "n_edits": 5228,
+    "n_states": 166362,
+    "n_test_tasks": 106,
+    "n_trajectories": 928,
+    "pos_rate": 0.05769346365155504,
+    "ci95": [
+     0.6265709572619621,
+     0.7996051886699945
+    ],
+    "label_changed_by_edit": {
+     "n_states": 5225,
+     "n_edits": 169,
+     "pos_rate": 0.7732057416267942,
+     "auc": 0.4885461837322973
+    }
+   },
+   "strict": {
+    "auc": 0.7649525125669503,
+    "n_edits": 3027,
+    "n_states": 79753,
+    "n_test_tasks": 98,
+    "n_trajectories": 711,
+    "pos_rate": 0.03905809185861347,
+    "ci95": [
+     0.6812283613558706,
+     0.8274047373559432
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2870,
+     "n_edits": 77,
+     "pos_rate": 0.645993031358885,
+     "auc": 0.43005546636767494
+    }
+   },
+   "none": {
+    "auc": 0.7274944495415478,
+    "n_edits": 5454,
+    "n_states": 175456,
+    "n_test_tasks": 106,
+    "n_trajectories": 945,
+    "pos_rate": 0.058328013861024985,
+    "ci95": [
+     0.6357863268987732,
+     0.8026782225675235
+    ],
+    "label_changed_by_edit": {
+     "n_states": 5313,
+     "n_edits": 174,
+     "pos_rate": 0.7660455486542443,
+     "auc": 0.4962627075257808
+    }
+   },
+   "best_after_edit_layer_primary": 21,
+   "auc_at_best_after_edit_layer_primary": 0.7233749579408999,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.6265709572619621,
+    0.7996051886699945
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.6134769865800452,
+    "11": 0.6814999742340409,
+    "21": 0.7233749579408999,
+    "31": 0.7075323879330048,
+    "40": 0.6714655859831777
+   }
+  },
+  "laguna_pro|currently_reduces_failing": {
+   "layer": 21,
+   "all_states_auc": 0.7801533496171842,
+   "primary": {
+    "auc": 0.7383543266496864,
+    "n_edits": 5228,
+    "n_states": 166362,
+    "n_test_tasks": 106,
+    "n_trajectories": 928,
+    "pos_rate": 0.18384607061708805,
+    "ci95": [
+     0.6402488163496239,
+     0.8018931151560974
+    ],
+    "label_changed_by_edit": {
+     "n_states": 9899,
+     "n_edits": 308,
+     "pos_rate": 0.7279523184160016,
+     "auc": 0.40420464379695964
+    }
+   },
+   "strict": {
+    "auc": 0.6792785856811011,
+    "n_edits": 3027,
+    "n_states": 79753,
+    "n_test_tasks": 98,
+    "n_trajectories": 711,
+    "pos_rate": 0.07809110629067245,
+    "ci95": [
+     0.501298573516873,
+     0.8556202817289141
+    ],
+    "label_changed_by_edit": {
+     "n_states": 3599,
+     "n_edits": 120,
+     "pos_rate": 0.6496248958043901,
+     "auc": 0.3631081555027478
+    }
+   },
+   "none": {
+    "auc": 0.7267128697864721,
+    "n_edits": 5454,
+    "n_states": 175456,
+    "n_test_tasks": 106,
+    "n_trajectories": 945,
+    "pos_rate": 0.18458758891118002,
+    "ci95": [
+     0.6311031561902777,
+     0.7960229810356103
+    ],
+    "label_changed_by_edit": {
+     "n_states": 12900,
+     "n_edits": 337,
+     "pos_rate": 0.5617054263565892,
+     "auc": 0.35647140156417245
+    }
+   },
+   "best_after_edit_layer_primary": 11,
+   "auc_at_best_after_edit_layer_primary": 0.7593248244515175,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.6379875715871842,
+    0.8291190065377284
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.7194078416492647,
+    "11": 0.7593248244515175,
+    "21": 0.7383543266496864,
+    "31": 0.7483976621509981,
+    "40": 0.7391733473137911
+   }
+  },
+  "laguna_pro|currently_has_regressions": {
+   "layer": 21,
+   "all_states_auc": 0.7395114430910747,
+   "primary": {
+    "auc": 0.6858241834862959,
+    "n_edits": 5228,
+    "n_states": 166362,
+    "n_test_tasks": 106,
+    "n_trajectories": 928,
+    "pos_rate": 0.08014450415359277,
+    "ci95": [
+     0.6108881242432008,
+     0.7881464680239317
+    ],
+    "label_changed_by_edit": {
+     "n_states": 4108,
+     "n_edits": 95,
+     "pos_rate": 0.6686952288218111,
+     "auc": 0.4972486182909577
+    }
+   },
+   "strict": {
+    "auc": 0.8256323594276012,
+    "n_edits": 3027,
+    "n_states": 79753,
+    "n_test_tasks": 98,
+    "n_trajectories": 711,
+    "pos_rate": 0.01307787794816496,
+    "ci95": [
+     0.6930196679685088,
+     0.8931490150801074
+    ],
+    "label_changed_by_edit": {
+     "n_states": 502,
+     "n_edits": 14,
+     "pos_rate": 0.2151394422310757,
+     "auc": 0.4544322241022749
+    }
+   },
+   "none": {
+    "auc": 0.6742354718486212,
+    "n_edits": 5454,
+    "n_states": 175456,
+    "n_test_tasks": 106,
+    "n_trajectories": 945,
+    "pos_rate": 0.08111435345613716,
+    "ci95": [
+     0.6006864547280883,
+     0.7780964629387456
+    ],
+    "label_changed_by_edit": {
+     "n_states": 4295,
+     "n_edits": 101,
+     "pos_rate": 0.681024447031432,
+     "auc": 0.4989870859067939
+    }
+   },
+   "best_after_edit_layer_primary": 40,
+   "auc_at_best_after_edit_layer_primary": 0.7163057940912122,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.6509016208610797,
+    0.8093449916362827
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.6859606277027388,
+    "11": 0.684762332710632,
+    "21": 0.6858241834862959,
+    "31": 0.7036369920677222,
+    "40": 0.7163057940912122
+   }
+  },
+  "qwen_pro|currently_compiles": {
+   "layer": 1,
+   "all_states_auc": 0.7502263211604892,
+   "primary": {
+    "auc": 0.7344170707658738,
+    "n_edits": 2393,
+    "n_states": 33870,
+    "n_test_tasks": 94,
+    "n_trajectories": 681,
+    "pos_rate": 0.5685857691172129,
+    "ci95": [
+     0.5939255202084107,
+     0.8595168815701696
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2185,
+     "n_edits": 191,
+     "pos_rate": 0.5812356979405034,
+     "auc": 0.32890581300288285
+    }
+   },
+   "strict": {
+    "auc": 0.7785886177336547,
+    "n_edits": 1507,
+    "n_states": 15659,
+    "n_test_tasks": 89,
+    "n_trajectories": 566,
+    "pos_rate": 0.5097388083530239,
+    "ci95": [
+     0.6236818524612713,
+     0.8811154876751975
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1093,
+     "n_edits": 115,
+     "pos_rate": 0.41171088746569073,
+     "auc": 0.43833074131674443
+    }
+   },
+   "none": {
+    "auc": 0.7336673421619586,
+    "n_edits": 2437,
+    "n_states": 34138,
+    "n_test_tasks": 94,
+    "n_trajectories": 690,
+    "pos_rate": 0.5686039018102994,
+    "ci95": [
+     0.5930858218221784,
+     0.8573126540905688
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2244,
+     "n_edits": 200,
+     "pos_rate": 0.5704099821746881,
+     "auc": 0.34189493646265556
+    }
+   },
+   "best_after_edit_layer_primary": 40,
+   "auc_at_best_after_edit_layer_primary": 0.7462440284201699,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.6386641372410612,
+    0.8352780171282749
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.7344170707658738,
+    "11": 0.7379594124612787,
+    "21": 0.7394845695647987,
+    "31": 0.7345829497602214,
+    "40": 0.7462440284201699
+   }
+  },
+  "qwen_pro|currently_correct": {
+   "layer": 31,
+   "all_states_auc": 0.8218086252932206,
+   "primary": {
+    "auc": 0.6582680699271904,
+    "n_edits": 2393,
+    "n_states": 33870,
+    "n_test_tasks": 94,
+    "n_trajectories": 681,
+    "pos_rate": 0.1274579273693534,
+    "ci95": [
+     0.5686198691547941,
+     0.7933248791258739
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1687,
+     "n_edits": 139,
+     "pos_rate": 0.9324244220509781,
+     "auc": 0.21773680864589956
+    }
+   },
+   "strict": {
+    "auc": 0.7707253165279806,
+    "n_edits": 1507,
+    "n_states": 15659,
+    "n_test_tasks": 89,
+    "n_trajectories": 566,
+    "pos_rate": 0.07203525129318603,
+    "ci95": [
+     0.684916528275502,
+     0.8488049616395957
+    ],
+    "label_changed_by_edit": {
+     "n_states": 509,
+     "n_edits": 69,
+     "pos_rate": 0.8565815324165029,
+     "auc": 0.30501445268317207
+    }
+   },
+   "none": {
+    "auc": 0.6597140749894225,
+    "n_edits": 2437,
+    "n_states": 34138,
+    "n_test_tasks": 94,
+    "n_trajectories": 690,
+    "pos_rate": 0.12856640693655164,
+    "ci95": [
+     0.578004770305766,
+     0.793454478333892
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1743,
+     "n_edits": 149,
+     "pos_rate": 0.9345955249569707,
+     "auc": 0.2193844033041474
+    }
+   },
+   "best_after_edit_layer_primary": 31,
+   "auc_at_best_after_edit_layer_primary": 0.6582680699271904,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.5686198691547941,
+    0.7933248791258739
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.45786643033551083,
+    "11": 0.583399066443651,
+    "21": 0.635172937082191,
+    "31": 0.6582680699271904,
+    "40": 0.6175288652125064
+   }
+  },
+  "qwen_pro|currently_reduces_failing": {
+   "layer": 31,
+   "all_states_auc": 0.8358518094255665,
+   "primary": {
+    "auc": 0.6901216545046411,
+    "n_edits": 2393,
+    "n_states": 33870,
+    "n_test_tasks": 94,
+    "n_trajectories": 681,
+    "pos_rate": 0.2017124298789489,
+    "ci95": [
+     0.6064144841630222,
+     0.7916212347782521
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1972,
+     "n_edits": 185,
+     "pos_rate": 0.8301217038539553,
+     "auc": 0.4065117296838957
+    }
+   },
+   "strict": {
+    "auc": 0.7544608472187103,
+    "n_edits": 1507,
+    "n_states": 15659,
+    "n_test_tasks": 89,
+    "n_trajectories": 566,
+    "pos_rate": 0.11028801328309598,
+    "ci95": [
+     0.6749172635449598,
+     0.8249085334419689
+    ],
+    "label_changed_by_edit": {
+     "n_states": 660,
+     "n_edits": 96,
+     "pos_rate": 0.8560606060606061,
+     "auc": 0.4661574289706567
+    }
+   },
+   "none": {
+    "auc": 0.6909861564594652,
+    "n_edits": 2437,
+    "n_states": 34138,
+    "n_test_tasks": 94,
+    "n_trajectories": 690,
+    "pos_rate": 0.20215009666647138,
+    "ci95": [
+     0.5993325860840192,
+     0.7983263927729392
+    ],
+    "label_changed_by_edit": {
+     "n_states": 2015,
+     "n_edits": 192,
+     "pos_rate": 0.8287841191066998,
+     "auc": 0.401733923457433
+    }
+   },
+   "best_after_edit_layer_primary": 1,
+   "auc_at_best_after_edit_layer_primary": 0.7558926764404612,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.631944872674541,
+    0.8306693272589276
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.7558926764404612,
+    "11": 0.67056866188674,
+    "21": 0.6646773496465119,
+    "31": 0.6901216545046411,
+    "40": 0.7115729398670932
+   }
+  },
+  "qwen_pro|currently_has_regressions": {
+   "layer": 1,
+   "all_states_auc": 0.8403362984340006,
+   "primary": {
+    "auc": 0.8038515883195806,
+    "n_edits": 2393,
+    "n_states": 33870,
+    "n_test_tasks": 94,
+    "n_trajectories": 681,
+    "pos_rate": 0.06601712429878949,
+    "ci95": [
+     0.7004701867908844,
+     0.877924427127951
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1836,
+     "n_edits": 64,
+     "pos_rate": 0.8006535947712419,
+     "auc": 0.5911415932493216
+    }
+   },
+   "strict": {
+    "auc": 0.8118005210895118,
+    "n_edits": 1507,
+    "n_states": 15659,
+    "n_test_tasks": 89,
+    "n_trajectories": 566,
+    "pos_rate": 0.004597994763394853,
+    "ci95": [
+     0.7433608341161302,
+     0.8767926827004928
+    ],
+    "label_changed_by_edit": {
+     "n_states": 60,
+     "n_edits": 9,
+     "pos_rate": 0.8,
+     "auc": 0.4131944444444444
+    }
+   },
+   "none": {
+    "auc": 0.8036555420403165,
+    "n_edits": 2437,
+    "n_states": 34138,
+    "n_test_tasks": 94,
+    "n_trajectories": 690,
+    "pos_rate": 0.06579178627921964,
+    "ci95": [
+     0.7033533121225587,
+     0.879355849036153
+    ],
+    "label_changed_by_edit": {
+     "n_states": 1852,
+     "n_edits": 66,
+     "pos_rate": 0.7991360691144709,
+     "auc": 0.5933049985469341
+    }
+   },
+   "best_after_edit_layer_primary": 1,
+   "auc_at_best_after_edit_layer_primary": 0.8038515883195806,
+   "ci95_at_best_after_edit_layer_primary": [
+    0.7004701867908844,
+    0.877924427127951
+   ],
+   "auc_primary_by_layer": {
+    "1": 0.8038515883195806,
+    "11": 0.713377092060206,
+    "21": 0.71379050930573,
+    "31": 0.7216541598377597,
+    "40": 0.6972377733678682
+   }
+  }
+ },
+ "filter": {
+  "laguna_verified": {
+   "all_splits": {
+    "edits": 14545,
+    "edits_with_next_turn": 14453,
+    "dropped_primary": 480,
+    "dropped_strict": 10576,
+    "python_editor_scripts": 10096,
+    "dropped_primary_by_reason": {
+     "python": 476,
+     "python+run": 3,
+     "run": 1
+    },
+    "dropped_primary_share": 0.03300103128222757,
+    "dropped_strict_share": 0.7271227225850808
+   },
+   "test_split": {
+    "edits": 2153,
+    "edits_with_next_turn": 2133,
+    "dropped_primary": 75,
+    "dropped_strict": 1662,
+    "python_editor_scripts": 1587,
+    "dropped_primary_by_reason": {
+     "python": 75
+    },
+    "dropped_primary_share": 0.03483511379470506,
+    "dropped_strict_share": 0.7719461216906642
+   }
+  },
+  "qwen_verified": {
+   "all_splits": {
+    "edits": 9730,
+    "edits_with_next_turn": 9680,
+    "dropped_primary": 112,
+    "dropped_strict": 4035,
+    "python_editor_scripts": 3923,
+    "dropped_primary_by_reason": {
+     "python": 112
+    },
+    "dropped_primary_share": 0.011510791366906475,
+    "dropped_strict_share": 0.4146968139773895
+   },
+   "test_split": {
+    "edits": 1444,
+    "edits_with_next_turn": 1435,
+    "dropped_primary": 7,
+    "dropped_strict": 689,
+    "python_editor_scripts": 682,
+    "dropped_primary_by_reason": {
+     "python": 7
+    },
+    "dropped_primary_share": 0.004847645429362881,
+    "dropped_strict_share": 0.47714681440443213
+   }
+  },
+  "laguna_pro": {
+   "all_splits": {
+    "edits": 36648,
+    "edits_with_next_turn": 36273,
+    "dropped_primary": 1322,
+    "dropped_strict": 16834,
+    "python_editor_scripts": 15512,
+    "dropped_primary_by_reason": {
+     "run": 740,
+     "python": 325,
+     "build_lint": 257
+    },
+    "dropped_primary_share": 0.036072909845012005,
+    "dropped_strict_share": 0.4593429382230954
+   },
+   "test_split": {
+    "edits": 5594,
+    "edits_with_next_turn": 5528,
+    "dropped_primary": 236,
+    "dropped_strict": 2489,
+    "python_editor_scripts": 2253,
+    "dropped_primary_by_reason": {
+     "run": 89,
+     "python": 55,
+     "build_lint": 92
+    },
+    "dropped_primary_share": 0.042188058634250986,
+    "dropped_strict_share": 0.4449410082230962
+   }
+  },
+  "qwen_pro": {
+   "all_splits": {
+    "edits": 18557,
+    "edits_with_next_turn": 18496,
+    "dropped_primary": 507,
+    "dropped_strict": 6646,
+    "python_editor_scripts": 6139,
+    "dropped_primary_by_reason": {
+     "run": 286,
+     "python": 44,
+     "build_lint": 177
+    },
+    "dropped_primary_share": 0.027321226491350974,
+    "dropped_strict_share": 0.35813978552567766
+   },
+   "test_split": {
+    "edits": 2453,
+    "edits_with_next_turn": 2441,
+    "dropped_primary": 44,
+    "dropped_strict": 933,
+    "python_editor_scripts": 889,
+    "dropped_primary_by_reason": {
+     "run": 20,
+     "python": 3,
+     "build_lint": 21
+    },
+    "dropped_primary_share": 0.017937219730941704,
+    "dropped_strict_share": 0.38035059111292296
+   }
+  }
+ },
+ "counts_same_for_all_properties": {
+  "laguna_verified": true,
+  "qwen_verified": true,
+  "laguna_pro": true,
+  "qwen_pro": true
+ }
+}

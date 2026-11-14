@@ -255,8 +255,15 @@ def plot_generalization_barplot(
     figures_dir: Path,
     verified_pooled_run_ids: list[str] | None = None,
     pro_pooled_run_ids: list[str] | None = None,
+    out_suffix: str = "",
+    verified_shuffled_run_ids: list[str] | None = None,
+    pro_shuffled_run_ids: list[str] | None = None,
 ) -> None:
-    """Grouped barplot: best-layer AUC per probe × model × dataset."""
+    """Grouped barplot: best-layer AUC per probe × model × dataset.
+
+    If shuffled run ids are given (aligned with the models), each bar gets a black
+    tick at the best-layer AUC of its shuffled-label control.
+    """
     # Build series list: (color_key, label, results_dir, effective_run_id)
     series = []
     for i, (model_id, model_label) in enumerate(zip(verified_run_ids, model_labels)):
@@ -264,10 +271,12 @@ def plot_generalization_barplot(
         v_run = (verified_pooled_run_ids or verified_run_ids)[i]
         _pro_list = pro_pooled_run_ids or pro_run_ids
         p_run = _pro_list[i] if pro_run_ids and i < len(_pro_list) else None
+        v_shuf = (verified_shuffled_run_ids or [None] * (i + 1))[i]
+        p_shuf = (pro_shuffled_run_ids or [None] * (i + 1))[i]
         series.append((f"{model_key}_verified", f"{model_label} (Verified)",
-                        verified_results_dir, v_run))
+                        verified_results_dir, v_run, v_shuf))
         series.append((f"{model_key}_pro",      f"{model_label} (Pro)",
-                        pro_results_dir,      p_run))
+                        pro_results_dir,      p_run, p_shuf))
 
     n_series  = len(series)
     bar_width = 0.15
@@ -277,7 +286,8 @@ def plot_generalization_barplot(
     fig, ax = plt.subplots(figsize=(_style.FULL_WIDTH, _style.FIG_HEIGHT_BAR))
 
     legend_handles = []
-    for i, (color_key, label, res_dir, run_id) in enumerate(series):
+    shuf_drawn = False
+    for i, (color_key, label, res_dir, run_id, shuf_id) in enumerate(series):
         dataset   = "pro" if color_key.endswith("_pro") else "verified"
         color     = _style.COLORS[color_key]
         hatch     = _style.HATCH[dataset]
@@ -295,12 +305,22 @@ def plot_generalization_barplot(
             ax.bar(x[pi] + offsets[i], v, width=bar_width,
                    color=color, hatch=hatch, edgecolor=ec, linewidth=0.6, zorder=3)
             rendered = True
+            shuf_res = _load(res_dir, shuf_id, probe) if shuf_id else None
+            if shuf_res is not None:
+                sv = _best_layer_mean(shuf_res, "test_auc")
+                if not math.isnan(sv):
+                    ax.hlines(sv, x[pi] + offsets[i] - bar_width / 2, x[pi] + offsets[i] + bar_width / 2,
+                              colors="black", linewidth=1.6, zorder=4)
+                    shuf_drawn = True
 
         if rendered:
             legend_handles.append(mpatches.Patch(
                 facecolor=color, hatch=hatch, edgecolor=ec, linewidth=0.6, label=label,
             ))
 
+    if shuf_drawn:
+        legend_handles.append(plt.Line2D([0], [0], color="black", linewidth=1.6,
+                                         label="Shuffled-label control"))
     ax.axhline(0.5, linestyle="--", color=_style.COLORS["baseline"],
                linewidth=1.0, zorder=2)
     legend_handles.append(plt.Line2D(
@@ -318,7 +338,7 @@ def plot_generalization_barplot(
     ax.set_ylim(0.45, 1.0)
     ax.legend(handles=legend_handles, ncol=2, loc="upper right")
     figures_dir.mkdir(parents=True, exist_ok=True)
-    out = figures_dir / "auc_summary_barplot.pdf"
+    out = figures_dir / f"auc_summary_barplot{out_suffix}.pdf"
     fig.savefig(out)
     plt.close(fig)
     print(f"  [fig] {out}")
@@ -709,6 +729,7 @@ def plot_transfer_barplot(
     pro_pooled_run_ids: list[str],
     verified_to_pro_run_ids: list[str],
     pro_to_verified_run_ids: list[str],
+    out_suffix: str = "",
 ) -> None:
     """Grouped barplot: in-dist vs transfer AUC (best layer) per probe, one subplot per model."""
     def _best(res_dir: Path, run_id: str, probe: str) -> float:
@@ -784,7 +805,7 @@ def plot_transfer_barplot(
 
     fig.tight_layout()
     figures_dir.mkdir(parents=True, exist_ok=True)
-    out = figures_dir / "transfer_barplot.pdf"
+    out = figures_dir / f"transfer_barplot{out_suffix}.pdf"
     fig.savefig(out, bbox_inches="tight")
     plt.close(fig)
     print(f"  [fig] {out}")
@@ -958,6 +979,28 @@ def plot_auc_heatmap(
 # Layer AUC line plot
 # ---------------------------------------------------------------------------
 
+SHUFFLED_LINESTYLE = (0, (4, 1.5, 1, 1.5))  # dash-dot
+
+
+def _plot_shuffled_layers(ax, res_dir: Path, run_id: str | None, probe: str,
+                          layers: list[int], color: str) -> None:
+    """Shuffled-label control for one series: thin dash-dot line in the series colour."""
+    if not run_id:
+        return
+    res = _load(res_dir, run_id, probe)
+    if res is None:
+        return
+    aucs = _layer_means(res, "test_auc", layers)
+    xs = [l for l in layers if not math.isnan(aucs.get(l, float("nan")))]
+    ax.plot(xs, [aucs[l] for l in xs], linestyle=SHUFFLED_LINESTYLE, color=color,
+            alpha=0.6, linewidth=1.0, zorder=1)
+
+
+def _shuffled_legend_handle():
+    return plt.Line2D([0], [0], linestyle=SHUFFLED_LINESTYLE, color="#777777",
+                      linewidth=1.0, label="Shuffled-label control")
+
+
 def plot_layer_auc(
     results_dir: Path,
     run_ids: list[str],
@@ -967,7 +1010,10 @@ def plot_layer_auc(
     figures_dir: Path,
     out_run_id: str,
     extra_series: list[tuple[Path, str, str]] | None = None,
+    shuffled_ids: dict[str, str] | None = None,
 ) -> None:
+    """AUC vs layer. shuffled_ids maps a series' run id to its shuffled-control run id."""
+    shuffled_ids = shuffled_ids or {}
     out_dir = figures_dir / out_run_id
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -998,6 +1044,7 @@ def plot_layer_auc(
 
         ax.plot(xs, ys, linestyle=ls, marker=marker, markersize=ms,
                 color=color, alpha=alpha, label=label, linewidth=1.4)
+        _plot_shuffled_layers(ax, results_dir, shuffled_ids.get(run_id), probe, layers, color)
 
     for extra_dir, extra_run_id, extra_label in (extra_series or []):
         all_res = _load(extra_dir, extra_run_id, probe)
@@ -1009,7 +1056,12 @@ def plot_layer_auc(
         color = _style.COLORS["qwen_pro" if "qwen" in extra_run_id else "laguna_pro"]
         ax.plot(xs, ys, linestyle="--", marker=prop_marker, markersize=5,
                 color=color, alpha=0.85, label=extra_label, linewidth=1.4)
+        _plot_shuffled_layers(ax, extra_dir, shuffled_ids.get(extra_run_id), probe, layers, color)
 
+    if shuffled_ids:
+        h = _shuffled_legend_handle()
+        ax.plot([], [], linestyle=h.get_linestyle(), color=h.get_color(),
+                linewidth=1.0, label=h.get_label())
     ax.axhline(0.5, linestyle=":", color=_style.COLORS["baseline"],
                linewidth=1.0, label="Random")
     ax.set_xlabel("Layer")
@@ -1046,8 +1098,13 @@ def plot_layer_auc_grid(
     figures_dir: Path,
     out_run_id: str,
     extra_series: list[tuple[Path, str, str]] | None = None,
+    shuffled_ids: dict[str, str] | None = None,
 ) -> None:
-    """2×2 panel of AUC-vs-layer curves for all four probes, one shared legend."""
+    """2×2 panel of AUC-vs-layer curves for all four probes, one shared legend.
+
+    shuffled_ids maps a series' run id to its shuffled-control run id.
+    """
+    shuffled_ids = shuffled_ids or {}
     assert len(probes) == 4, "grid expects exactly 4 probes"
 
     fig, axes = plt.subplots(
@@ -1083,6 +1140,7 @@ def plot_layer_auc_grid(
             series_i += 1
             line,   = ax.plot(xs, ys, linestyle="-", marker=marker, markersize=5,
                               color=color, linewidth=1.4, label=label)
+            _plot_shuffled_layers(ax, results_dir, shuffled_ids.get(run_id), probe, layers, color)
             if not legend_built:
                 legend_handles.append(line)
 
@@ -1098,9 +1156,12 @@ def plot_layer_auc_grid(
             series_i += 1
             line, = ax.plot(xs, ys, linestyle="--", marker=marker, markersize=5,
                             color=color, alpha=0.85, linewidth=1.4, label=extra_label)
+            _plot_shuffled_layers(ax, extra_dir, shuffled_ids.get(extra_run_id), probe, layers, color)
             if not legend_built:
                 legend_handles.append(line)
 
+        if shuffled_ids and not legend_built:
+            legend_handles.append(_shuffled_legend_handle())
         rand_line = ax.axhline(0.5, linestyle=(0, (1, 1.5)), color="#C2C2C2",
                                linewidth=1.4, zorder=0.5, label="Random")
         if not legend_built:
@@ -2063,6 +2124,25 @@ def main():
         figures_dir           = figures_dir,
         verified_pooled_run_ids = args.pooled_run_ids,
         pro_pooled_run_ids      = args.pro_pooled_run_ids,
+        verified_shuffled_run_ids = [f"{r}_shuffled" for r in args.pooled_run_ids],
+        pro_shuffled_run_ids      = [f"{r}_shuffled" for r in args.pro_pooled_run_ids],
+    )
+    # Same plot restricted to after-edit tokens (the <pooled>_after_edit eval runs).
+    print("[fig] AUC summary barplot (after-edit)...")
+    plot_generalization_barplot(
+        verified_results_dir  = results_dir,
+        pro_results_dir       = pro_results_dir,
+        verified_run_ids      = args.model_run_ids,
+        pro_run_ids           = args.pro_model_run_ids,
+        model_labels          = model_labels,
+        probes                = probes,
+        layers                = layers,
+        figures_dir           = figures_dir,
+        verified_pooled_run_ids = [f"{r}_after_edit" for r in args.pooled_run_ids],
+        pro_pooled_run_ids      = [f"{r}_after_edit" for r in args.pro_pooled_run_ids],
+        out_suffix            = "_after_edit",
+        verified_shuffled_run_ids = [f"{r}_shuffled_after_edit" for r in args.pooled_run_ids],
+        pro_shuffled_run_ids      = [f"{r}_shuffled_after_edit" for r in args.pro_pooled_run_ids],
     )
 
     # --- Tables ---
@@ -2180,35 +2260,43 @@ def main():
             )
 
     # --- Layer AUC line plots (pooled runs only, Random baseline from axhline) ---
-    print("[fig] AUC vs layer plots...")
-    pooled_ids  = args.pooled_run_ids
-    pool_labels = [MODEL_LABELS.get(_model_key(r), r) + " (Verified)" for r in pooled_ids]
-    pro_extra   = [
-        (pro_results_dir, r, MODEL_LABELS.get(_model_key(r), r) + " (Pro)")
-        for r in (args.pro_pooled_run_ids or args.pro_model_run_ids or [])
-    ] if pro_results_dir.exists() else []
-    for probe in probes:
-        plot_layer_auc(
-            results_dir  = results_dir,
-            run_ids      = pooled_ids,
-            run_labels   = pool_labels,
-            probe        = probe,
-            layers       = layers,
-            figures_dir  = figures_dir,
-            out_run_id   = "combined",
-            extra_series = pro_extra or None,
-        )
-    if len(probes) == 4:
-        plot_layer_auc_grid(
-            results_dir  = results_dir,
-            run_ids      = pooled_ids,
-            run_labels   = pool_labels,
-            probes       = probes,
-            layers       = layers,
-            figures_dir  = figures_dir,
-            out_run_id   = "combined",
-            extra_series = pro_extra or None,
-        )
+    # Drawn for all tokens (combined/) and for after-edit tokens only (combined_after_edit/,
+    # from the <pooled>_after_edit eval runs).
+    for sfx in ("", "_after_edit"):
+        print(f"[fig] AUC vs layer plots{' (after-edit)' if sfx else ''}...")
+        pooled_ids  = [f"{r}{sfx}" for r in args.pooled_run_ids]
+        pool_labels = [MODEL_LABELS.get(_model_key(r), r) + " (Verified)" for r in args.pooled_run_ids]
+        pro_extra   = [
+            (pro_results_dir, f"{r}{sfx}", MODEL_LABELS.get(_model_key(r), r) + " (Pro)")
+            for r in (args.pro_pooled_run_ids or args.pro_model_run_ids or [])
+        ] if pro_results_dir.exists() else []
+        # Shuffled-label control of each series (<pooled>_shuffled, or its after-edit eval).
+        shuffled_ids = {f"{r}{sfx}": f"{r}_shuffled{sfx}"
+                        for r in list(args.pooled_run_ids) + list(args.pro_pooled_run_ids or [])}
+        for probe in probes:
+            plot_layer_auc(
+                results_dir  = results_dir,
+                run_ids      = pooled_ids,
+                run_labels   = pool_labels,
+                probe        = probe,
+                layers       = layers,
+                figures_dir  = figures_dir,
+                out_run_id   = f"combined{sfx}",
+                extra_series = pro_extra or None,
+                shuffled_ids = shuffled_ids,
+            )
+        if len(probes) == 4:
+            plot_layer_auc_grid(
+                results_dir  = results_dir,
+                run_ids      = pooled_ids,
+                run_labels   = pool_labels,
+                probes       = probes,
+                layers       = layers,
+                figures_dir  = figures_dir,
+                out_run_id   = f"combined{sfx}",
+                extra_series = pro_extra or None,
+                shuffled_ids = shuffled_ids,
+            )
 
     # --- Transfer barplot + table ---
     transfer_model_labels = [MODEL_LABELS.get(_model_key(r), r)
@@ -2224,6 +2312,19 @@ def main():
         pro_pooled_run_ids      = args.pro_pooled_run_ids_transfer,
         verified_to_pro_run_ids = args.verified_to_pro_run_ids,
         pro_to_verified_run_ids = args.pro_to_verified_run_ids,
+    )
+    print("[fig] transfer barplot (after-edit)...")
+    plot_transfer_barplot(
+        verified_results_dir   = results_dir,
+        pro_results_dir        = pro_results_dir,
+        probes                 = probes,
+        figures_dir            = figures_dir,
+        model_labels           = transfer_model_labels,
+        verified_pooled_run_ids = [f"{r}_after_edit" for r in args.verified_pooled_run_ids],
+        pro_pooled_run_ids      = [f"{r}_after_edit" for r in args.pro_pooled_run_ids_transfer],
+        verified_to_pro_run_ids = [f"{r}_after_edit" for r in args.verified_to_pro_run_ids],
+        pro_to_verified_run_ids = [f"{r}_after_edit" for r in args.pro_to_verified_run_ids],
+        out_suffix              = "_after_edit",
     )
     print("[table] building transfer table...")
     transfer_tex = build_transfer_table(

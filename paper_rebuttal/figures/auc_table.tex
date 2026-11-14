@@ -1,0 +1,40 @@
+\begin{table*}[t]
+\centering
+\caption{AUC per probe, model, and benchmark across transformer layers. \textbf{Bold} marks the best layer per row. \emph{Shuffled}: probe trained on labels permuted across tokens; \emph{Traj.\ shuffle}: probe trained with each trajectory's labels replaced by another trajectory's label sequence, aligned by relative position. Both are evaluated on the real test labels at their best layer.}
+\label{tab:auc_roc}
+\begin{tabular}{lccccccc}
+\toprule
+ & \multicolumn{5}{c}{AUC $\uparrow$} & Shuffled & Traj.\ shuffle \\
+\cmidrule(lr){2-6}
+Probe & 1 & 11 & 21 & 31 & 40 & (best layer) & (best layer) \\
+\midrule
+\multicolumn{8}{l}{\textsc{SWE-bench Verified}} \\
+\addlinespace[2pt]
+\multicolumn{8}{l}{\quad\textit{Laguna-XS.2}} \\
+\Syntactic{} & 0.659 & \textbf{0.691} & 0.665 & 0.685 & 0.650 & 0.523 & 0.604 \\
+\Semantic{} & 0.686 & 0.770 & \textbf{0.788} & 0.767 & 0.724 & 0.518 & 0.665 \\
+\RedFail{} & 0.671 & 0.741 & \textbf{0.773} & 0.747 & 0.693 & 0.518 & 0.680 \\
+\Regressions{} & 0.586 & 0.685 & \textbf{0.695} & 0.677 & 0.617 & 0.508 & 0.631 \\
+\addlinespace[3pt]
+\multicolumn{8}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+\Syntactic{} & 0.682 & \textbf{0.781} & 0.762 & 0.771 & 0.736 & 0.515 & 0.683 \\
+\Semantic{} & 0.695 & 0.822 & 0.836 & \textbf{0.838} & 0.805 & 0.514 & 0.776 \\
+\RedFail{} & 0.694 & 0.822 & 0.832 & \textbf{0.832} & 0.796 & 0.548 & 0.778 \\
+\Regressions{} & 0.599 & 0.742 & \textbf{0.772} & 0.770 & 0.720 & 0.513 & 0.643 \\
+\midrule
+\multicolumn{8}{l}{\textsc{SWE-bench Pro}} \\
+\addlinespace[2pt]
+\multicolumn{8}{l}{\quad\textit{Laguna-XS.2}} \\
+\Syntactic{} & 0.746 & \textbf{0.786} & 0.771 & 0.770 & 0.777 & 0.522 & 0.479 \\
+\Semantic{} & 0.642 & 0.761 & \textbf{0.794} & 0.772 & 0.723 & 0.531 & 0.652 \\
+\RedFail{} & 0.697 & 0.775 & \textbf{0.780} & 0.774 & 0.745 & 0.522 & 0.632 \\
+\Regressions{} & 0.659 & 0.723 & \textbf{0.740} & 0.738 & 0.724 & 0.552 & 0.564 \\
+\addlinespace[3pt]
+\multicolumn{8}{l}{\quad\textit{Qwen3.6-35B-A3B}} \\
+\Syntactic{} & \textbf{0.750} & 0.718 & 0.711 & 0.718 & 0.720 & 0.547 & 0.570 \\
+\Semantic{} & 0.637 & 0.802 & 0.815 & \textbf{0.822} & 0.759 & 0.517 & 0.771 \\
+\RedFail{} & 0.767 & 0.826 & 0.830 & \textbf{0.836} & 0.805 & 0.542 & 0.761 \\
+\Regressions{} & \textbf{0.840} & 0.811 & 0.818 & 0.832 & 0.799 & 0.539 & 0.693 \\
+\bottomrule
+\end{tabular}
+\end{table*}

@@ -1,0 +1,189 @@
+{
+ "mode": "k0",
+ "run": "laguna_verified",
+ "bench": "swebench",
+ "pooled": "laguna_xs2_full_pooled",
+ "probe": "currently_has_regressions",
+ "layer": 20,
+ "stored_test_auc": 0.6954518796587461,
+ "n_boot": 1000,
+ "C_grid": [
+  0.001,
+  0.0031622776601683794,
+  0.01,
+  0.03162277660168379,
+  0.1,
+  0.31622776601683794,
+  1.0,
+  3.1622776601683795,
+  10.0,
+  31.622776601683793,
+  100.0
+ ],
+ "a2_chars": 32000,
+ "text_info": {
+  "n_units": 276686,
+  "n_trajectories": 4990,
+  "n_train_trajectories_for_vocab": 3203,
+  "n_train_units_for_vocab": 182850,
+  "text_a1": {
+   "shape": [
+    276686,
+    200000
+   ],
+   "nnz": 32084787,
+   "vocab": 200000,
+   "empty_docs": 4990
+  },
+  "n_units_this_cache": 268211
+ },
+ "counts": {
+  "all": {
+   "n": 1130891,
+   "share": 1.0,
+   "n_pos": 125685,
+   "pos_rate": 0.11113803187044552,
+   "n_tasks": 75
+  },
+  "not_yet_run": {
+   "n": 197320,
+   "share": 0.17448189082767482,
+   "n_pos": 19415,
+   "pos_rate": 0.09839347253192783,
+   "n_tasks": 75
+  },
+  "already_run": {
+   "n": 933571,
+   "share": 0.8255181091723252,
+   "n_pos": 106270,
+   "pos_rate": 0.11383172784930123,
+   "n_tasks": 75
+  },
+  "not_yet_run_strict": {
+   "n": 101194,
+   "share": 0.08948165649916746,
+   "n_pos": 1669,
+   "pos_rate": 0.01649307271182086,
+   "n_tasks": 75
+  },
+  "already_run_strict": {
+   "n": 1029697,
+   "share": 0.9105183435008325,
+   "n_pos": 124016,
+   "pos_rate": 0.12043931370102079,
+   "n_tasks": 75
+  }
+ },
+ "fit": {
+  "text_a1": {
+   "n_train_units": 174269,
+   "n_train_tokens": 5254768,
+   "train_pos_rate": 0.08398163344223761,
+   "val_auc": {
+    "1e-03": 0.5231406956892468,
+    "3e-03": 0.5212610961321125,
+    "1e-02": 0.5238168579612161,
+    "3e-02": 0.5293581905455704,
+    "1e-01": 0.5293635687398373,
+    "3e-01": 0.5199939732549779,
+    "1e+00": 0.5199939732549779,
+    "3e+00": 0.5199939732549779,
+    "1e+01": 0.5204642203136255,
+    "3e+01": 0.5204642203136255,
+    "1e+02": 0.5204642203136255
+   },
+   "C": 0.1,
+   "best_val_auc": 0.5293635687398373,
+   "C_at_grid_edge": false
+  }
+ },
+ "auc": {
+  "real_testbest|all": 0.6954518796587461,
+  "real_testbest|not_yet_run": 0.7427523089489574,
+  "real_testbest|already_run": 0.6848852216792496,
+  "real_testbest|not_yet_run_strict": 0.7904279901130128,
+  "real_testbest|already_run_strict": 0.6777088493403336,
+  "text_a1|all": 0.5488384376018608,
+  "text_a1|not_yet_run": 0.6063990193529473,
+  "text_a1|already_run": 0.5445882818113346,
+  "text_a1|not_yet_run_strict": 0.6597349091829088,
+  "text_a1|already_run_strict": 0.5489267300174132,
+  "real-text_a1|all": 0.1466134420568853,
+  "real-text_a1|not_yet_run": 0.13635328959601012,
+  "real-text_a1|already_run": 0.14029693986791503,
+  "real-text_a1|not_yet_run_strict": 0.130693080930104,
+  "real-text_a1|already_run_strict": 0.12878211932292039,
+  "real|already-not_yet": -0.057867087269707795,
+  "real|already-not_yet_strict": -0.1127191407726792
+ },
+ "ci95": {
+  "real_testbest|all": [
+   0.6286260472053077,
+   0.7583217903018858
+  ],
+  "real_testbest|not_yet_run": [
+   0.6722886395117134,
+   0.801185681194476
+  ],
+  "real_testbest|already_run": [
+   0.6130692595355521,
+   0.7546104287419437
+  ],
+  "real_testbest|not_yet_run_strict": [
+   0.6900640395477335,
+   0.8301913538959813
+  ],
+  "real_testbest|already_run_strict": [
+   0.609012858496625,
+   0.7446326155893644
+  ],
+  "text_a1|all": [
+   0.4577303124533722,
+   0.6518469522111852
+  ],
+  "text_a1|not_yet_run": [
+   0.5084376903984349,
+   0.7076463218619959
+  ],
+  "text_a1|already_run": [
+   0.4464818859822344,
+   0.6538646754058332
+  ],
+  "text_a1|not_yet_run_strict": [
+   0.4664892790867071,
+   0.7426479818456985
+  ],
+  "text_a1|already_run_strict": [
+   0.4578608003809631,
+   0.6528602379336719
+  ],
+  "real-text_a1|all": [
+   0.08366176447668915,
+   0.20576461136355587
+  ],
+  "real-text_a1|not_yet_run": [
+   0.044564858242271514,
+   0.21803944115456494
+  ],
+  "real-text_a1|already_run": [
+   0.07736808069435486,
+   0.20711117424941267
+  ],
+  "real-text_a1|not_yet_run_strict": [
+   0.027848093175862624,
+   0.2583173815695487
+  ],
+  "real-text_a1|already_run_strict": [
+   0.06808316582973617,
+   0.18788268000188849
+  ],
+  "real|already-not_yet": [
+   -0.11848424542111775,
+   0.009656672595300269
+  ],
+  "real|already-not_yet_strict": [
+   -0.17262317123487686,
+   -0.009216249547536838
+  ]
+ }
+}

@@ -158,3 +158,27 @@ def test_label_shift_uses_real_turns(tmp_path):
     # Turn 1 → False, turn 2 → True (read from turn_labels even though turn 2 has no position).
     assert cache["y"].tolist() == [0, 0, 0, 1]
     assert cache["y_original"].tolist() == [0, 0, 0, 0]
+
+
+def test_groups_are_tasks(tmp_path):
+    """Splits are by task: runs of one task share a group, and distinct tasks never
+    share one (even from the same repository or base commit)."""
+    tasks = ["django__django-11206", "django__django-11749",
+             "instance_NodeBB__NodeBB-00c70ce7-vnan", "instance_NodeBB__NodeBB-00c70ce7-vabc123"]
+    out_dir = tmp_path / "outputs" / RUN_ID
+    out_dir.mkdir(parents=True)
+    for task in tasks:
+        for sid in (task, f"{task}_run01"):
+            torch.save({
+                "activations": {li: torch.randn(N_STEPS, HIDDEN_DIM, dtype=torch.float16) for li in PROBE_LAYERS},
+                "labels": {"will_be_correct": True},
+                "sample_id": sid,
+                "group_id": task,
+            }, out_dir / f"{sid}.pt")
+
+    build_cache(RUN_ID, ["will_be_correct"], output_dir=str(tmp_path / "outputs"), cache_dir=str(tmp_path / "cache"))
+    cache = torch.load(tmp_path / "cache" / RUN_ID / "will_be_correct" / f"layer_{PROBE_LAYERS[0]}.pt", weights_only=False)
+
+    assert sorted(set(cache["group_id"])) == sorted(tasks)
+    for sid, gid in zip(cache["sample_id"], cache["group_id"]):
+        assert gid == sid.removesuffix("_run01")

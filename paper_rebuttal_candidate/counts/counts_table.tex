@@ -1,0 +1,29 @@
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{Population after filtering, per model, benchmark and lookahead window (task-level split, 70/15/15). A hidden state $h_t$ is kept if its label is defined; with a window $k_{\max}$ only states whose turn has at least $k_{\max}$ later turns are kept, so trajectories with at most $k_{\max}$ turns drop out. Tasks, trajectories and $\#h_t$ are for the test split; the percentage is the share of the test split's trajectories that keep at least one state. The last column gives $\#h_t$ for train / validation / test. As in training, each population is split over its own tasks, so a window that removes every trajectory of some tasks also changes which tasks are in test. Counts are for \texttt{currently\_compiles}; see the JSON for the other properties.}
+\label{tab:population_counts}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lllrrrr}
+\toprule
+Model & Benchmark & Filter & Tasks & Traj. & $\#h_t$ & $\#h_t$ train / val / test \\
+\midrule
+\multirow{6}{*}{\texttt{Laguna}} & \multirow{3}{*}{Verified} & $k{=}0$ (no window) & 75 & 706 (94\%) & 1.13M & 5.26M / 1.09M / 1.13M \\
+ &  & $k_{\max}{=}15$ & 76 & 716 (94\%) & 719k & 3.35M / 686k / 719k \\
+ &  & $k_{\max}{=}50$ & 63 & 384 (61\%) & 182k & 663k / 128k / 182k \\
+\addlinespace
+ & \multirow{3}{*}{Pro} & $k{=}0$ (no window) & 106 & 946 (88\%) & 1.25M & 5.15M / 1.24M / 1.25M \\
+ &  & $k_{\max}{=}15$ & 106 & 939 (87\%) & 805k & 3.25M / 769k / 805k \\
+ &  & $k_{\max}{=}50$ & 95 & 596 (64\%) & 126k & 486k / 110k / 126k \\
+\midrule
+\multirow{6}{*}{\texttt{Qwen3.6}} & \multirow{3}{*}{Verified} & $k{=}0$ (no window) & 75 & 667 (89\%) & 571k & 2.71M / 508k / 571k \\
+ &  & $k_{\max}{=}15$ & 73 & 574 (79\%) & 354k & 1.60M / 318k / 354k \\
+ &  & $k_{\max}{=}50$ & 45 & 238 (52\%) & 61k & 331k / 71k / 61k \\
+\addlinespace
+ & \multirow{3}{*}{Pro} & $k{=}0$ (no window) & 94 & 692 (80\%) & 468k & 2.48M / 530k / 468k \\
+ &  & $k_{\max}{=}15$ & 98 & 743 (86\%) & 360k & 1.42M / 327k / 360k \\
+ &  & $k_{\max}{=}50$ & 76 & 339 (47\%) & 67k & 313k / 75k / 67k \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

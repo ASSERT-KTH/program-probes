@@ -1,0 +1,115 @@
+{
+  "mode": "outcome",
+  "bench": "swebench_pro",
+  "outputs_dir": "outputs/swebench_pro/qwen36_35b_a3b_full",
+  "n_trajectories": 5804,
+  "yT_vs_outcome": {
+    "yT=0,outcome=0": 3990,
+    "yT=none,outcome=0": 912,
+    "yT=1,outcome=1": 842,
+    "yT=0,outcome=1": 42,
+    "yT=1,outcome=0": 17,
+    "yT=none,outcome=1": 1
+  },
+  "yT_agreement": {
+    "n_defined": 4891,
+    "agree": 4832,
+    "agreement": 0.9879370271928031
+  },
+  "last_edit_vs_outcome": {
+    "last_edit=0,outcome=0": 3990,
+    "last_edit=none,outcome=0": 912,
+    "last_edit=1,outcome=1": 843,
+    "last_edit=0,outcome=1": 41,
+    "last_edit=1,outcome=0": 17,
+    "last_edit=none,outcome=1": 1
+  },
+  "last_edit_agreement": {
+    "n_defined": 4891,
+    "agree": 4833,
+    "agreement": 0.9881414843590268
+  },
+  "n_last_edit_in_last_turn": 61,
+  "disagreement_examples": [
+    {
+      "sample_id": "instance_NodeBB__NodeBB-1ea9481af6125ffd6da0592ed439aa62af0bca11-vd59a5728dfc977f44533186ace531248c2917516_run09",
+      "yT": "0",
+      "outcome": "1",
+      "last_edit": "0",
+      "n_turns": 55,
+      "last_edit_cmd_idx": 37
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run01",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 32,
+      "last_edit_cmd_idx": 28
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run02",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 68,
+      "last_edit_cmd_idx": 65
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run03",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 13,
+      "last_edit_cmd_idx": 12
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run04",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 39,
+      "last_edit_cmd_idx": 35
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run05",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 23,
+      "last_edit_cmd_idx": 21
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run06",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 29,
+      "last_edit_cmd_idx": 26
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run07",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 27,
+      "last_edit_cmd_idx": 26
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run08",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 24,
+      "last_edit_cmd_idx": 22
+    },
+    {
+      "sample_id": "instance_NodeBB__NodeBB-397835a05a8e2897324e566b41c5e616e172b4af-v89631a1cdb318276acb48860c5d78077211397c6_run09",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 49,
+      "last_edit_cmd_idx": 46
+    }
+  ]
+}

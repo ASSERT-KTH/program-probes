@@ -1,0 +1,1308 @@
+{
+  "rerun": {
+    "laguna_verified": {
+      "k0": {
+        "train": {
+          "tasks": 350,
+          "trajectories": 3296,
+          "states": 5260077,
+          "trajectories_in_split": 3496,
+          "frac_trajectories_kept": 0.9427917620137299
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 683,
+          "states": 1087617,
+          "trajectories_in_split": 745,
+          "frac_trajectories_kept": 0.9167785234899329
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 706,
+          "states": 1130891,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.9413333333333334
+        },
+        "all": {
+          "tasks": 499,
+          "trajectories": 4685,
+          "states": 7478585,
+          "generations": 4991,
+          "frac_generations_kept": 0.938689641354438
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "same_for_all_probes": false,
+        "per_probe_states": {
+          "currently_compiles": {
+            "train": 5260077,
+            "val": 1087617,
+            "test": 1130891
+          },
+          "currently_correct": {
+            "train": 5254768,
+            "val": 1087617,
+            "test": 1130891
+          },
+          "currently_reduces_failing": {
+            "train": 5254768,
+            "val": 1087617,
+            "test": 1130891
+          },
+          "currently_has_regressions": {
+            "train": 5254768,
+            "val": 1087617,
+            "test": 1130891
+          }
+        },
+        "test_pos_rate": {
+          "currently_compiles": 0.8996490377940933,
+          "currently_correct": 0.35369987027927535,
+          "currently_reduces_failing": 0.40157097368358224,
+          "currently_has_regressions": 0.11113803187044552
+        }
+      },
+      "max15": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3184,
+          "states": 3353097,
+          "trajectories_in_split": 3477,
+          "frac_trajectories_kept": 0.9157319528329019
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 655,
+          "states": 685934,
+          "trajectories_in_split": 735,
+          "frac_trajectories_kept": 0.891156462585034
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 716,
+          "states": 719160,
+          "trajectories_in_split": 759,
+          "frac_trajectories_kept": 0.9433465085638999
+        },
+        "all": {
+          "tasks": 497,
+          "trajectories": 4555,
+          "states": 4758191,
+          "generations": 4991,
+          "frac_generations_kept": 0.9126427569625326
+        },
+        "split_groups": {
+          "train": 348,
+          "val": 74,
+          "test": 76
+        },
+        "test_tasks_shared_with_k0_test": 62,
+        "same_for_all_probes": false,
+        "per_probe_states": {
+          "currently_compiles": {
+            "train": 3353097,
+            "val": 685934,
+            "test": 719160
+          },
+          "currently_correct": {
+            "train": 3351681,
+            "val": 685934,
+            "test": 719160
+          },
+          "currently_reduces_failing": {
+            "train": 3351681,
+            "val": 685934,
+            "test": 719160
+          },
+          "currently_has_regressions": {
+            "train": 3351681,
+            "val": 685934,
+            "test": 719160
+          }
+        },
+        "test_pos_rate": {
+          "currently_compiles": 0.8944532510150731,
+          "currently_correct": 0.27384865676622727,
+          "currently_reduces_failing": 0.3066355192168641,
+          "currently_has_regressions": 0.10984064742199233
+        }
+      },
+      "max50": {
+        "train": {
+          "tasks": 288,
+          "trajectories": 1760,
+          "states": 663280,
+          "trajectories_in_split": 2896,
+          "frac_trajectories_kept": 0.6077348066298343
+        },
+        "val": {
+          "tasks": 62,
+          "trajectories": 380,
+          "states": 128422,
+          "trajectories_in_split": 620,
+          "frac_trajectories_kept": 0.6129032258064516
+        },
+        "test": {
+          "tasks": 63,
+          "trajectories": 384,
+          "states": 181946,
+          "trajectories_in_split": 625,
+          "frac_trajectories_kept": 0.6144
+        },
+        "all": {
+          "tasks": 413,
+          "trajectories": 2524,
+          "states": 973648,
+          "generations": 4991,
+          "frac_generations_kept": 0.5057102785013023
+        },
+        "split_groups": {
+          "train": 290,
+          "val": 62,
+          "test": 63
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.9756246358809757,
+          "currently_correct": 0.07629736295384344,
+          "currently_reduces_failing": 0.11675442164158596,
+          "currently_has_regressions": 0.06484891121541557
+        }
+      }
+    },
+    "laguna_pro": {
+      "k0": {
+        "train": {
+          "tasks": 489,
+          "trajectories": 4160,
+          "states": 5152783,
+          "trajectories_in_split": 4818,
+          "frac_trajectories_kept": 0.8634288086342881
+        },
+        "val": {
+          "tasks": 108,
+          "trajectories": 958,
+          "states": 1235618,
+          "trajectories_in_split": 1034,
+          "frac_trajectories_kept": 0.9264990328820116
+        },
+        "test": {
+          "tasks": 106,
+          "trajectories": 946,
+          "states": 1252636,
+          "trajectories_in_split": 1069,
+          "frac_trajectories_kept": 0.8849391955098223
+        },
+        "all": {
+          "tasks": 703,
+          "trajectories": 6064,
+          "states": 7641037,
+          "generations": 6921,
+          "frac_generations_kept": 0.8761739633001011
+        },
+        "split_groups": {
+          "train": 508,
+          "val": 108,
+          "test": 110
+        },
+        "test_tasks_shared_with_k0_test": 110,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.5583401722447703,
+          "currently_correct": 0.05263300751375499,
+          "currently_reduces_failing": 0.1275015247845344,
+          "currently_has_regressions": 0.056252574570745215
+        }
+      },
+      "max15": {
+        "train": {
+          "tasks": 489,
+          "trajectories": 4130,
+          "states": 3254505,
+          "trajectories_in_split": 4821,
+          "frac_trajectories_kept": 0.8566687409251192
+        },
+        "val": {
+          "tasks": 107,
+          "trajectories": 939,
+          "states": 769190,
+          "trajectories_in_split": 1025,
+          "frac_trajectories_kept": 0.9160975609756098
+        },
+        "test": {
+          "tasks": 106,
+          "trajectories": 939,
+          "states": 804894,
+          "trajectories_in_split": 1074,
+          "frac_trajectories_kept": 0.8743016759776536
+        },
+        "all": {
+          "tasks": 702,
+          "trajectories": 6008,
+          "states": 4828589,
+          "generations": 6921,
+          "frac_generations_kept": 0.8680826470163271
+        },
+        "split_groups": {
+          "train": 507,
+          "val": 108,
+          "test": 110
+        },
+        "test_tasks_shared_with_k0_test": 97,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.5628542391917445,
+          "currently_correct": 0.037562710120835785,
+          "currently_reduces_failing": 0.08976461496793367,
+          "currently_has_regressions": 0.04395858336625692
+        }
+      },
+      "max50": {
+        "train": {
+          "tasks": 434,
+          "trajectories": 2559,
+          "states": 486139,
+          "trajectories_in_split": 4295,
+          "frac_trajectories_kept": 0.5958090803259605
+        },
+        "val": {
+          "tasks": 95,
+          "trajectories": 541,
+          "states": 109932,
+          "trajectories_in_split": 933,
+          "frac_trajectories_kept": 0.579849946409432
+        },
+        "test": {
+          "tasks": 95,
+          "trajectories": 596,
+          "states": 126174,
+          "trajectories_in_split": 936,
+          "frac_trajectories_kept": 0.6367521367521367
+        },
+        "all": {
+          "tasks": 624,
+          "trajectories": 3696,
+          "states": 722245,
+          "generations": 6921,
+          "frac_generations_kept": 0.5340268747290854
+        },
+        "split_groups": {
+          "train": 448,
+          "val": 96,
+          "test": 97
+        },
+        "test_tasks_shared_with_k0_test": 14,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.6087545770126968,
+          "currently_correct": 0.004430389779193812,
+          "currently_reduces_failing": 0.025750154548480668,
+          "currently_has_regressions": 0.01717469526209837
+        }
+      }
+    },
+    "qwen_verified": {
+      "k0": {
+        "train": {
+          "tasks": 348,
+          "trajectories": 3211,
+          "states": 2706453,
+          "trajectories_in_split": 3498,
+          "frac_trajectories_kept": 0.9179531160663236
+        },
+        "val": {
+          "tasks": 73,
+          "trajectories": 648,
+          "states": 508017,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.864
+        },
+        "test": {
+          "tasks": 75,
+          "trajectories": 667,
+          "states": 570687,
+          "trajectories_in_split": 750,
+          "frac_trajectories_kept": 0.8893333333333333
+        },
+        "all": {
+          "tasks": 496,
+          "trajectories": 4526,
+          "states": 3785157,
+          "generations": 4998,
+          "frac_generations_kept": 0.905562224889956
+        },
+        "split_groups": {
+          "train": 350,
+          "val": 75,
+          "test": 75
+        },
+        "test_tasks_shared_with_k0_test": 75,
+        "same_for_all_probes": false,
+        "per_probe_states": {
+          "currently_compiles": {
+            "train": 2706453,
+            "val": 508017,
+            "test": 570687
+          },
+          "currently_correct": {
+            "train": 2705968,
+            "val": 508017,
+            "test": 570687
+          },
+          "currently_reduces_failing": {
+            "train": 2705968,
+            "val": 508017,
+            "test": 570687
+          },
+          "currently_has_regressions": {
+            "train": 2705968,
+            "val": 508017,
+            "test": 570687
+          }
+        },
+        "test_pos_rate": {
+          "currently_compiles": 0.9151759195495955,
+          "currently_correct": 0.27341432343824196,
+          "currently_reduces_failing": 0.30384781850646675,
+          "currently_has_regressions": 0.06666351257344219
+        }
+      },
+      "max15": {
+        "train": {
+          "tasks": 335,
+          "trajectories": 2801,
+          "states": 1602376,
+          "trajectories_in_split": 3378,
+          "frac_trajectories_kept": 0.8291888691533452
+        },
+        "val": {
+          "tasks": 71,
+          "trajectories": 590,
+          "states": 318490,
+          "trajectories_in_split": 720,
+          "frac_trajectories_kept": 0.8194444444444444
+        },
+        "test": {
+          "tasks": 73,
+          "trajectories": 574,
+          "states": 353824,
+          "trajectories_in_split": 730,
+          "frac_trajectories_kept": 0.7863013698630137
+        },
+        "all": {
+          "tasks": 479,
+          "trajectories": 3965,
+          "states": 2274690,
+          "generations": 4998,
+          "frac_generations_kept": 0.7933173269307723
+        },
+        "split_groups": {
+          "train": 338,
+          "val": 72,
+          "test": 73
+        },
+        "test_tasks_shared_with_k0_test": 20,
+        "same_for_all_probes": false,
+        "per_probe_states": {
+          "currently_compiles": {
+            "train": 1602376,
+            "val": 318490,
+            "test": 353824
+          },
+          "currently_correct": {
+            "train": 1602308,
+            "val": 318490,
+            "test": 353824
+          },
+          "currently_reduces_failing": {
+            "train": 1602308,
+            "val": 318490,
+            "test": 353824
+          },
+          "currently_has_regressions": {
+            "train": 1602308,
+            "val": 318490,
+            "test": 353824
+          }
+        },
+        "test_pos_rate": {
+          "currently_compiles": 0.9565433661933617,
+          "currently_correct": 0.08910362213982093,
+          "currently_reduces_failing": 0.11652403454824997,
+          "currently_has_regressions": 0.037659966537035364
+        }
+      },
+      "max50": {
+        "train": {
+          "tasks": 208,
+          "trajectories": 1119,
+          "states": 331307,
+          "trajectories_in_split": 2118,
+          "frac_trajectories_kept": 0.5283286118980169
+        },
+        "val": {
+          "tasks": 44,
+          "trajectories": 217,
+          "states": 70695,
+          "trajectories_in_split": 450,
+          "frac_trajectories_kept": 0.4822222222222222
+        },
+        "test": {
+          "tasks": 45,
+          "trajectories": 238,
+          "states": 60746,
+          "trajectories_in_split": 460,
+          "frac_trajectories_kept": 0.5173913043478261
+        },
+        "all": {
+          "tasks": 297,
+          "trajectories": 1574,
+          "states": 462748,
+          "generations": 4998,
+          "frac_generations_kept": 0.3149259703881553
+        },
+        "split_groups": {
+          "train": 212,
+          "val": 45,
+          "test": 46
+        },
+        "test_tasks_shared_with_k0_test": 9,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.9912257597208046,
+          "currently_correct": 0.033253218318901656,
+          "currently_reduces_failing": 0.0631317288381128,
+          "currently_has_regressions": 0.023968656372436045
+        }
+      }
+    },
+    "qwen_pro": {
+      "k0": {
+        "train": {
+          "tasks": 441,
+          "trajectories": 3468,
+          "states": 2476824,
+          "trajectories_in_split": 4056,
+          "frac_trajectories_kept": 0.8550295857988166
+        },
+        "val": {
+          "tasks": 94,
+          "trajectories": 743,
+          "states": 530233,
+          "trajectories_in_split": 884,
+          "frac_trajectories_kept": 0.8404977375565611
+        },
+        "test": {
+          "tasks": 94,
+          "trajectories": 692,
+          "states": 467504,
+          "trajectories_in_split": 864,
+          "frac_trajectories_kept": 0.8009259259259259
+        },
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "split_groups": {
+          "train": 485,
+          "val": 104,
+          "test": 105
+        },
+        "test_tasks_shared_with_k0_test": 105,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.6274342037715185,
+          "currently_correct": 0.05804442314932065,
+          "currently_reduces_failing": 0.10211677333242068,
+          "currently_has_regressions": 0.0166950443204764
+        }
+      },
+      "max15": {
+        "train": {
+          "tasks": 430,
+          "trajectories": 3248,
+          "states": 1417045,
+          "trajectories_in_split": 4006,
+          "frac_trajectories_kept": 0.8107838242636046
+        },
+        "val": {
+          "tasks": 97,
+          "trajectories": 747,
+          "states": 327443,
+          "trajectories_in_split": 903,
+          "frac_trajectories_kept": 0.8272425249169435
+        },
+        "test": {
+          "tasks": 98,
+          "trajectories": 743,
+          "states": 360151,
+          "trajectories_in_split": 865,
+          "frac_trajectories_kept": 0.8589595375722543
+        },
+        "all": {
+          "tasks": 625,
+          "trajectories": 4738,
+          "states": 2104639,
+          "generations": 5804,
+          "frac_generations_kept": 0.8163335630599586
+        },
+        "split_groups": {
+          "train": 483,
+          "val": 103,
+          "test": 105
+        },
+        "test_tasks_shared_with_k0_test": 37,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.5751309867250126,
+          "currently_correct": 0.04940983087649347,
+          "currently_reduces_failing": 0.05550727333812762,
+          "currently_has_regressions": 0.0053810762707864205
+        }
+      },
+      "max50": {
+        "train": {
+          "tasks": 346,
+          "trajectories": 1687,
+          "states": 312616,
+          "trajectories_in_split": 3200,
+          "frac_trajectories_kept": 0.5271875
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 408,
+          "states": 75000,
+          "trajectories_in_split": 704,
+          "frac_trajectories_kept": 0.5795454545454546
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 339,
+          "states": 66858,
+          "trajectories_in_split": 727,
+          "frac_trajectories_kept": 0.46629986244841815
+        },
+        "all": {
+          "tasks": 496,
+          "trajectories": 2434,
+          "states": 454474,
+          "generations": 5804,
+          "frac_generations_kept": 0.41936595451412817
+        },
+        "split_groups": {
+          "train": 385,
+          "val": 82,
+          "test": 83
+        },
+        "test_tasks_shared_with_k0_test": 18,
+        "same_for_all_probes": true,
+        "test_pos_rate": {
+          "currently_compiles": 0.5762661162463729,
+          "currently_correct": 0.04093750934817075,
+          "currently_reduces_failing": 0.01356606539232403,
+          "currently_has_regressions": 0.0018247629303897812
+        }
+      }
+    }
+  },
+  "length": {
+    "laguna_verified": {
+      "median_turns": 55.0,
+      "frac_turns_ge15": 0.9777599679422961,
+      "frac_turns_ge50": 0.5684231616910439,
+      "frac_turns_ge16": 0.9729513123622521,
+      "frac_turns_ge51": 0.5519935884592266,
+      "n_label_files": 4991,
+      "median_steps_generations": 55.0,
+      "frac_steps_ge50": 0.5684231616910439,
+      "frac_steps_ge15": 0.9777599679422961,
+      "n_generations": 4991,
+      "turns_equal_steps": 4991,
+      "n_common": 4991
+    },
+    "laguna_pro": {
+      "median_turns": 56.0,
+      "frac_turns_ge15": 0.987429562201994,
+      "frac_turns_ge50": 0.6009247218610028,
+      "frac_turns_ge16": 0.9835283918508886,
+      "frac_turns_ge51": 0.5870538939459615,
+      "n_label_files": 6921,
+      "median_steps_generations": 56.0,
+      "frac_steps_ge50": 0.6009247218610028,
+      "frac_steps_ge15": 0.987429562201994,
+      "n_generations": 6921,
+      "turns_equal_steps": 6921,
+      "n_common": 6921
+    },
+    "qwen_verified": {
+      "median_turns": 39.0,
+      "frac_turns_ge15": 0.8997599039615847,
+      "frac_turns_ge50": 0.40036014405762305,
+      "frac_turns_ge16": 0.8827531012404962,
+      "frac_turns_ge51": 0.39195678271308526,
+      "n_label_files": 4998,
+      "median_steps_generations": 39.0,
+      "frac_steps_ge50": 0.40036014405762305,
+      "frac_steps_ge15": 0.8997599039615847,
+      "n_generations": 4998,
+      "turns_equal_steps": 4998,
+      "n_common": 4998
+    },
+    "qwen_pro": {
+      "median_turns": 54.0,
+      "frac_turns_ge15": 0.9670916609235011,
+      "frac_turns_ge50": 0.5489317711922812,
+      "frac_turns_ge16": 0.9583046175051688,
+      "frac_turns_ge51": 0.5365265334252239,
+      "n_label_files": 5804,
+      "median_steps_generations": 54.0,
+      "frac_steps_ge50": 0.5489317711922812,
+      "frac_steps_ge15": 0.9670916609235011,
+      "n_generations": 5804,
+      "turns_equal_steps": 5804,
+      "n_common": 5804
+    }
+  },
+  "legacy": {
+    "laguna_verified": {
+      "filters": {
+        "k0": {
+          "split_groups": {
+            "train": 8,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sphinx-doc__sphinx"
+          ],
+          "tasks_by_split": {
+            "train": 202,
+            "val": 1,
+            "test": 296
+          },
+          "test": {
+            "tasks": 296,
+            "trajectories": 2779,
+            "states": 4713432,
+            "trajectories_in_split": 2968,
+            "frac_trajectories_kept": 0.9363207547169812
+          },
+          "all": {
+            "tasks": 499,
+            "trajectories": 4685,
+            "states": 7478585,
+            "generations": 4991,
+            "frac_generations_kept": 0.938689641354438
+          },
+          "states_by_split": {
+            "train": 2761598,
+            "val": 3555,
+            "test": 4713432
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 4713432,
+            "currently_correct": 4711916,
+            "currently_reduces_failing": 4711916,
+            "currently_has_regressions": 4711916
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 4713432,
+            "currently_correct": 4711916,
+            "currently_reduces_failing": 4711916,
+            "currently_has_regressions": 4711916
+          }
+        },
+        "max15": {
+          "split_groups": {
+            "train": 8,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sphinx-doc__sphinx"
+          ],
+          "tasks_by_split": {
+            "train": 200,
+            "val": 1,
+            "test": 296
+          },
+          "test": {
+            "tasks": 296,
+            "trajectories": 2720,
+            "states": 3465919,
+            "trajectories_in_split": 2968,
+            "frac_trajectories_kept": 0.9164420485175202
+          },
+          "all": {
+            "tasks": 497,
+            "trajectories": 4550,
+            "states": 5464296,
+            "generations": 4991,
+            "frac_generations_kept": 0.9116409537166901
+          },
+          "states_by_split": {
+            "train": 1996563,
+            "val": 1814,
+            "test": 3465919
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 3465919,
+            "currently_correct": 3465265,
+            "currently_reduces_failing": 3465265,
+            "currently_has_regressions": 3465265
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 3465919,
+            "currently_correct": 3465265,
+            "currently_reduces_failing": 3465265,
+            "currently_has_regressions": 3465265
+          }
+        },
+        "max50": {
+          "split_groups": {
+            "train": 8,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sphinx-doc__sphinx"
+          ],
+          "tasks_by_split": {
+            "train": 162,
+            "val": 1,
+            "test": 248
+          },
+          "test": {
+            "tasks": 248,
+            "trajectories": 1535,
+            "states": 1062176,
+            "trajectories_in_split": 2968,
+            "frac_trajectories_kept": 0.5171832884097035
+          },
+          "all": {
+            "tasks": 411,
+            "trajectories": 2437,
+            "states": 1670161,
+            "generations": 4991,
+            "frac_generations_kept": 0.48827890202364255
+          },
+          "states_by_split": {
+            "train": 607960,
+            "val": 25,
+            "test": 1062176
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 1062176,
+            "currently_correct": 1062176,
+            "currently_reduces_failing": 1062176,
+            "currently_has_regressions": 1062176
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 1062176,
+            "currently_correct": 1062176,
+            "currently_reduces_failing": 1062176,
+            "currently_has_regressions": 1062176
+          }
+        }
+      }
+    },
+    "laguna_pro": {
+      "filters": {
+        "k0": {
+          "split_groups": {
+            "train": 303,
+            "val": 65,
+            "test": 66
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 523,
+            "val": 62,
+            "test": 118
+          },
+          "test": {
+            "tasks": 118,
+            "trajectories": 995,
+            "states": 1266004,
+            "trajectories_in_split": 1167,
+            "frac_trajectories_kept": 0.8526135389888603
+          },
+          "all": {
+            "tasks": 703,
+            "trajectories": 6064,
+            "states": 7641037,
+            "generations": 6921,
+            "frac_generations_kept": 0.8761739633001011
+          },
+          "states_by_split": {
+            "train": 5613733,
+            "val": 761300,
+            "test": 1266004
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 1266004,
+            "currently_correct": 1266004,
+            "currently_reduces_failing": 1266004,
+            "currently_has_regressions": 1266004
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 1266004,
+            "currently_correct": 1266004,
+            "currently_reduces_failing": 1266004,
+            "currently_has_regressions": 1266004
+          }
+        },
+        "max15": {
+          "split_groups": {
+            "train": 303,
+            "val": 64,
+            "test": 66
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 460,
+            "val": 124,
+            "test": 118
+          },
+          "test": {
+            "tasks": 118,
+            "trajectories": 989,
+            "states": 902571,
+            "trajectories_in_split": 1162,
+            "frac_trajectories_kept": 0.851118760757315
+          },
+          "all": {
+            "tasks": 702,
+            "trajectories": 6002,
+            "states": 5588876,
+            "generations": 6921,
+            "frac_generations_kept": 0.8672157202716371
+          },
+          "states_by_split": {
+            "train": 3785669,
+            "val": 900636,
+            "test": 902571
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 902571,
+            "currently_correct": 902571,
+            "currently_reduces_failing": 902571,
+            "currently_has_regressions": 902571
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 902571,
+            "currently_correct": 902571,
+            "currently_reduces_failing": 902571,
+            "currently_has_regressions": 902571
+          }
+        },
+        "max50": {
+          "split_groups": {
+            "train": 262,
+            "val": 56,
+            "test": 57
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 504,
+            "val": 57,
+            "test": 53
+          },
+          "test": {
+            "tasks": 53,
+            "trajectories": 302,
+            "states": 144545,
+            "trajectories_in_split": 569,
+            "frac_trajectories_kept": 0.5307557117750439
+          },
+          "all": {
+            "tasks": 614,
+            "trajectories": 3543,
+            "states": 1522286,
+            "generations": 6921,
+            "frac_generations_kept": 0.5119202427394886
+          },
+          "states_by_split": {
+            "train": 1242371,
+            "val": 135370,
+            "test": 144545
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 144545,
+            "currently_correct": 144545,
+            "currently_reduces_failing": 144545,
+            "currently_has_regressions": 144545
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 144545,
+            "currently_correct": 144545,
+            "currently_reduces_failing": 144545,
+            "currently_has_regressions": 144545
+          }
+        }
+      }
+    },
+    "qwen_verified": {
+      "filters": {
+        "k0": {
+          "split_groups": {
+            "train": 8,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sphinx-doc__sphinx"
+          ],
+          "tasks_by_split": {
+            "train": 202,
+            "val": 1,
+            "test": 293
+          },
+          "test": {
+            "tasks": 293,
+            "trajectories": 2637,
+            "states": 2115362,
+            "trajectories_in_split": 2970,
+            "frac_trajectories_kept": 0.8878787878787879
+          },
+          "all": {
+            "tasks": 496,
+            "trajectories": 4526,
+            "states": 3785157,
+            "generations": 4998,
+            "frac_generations_kept": 0.905562224889956
+          },
+          "states_by_split": {
+            "train": 1667958,
+            "val": 1837,
+            "test": 2115362
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 2115362,
+            "currently_correct": 2115246,
+            "currently_reduces_failing": 2115246,
+            "currently_has_regressions": 2115246
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 2115362,
+            "currently_correct": 2115246,
+            "currently_reduces_failing": 2115246,
+            "currently_has_regressions": 2115246
+          }
+        },
+        "max15": {
+          "split_groups": {
+            "train": 8,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sphinx-doc__sphinx"
+          ],
+          "tasks_by_split": {
+            "train": 191,
+            "val": 1,
+            "test": 287
+          },
+          "test": {
+            "tasks": 287,
+            "trajectories": 2363,
+            "states": 1412461,
+            "trajectories_in_split": 2970,
+            "frac_trajectories_kept": 0.7956228956228957
+          },
+          "all": {
+            "tasks": 479,
+            "trajectories": 3965,
+            "states": 2519093,
+            "generations": 4998,
+            "frac_generations_kept": 0.7933173269307723
+          },
+          "states_by_split": {
+            "train": 1106353,
+            "val": 279,
+            "test": 1412461
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 1412461,
+            "currently_correct": 1412461,
+            "currently_reduces_failing": 1412461,
+            "currently_has_regressions": 1412461
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 1412461,
+            "currently_correct": 1412461,
+            "currently_reduces_failing": 1412461,
+            "currently_has_regressions": 1412461
+          }
+        },
+        "max50": {
+          "split_groups": {
+            "train": 7,
+            "val": 1,
+            "test": 3
+          },
+          "test_groups": [
+            "astropy__astropy",
+            "django__django",
+            "sympy__sympy"
+          ],
+          "tasks_by_split": {
+            "train": 100,
+            "val": 3,
+            "test": 194
+          },
+          "test": {
+            "tasks": 194,
+            "trajectories": 1060,
+            "states": 442104,
+            "trajectories_in_split": 3280,
+            "frac_trajectories_kept": 0.3231707317073171
+          },
+          "all": {
+            "tasks": 297,
+            "trajectories": 1574,
+            "states": 699124,
+            "generations": 4998,
+            "frac_generations_kept": 0.3149259703881553
+          },
+          "states_by_split": {
+            "train": 253373,
+            "val": 3647,
+            "test": 442104
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 442104,
+            "currently_correct": 442104,
+            "currently_reduces_failing": 442104,
+            "currently_has_regressions": 442104
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 442104,
+            "currently_correct": 442104,
+            "currently_reduces_failing": 442104,
+            "currently_has_regressions": 442104
+          }
+        }
+      }
+    },
+    "qwen_pro": {
+      "filters": {
+        "k0": {
+          "split_groups": {
+            "train": 288,
+            "val": 61,
+            "test": 63
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 329,
+            "val": 195,
+            "test": 105
+          },
+          "test": {
+            "tasks": 105,
+            "trajectories": 765,
+            "states": 488455,
+            "trajectories_in_split": 968,
+            "frac_trajectories_kept": 0.7902892561983471
+          },
+          "all": {
+            "tasks": 629,
+            "trajectories": 4903,
+            "states": 3474561,
+            "generations": 5804,
+            "frac_generations_kept": 0.8447622329427981
+          },
+          "states_by_split": {
+            "train": 1732509,
+            "val": 1253597,
+            "test": 488455
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 488455,
+            "currently_correct": 488455,
+            "currently_reduces_failing": 488455,
+            "currently_has_regressions": 488455
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 488455,
+            "currently_correct": 488455,
+            "currently_reduces_failing": 488455,
+            "currently_has_regressions": 488455
+          }
+        },
+        "max15": {
+          "split_groups": {
+            "train": 286,
+            "val": 61,
+            "test": 62
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 471,
+            "val": 100,
+            "test": 56
+          },
+          "test": {
+            "tasks": 56,
+            "trajectories": 426,
+            "states": 197922,
+            "trajectories_in_split": 544,
+            "frac_trajectories_kept": 0.7830882352941176
+          },
+          "all": {
+            "tasks": 627,
+            "trajectories": 4739,
+            "states": 2450039,
+            "generations": 5804,
+            "frac_generations_kept": 0.8165058580289456
+          },
+          "states_by_split": {
+            "train": 1918022,
+            "val": 334095,
+            "test": 197922
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 197922,
+            "currently_correct": 197922,
+            "currently_reduces_failing": 197922,
+            "currently_has_regressions": 197922
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 197922,
+            "currently_correct": 197922,
+            "currently_reduces_failing": 197922,
+            "currently_has_regressions": 197922
+          }
+        },
+        "max50": {
+          "split_groups": {
+            "train": 221,
+            "val": 47,
+            "test": 49
+          },
+          "test_groups": null,
+          "tasks_by_split": {
+            "train": 345,
+            "val": 42,
+            "test": 109
+          },
+          "test": {
+            "tasks": 109,
+            "trajectories": 626,
+            "states": 182635,
+            "trajectories_in_split": 1107,
+            "frac_trajectories_kept": 0.5654923215898826
+          },
+          "all": {
+            "tasks": 496,
+            "trajectories": 2437,
+            "states": 719643,
+            "generations": 5804,
+            "frac_generations_kept": 0.4198828394210889
+          },
+          "states_by_split": {
+            "train": 486601,
+            "val": 50407,
+            "test": 182635
+          },
+          "per_probe_test_states": {
+            "currently_compiles": 182635,
+            "currently_correct": 182635,
+            "currently_reduces_failing": 182635,
+            "currently_has_regressions": 182635
+          },
+          "matches_stored_all_probes": true,
+          "stored_test": {
+            "currently_compiles": 182635,
+            "currently_correct": 182635,
+            "currently_reduces_failing": 182635,
+            "currently_has_regressions": 182635
+          }
+        }
+      }
+    }
+  },
+  "legacy_max50_decomposition": {
+    "laguna": {
+      "verified": {
+        "test_trajectories": 2968,
+        "window_keep_share": 0.5171832884097035,
+        "states_per_kept_trajectory": 691.971335504886,
+        "test_states": 1062176
+      },
+      "pro": {
+        "test_trajectories": 569,
+        "window_keep_share": 0.5307557117750439,
+        "states_per_kept_trajectory": 478.62582781456956,
+        "test_states": 144545
+      },
+      "ratio_verified_over_pro": {
+        "test_trajectories": 5.216168717047451,
+        "window_keep_share": 0.9744281162421236,
+        "states_per_kept_trajectory": 1.4457459152684324,
+        "test_states": 7.348410529592861
+      },
+      "share_of_log_ratio": {
+        "test_trajectories": 0.8281656513042965,
+        "window_keep_share": -0.0129880846651253,
+        "states_per_kept_trajectory": 0.18482243336082874
+      }
+    },
+    "qwen": {
+      "verified": {
+        "test_trajectories": 3280,
+        "window_keep_share": 0.3231707317073171,
+        "states_per_kept_trajectory": 417.07924528301885,
+        "test_states": 442104
+      },
+      "pro": {
+        "test_trajectories": 1107,
+        "window_keep_share": 0.5654923215898826,
+        "states_per_kept_trajectory": 291.74920127795525,
+        "test_states": 182635
+      },
+      "ratio_verified_over_pro": {
+        "test_trajectories": 2.962962962962963,
+        "window_keep_share": 0.5714856230031948,
+        "states_per_kept_trajectory": 1.4295814468594181,
+        "test_states": 2.420697018643743
+      },
+      "share_of_log_ratio": {
+        "test_trajectories": 1.228644288165265,
+        "window_keep_share": -0.6328968465790644,
+        "states_per_kept_trajectory": 0.4042525584137992
+      }
+    }
+  }
+}

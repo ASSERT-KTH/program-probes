@@ -1,0 +1,189 @@
+{
+ "mode": "k0",
+ "run": "laguna_pro",
+ "bench": "swebench_pro",
+ "pooled": "laguna_xs2_pro_full_pooled",
+ "probe": "currently_correct",
+ "layer": 20,
+ "stored_test_auc": 0.7939589177726336,
+ "n_boot": 1000,
+ "C_grid": [
+  0.001,
+  0.0031622776601683794,
+  0.01,
+  0.03162277660168379,
+  0.1,
+  0.31622776601683794,
+  1.0,
+  3.1622776601683795,
+  10.0,
+  31.622776601683793,
+  100.0
+ ],
+ "a2_chars": 32000,
+ "text_info": {
+  "n_units": 383024,
+  "n_trajectories": 6921,
+  "n_train_trajectories_for_vocab": 4564,
+  "n_train_units_for_vocab": 256219,
+  "text_a1": {
+   "shape": [
+    383024,
+    200000
+   ],
+   "nnz": 59208817,
+   "vocab": 200000,
+   "empty_docs": 6921
+  },
+  "n_units_this_cache": 371842
+ },
+ "counts": {
+  "all": {
+   "n": 1252636,
+   "share": 1.0,
+   "n_pos": 65930,
+   "pos_rate": 0.05263300751375499,
+   "n_tasks": 106
+  },
+  "not_yet_run": {
+   "n": 674404,
+   "share": 0.538387847706756,
+   "n_pos": 17960,
+   "pos_rate": 0.026630921524783364,
+   "n_tasks": 106
+  },
+  "already_run": {
+   "n": 578232,
+   "share": 0.461612152293244,
+   "n_pos": 47970,
+   "pos_rate": 0.08295978084920931,
+   "n_tasks": 101
+  },
+  "not_yet_run_strict": {
+   "n": 457306,
+   "share": 0.36507492998764207,
+   "n_pos": 6881,
+   "pos_rate": 0.015046817666945109,
+   "n_tasks": 106
+  },
+  "already_run_strict": {
+   "n": 795330,
+   "share": 0.634925070012358,
+   "n_pos": 59049,
+   "pos_rate": 0.07424465316283807,
+   "n_tasks": 104
+  }
+ },
+ "fit": {
+  "text_a1": {
+   "n_train_units": 229235,
+   "n_train_tokens": 5152783,
+   "train_pos_rate": 0.0797248787693951,
+   "val_auc": {
+    "1e-03": 0.6387468745685292,
+    "3e-03": 0.6397184365947619,
+    "1e-02": 0.6452618707627131,
+    "3e-02": 0.6458286548544454,
+    "1e-01": 0.6409412165841228,
+    "3e-01": 0.6409412165841228,
+    "1e+00": 0.6159548584690244,
+    "3e+00": 0.6159548584690244,
+    "1e+01": 0.6159548584690244,
+    "3e+01": 0.6159548584690244,
+    "1e+02": 0.6159548584690244
+   },
+   "C": 0.03162277660168379,
+   "best_val_auc": 0.6458286548544454,
+   "C_at_grid_edge": false
+  }
+ },
+ "auc": {
+  "real_testbest|all": 0.7939589177726336,
+  "real_testbest|not_yet_run": 0.8230768681856224,
+  "real_testbest|already_run": 0.7352662117759579,
+  "real_testbest|not_yet_run_strict": 0.883401959735794,
+  "real_testbest|already_run_strict": 0.7302044257376371,
+  "text_a1|all": 0.661837991115053,
+  "text_a1|not_yet_run": 0.6905208524870022,
+  "text_a1|already_run": 0.6128291893696106,
+  "text_a1|not_yet_run_strict": 0.6460589626888981,
+  "text_a1|already_run_strict": 0.6131374640105093,
+  "real-text_a1|all": 0.13212092665758057,
+  "real-text_a1|not_yet_run": 0.1325560156986202,
+  "real-text_a1|already_run": 0.12243702240634724,
+  "real-text_a1|not_yet_run_strict": 0.237342997046896,
+  "real-text_a1|already_run_strict": 0.11706696172712783,
+  "real|already-not_yet": -0.08781065640966457,
+  "real|already-not_yet_strict": -0.15319753399815694
+ },
+ "ci95": {
+  "real_testbest|all": [
+   0.7460566444575643,
+   0.838644070265086
+  ],
+  "real_testbest|not_yet_run": [
+   0.7682327871691765,
+   0.8697012057942028
+  ],
+  "real_testbest|already_run": [
+   0.6674476477089826,
+   0.7940919879306116
+  ],
+  "real_testbest|not_yet_run_strict": [
+   0.8225871078112362,
+   0.915554119800935
+  ],
+  "real_testbest|already_run_strict": [
+   0.6661063445742964,
+   0.7868041366481988
+  ],
+  "text_a1|all": [
+   0.5983567872677619,
+   0.7161363267826991
+  ],
+  "text_a1|not_yet_run": [
+   0.5882563183249558,
+   0.7684630843254643
+  ],
+  "text_a1|already_run": [
+   0.5385204540732177,
+   0.6788860323488585
+  ],
+  "text_a1|not_yet_run_strict": [
+   0.533394064150571,
+   0.7642953767142205
+  ],
+  "text_a1|already_run_strict": [
+   0.5408504632371486,
+   0.6736854595353654
+  ],
+  "real-text_a1|all": [
+   0.08521018384580469,
+   0.18221771489227762
+  ],
+  "real-text_a1|not_yet_run": [
+   0.05531431935153448,
+   0.23274806457177113
+  ],
+  "real-text_a1|already_run": [
+   0.06445786898105012,
+   0.177784360092837
+  ],
+  "real-text_a1|not_yet_run_strict": [
+   0.10676359274491073,
+   0.3411459274010438
+  ],
+  "real-text_a1|already_run_strict": [
+   0.06121170400541943,
+   0.17698053338340916
+  ],
+  "real|already-not_yet": [
+   -0.1484865301412365,
+   -0.026389520208558045
+  ],
+  "real|already-not_yet_strict": [
+   -0.2185652626066972,
+   -0.08055211794486847
+  ]
+ }
+}

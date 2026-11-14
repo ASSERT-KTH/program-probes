@@ -136,3 +136,64 @@ def test_bin_index_clamped():
     assert _bin_index(1.0) == 9  # clamped to n_bins-1
     assert _bin_index(0.95) == 9
     assert _bin_index(0.55) == 5
+
+
+@pytest.mark.parametrize("unit", ["token", "trajectory"])
+def test_shuffle_labels_scores_against_real_test_labels(tmp_path, monkeypatch, unit):
+    """The shuffled-label control must only transform train/val labels.
+
+    The shuffle is replaced by label inversion: a probe trained on inverted labels
+    scores AUC ~0 against the real test labels, but ~1 if y_test were inverted too.
+    """
+    import src.probe as probe_mod
+
+    torch.manual_seed(0)
+    n = 400
+    y = torch.randint(0, 2, (n,), dtype=torch.int64)
+    H = torch.randn(n, HIDDEN_DIM)
+    H[:, 0] = 3.0 * (2 * y - 1)  # labels are linearly readable
+    cache = {
+        "H": H, "y": y, "rel_pos": torch.linspace(0, 1, n),
+        "sample_id": [f"s{i % 20}" for i in range(n)],
+        "group_id": [f"g{i % 20}" for i in range(n)],
+    }
+    cache_path = tmp_path / "layer_0.pt"
+    torch.save(cache, cache_path)
+
+    calls = []
+
+    def invert(labels, sample_ids, shuffle_unit):
+        calls.append(shuffle_unit)
+        return 1 - labels
+
+    monkeypatch.setattr(probe_mod, "_shuffle_labels", invert)
+    results, _ = train_probe_layer(
+        str(cache_path), LAYER_IDX, lr=1e-2, weight_decay=0.0, batch_size=64, patience=5,
+        seed=42, n_bins=1, shuffle_labels=True, shuffle_unit=unit,
+    )
+    assert calls == [unit, unit]  # train and val only
+    assert results[0].test_auc < 0.2
+
+
+def _merge_one_layer(out: str, layer: int) -> None:
+    from src.probe import _merge_save
+    # ~16MB per layer, like real probe weights, so concurrent writes actually overlap.
+    weights = {layer: {0: {"w": torch.full((2000, 2000), float(layer))}}}
+    _merge_save(Path(out), {layer: [f"result_{layer}"]}, weights)
+
+
+def test_merge_save_keeps_all_layers_under_concurrency(tmp_path):
+    """Per-layer jobs merging into the same run must not lose each other's layers."""
+    import multiprocessing as mp
+
+    ctx = mp.get_context("spawn")
+    procs = [ctx.Process(target=_merge_one_layer, args=(str(tmp_path), L)) for L in range(8)]
+    for p in procs:
+        p.start()
+    for p in procs:
+        p.join()
+        assert p.exitcode == 0
+    results = torch.load(tmp_path / "results.pt", weights_only=False)
+    weights = torch.load(tmp_path / "weights.pt", weights_only=False)
+    assert sorted(results) == list(range(8))
+    assert sorted(weights) == list(range(8))

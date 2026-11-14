@@ -1,0 +1,1572 @@
+{
+  "run": "qwen_pro",
+  "bench": "swebench_pro",
+  "cache": "qwen36_35b_a3b_full",
+  "pooled": "qwen36_35b_a3b_pro_full_pooled",
+  "length": {
+    "turns_label_files": {
+      "n": 5804,
+      "median": 54.0,
+      "mean": 56.46106133700896,
+      "frac_ge15": 0.9670916609235011,
+      "frac_ge16": 0.9583046175051688,
+      "frac_ge50": 0.5489317711922812,
+      "frac_ge51": 0.5365265334252239,
+      "n_ge15": 5613,
+      "n_ge16": 5562,
+      "n_ge50": 3186,
+      "n_ge51": 3114
+    },
+    "steps_generations": {
+      "n": 5804,
+      "median": 54.0,
+      "mean": 56.46106133700896,
+      "frac_ge15": 0.9670916609235011,
+      "frac_ge16": 0.9583046175051688,
+      "frac_ge50": 0.5489317711922812,
+      "frac_ge51": 0.5365265334252239,
+      "n_ge15": 5613,
+      "n_ge16": 5562,
+      "n_ge50": 3186,
+      "n_ge51": 3114
+    },
+    "n_label_files": 5804,
+    "n_generations": 5804,
+    "turns_equal_steps": 5804,
+    "n_common": 5804
+  },
+  "rerun": {
+    "k0": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 441,
+          "trajectories": 3468,
+          "states": 2476824,
+          "tasks_with_rows": 485,
+          "trajectories_with_rows": 4056,
+          "rows": 2867835,
+          "n_pos": 1425210,
+          "pos_rate": 0.5754183583492408,
+          "trajectories_in_split": 4056,
+          "frac_trajectories_kept": 0.8550295857988166
+        },
+        "val": {
+          "tasks": 94,
+          "trajectories": 743,
+          "states": 530233,
+          "tasks_with_rows": 104,
+          "trajectories_with_rows": 884,
+          "rows": 612430,
+          "n_pos": 339781,
+          "pos_rate": 0.6408145098475576,
+          "trajectories_in_split": 884,
+          "frac_trajectories_kept": 0.8404977375565611
+        },
+        "test": {
+          "tasks": 94,
+          "trajectories": 692,
+          "states": 467504,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 864,
+          "rows": 597804,
+          "n_pos": 293328,
+          "pos_rate": 0.6274342037715185,
+          "trajectories_in_split": 864,
+          "frac_trajectories_kept": 0.8009259259259259
+        },
+        "split_groups": {
+          "train": 485,
+          "val": 104,
+          "test": 105
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 105,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 2476824,
+          "val": 530233,
+          "test": 467504,
+          "n_pos_test": 293328
+        }
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 441,
+          "trajectories": 3468,
+          "states": 2476824,
+          "tasks_with_rows": 485,
+          "trajectories_with_rows": 4056,
+          "rows": 2867835,
+          "n_pos": 172582,
+          "pos_rate": 0.06967874988291457,
+          "trajectories_in_split": 4056,
+          "frac_trajectories_kept": 0.8550295857988166
+        },
+        "val": {
+          "tasks": 94,
+          "trajectories": 743,
+          "states": 530233,
+          "tasks_with_rows": 104,
+          "trajectories_with_rows": 884,
+          "rows": 612430,
+          "n_pos": 51341,
+          "pos_rate": 0.09682724387203362,
+          "trajectories_in_split": 884,
+          "frac_trajectories_kept": 0.8404977375565611
+        },
+        "test": {
+          "tasks": 94,
+          "trajectories": 692,
+          "states": 467504,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 864,
+          "rows": 597804,
+          "n_pos": 27136,
+          "pos_rate": 0.05804442314932065,
+          "trajectories_in_split": 864,
+          "frac_trajectories_kept": 0.8009259259259259
+        },
+        "split_groups": {
+          "train": 485,
+          "val": 104,
+          "test": 105
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 105,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 2476824,
+          "val": 530233,
+          "test": 467504,
+          "n_pos_test": 27136
+        }
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 441,
+          "trajectories": 3468,
+          "states": 2476824,
+          "tasks_with_rows": 485,
+          "trajectories_with_rows": 4056,
+          "rows": 2867835,
+          "n_pos": 209751,
+          "pos_rate": 0.08468546816406818,
+          "trajectories_in_split": 4056,
+          "frac_trajectories_kept": 0.8550295857988166
+        },
+        "val": {
+          "tasks": 94,
+          "trajectories": 743,
+          "states": 530233,
+          "tasks_with_rows": 104,
+          "trajectories_with_rows": 884,
+          "rows": 612430,
+          "n_pos": 54469,
+          "pos_rate": 0.10272653720156988,
+          "trajectories_in_split": 884,
+          "frac_trajectories_kept": 0.8404977375565611
+        },
+        "test": {
+          "tasks": 94,
+          "trajectories": 692,
+          "states": 467504,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 864,
+          "rows": 597804,
+          "n_pos": 47740,
+          "pos_rate": 0.10211677333242068,
+          "trajectories_in_split": 864,
+          "frac_trajectories_kept": 0.8009259259259259
+        },
+        "split_groups": {
+          "train": 485,
+          "val": 104,
+          "test": 105
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 105,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 2476824,
+          "val": 530233,
+          "test": 467504,
+          "n_pos_test": 47740
+        }
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 441,
+          "trajectories": 3468,
+          "states": 2476824,
+          "tasks_with_rows": 485,
+          "trajectories_with_rows": 4056,
+          "rows": 2867835,
+          "n_pos": 58911,
+          "pos_rate": 0.02378489549519869,
+          "trajectories_in_split": 4056,
+          "frac_trajectories_kept": 0.8550295857988166
+        },
+        "val": {
+          "tasks": 94,
+          "trajectories": 743,
+          "states": 530233,
+          "tasks_with_rows": 104,
+          "trajectories_with_rows": 884,
+          "rows": 612430,
+          "n_pos": 7015,
+          "pos_rate": 0.01323003283462176,
+          "trajectories_in_split": 884,
+          "frac_trajectories_kept": 0.8404977375565611
+        },
+        "test": {
+          "tasks": 94,
+          "trajectories": 692,
+          "states": 467504,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 864,
+          "rows": 597804,
+          "n_pos": 7805,
+          "pos_rate": 0.0166950443204764,
+          "trajectories_in_split": 864,
+          "frac_trajectories_kept": 0.8009259259259259
+        },
+        "split_groups": {
+          "train": 485,
+          "val": 104,
+          "test": 105
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 105,
+        "test_tasks_not_in_k0_test": 0,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 2476824,
+          "val": 530233,
+          "test": 467504,
+          "n_pos_test": 7805
+        }
+      }
+    },
+    "max15": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 430,
+          "trajectories": 3248,
+          "states": 1417045,
+          "tasks_with_rows": 483,
+          "trajectories_with_rows": 3850,
+          "rows": 1735987,
+          "n_pos": 821021,
+          "pos_rate": 0.5793895042147568,
+          "trajectories_in_split": 4006,
+          "frac_trajectories_kept": 0.8107838242636046
+        },
+        "val": {
+          "tasks": 97,
+          "trajectories": 747,
+          "states": 327443,
+          "tasks_with_rows": 103,
+          "trajectories_with_rows": 864,
+          "rows": 399583,
+          "n_pos": 175934,
+          "pos_rate": 0.5372965676468882,
+          "trajectories_in_split": 903,
+          "frac_trajectories_kept": 0.8272425249169435
+        },
+        "test": {
+          "tasks": 98,
+          "trajectories": 743,
+          "states": 360151,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 848,
+          "rows": 423805,
+          "n_pos": 207134,
+          "pos_rate": 0.5751309867250126,
+          "trajectories_in_split": 865,
+          "frac_trajectories_kept": 0.8589595375722543
+        },
+        "split_groups": {
+          "train": 483,
+          "val": 103,
+          "test": 105
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 625,
+          "trajectories": 4738,
+          "states": 2104639,
+          "generations": 5804,
+          "frac_generations_kept": 0.8163335630599586
+        },
+        "test_tasks_shared_with_k0_test": 37,
+        "test_tasks_not_in_k0_test": 68,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 1417045,
+          "val": 327443,
+          "test": 360151,
+          "n_pos_test": 207134
+        },
+        "figure_n_test": 360151
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 430,
+          "trajectories": 3248,
+          "states": 1417045,
+          "tasks_with_rows": 483,
+          "trajectories_with_rows": 3850,
+          "rows": 1735987,
+          "n_pos": 51448,
+          "pos_rate": 0.03630653931244244,
+          "trajectories_in_split": 4006,
+          "frac_trajectories_kept": 0.8107838242636046
+        },
+        "val": {
+          "tasks": 97,
+          "trajectories": 747,
+          "states": 327443,
+          "tasks_with_rows": 103,
+          "trajectories_with_rows": 864,
+          "rows": 399583,
+          "n_pos": 8049,
+          "pos_rate": 0.024581377522194702,
+          "trajectories_in_split": 903,
+          "frac_trajectories_kept": 0.8272425249169435
+        },
+        "test": {
+          "tasks": 98,
+          "trajectories": 743,
+          "states": 360151,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 848,
+          "rows": 423805,
+          "n_pos": 17795,
+          "pos_rate": 0.04940983087649347,
+          "trajectories_in_split": 865,
+          "frac_trajectories_kept": 0.8589595375722543
+        },
+        "split_groups": {
+          "train": 483,
+          "val": 103,
+          "test": 105
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 625,
+          "trajectories": 4738,
+          "states": 2104639,
+          "generations": 5804,
+          "frac_generations_kept": 0.8163335630599586
+        },
+        "test_tasks_shared_with_k0_test": 37,
+        "test_tasks_not_in_k0_test": 68,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 1417045,
+          "val": 327443,
+          "test": 360151,
+          "n_pos_test": 17795
+        },
+        "figure_n_test": 360151
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 430,
+          "trajectories": 3248,
+          "states": 1417045,
+          "tasks_with_rows": 483,
+          "trajectories_with_rows": 3850,
+          "rows": 1735987,
+          "n_pos": 76951,
+          "pos_rate": 0.05430385061871712,
+          "trajectories_in_split": 4006,
+          "frac_trajectories_kept": 0.8107838242636046
+        },
+        "val": {
+          "tasks": 97,
+          "trajectories": 747,
+          "states": 327443,
+          "tasks_with_rows": 103,
+          "trajectories_with_rows": 864,
+          "rows": 399583,
+          "n_pos": 14391,
+          "pos_rate": 0.04394963398209765,
+          "trajectories_in_split": 903,
+          "frac_trajectories_kept": 0.8272425249169435
+        },
+        "test": {
+          "tasks": 98,
+          "trajectories": 743,
+          "states": 360151,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 848,
+          "rows": 423805,
+          "n_pos": 19991,
+          "pos_rate": 0.05550727333812762,
+          "trajectories_in_split": 865,
+          "frac_trajectories_kept": 0.8589595375722543
+        },
+        "split_groups": {
+          "train": 483,
+          "val": 103,
+          "test": 105
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 625,
+          "trajectories": 4738,
+          "states": 2104639,
+          "generations": 5804,
+          "frac_generations_kept": 0.8163335630599586
+        },
+        "test_tasks_shared_with_k0_test": 37,
+        "test_tasks_not_in_k0_test": 68,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 1417045,
+          "val": 327443,
+          "test": 360151,
+          "n_pos_test": 19991
+        },
+        "figure_n_test": 360151
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 430,
+          "trajectories": 3248,
+          "states": 1417045,
+          "tasks_with_rows": 483,
+          "trajectories_with_rows": 3850,
+          "rows": 1735987,
+          "n_pos": 24454,
+          "pos_rate": 0.017257038414446965,
+          "trajectories_in_split": 4006,
+          "frac_trajectories_kept": 0.8107838242636046
+        },
+        "val": {
+          "tasks": 97,
+          "trajectories": 747,
+          "states": 327443,
+          "tasks_with_rows": 103,
+          "trajectories_with_rows": 864,
+          "rows": 399583,
+          "n_pos": 2820,
+          "pos_rate": 0.00861218593770519,
+          "trajectories_in_split": 903,
+          "frac_trajectories_kept": 0.8272425249169435
+        },
+        "test": {
+          "tasks": 98,
+          "trajectories": 743,
+          "states": 360151,
+          "tasks_with_rows": 105,
+          "trajectories_with_rows": 848,
+          "rows": 423805,
+          "n_pos": 1938,
+          "pos_rate": 0.0053810762707864205,
+          "trajectories_in_split": 865,
+          "frac_trajectories_kept": 0.8589595375722543
+        },
+        "split_groups": {
+          "train": 483,
+          "val": 103,
+          "test": 105
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 625,
+          "trajectories": 4738,
+          "states": 2104639,
+          "generations": 5804,
+          "frac_generations_kept": 0.8163335630599586
+        },
+        "test_tasks_shared_with_k0_test": 37,
+        "test_tasks_not_in_k0_test": 68,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 1417045,
+          "val": 327443,
+          "test": 360151,
+          "n_pos_test": 1938
+        },
+        "figure_n_test": 360151
+      }
+    },
+    "max50": {
+      "currently_compiles": {
+        "train": {
+          "tasks": 346,
+          "trajectories": 1687,
+          "states": 312616,
+          "tasks_with_rows": 385,
+          "trajectories_with_rows": 2137,
+          "rows": 453522,
+          "n_pos": 152095,
+          "pos_rate": 0.4865234025129872,
+          "trajectories_in_split": 3200,
+          "frac_trajectories_kept": 0.5271875
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 408,
+          "states": 75000,
+          "tasks_with_rows": 82,
+          "trajectories_with_rows": 545,
+          "rows": 115155,
+          "n_pos": 56228,
+          "pos_rate": 0.7497066666666666,
+          "trajectories_in_split": 704,
+          "frac_trajectories_kept": 0.5795454545454546
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 339,
+          "states": 66858,
+          "tasks_with_rows": 83,
+          "trajectories_with_rows": 432,
+          "rows": 93395,
+          "n_pos": 38528,
+          "pos_rate": 0.5762661162463729,
+          "trajectories_in_split": 727,
+          "frac_trajectories_kept": 0.46629986244841815
+        },
+        "split_groups": {
+          "train": 385,
+          "val": 82,
+          "test": 83
+        },
+        "generations_unassigned": 1173,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2434,
+          "states": 454474,
+          "generations": 5804,
+          "frac_generations_kept": 0.41936595451412817
+        },
+        "test_tasks_shared_with_k0_test": 18,
+        "test_tasks_not_in_k0_test": 65,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 312616,
+          "val": 75000,
+          "test": 66858,
+          "n_pos_test": 38528
+        },
+        "figure_n_test": 66858
+      },
+      "currently_correct": {
+        "train": {
+          "tasks": 346,
+          "trajectories": 1687,
+          "states": 312616,
+          "tasks_with_rows": 385,
+          "trajectories_with_rows": 2137,
+          "rows": 453522,
+          "n_pos": 4151,
+          "pos_rate": 0.01327827110576554,
+          "trajectories_in_split": 3200,
+          "frac_trajectories_kept": 0.5271875
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 408,
+          "states": 75000,
+          "tasks_with_rows": 82,
+          "trajectories_with_rows": 545,
+          "rows": 115155,
+          "n_pos": 0,
+          "pos_rate": 0.0,
+          "trajectories_in_split": 704,
+          "frac_trajectories_kept": 0.5795454545454546
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 339,
+          "states": 66858,
+          "tasks_with_rows": 83,
+          "trajectories_with_rows": 432,
+          "rows": 93395,
+          "n_pos": 2737,
+          "pos_rate": 0.04093750934817075,
+          "trajectories_in_split": 727,
+          "frac_trajectories_kept": 0.46629986244841815
+        },
+        "split_groups": {
+          "train": 385,
+          "val": 82,
+          "test": 83
+        },
+        "generations_unassigned": 1173,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2434,
+          "states": 454474,
+          "generations": 5804,
+          "frac_generations_kept": 0.41936595451412817
+        },
+        "test_tasks_shared_with_k0_test": 18,
+        "test_tasks_not_in_k0_test": 65,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 312616,
+          "val": 75000,
+          "test": 66858,
+          "n_pos_test": 2737
+        },
+        "figure_n_test": 66858
+      },
+      "currently_reduces_failing": {
+        "train": {
+          "tasks": 346,
+          "trajectories": 1687,
+          "states": 312616,
+          "tasks_with_rows": 385,
+          "trajectories_with_rows": 2137,
+          "rows": 453522,
+          "n_pos": 2657,
+          "pos_rate": 0.00849924508022622,
+          "trajectories_in_split": 3200,
+          "frac_trajectories_kept": 0.5271875
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 408,
+          "states": 75000,
+          "tasks_with_rows": 82,
+          "trajectories_with_rows": 545,
+          "rows": 115155,
+          "n_pos": 680,
+          "pos_rate": 0.009066666666666667,
+          "trajectories_in_split": 704,
+          "frac_trajectories_kept": 0.5795454545454546
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 339,
+          "states": 66858,
+          "tasks_with_rows": 83,
+          "trajectories_with_rows": 432,
+          "rows": 93395,
+          "n_pos": 907,
+          "pos_rate": 0.01356606539232403,
+          "trajectories_in_split": 727,
+          "frac_trajectories_kept": 0.46629986244841815
+        },
+        "split_groups": {
+          "train": 385,
+          "val": 82,
+          "test": 83
+        },
+        "generations_unassigned": 1173,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2434,
+          "states": 454474,
+          "generations": 5804,
+          "frac_generations_kept": 0.41936595451412817
+        },
+        "test_tasks_shared_with_k0_test": 18,
+        "test_tasks_not_in_k0_test": 65,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 312616,
+          "val": 75000,
+          "test": 66858,
+          "n_pos_test": 907
+        },
+        "figure_n_test": 66858
+      },
+      "currently_has_regressions": {
+        "train": {
+          "tasks": 346,
+          "trajectories": 1687,
+          "states": 312616,
+          "tasks_with_rows": 385,
+          "trajectories_with_rows": 2137,
+          "rows": 453522,
+          "n_pos": 389,
+          "pos_rate": 0.0012443381016966502,
+          "trajectories_in_split": 3200,
+          "frac_trajectories_kept": 0.5271875
+        },
+        "val": {
+          "tasks": 74,
+          "trajectories": 408,
+          "states": 75000,
+          "tasks_with_rows": 82,
+          "trajectories_with_rows": 545,
+          "rows": 115155,
+          "n_pos": 107,
+          "pos_rate": 0.0014266666666666666,
+          "trajectories_in_split": 704,
+          "frac_trajectories_kept": 0.5795454545454546
+        },
+        "test": {
+          "tasks": 76,
+          "trajectories": 339,
+          "states": 66858,
+          "tasks_with_rows": 83,
+          "trajectories_with_rows": 432,
+          "rows": 93395,
+          "n_pos": 122,
+          "pos_rate": 0.0018247629303897812,
+          "trajectories_in_split": 727,
+          "frac_trajectories_kept": 0.46629986244841815
+        },
+        "split_groups": {
+          "train": 385,
+          "val": 82,
+          "test": 83
+        },
+        "generations_unassigned": 1173,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2434,
+          "states": 454474,
+          "generations": 5804,
+          "frac_generations_kept": 0.41936595451412817
+        },
+        "test_tasks_shared_with_k0_test": 18,
+        "test_tasks_not_in_k0_test": 65,
+        "same_rows_as_first_probe": true,
+        "stored": {
+          "layer": 0,
+          "train": 312616,
+          "val": 75000,
+          "test": 66858,
+          "n_pos_test": 122
+        },
+        "figure_n_test": 66858
+      }
+    }
+  },
+  "legacy": {
+    "currently_compiles": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 329,
+          "trajectories": 2479,
+          "states": 1732509,
+          "tasks_with_rows": 373,
+          "trajectories_with_rows": 3073,
+          "rows": 2148634,
+          "n_pos": 1122995,
+          "pos_rate": 0.6481899949726091,
+          "trajectories_in_split": 3073,
+          "frac_trajectories_kept": 0.8067035470224536,
+          "rows_in_window": 2148634
+        },
+        "val": {
+          "tasks": 195,
+          "trajectories": 1659,
+          "states": 1253597,
+          "tasks_with_rows": 204,
+          "trajectories_with_rows": 1763,
+          "rows": 1310997,
+          "n_pos": 742990,
+          "pos_rate": 0.5926864853697001,
+          "trajectories_in_split": 1763,
+          "frac_trajectories_kept": 0.9410096426545661,
+          "rows_in_window": 1310997
+        },
+        "test": {
+          "tasks": 105,
+          "trajectories": 765,
+          "states": 488455,
+          "tasks_with_rows": 117,
+          "trajectories_with_rows": 968,
+          "rows": 618438,
+          "n_pos": 192334,
+          "pos_rate": 0.39375991647132286,
+          "trajectories_in_split": 968,
+          "frac_trajectories_kept": 0.7902892561983471,
+          "rows_in_window": 618438
+        },
+        "split_groups": {
+          "train": 288,
+          "val": 61,
+          "test": 63
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 117,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1732509,
+          "val": 1253597,
+          "test": 488455,
+          "n_pos_test": 192334
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 471,
+          "trajectories": 3587,
+          "states": 1918022,
+          "tasks_with_rows": 516,
+          "trajectories_with_rows": 4307,
+          "rows": 3115130,
+          "n_pos": 1093079,
+          "pos_rate": 0.5698990939624259,
+          "trajectories_in_split": 4307,
+          "frac_trajectories_kept": 0.8328302762944044,
+          "rows_in_window": 2268782
+        },
+        "val": {
+          "tasks": 100,
+          "trajectories": 726,
+          "states": 334095,
+          "tasks_with_rows": 113,
+          "trajectories_with_rows": 923,
+          "rows": 601825,
+          "n_pos": 179329,
+          "pos_rate": 0.5367605022523534,
+          "trajectories_in_split": 923,
+          "frac_trajectories_kept": 0.7865655471289275,
+          "rows_in_window": 420904
+        },
+        "test": {
+          "tasks": 56,
+          "trajectories": 426,
+          "states": 197922,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 544,
+          "rows": 359055,
+          "n_pos": 136618,
+          "pos_rate": 0.6902618203130526,
+          "trajectories_in_split": 544,
+          "frac_trajectories_kept": 0.7830882352941176,
+          "rows_in_window": 243657
+        },
+        "split_groups": {
+          "train": 286,
+          "val": 61,
+          "test": 62
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 627,
+          "trajectories": 4739,
+          "states": 2450039,
+          "generations": 5804,
+          "frac_generations_kept": 0.8165058580289456
+        },
+        "test_tasks_shared_with_k0_test": 23,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1918022,
+          "val": 334095,
+          "test": 197922,
+          "n_pos_test": 136618
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 345,
+          "trajectories": 1642,
+          "states": 486601,
+          "tasks_with_rows": 423,
+          "trajectories_with_rows": 3502,
+          "rows": 2572396,
+          "n_pos": 289919,
+          "pos_rate": 0.5958043653835483,
+          "trajectories_in_split": 3502,
+          "frac_trajectories_kept": 0.4688749286122216,
+          "rows_in_window": 665423
+        },
+        "val": {
+          "tasks": 42,
+          "trajectories": 169,
+          "states": 50407,
+          "tasks_with_rows": 47,
+          "trajectories_with_rows": 438,
+          "rows": 349749,
+          "n_pos": 31881,
+          "pos_rate": 0.6324716805205626,
+          "trajectories_in_split": 438,
+          "frac_trajectories_kept": 0.3858447488584475,
+          "rows_in_window": 84602
+        },
+        "test": {
+          "tasks": 109,
+          "trajectories": 626,
+          "states": 182635,
+          "tasks_with_rows": 129,
+          "trajectories_with_rows": 1107,
+          "rows": 862858,
+          "n_pos": 72152,
+          "pos_rate": 0.3950611876146412,
+          "trajectories_in_split": 1107,
+          "frac_trajectories_kept": 0.5654923215898826,
+          "rows_in_window": 213525
+        },
+        "split_groups": {
+          "train": 221,
+          "val": 47,
+          "test": 49
+        },
+        "generations_unassigned": 757,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2437,
+          "states": 719643,
+          "generations": 5804,
+          "frac_generations_kept": 0.4198828394210889
+        },
+        "test_tasks_shared_with_k0_test": 8,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 486601,
+          "val": 50407,
+          "test": 182635,
+          "n_pos_test": 72152
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_correct": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 329,
+          "trajectories": 2479,
+          "states": 1732509,
+          "tasks_with_rows": 373,
+          "trajectories_with_rows": 3073,
+          "rows": 2148634,
+          "n_pos": 138870,
+          "pos_rate": 0.08015542776401162,
+          "trajectories_in_split": 3073,
+          "frac_trajectories_kept": 0.8067035470224536,
+          "rows_in_window": 2148634
+        },
+        "val": {
+          "tasks": 195,
+          "trajectories": 1659,
+          "states": 1253597,
+          "tasks_with_rows": 204,
+          "trajectories_with_rows": 1763,
+          "rows": 1310997,
+          "n_pos": 74400,
+          "pos_rate": 0.059349216694041224,
+          "trajectories_in_split": 1763,
+          "frac_trajectories_kept": 0.9410096426545661,
+          "rows_in_window": 1310997
+        },
+        "test": {
+          "tasks": 105,
+          "trajectories": 765,
+          "states": 488455,
+          "tasks_with_rows": 117,
+          "trajectories_with_rows": 968,
+          "rows": 618438,
+          "n_pos": 37789,
+          "pos_rate": 0.0773643426723035,
+          "trajectories_in_split": 968,
+          "frac_trajectories_kept": 0.7902892561983471,
+          "rows_in_window": 618438
+        },
+        "split_groups": {
+          "train": 288,
+          "val": 61,
+          "test": 63
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 117,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1732509,
+          "val": 1253597,
+          "test": 488455,
+          "n_pos_test": 37789
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 471,
+          "trajectories": 3587,
+          "states": 1918022,
+          "tasks_with_rows": 516,
+          "trajectories_with_rows": 4307,
+          "rows": 3115130,
+          "n_pos": 73585,
+          "pos_rate": 0.03836504482221789,
+          "trajectories_in_split": 4307,
+          "frac_trajectories_kept": 0.8328302762944044,
+          "rows_in_window": 2268782
+        },
+        "val": {
+          "tasks": 100,
+          "trajectories": 726,
+          "states": 334095,
+          "tasks_with_rows": 113,
+          "trajectories_with_rows": 923,
+          "rows": 601825,
+          "n_pos": 16539,
+          "pos_rate": 0.049503883625914784,
+          "trajectories_in_split": 923,
+          "frac_trajectories_kept": 0.7865655471289275,
+          "rows_in_window": 420904
+        },
+        "test": {
+          "tasks": 56,
+          "trajectories": 426,
+          "states": 197922,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 544,
+          "rows": 359055,
+          "n_pos": 6738,
+          "pos_rate": 0.03404371419043866,
+          "trajectories_in_split": 544,
+          "frac_trajectories_kept": 0.7830882352941176,
+          "rows_in_window": 243657
+        },
+        "split_groups": {
+          "train": 286,
+          "val": 61,
+          "test": 62
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 627,
+          "trajectories": 4739,
+          "states": 2450039,
+          "generations": 5804,
+          "frac_generations_kept": 0.8165058580289456
+        },
+        "test_tasks_shared_with_k0_test": 23,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1918022,
+          "val": 334095,
+          "test": 197922,
+          "n_pos_test": 6738
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 345,
+          "trajectories": 1642,
+          "states": 486601,
+          "tasks_with_rows": 423,
+          "trajectories_with_rows": 3502,
+          "rows": 2572396,
+          "n_pos": 8327,
+          "pos_rate": 0.017112582999212908,
+          "trajectories_in_split": 3502,
+          "frac_trajectories_kept": 0.4688749286122216,
+          "rows_in_window": 665423
+        },
+        "val": {
+          "tasks": 42,
+          "trajectories": 169,
+          "states": 50407,
+          "tasks_with_rows": 47,
+          "trajectories_with_rows": 438,
+          "rows": 349749,
+          "n_pos": 437,
+          "pos_rate": 0.008669430833019224,
+          "trajectories_in_split": 438,
+          "frac_trajectories_kept": 0.3858447488584475,
+          "rows_in_window": 84602
+        },
+        "test": {
+          "tasks": 109,
+          "trajectories": 626,
+          "states": 182635,
+          "tasks_with_rows": 129,
+          "trajectories_with_rows": 1107,
+          "rows": 862858,
+          "n_pos": 288,
+          "pos_rate": 0.0015769157061899417,
+          "trajectories_in_split": 1107,
+          "frac_trajectories_kept": 0.5654923215898826,
+          "rows_in_window": 213525
+        },
+        "split_groups": {
+          "train": 221,
+          "val": 47,
+          "test": 49
+        },
+        "generations_unassigned": 757,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2437,
+          "states": 719643,
+          "generations": 5804,
+          "frac_generations_kept": 0.4198828394210889
+        },
+        "test_tasks_shared_with_k0_test": 8,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 486601,
+          "val": 50407,
+          "test": 182635,
+          "n_pos_test": 288
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_reduces_failing": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 329,
+          "trajectories": 2479,
+          "states": 1732509,
+          "tasks_with_rows": 373,
+          "trajectories_with_rows": 3073,
+          "rows": 2148634,
+          "n_pos": 214993,
+          "pos_rate": 0.12409343905284186,
+          "trajectories_in_split": 3073,
+          "frac_trajectories_kept": 0.8067035470224536,
+          "rows_in_window": 2148634
+        },
+        "val": {
+          "tasks": 195,
+          "trajectories": 1659,
+          "states": 1253597,
+          "tasks_with_rows": 204,
+          "trajectories_with_rows": 1763,
+          "rows": 1310997,
+          "n_pos": 52856,
+          "pos_rate": 0.04216347039758391,
+          "trajectories_in_split": 1763,
+          "frac_trajectories_kept": 0.9410096426545661,
+          "rows_in_window": 1310997
+        },
+        "test": {
+          "tasks": 105,
+          "trajectories": 765,
+          "states": 488455,
+          "tasks_with_rows": 117,
+          "trajectories_with_rows": 968,
+          "rows": 618438,
+          "n_pos": 44111,
+          "pos_rate": 0.09030719308841142,
+          "trajectories_in_split": 968,
+          "frac_trajectories_kept": 0.7902892561983471,
+          "rows_in_window": 618438
+        },
+        "split_groups": {
+          "train": 288,
+          "val": 61,
+          "test": 63
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 117,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1732509,
+          "val": 1253597,
+          "test": 488455,
+          "n_pos_test": 44111
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 471,
+          "trajectories": 3587,
+          "states": 1918022,
+          "tasks_with_rows": 516,
+          "trajectories_with_rows": 4307,
+          "rows": 3115130,
+          "n_pos": 105853,
+          "pos_rate": 0.05518862661637875,
+          "trajectories_in_split": 4307,
+          "frac_trajectories_kept": 0.8328302762944044,
+          "rows_in_window": 2268782
+        },
+        "val": {
+          "tasks": 100,
+          "trajectories": 726,
+          "states": 334095,
+          "tasks_with_rows": 113,
+          "trajectories_with_rows": 923,
+          "rows": 601825,
+          "n_pos": 23145,
+          "pos_rate": 0.06927670273425224,
+          "trajectories_in_split": 923,
+          "frac_trajectories_kept": 0.7865655471289275,
+          "rows_in_window": 420904
+        },
+        "test": {
+          "tasks": 56,
+          "trajectories": 426,
+          "states": 197922,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 544,
+          "rows": 359055,
+          "n_pos": 12401,
+          "pos_rate": 0.0626559957963238,
+          "trajectories_in_split": 544,
+          "frac_trajectories_kept": 0.7830882352941176,
+          "rows_in_window": 243657
+        },
+        "split_groups": {
+          "train": 286,
+          "val": 61,
+          "test": 62
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 627,
+          "trajectories": 4739,
+          "states": 2450039,
+          "generations": 5804,
+          "frac_generations_kept": 0.8165058580289456
+        },
+        "test_tasks_shared_with_k0_test": 23,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1918022,
+          "val": 334095,
+          "test": 197922,
+          "n_pos_test": 12401
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 345,
+          "trajectories": 1642,
+          "states": 486601,
+          "tasks_with_rows": 423,
+          "trajectories_with_rows": 3502,
+          "rows": 2572396,
+          "n_pos": 8863,
+          "pos_rate": 0.01821410149177663,
+          "trajectories_in_split": 3502,
+          "frac_trajectories_kept": 0.4688749286122216,
+          "rows_in_window": 665423
+        },
+        "val": {
+          "tasks": 42,
+          "trajectories": 169,
+          "states": 50407,
+          "tasks_with_rows": 47,
+          "trajectories_with_rows": 438,
+          "rows": 349749,
+          "n_pos": 853,
+          "pos_rate": 0.016922252861705716,
+          "trajectories_in_split": 438,
+          "frac_trajectories_kept": 0.3858447488584475,
+          "rows_in_window": 84602
+        },
+        "test": {
+          "tasks": 109,
+          "trajectories": 626,
+          "states": 182635,
+          "tasks_with_rows": 129,
+          "trajectories_with_rows": 1107,
+          "rows": 862858,
+          "n_pos": 1428,
+          "pos_rate": 0.00781887370985846,
+          "trajectories_in_split": 1107,
+          "frac_trajectories_kept": 0.5654923215898826,
+          "rows_in_window": 213525
+        },
+        "split_groups": {
+          "train": 221,
+          "val": 47,
+          "test": 49
+        },
+        "generations_unassigned": 757,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2437,
+          "states": 719643,
+          "generations": 5804,
+          "frac_generations_kept": 0.4198828394210889
+        },
+        "test_tasks_shared_with_k0_test": 8,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 486601,
+          "val": 50407,
+          "test": 182635,
+          "n_pos_test": 1428
+        },
+        "matches_stored": true
+      }
+    },
+    "currently_has_regressions": {
+      "rows_mismatch_n_captured_steps": 0,
+      "step_idx_max_plus1_equals_n_turns": 1.0,
+      "k0": {
+        "train": {
+          "tasks": 329,
+          "trajectories": 2479,
+          "states": 1732509,
+          "tasks_with_rows": 373,
+          "trajectories_with_rows": 3073,
+          "rows": 2148634,
+          "n_pos": 58431,
+          "pos_rate": 0.03372623172520316,
+          "trajectories_in_split": 3073,
+          "frac_trajectories_kept": 0.8067035470224536,
+          "rows_in_window": 2148634
+        },
+        "val": {
+          "tasks": 195,
+          "trajectories": 1659,
+          "states": 1253597,
+          "tasks_with_rows": 204,
+          "trajectories_with_rows": 1763,
+          "rows": 1310997,
+          "n_pos": 8622,
+          "pos_rate": 0.006877808418494939,
+          "trajectories_in_split": 1763,
+          "frac_trajectories_kept": 0.9410096426545661,
+          "rows_in_window": 1310997
+        },
+        "test": {
+          "tasks": 105,
+          "trajectories": 765,
+          "states": 488455,
+          "tasks_with_rows": 117,
+          "trajectories_with_rows": 968,
+          "rows": 618438,
+          "n_pos": 6678,
+          "pos_rate": 0.013671679069719831,
+          "trajectories_in_split": 968,
+          "frac_trajectories_kept": 0.7902892561983471,
+          "rows_in_window": 618438
+        },
+        "split_groups": {
+          "train": 288,
+          "val": 61,
+          "test": 63
+        },
+        "generations_unassigned": 0,
+        "all": {
+          "tasks": 629,
+          "trajectories": 4903,
+          "states": 3474561,
+          "generations": 5804,
+          "frac_generations_kept": 0.8447622329427981
+        },
+        "test_tasks_shared_with_k0_test": 117,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1732509,
+          "val": 1253597,
+          "test": 488455,
+          "n_pos_test": 6678
+        },
+        "matches_stored": true
+      },
+      "max15": {
+        "train": {
+          "tasks": 471,
+          "trajectories": 3587,
+          "states": 1918022,
+          "tasks_with_rows": 516,
+          "trajectories_with_rows": 4307,
+          "rows": 3115130,
+          "n_pos": 30645,
+          "pos_rate": 0.015977397548099032,
+          "trajectories_in_split": 4307,
+          "frac_trajectories_kept": 0.8328302762944044,
+          "rows_in_window": 2268782
+        },
+        "val": {
+          "tasks": 100,
+          "trajectories": 726,
+          "states": 334095,
+          "tasks_with_rows": 113,
+          "trajectories_with_rows": 923,
+          "rows": 601825,
+          "n_pos": 4312,
+          "pos_rate": 0.01290650862778551,
+          "trajectories_in_split": 923,
+          "frac_trajectories_kept": 0.7865655471289275,
+          "rows_in_window": 420904
+        },
+        "test": {
+          "tasks": 56,
+          "trajectories": 426,
+          "states": 197922,
+          "tasks_with_rows": 62,
+          "trajectories_with_rows": 544,
+          "rows": 359055,
+          "n_pos": 2717,
+          "pos_rate": 0.01372763007649478,
+          "trajectories_in_split": 544,
+          "frac_trajectories_kept": 0.7830882352941176,
+          "rows_in_window": 243657
+        },
+        "split_groups": {
+          "train": 286,
+          "val": 61,
+          "test": 62
+        },
+        "generations_unassigned": 30,
+        "all": {
+          "tasks": 627,
+          "trajectories": 4739,
+          "states": 2450039,
+          "generations": 5804,
+          "frac_generations_kept": 0.8165058580289456
+        },
+        "test_tasks_shared_with_k0_test": 23,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 1918022,
+          "val": 334095,
+          "test": 197922,
+          "n_pos_test": 2717
+        },
+        "matches_stored": true
+      },
+      "max50": {
+        "train": {
+          "tasks": 345,
+          "trajectories": 1642,
+          "states": 486601,
+          "tasks_with_rows": 423,
+          "trajectories_with_rows": 3502,
+          "rows": 2572396,
+          "n_pos": 1978,
+          "pos_rate": 0.004064932049050454,
+          "trajectories_in_split": 3502,
+          "frac_trajectories_kept": 0.4688749286122216,
+          "rows_in_window": 665423
+        },
+        "val": {
+          "tasks": 42,
+          "trajectories": 169,
+          "states": 50407,
+          "tasks_with_rows": 47,
+          "trajectories_with_rows": 438,
+          "rows": 349749,
+          "n_pos": 411,
+          "pos_rate": 0.008153629456226318,
+          "trajectories_in_split": 438,
+          "frac_trajectories_kept": 0.3858447488584475,
+          "rows_in_window": 84602
+        },
+        "test": {
+          "tasks": 109,
+          "trajectories": 626,
+          "states": 182635,
+          "tasks_with_rows": 129,
+          "trajectories_with_rows": 1107,
+          "rows": 862858,
+          "n_pos": 29,
+          "pos_rate": 0.00015878665097051497,
+          "trajectories_in_split": 1107,
+          "frac_trajectories_kept": 0.5654923215898826,
+          "rows_in_window": 213525
+        },
+        "split_groups": {
+          "train": 221,
+          "val": 47,
+          "test": 49
+        },
+        "generations_unassigned": 757,
+        "all": {
+          "tasks": 496,
+          "trajectories": 2437,
+          "states": 719643,
+          "generations": 5804,
+          "frac_generations_kept": 0.4198828394210889
+        },
+        "test_tasks_shared_with_k0_test": 8,
+        "test_groups": null,
+        "stored": {
+          "layer": 0,
+          "train": 486601,
+          "val": 50407,
+          "test": 182635,
+          "n_pos_test": 29
+        },
+        "matches_stored": true
+      }
+    }
+  }
+}

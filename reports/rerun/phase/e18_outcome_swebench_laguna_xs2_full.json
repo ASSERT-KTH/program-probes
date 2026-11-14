@@ -1,0 +1,115 @@
+{
+  "mode": "outcome",
+  "bench": "swebench",
+  "outputs_dir": "outputs/swebench/laguna_xs2_full",
+  "n_trajectories": 4991,
+  "yT_vs_outcome": {
+    "yT=1,outcome=1": 2806,
+    "yT=none,outcome=0": 315,
+    "yT=0,outcome=0": 1763,
+    "yT=1,outcome=0": 43,
+    "yT=0,outcome=1": 63,
+    "yT=none,outcome=1": 1
+  },
+  "yT_agreement": {
+    "n_defined": 4675,
+    "agree": 4569,
+    "agreement": 0.9773262032085561
+  },
+  "last_edit_vs_outcome": {
+    "last_edit=1,outcome=1": 2814,
+    "last_edit=none,outcome=0": 314,
+    "last_edit=0,outcome=0": 1768,
+    "last_edit=1,outcome=0": 39,
+    "last_edit=0,outcome=1": 55,
+    "last_edit=none,outcome=1": 1
+  },
+  "last_edit_agreement": {
+    "n_defined": 4676,
+    "agree": 4582,
+    "agreement": 0.9798973481608212
+  },
+  "n_last_edit_in_last_turn": 92,
+  "disagreement_examples": [
+    {
+      "sample_id": "astropy__astropy-13236_run07",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 81,
+      "last_edit_cmd_idx": 74
+    },
+    {
+      "sample_id": "astropy__astropy-14369_run07",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 80,
+      "last_edit_cmd_idx": 64
+    },
+    {
+      "sample_id": "django__django-10097",
+      "yT": "0",
+      "outcome": "1",
+      "last_edit": "0",
+      "n_turns": 80,
+      "last_edit_cmd_idx": 77
+    },
+    {
+      "sample_id": "django__django-10097_run01",
+      "yT": "0",
+      "outcome": "1",
+      "last_edit": "0",
+      "n_turns": 52,
+      "last_edit_cmd_idx": 44
+    },
+    {
+      "sample_id": "django__django-10097_run02",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 83,
+      "last_edit_cmd_idx": 54
+    },
+    {
+      "sample_id": "django__django-10097_run04",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 46,
+      "last_edit_cmd_idx": 19
+    },
+    {
+      "sample_id": "django__django-10097_run07",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 82,
+      "last_edit_cmd_idx": 80
+    },
+    {
+      "sample_id": "django__django-10097_run08",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 80,
+      "last_edit_cmd_idx": 66
+    },
+    {
+      "sample_id": "django__django-10914_run01",
+      "yT": "1",
+      "outcome": "0",
+      "last_edit": "1",
+      "n_turns": 85,
+      "last_edit_cmd_idx": 16
+    },
+    {
+      "sample_id": "django__django-11141_run02",
+      "yT": "0",
+      "outcome": "1",
+      "last_edit": "0",
+      "n_turns": 88,
+      "last_edit_cmd_idx": 69
+    }
+  ]
+}

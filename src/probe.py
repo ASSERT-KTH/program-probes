@@ -1,4 +1,7 @@
+import contextlib
+import fcntl
 import math
+import os
 import random
 import copy
 import numpy as np
@@ -90,6 +93,30 @@ def _shuffle_by_trajectory(y: torch.Tensor, sample_ids: list[str]) -> torch.Tens
         src = [d_idx[round(j * (n_d - 1) / max(n_r - 1, 1))] for j in range(n_r)]
         out[r_idx] = y[src]
     return out
+
+
+@contextlib.contextmanager
+def _locked(lock_path: Path):
+    """Exclusive fcntl lock (works across nodes on the shared project filesystem)."""
+    with open(lock_path, "w") as f:
+        fcntl.lockf(f, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.lockf(f, fcntl.LOCK_UN)
+
+
+def _atomic_save(obj, path: Path) -> None:
+    tmp = path.with_name(f".{path.name}.tmp{os.getpid()}")
+    torch.save(obj, tmp)
+    os.replace(tmp, path)
+
+
+def _shuffle_labels(y: torch.Tensor, sample_ids: list[str], unit: str) -> torch.Tensor:
+    """Shuffle labels per token or per trajectory (see _shuffle_by_trajectory)."""
+    if unit == "trajectory":
+        return _shuffle_by_trajectory(y, sample_ids)
+    return y[torch.randperm(len(y))]
 
 
 def _compute_ece(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> float:
@@ -224,14 +251,12 @@ def train_probe_layer(
         H_val, y_val = bin_H[val_mask], bin_y[val_mask]
         H_test, y_test = bin_H[test_mask], bin_y[test_mask]
 
-        if shuffle_labels and shuffle_unit == "trajectory":
-            y_train = _shuffle_by_trajectory(y_train, [s for s, m in zip(bin_samples, train_mask.tolist()) if m])
-            y_val   = _shuffle_by_trajectory(y_val, [s for s, m in zip(bin_samples, val_mask.tolist()) if m])
-            y_test  = _shuffle_by_trajectory(y_test, [s for s, m in zip(bin_samples, test_mask.tolist()) if m])
-        elif shuffle_labels:
-            y_train = y_train[torch.randperm(len(y_train))]
-            y_val   = y_val[torch.randperm(len(y_val))]
-            y_test  = y_test[torch.randperm(len(y_test))]
+        # Null control: train and early-stop on shuffled labels, but score against the
+        # real test labels — shuffling y_test too would pin test AUC at ~0.5 regardless
+        # of what the probe learned.
+        if shuffle_labels:
+            y_train = _shuffle_labels(y_train, [s for s, m in zip(bin_samples, train_mask.tolist()) if m], shuffle_unit)
+            y_val   = _shuffle_labels(y_val, [s for s, m in zip(bin_samples, val_mask.tolist()) if m], shuffle_unit)
         rel_pos_val  = bin_rel_pos[val_mask]
         rel_pos_test = bin_rel_pos[test_mask]
         step_idx_val  = bin_step_idx[val_mask]  if bin_step_idx is not None else None
@@ -640,21 +665,32 @@ def run_final(
     out = Path(results_dir) / run_id / probe_name
     out.mkdir(parents=True, exist_ok=True)
 
-    results_path = out / "results.pt"
-    if results_path.exists():
-        existing = torch.load(results_path, weights_only=False)
-        existing.update(all_results)
-        all_results = existing
-
-    weights_path = out / "weights.pt"
-    if weights_path.exists():
-        existing_w = torch.load(weights_path, weights_only=False)
-        existing_w.update(all_weights)
-        all_weights = existing_w
-
-    torch.save(all_results, results_path)
-    torch.save(all_weights, weights_path)
+    all_results = _merge_save(out, all_results, all_weights)
     return {layer: [vars(r) for r in rs] for layer, rs in all_results.items()}
+
+
+def _merge_save(out: Path, all_results: dict, all_weights: dict) -> dict:
+    """Merge per-layer results/weights into out/{results,weights}.pt and return merged results.
+
+    Per-layer jobs of the same run write to the same files; the read-merge-write is
+    locked so concurrent jobs neither read a half-written file nor drop each other's layers.
+    """
+    results_path = out / "results.pt"
+    weights_path = out / "weights.pt"
+    with _locked(out / ".merge.lock"):
+        if results_path.exists():
+            existing = torch.load(results_path, weights_only=False)
+            existing.update(all_results)
+            all_results = existing
+
+        if weights_path.exists():
+            existing_w = torch.load(weights_path, weights_only=False)
+            existing_w.update(all_weights)
+            all_weights = existing_w
+
+        _atomic_save(all_results, results_path)
+        _atomic_save(all_weights, weights_path)
+    return all_results
 
 
 def _compute_nll_correlation(

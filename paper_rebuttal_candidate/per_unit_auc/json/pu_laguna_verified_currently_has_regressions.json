@@ -1,0 +1,66 @@
+{
+ "mode": "per_unit_auc",
+ "run": "laguna_verified",
+ "bench": "swebench",
+ "pooled": "laguna_xs2_full_pooled",
+ "probe": "currently_has_regressions",
+ "layer": 20,
+ "stored_test_auc": 0.6954518796587461,
+ "n_boot": 1000,
+ "score": "P(y=1)",
+ "counts": {
+  "n_test_tokens": 1130891,
+  "n_pos_tokens": 125685,
+  "n_test_tasks": 75,
+  "n_test_trajectories": 706,
+  "n_test_versions": 2836,
+  "n_versions_label_not_constant": 0,
+  "n_test_versions_used": 2836,
+  "share_versions_label1": 0.12094499294781383,
+  "share_versions_label0": 0.8790550070521862,
+  "n_versions_label1": 343,
+  "n_versions_label0": 2493,
+  "tokens_per_trajectory": {
+   "median": 1224.5,
+   "max": 11242
+  },
+  "tokens_per_version": {
+   "median": 224.0,
+   "max": 8361
+  },
+  "versions_per_trajectory": {
+   "median": 3.0,
+   "max": 29
+  }
+ },
+ "auc": {
+  "pooled": 0.6954518796587461,
+  "per_traj": 0.7508229920461711,
+  "per_version": 0.7734835381634173,
+  "per_traj-pooled": 0.05537111238742498,
+  "per_version-pooled": 0.0780316585046712
+ },
+ "ci95": {
+  "pooled": [
+   0.6286260472053077,
+   0.7583217903018858
+  ],
+  "per_traj": [
+   0.7039925145873611,
+   0.8032144915578333
+  ],
+  "per_version": [
+   0.6987346276057907,
+   0.8429300118697276
+  ],
+  "per_traj-pooled": [
+   0.023262241858441012,
+   0.08761468913862033
+  ],
+  "per_version-pooled": [
+   0.025534821083312405,
+   0.12554616314957645
+  ]
+ },
+ "label_violations": []
+}

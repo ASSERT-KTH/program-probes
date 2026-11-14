@@ -1,0 +1,58 @@
+\begin{table*}[t]
+\centering
+\caption{Cross-dataset transfer AUC, pooled over test tokens. Gray rows show in-distribution reference performance. Transfer rows show AUC when probe weights trained on one dataset are evaluated on the other; the subscript shows the delta relative to the in-distribution baseline on the \emph{same} evaluation set.}
+\label{tab:transfer}
+\begin{tabular}{lccccc}
+\toprule
+ & Layer 1 & Layer 11 & Layer 21 & Layer 31 & Layer 40 \\
+\midrule
+\multicolumn{6}{l}{\textit{\Syntactic{}}} \\
+\quad{}\textit{Laguna-XS.2} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.659} & \textcolor{gray}{\small 0.691} & \textcolor{gray}{\small 0.665} & \textcolor{gray}{\small 0.685} & \textcolor{gray}{\small 0.650} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.746} & \textcolor{gray}{\small 0.786} & \textcolor{gray}{\small 0.771} & \textcolor{gray}{\small 0.770} & \textcolor{gray}{\small 0.777} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.481\,{\scriptsize \textcolor{red!70!black}{$-0.265$}} & 0.516\,{\scriptsize \textcolor{red!70!black}{$-0.270$}} & 0.515\,{\scriptsize \textcolor{red!70!black}{$-0.256$}} & 0.538\,{\scriptsize \textcolor{red!70!black}{$-0.232$}} & 0.497\,{\scriptsize \textcolor{red!70!black}{$-0.280$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.475\,{\scriptsize \textcolor{red!70!black}{$-0.185$}} & 0.493\,{\scriptsize \textcolor{red!70!black}{$-0.198$}} & 0.530\,{\scriptsize \textcolor{red!70!black}{$-0.134$}} & 0.505\,{\scriptsize \textcolor{red!70!black}{$-0.181$}} & 0.472\,{\scriptsize \textcolor{red!70!black}{$-0.179$}}  \\
+\quad{}\textit{Qwen3.6-35B-A3B} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.682} & \textcolor{gray}{\small 0.781} & \textcolor{gray}{\small 0.762} & \textcolor{gray}{\small 0.771} & \textcolor{gray}{\small 0.736} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.750} & \textcolor{gray}{\small 0.718} & \textcolor{gray}{\small 0.711} & \textcolor{gray}{\small 0.718} & \textcolor{gray}{\small 0.720} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.591\,{\scriptsize \textcolor{red!70!black}{$-0.160$}} & 0.524\,{\scriptsize \textcolor{red!70!black}{$-0.194$}} & 0.522\,{\scriptsize \textcolor{red!70!black}{$-0.189$}} & 0.514\,{\scriptsize \textcolor{red!70!black}{$-0.204$}} & 0.505\,{\scriptsize \textcolor{red!70!black}{$-0.215$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.492\,{\scriptsize \textcolor{red!70!black}{$-0.190$}} & 0.512\,{\scriptsize \textcolor{red!70!black}{$-0.270$}} & 0.547\,{\scriptsize \textcolor{red!70!black}{$-0.214$}} & 0.508\,{\scriptsize \textcolor{red!70!black}{$-0.264$}} & 0.460\,{\scriptsize \textcolor{red!70!black}{$-0.275$}}  \\
+\midrule
+\multicolumn{6}{l}{\textit{\Semantic{}}} \\
+\quad{}\textit{Laguna-XS.2} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.686} & \textcolor{gray}{\small 0.770} & \textcolor{gray}{\small 0.788} & \textcolor{gray}{\small 0.767} & \textcolor{gray}{\small 0.724} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.642} & \textcolor{gray}{\small 0.761} & \textcolor{gray}{\small 0.794} & \textcolor{gray}{\small 0.772} & \textcolor{gray}{\small 0.723} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.573\,{\scriptsize \textcolor{red!70!black}{$-0.069$}} & 0.718\,{\scriptsize \textcolor{red!70!black}{$-0.043$}} & 0.778\,{\scriptsize \textcolor{red!70!black}{$-0.016$}} & 0.728\,{\scriptsize \textcolor{red!70!black}{$-0.044$}} & 0.635\,{\scriptsize \textcolor{red!70!black}{$-0.088$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.565\,{\scriptsize \textcolor{red!70!black}{$-0.120$}} & 0.714\,{\scriptsize \textcolor{red!70!black}{$-0.056$}} & 0.750\,{\scriptsize \textcolor{red!70!black}{$-0.038$}} & 0.715\,{\scriptsize \textcolor{red!70!black}{$-0.051$}} & 0.662\,{\scriptsize \textcolor{red!70!black}{$-0.063$}}  \\
+\quad{}\textit{Qwen3.6-35B-A3B} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.695} & \textcolor{gray}{\small 0.822} & \textcolor{gray}{\small 0.836} & \textcolor{gray}{\small 0.838} & \textcolor{gray}{\small 0.805} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.637} & \textcolor{gray}{\small 0.802} & \textcolor{gray}{\small 0.815} & \textcolor{gray}{\small 0.822} & \textcolor{gray}{\small 0.759} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.621\,{\scriptsize \textcolor{red!70!black}{$-0.016$}} & 0.794\,{\scriptsize \textcolor{red!70!black}{$-0.008$}} & 0.813\,{\scriptsize \textcolor{red!70!black}{$-0.002$}} & 0.820\,{\scriptsize \textcolor{red!70!black}{$-0.001$}} & 0.782\,{\scriptsize \textcolor{green!50!black}{$+0.023$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.593\,{\scriptsize \textcolor{red!70!black}{$-0.101$}} & 0.758\,{\scriptsize \textcolor{red!70!black}{$-0.064$}} & 0.755\,{\scriptsize \textcolor{red!70!black}{$-0.081$}} & 0.747\,{\scriptsize \textcolor{red!70!black}{$-0.091$}} & 0.695\,{\scriptsize \textcolor{red!70!black}{$-0.110$}}  \\
+\midrule
+\multicolumn{6}{l}{\textit{\RedFail{}}} \\
+\quad{}\textit{Laguna-XS.2} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.671} & \textcolor{gray}{\small 0.741} & \textcolor{gray}{\small 0.773} & \textcolor{gray}{\small 0.747} & \textcolor{gray}{\small 0.693} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.697} & \textcolor{gray}{\small 0.775} & \textcolor{gray}{\small 0.780} & \textcolor{gray}{\small 0.774} & \textcolor{gray}{\small 0.745} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.555\,{\scriptsize \textcolor{red!70!black}{$-0.143$}} & 0.623\,{\scriptsize \textcolor{red!70!black}{$-0.152$}} & 0.693\,{\scriptsize \textcolor{red!70!black}{$-0.087$}} & 0.656\,{\scriptsize \textcolor{red!70!black}{$-0.119$}} & 0.568\,{\scriptsize \textcolor{red!70!black}{$-0.178$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.524\,{\scriptsize \textcolor{red!70!black}{$-0.147$}} & 0.661\,{\scriptsize \textcolor{red!70!black}{$-0.079$}} & 0.702\,{\scriptsize \textcolor{red!70!black}{$-0.071$}} & 0.680\,{\scriptsize \textcolor{red!70!black}{$-0.067$}} & 0.631\,{\scriptsize \textcolor{red!70!black}{$-0.062$}}  \\
+\quad{}\textit{Qwen3.6-35B-A3B} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.694} & \textcolor{gray}{\small 0.822} & \textcolor{gray}{\small 0.832} & \textcolor{gray}{\small 0.832} & \textcolor{gray}{\small 0.796} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.767} & \textcolor{gray}{\small 0.826} & \textcolor{gray}{\small 0.830} & \textcolor{gray}{\small 0.836} & \textcolor{gray}{\small 0.805} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.672\,{\scriptsize \textcolor{red!70!black}{$-0.095$}} & 0.775\,{\scriptsize \textcolor{red!70!black}{$-0.051$}} & 0.779\,{\scriptsize \textcolor{red!70!black}{$-0.051$}} & 0.782\,{\scriptsize \textcolor{red!70!black}{$-0.054$}} & 0.737\,{\scriptsize \textcolor{red!70!black}{$-0.068$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.591\,{\scriptsize \textcolor{red!70!black}{$-0.103$}} & 0.751\,{\scriptsize \textcolor{red!70!black}{$-0.072$}} & 0.766\,{\scriptsize \textcolor{red!70!black}{$-0.066$}} & 0.774\,{\scriptsize \textcolor{red!70!black}{$-0.058$}} & 0.713\,{\scriptsize \textcolor{red!70!black}{$-0.083$}}  \\
+\midrule
+\multicolumn{6}{l}{\textit{\Regressions{}}} \\
+\quad{}\textit{Laguna-XS.2} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.586} & \textcolor{gray}{\small 0.685} & \textcolor{gray}{\small 0.695} & \textcolor{gray}{\small 0.677} & \textcolor{gray}{\small 0.617} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.659} & \textcolor{gray}{\small 0.723} & \textcolor{gray}{\small 0.740} & \textcolor{gray}{\small 0.738} & \textcolor{gray}{\small 0.724} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.536\,{\scriptsize \textcolor{red!70!black}{$-0.123$}} & 0.528\,{\scriptsize \textcolor{red!70!black}{$-0.195$}} & 0.599\,{\scriptsize \textcolor{red!70!black}{$-0.140$}} & 0.576\,{\scriptsize \textcolor{red!70!black}{$-0.162$}} & 0.551\,{\scriptsize \textcolor{red!70!black}{$-0.174$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.542\,{\scriptsize \textcolor{red!70!black}{$-0.044$}} & 0.635\,{\scriptsize \textcolor{red!70!black}{$-0.050$}} & 0.645\,{\scriptsize \textcolor{red!70!black}{$-0.050$}} & 0.629\,{\scriptsize \textcolor{red!70!black}{$-0.048$}} & 0.554\,{\scriptsize \textcolor{red!70!black}{$-0.064$}}  \\
+\quad{}\textit{Qwen3.6-35B-A3B} \\
+\qquad{}\textcolor{gray}{\small In-dist (Verified)} & \textcolor{gray}{\small 0.599} & \textcolor{gray}{\small 0.742} & \textcolor{gray}{\small 0.772} & \textcolor{gray}{\small 0.770} & \textcolor{gray}{\small 0.720} \\
+\qquad{}\textcolor{gray}{\small In-dist (Pro)} & \textcolor{gray}{\small 0.840} & \textcolor{gray}{\small 0.811} & \textcolor{gray}{\small 0.818} & \textcolor{gray}{\small 0.832} & \textcolor{gray}{\small 0.799} \\
+\qquad{}Verified $\rightarrow$ Pro & 0.599\,{\scriptsize \textcolor{red!70!black}{$-0.241$}} & 0.760\,{\scriptsize \textcolor{red!70!black}{$-0.050$}} & 0.765\,{\scriptsize \textcolor{red!70!black}{$-0.054$}} & 0.745\,{\scriptsize \textcolor{red!70!black}{$-0.086$}} & 0.694\,{\scriptsize \textcolor{red!70!black}{$-0.105$}}  \\
+\qquad{}Pro $\rightarrow$ Verified & 0.532\,{\scriptsize \textcolor{red!70!black}{$-0.067$}} & 0.650\,{\scriptsize \textcolor{red!70!black}{$-0.092$}} & 0.657\,{\scriptsize \textcolor{red!70!black}{$-0.115$}} & 0.672\,{\scriptsize \textcolor{red!70!black}{$-0.097$}} & 0.599\,{\scriptsize \textcolor{red!70!black}{$-0.121$}}  \\
+\bottomrule
+\end{tabular}
+\end{table*}

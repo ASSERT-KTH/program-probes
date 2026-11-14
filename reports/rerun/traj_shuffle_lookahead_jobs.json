@@ -1,0 +1,1346 @@
+[
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190492"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190493"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190494"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190495"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190496"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190497"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190498"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190499"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190500"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190501"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190502"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190503"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep of7jxbmp",
+    "job_id": "18190504"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_correct --run-id laguna_xs2_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 1ignu8nv",
+    "job_id": "18190505"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190506"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190507"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190508"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190509"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190510"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190511"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190512"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190513"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190514"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190515"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190516"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190517"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kzy5vsxf",
+    "job_id": "18190518"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 39,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 39 --probe currently_reduces_failing --run-id laguna_xs2_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep s87b9i2v",
+    "job_id": "18190519"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190520"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190521"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190522"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190523"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190524"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep awldi94h",
+    "job_id": "18190525"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190526"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190527"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190528"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190529"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190530"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190531"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190532"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "laguna_xs2_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 2b4gz43k",
+    "job_id": "18190533"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190534"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190535"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190536"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190537"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190538"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190539"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 9budh1dw",
+    "job_id": "18190540"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 9budh1dw",
+    "job_id": "18190541"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190542"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190543"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190544"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep urryxseh",
+    "job_id": "18190545"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 9budh1dw",
+    "job_id": "18190546"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_correct --run-id qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep nvb5ux4w",
+    "job_id": "18190547"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep yb6ghnqx",
+    "job_id": "18190548"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep yb6ghnqx",
+    "job_id": "18190549"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190550"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190551"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190552"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190553"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190554"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 8hoxncr1",
+    "job_id": "18190555"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 8hoxncr1",
+    "job_id": "18190556"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 8hoxncr1",
+    "job_id": "18190557"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 8hoxncr1",
+    "job_id": "18190558"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 8hoxncr1",
+    "job_id": "18190559"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep bx2g093v",
+    "job_id": "18190560"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep yb6ghnqx",
+    "job_id": "18190561"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190562"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 7ijcg8wg",
+    "job_id": "18190563"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 7ijcg8wg",
+    "job_id": "18190564"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 7ijcg8wg",
+    "job_id": "18190565"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 7ijcg8wg",
+    "job_id": "18190566"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190567"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190568"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190569"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190570"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190571"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 6ae5htfc",
+    "job_id": "18190572"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190573"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 35nj16o7",
+    "job_id": "18190574"
+  },
+  {
+    "bench": "swebench",
+    "run_id": "qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_has_regressions --run-id qwen36_35b_a3b_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench --results-dir results/swebench --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kinzx0iy",
+    "job_id": "18190575"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190576"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190577"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190578"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190579"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190580"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190581"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190582"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190583"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190584"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190585"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190586"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190587"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190588"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep eq63e85s",
+    "job_id": "18190589"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190590"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190591"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190592"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190593"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190594"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190595"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190596"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190597"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190598"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep gx0jkqm1",
+    "job_id": "18190599"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 82wc2rdc",
+    "job_id": "18190600"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 82wc2rdc",
+    "job_id": "18190601"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190602"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep hg10t4om",
+    "job_id": "18190603"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190604"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190605"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190606"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190607"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190608"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max15 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kv2kdxrm",
+    "job_id": "18190609"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift1_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep kkyiebyd",
+    "job_id": "18190610"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 39,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 39 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift2_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 1vuh43uo",
+    "job_id": "18190611"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift3_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190612"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift5_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190613"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift10_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190614"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift15_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190615"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift25_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190616"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id laguna_xs2_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id laguna_xs2_pro_full_shift50_max50 --model-config configs/models/laguna_xs2.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 3i3hqdg5",
+    "job_id": "18190617"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190618"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190619"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190620"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190621"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190622"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190623"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 72mxik14",
+    "job_id": "18190624"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 72mxik14",
+    "job_id": "18190625"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 72mxik14",
+    "job_id": "18190626"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 72mxik14",
+    "job_id": "18190627"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ndzgkfhy",
+    "job_id": "18190628"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ndzgkfhy",
+    "job_id": "18190629"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ndzgkfhy",
+    "job_id": "18190630"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_correct",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_correct --run-id qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep luhefvmr",
+    "job_id": "18190631"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190632"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190633"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190634"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190635"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190636"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 39,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 39 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ze4wjx5b",
+    "job_id": "18190637"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep jnzzhcc9",
+    "job_id": "18190638"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep jnzzhcc9",
+    "job_id": "18190639"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep jnzzhcc9",
+    "job_id": "18190640"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep jnzzhcc9",
+    "job_id": "18190641"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190642"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190643"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep omvvkrkx",
+    "job_id": "18190644"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_reduces_failing",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_reduces_failing --run-id qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 4ksyfoqy",
+    "job_id": "18190645"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190646"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190647"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190648"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190649"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190650"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 0,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 0 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max15_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max15 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep 7pq7tzt6",
+    "job_id": "18190651"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 30,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 30 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift1_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift1_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ygvi36xn",
+    "job_id": "18190652"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift2_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift2_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190653"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift3_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift3_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190654"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift5_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift5_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190655"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift10_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift10_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190656"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift15_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift15_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190657"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 10,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 10 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift25_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift25_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep ue8wg4w0",
+    "job_id": "18190658"
+  },
+  {
+    "bench": "swebench_pro",
+    "run_id": "qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj",
+    "probe": "currently_has_regressions",
+    "layer": 20,
+    "cmd": "sbatch -A berzelius-2026-167 --exclude=node226 -t 04:00:00 --parsable -t 04:00:00 slurm/probe_final.sh --layer 20 --probe currently_has_regressions --run-id qwen36_35b_a3b_pro_full_pooled_shift50_max50_shuffled_traj --cache-run-id qwen36_35b_a3b_pro_full_shift50_max50 --model-config configs/models/qwen36_35b_a3b.yaml --probe-arch linear --cache-dir cache/swebench_pro --results-dir results/swebench_pro --n-bins 1 --shuffle-labels --shuffle-unit trajectory final --from-sweep jnu2f2rq",
+    "job_id": "18190659"
+  }
+]

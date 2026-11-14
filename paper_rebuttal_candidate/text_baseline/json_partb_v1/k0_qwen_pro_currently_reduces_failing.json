@@ -1,0 +1,189 @@
+{
+ "mode": "k0",
+ "run": "qwen_pro",
+ "bench": "swebench_pro",
+ "pooled": "qwen36_35b_a3b_pro_full_pooled",
+ "probe": "currently_reduces_failing",
+ "layer": 30,
+ "stored_test_auc": 0.8358518094255664,
+ "n_boot": 1000,
+ "C_grid": [
+  0.001,
+  0.0031622776601683794,
+  0.01,
+  0.03162277660168379,
+  0.1,
+  0.31622776601683794,
+  1.0,
+  3.1622776601683795,
+  10.0,
+  31.622776601683793,
+  100.0
+ ],
+ "a2_chars": 32000,
+ "text_info": {
+  "n_units": 327700,
+  "n_trajectories": 5804,
+  "n_train_trajectories_for_vocab": 2974,
+  "n_train_units_for_vocab": 170218,
+  "text_a1": {
+   "shape": [
+    327700,
+    200000
+   ],
+   "nnz": 47941935,
+   "vocab": 200000,
+   "empty_docs": 5804
+  },
+  "n_units_this_cache": 327700
+ },
+ "counts": {
+  "all": {
+   "n": 467504,
+   "share": 1.0,
+   "n_pos": 47740,
+   "pos_rate": 0.10211677333242068,
+   "n_tasks": 94
+  },
+  "not_yet_run": {
+   "n": 301387,
+   "share": 0.6446725589513672,
+   "n_pos": 22060,
+   "pos_rate": 0.07319492877927714,
+   "n_tasks": 94
+  },
+  "already_run": {
+   "n": 166117,
+   "share": 0.35532744104863273,
+   "n_pos": 25680,
+   "pos_rate": 0.1545898372833605,
+   "n_tasks": 87
+  },
+  "not_yet_run_strict": {
+   "n": 249721,
+   "share": 0.5341579965091208,
+   "n_pos": 8794,
+   "pos_rate": 0.03521530027510702,
+   "n_tasks": 94
+  },
+  "already_run_strict": {
+   "n": 217783,
+   "share": 0.46584200349087923,
+   "n_pos": 38946,
+   "pos_rate": 0.1788293852137219,
+   "n_tasks": 91
+  }
+ },
+ "fit": {
+  "text_a1": {
+   "n_train_units": 184011,
+   "n_train_tokens": 2476824,
+   "train_pos_rate": 0.08468546816406818,
+   "val_auc": {
+    "1e-03": 0.7144615687342715,
+    "3e-03": 0.7200993970549949,
+    "1e-02": 0.7412956768631731,
+    "3e-02": 0.7699062307897604,
+    "1e-01": 0.7909575177156376,
+    "3e-01": 0.7912032992743823,
+    "1e+00": 0.7912032992743823,
+    "3e+00": 0.7912032992743823,
+    "1e+01": 0.7912032992743823,
+    "3e+01": 0.7912032992743823,
+    "1e+02": 0.7912032992743823
+   },
+   "C": 0.31622776601683794,
+   "best_val_auc": 0.7912032992743823,
+   "C_at_grid_edge": false
+  }
+ },
+ "auc": {
+  "real_testbest|all": 0.8358518094255664,
+  "real_testbest|not_yet_run": 0.8597766591920567,
+  "real_testbest|already_run": 0.7781783401918759,
+  "real_testbest|not_yet_run_strict": 0.8759202653381063,
+  "real_testbest|already_run_strict": 0.7473841414012978,
+  "text_a1|all": 0.7401314737250948,
+  "text_a1|not_yet_run": 0.7496500109165054,
+  "text_a1|already_run": 0.6964401173987906,
+  "text_a1|not_yet_run_strict": 0.7120239418774662,
+  "text_a1|already_run_strict": 0.6862981249907795,
+  "real-text_a1|all": 0.09572033570047156,
+  "real-text_a1|not_yet_run": 0.1101266482755513,
+  "real-text_a1|already_run": 0.08173822279308529,
+  "real-text_a1|not_yet_run_strict": 0.1638963234606401,
+  "real-text_a1|already_run_strict": 0.06108601641051836,
+  "real|already-not_yet": -0.08159831900018077,
+  "real|already-not_yet_strict": -0.12853612393680847
+ },
+ "ci95": {
+  "real_testbest|all": [
+   0.7921670081484302,
+   0.8700431033629235
+  ],
+  "real_testbest|not_yet_run": [
+   0.8165539837263349,
+   0.8921443901362865
+  ],
+  "real_testbest|already_run": [
+   0.702527237182098,
+   0.8409963705120941
+  ],
+  "real_testbest|not_yet_run_strict": [
+   0.8407216963918039,
+   0.9098210531290203
+  ],
+  "real_testbest|already_run_strict": [
+   0.6774720001296088,
+   0.8010637091258532
+  ],
+  "text_a1|all": [
+   0.6827757435877558,
+   0.7902575647134965
+  ],
+  "text_a1|not_yet_run": [
+   0.6884970022731977,
+   0.8020518555400847
+  ],
+  "text_a1|already_run": [
+   0.6093232202768946,
+   0.7752351055028259
+  ],
+  "text_a1|not_yet_run_strict": [
+   0.634628534618622,
+   0.7811495684133581
+  ],
+  "text_a1|already_run_strict": [
+   0.6136209509293276,
+   0.7479374122431696
+  ],
+  "real-text_a1|all": [
+   0.050986285411302505,
+   0.13949549981956333
+  ],
+  "real-text_a1|not_yet_run": [
+   0.05429209414647854,
+   0.16673019333471512
+  ],
+  "real-text_a1|already_run": [
+   0.013848058758631659,
+   0.14867131729858823
+  ],
+  "real-text_a1|not_yet_run_strict": [
+   0.10112379008159365,
+   0.2383645406804864
+  ],
+  "real-text_a1|already_run_strict": [
+   0.0030377572678058134,
+   0.11396019338367824
+  ],
+  "real|already-not_yet": [
+   -0.15021298438577194,
+   -0.022417215862197807
+  ],
+  "real|already-not_yet_strict": [
+   -0.1840906166561562,
+   -0.08179909893201061
+  ]
+ }
+}

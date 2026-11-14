@@ -1,0 +1,64 @@
+{
+  "bench": "swebench_pro",
+  "run": "qwen36_35b_a3b_full",
+  "probes": {
+    "currently_compiles": {
+      "n_old": 4078069,
+      "n_new": 4078069,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": false,
+      "group_id_is_task": true,
+      "has_target_step_idx": true,
+      "n_groups": 694,
+      "n_samples": 5804,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.9118720293045044,
+      "step_idx_mean_abs_change": 6.377740383148193
+    },
+    "currently_correct": {
+      "n_old": 4078069,
+      "n_new": 4078069,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": false,
+      "group_id_is_task": true,
+      "has_target_step_idx": true,
+      "n_groups": 694,
+      "n_samples": 5804,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.9118720293045044,
+      "step_idx_mean_abs_change": 6.377740383148193
+    },
+    "currently_has_regressions": {
+      "n_old": 4078069,
+      "n_new": 4078069,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": false,
+      "group_id_is_task": true,
+      "has_target_step_idx": true,
+      "n_groups": 694,
+      "n_samples": 5804,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.9118720293045044,
+      "step_idx_mean_abs_change": 6.377740383148193
+    },
+    "currently_reduces_failing": {
+      "n_old": 4078069,
+      "n_new": 4078069,
+      "y_identical": true,
+      "sample_id_identical": true,
+      "group_id_identical": false,
+      "group_id_is_task": true,
+      "has_target_step_idx": true,
+      "n_groups": 694,
+      "n_samples": 5804,
+      "target_eq_step_idx": true,
+      "step_idx_frac_changed": 0.9118720293045044,
+      "step_idx_mean_abs_change": 6.377740383148193
+    }
+  },
+  "edit_step_index_identical": true,
+  "all_identical": true
+}

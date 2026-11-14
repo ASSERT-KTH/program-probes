@@ -1,0 +1,25 @@
+\begin{table}[t]
+\centering
+\footnotesize
+\caption{AUC of the $k{=}0$ probes on the hidden states right after a code edit, before anything has run on the new program version: the tokens of the first assistant turn whose label reflects the edit, whose context ends with the edit command and its own output. Edits whose command also ran something (tests, scripts, interpreters, builds, linters; Python scripts that only rewrite files are kept) are dropped. Same probe, test split and layer as Table~\ref{tab:auc_roc} (best layer on all test tokens); AUC pooled over the selected test tokens, with a 95\% task-level bootstrap CI (1000 resamples). Grey: the all-token AUC of Table~\ref{tab:auc_roc}. Counts (test split) are the same for all four properties; positive rates per property.}
+\label{tab:after_edit_k0}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lcccc}
+\toprule
+ & \Syntactic{} & \Semantic{} & \RedFail{} & \Regressions{} \\
+\midrule
+\multicolumn{5}{l}{\textsc{SWE-bench Verified}} \\
+\quad\textit{Laguna-XS.2} & 0.642 {\scriptsize[0.57, 0.70]} {\scriptsize\textcolor{gray}{0.691}} & 0.647 {\scriptsize[0.58, 0.71]} {\scriptsize\textcolor{gray}{0.788}} & 0.626 {\scriptsize[0.54, 0.71]} {\scriptsize\textcolor{gray}{0.773}} & 0.579 {\scriptsize[0.49, 0.64]} {\scriptsize\textcolor{gray}{0.695}} \\
+\quad{\scriptsize\textcolor{gray}{2,044 edits, 57.9k $h_t$, 75 tasks; 3\% of test edits dropped}} & \multicolumn{4}{l}{{\scriptsize\textcolor{gray}{positive rate 91\% / 39\% / 48\% / 19\%}}} \\
+\quad\textit{Qwen3.6-35B-A3B} & 0.615 {\scriptsize[0.53, 0.71]} {\scriptsize\textcolor{gray}{0.781}} & 0.643 {\scriptsize[0.58, 0.70]} {\scriptsize\textcolor{gray}{0.838}} & 0.576 {\scriptsize[0.52, 0.63]} {\scriptsize\textcolor{gray}{0.832}} & 0.618 {\scriptsize[0.49, 0.70]} {\scriptsize\textcolor{gray}{0.772}} \\
+\quad{\scriptsize\textcolor{gray}{1,417 edits, 21.1k $h_t$, 75 tasks; $<$1\% of test edits dropped}} & \multicolumn{4}{l}{{\scriptsize\textcolor{gray}{positive rate 86\% / 46\% / 49\% / 10\%}}} \\
+\midrule
+\multicolumn{5}{l}{\textsc{SWE-bench Pro}} \\
+\quad\textit{Laguna-XS.2} & 0.808 {\scriptsize[0.74, 0.87]} {\scriptsize\textcolor{gray}{0.786}} & 0.723 {\scriptsize[0.63, 0.80]} {\scriptsize\textcolor{gray}{0.794}} & 0.738 {\scriptsize[0.64, 0.80]} {\scriptsize\textcolor{gray}{0.780}} & 0.686 {\scriptsize[0.61, 0.79]} {\scriptsize\textcolor{gray}{0.740}} \\
+\quad{\scriptsize\textcolor{gray}{5,228 edits, 166.4k $h_t$, 106 tasks; 4\% of test edits dropped}} & \multicolumn{4}{l}{{\scriptsize\textcolor{gray}{positive rate 54\% / 6\% / 18\% / 8\%}}} \\
+\quad\textit{Qwen3.6-35B-A3B} & 0.734 {\scriptsize[0.59, 0.86]} {\scriptsize\textcolor{gray}{0.750}} & 0.658 {\scriptsize[0.57, 0.79]} {\scriptsize\textcolor{gray}{0.822}} & 0.690 {\scriptsize[0.61, 0.79]} {\scriptsize\textcolor{gray}{0.836}} & 0.804 {\scriptsize[0.70, 0.88]} {\scriptsize\textcolor{gray}{0.840}} \\
+\quad{\scriptsize\textcolor{gray}{2,393 edits, 33.9k $h_t$, 94 tasks; 2\% of test edits dropped}} & \multicolumn{4}{l}{{\scriptsize\textcolor{gray}{positive rate 57\% / 13\% / 20\% / 7\%}}} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

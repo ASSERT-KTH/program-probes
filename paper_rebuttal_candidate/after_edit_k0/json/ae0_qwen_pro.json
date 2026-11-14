@@ -1,0 +1,1462 @@
+{
+ "run": "qwen_pro",
+ "bench": "swebench_pro",
+ "cache": "qwen36_35b_a3b_full",
+ "pooled": "qwen36_35b_a3b_pro_full_pooled",
+ "alignment": {
+  "trajectories_with_edits": 4915,
+  "command_history_longer_than_assistant_turns": 0
+ },
+ "filter": {
+  "all_splits": {
+   "edits": 18557,
+   "edits_with_next_turn": 18496,
+   "dropped_primary": 507,
+   "dropped_strict": 6646,
+   "python_editor_scripts": 6139,
+   "dropped_primary_by_reason": {
+    "run": 286,
+    "python": 44,
+    "build_lint": 177
+   },
+   "dropped_primary_share": 0.027321226491350974,
+   "dropped_strict_share": 0.35813978552567766
+  },
+  "test_split": {
+   "edits": 2453,
+   "edits_with_next_turn": 2441,
+   "dropped_primary": 44,
+   "dropped_strict": 933,
+   "python_editor_scripts": 889,
+   "dropped_primary_by_reason": {
+    "run": 20,
+    "python": 3,
+    "build_lint": 21
+   },
+   "dropped_primary_share": 0.017937219730941704,
+   "dropped_strict_share": 0.38035059111292296
+  },
+  "examples": {
+   "dropped:build_lint": [
+    {
+     "sample_id": "instance_future-architect__vuls-139f3a81b66c47e6d8f70ce6c4afe7a9196a6ea8_run03",
+     "edit_turn": 87,
+     "cmd": "export PATH=$PATH:/usr/local/go/bin && cd /app && echo 'replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.8.1' >> go.mod && go mod tidy 2>&1 | tail -20"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-139f3a81b66c47e6d8f70ce6c4afe7a9196a6ea8_run06",
+     "edit_turn": 27,
+     "cmd": "export PATH=$PATH:/usr/local/go/bin && cd /app && go mod download github.com/aquasecurity/trivy@v0.30.4 2>&1"
+    },
+    {
+     "sample_id": "instance_flipt-io__flipt-2ca5dfb3513e4e786d2b037075617cccc286d5c3_run08",
+     "edit_turn": 74,
+     "cmd": "cd /app && /usr/local/go/bin/go get go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc@v1.25.0 2>&1"
+    },
+    {
+     "sample_id": "instance_flipt-io__flipt-e42da21a07a5ae35835ec54f74004ebd58713874",
+     "edit_turn": 14,
+     "cmd": "cd /app && /usr/local/go/bin/go mod tidy 2>&1 | head -20"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-a76302c11174ca081f656c63a000ffa746e350af_run05",
+     "edit_turn": 57,
+     "cmd": "export PATH=$PATH:/usr/local/go/bin && cd /app && go mod tidy 2>&1 | tail -5"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-3f8de0268376e1f0fa6d9d61abb0d9d3d580ea7d_run09",
+     "edit_turn": 11,
+     "cmd": "cat > /tmp/fix_listenports.go << 'GOEOF'\npackage main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n\t\"strings\"\n)\n\nfunc main() {\n\t// Read the file\n\tdata, err := os.ReadFile(\"/app/models/packages.go\")\n\tif err != nil {\n\t\tfmt.Fprintf(os.Stderr, \"Error reading file: %v\\n\", err)\n\t\tos.Exit(1)\n\t}\n\n\tcontent := string(data)\n\n\t// Fi [...] 1)\n\t\t}\n\t\tfmt.Println(\"Successfully added UnmarshalJSON method to ListenPort\")\n\t} else {\n\t\tfmt.Println(\"UnmarshalJSON method already exists\")\n\t}\n}\nGOEOF\n/usr/local/go/bin/go run /tmp/fix_listenports.go"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-139f3a81b66c47e6d8f70ce6c4afe7a9196a6ea8_run04",
+     "edit_turn": 78,
+     "cmd": "export PATH=$PATH:/usr/local/go/bin && cd /app && go mod tidy 2>&1 | tail -10"
+    },
+    {
+     "sample_id": "instance_flipt-io__flipt-e88e93990e3ec1e7697754b423decc510d5dd5fe",
+     "edit_turn": 30,
+     "cmd": "export PATH=$PATH:/usr/local/go/bin:/go/bin && cd /app && buf generate 2>&1"
+    }
+   ],
+   "dropped:python": [
+    {
+     "sample_id": "instance_internetarchive__openlibrary-798a582540019363d14b2090755cc7b89a350788-v430f20c722405e462d9ef44dee7d34c41e76fe7a_run08",
+     "edit_turn": 95,
+     "cmd": "python3 /tmp/consolidate_final.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-308a35d6999427c02b1dbf5211c033ad3b352556-ve8c8d62a2b60610a3c4631f5f23ed866bada9818",
+     "edit_turn": 50,
+     "cmd": "cat > /tmp/fix_models.py << 'PYEOF'\n# Read the original models.py\nwith open('/app/openlibrary/core/models.py', 'r') as f:\n    content = f.read()\n\n# Read the ListMixin methods from git\nimport subprocess\nresult = subprocess.run(\n    ['git', 'show', 'HEAD:openlibrary/core/lists/model.py'],\n    cwd='/ap [...]  + new_methods\n\ncontent = content.replace(old_repr, new_repr)\n\n# Write back\nwith open('/app/openlibrary/core/models.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done!\")\nPYEOF\npython /tmp/fix_models.py"
+    },
+    {
+     "sample_id": "instance_protonmail__webclients-428cd033fede5fd6ae9dbc7ab634e010b10e4209",
+     "edit_turn": 60,
+     "cmd": "python3 /tmp/patch_shares_state.py"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-01441351c3407abfc21c48a38e28828e1b504e0c_run09",
+     "edit_turn": 22,
+     "cmd": "cat > /tmp/fix_test.py << 'PYEOF'\nimport re\n\nwith open('/app/contrib/snmp2cpe/pkg/cpe/cpe_test.go', 'r') as f:\n    content = f.read()\n\n# Find the position after the FortiGate-60F test case\n# We need to insert the FortiSwitch-108E test case after it\n\nold_test = '''\t\t{\n\t\t\tname: \"FortiGate-60F\",\n\t\t\targ [...] and. Let's restore it from git\nimport subprocess\nsubprocess.run(['git', 'checkout', '/app/contrib/snmp2cpe/pkg/cpe/cpe_test.go'], cwd='/app')\nprint(\"Restored test file\")\nPYEOF\npython3 /tmp/fix_test.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-7bf3238533070f2d24bafbb26eedf675d51941f6-v08d8e8889ec945ab821fb156c04c7d2e2810debb_run05",
+     "edit_turn": 27,
+     "cmd": "python3 /app/openlibrary/solr/types_generator.py > /app/openlibrary/solr/solr_types.py"
+    },
+    {
+     "sample_id": "instance_ansible__ansible-f327e65d11bb905ed9f15996024f857a95592629-vba6da65a0f3baefda7a058ebbd0a8dcafb8512f5_run08",
+     "edit_turn": 15,
+     "cmd": "cat > /tmp/fix.py << 'EOF'\nimport re\nimport keyword\n\n# Read the file\nwith open('/app/lib/ansible/utils/collection_loader/_collection_finder.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the is_valid_collection_name method\nold_method = '''    @staticmethod\n    def is_valid_collection_nam [...] t.replace(old_method, new_method)\n\nwith open('/app/lib/ansible/utils/collection_loader/_collection_finder.py', 'w') as f:\n    f.write(content)\n\nprint(\"Fix applied successfully\")\nEOF\npython /tmp/fix.py"
+    },
+    {
+     "sample_id": "instance_gravitational__teleport-288c5519ce0dec9622361a5e5d6cd36aa2d9e348_run06",
+     "edit_turn": 54,
+     "cmd": "python3 -c \"\ncontent = open('/app/api/client/proto/authservice.pb.go').read()\nold = '''\t\tcase 3:\n\t\t\tif wireType != 0 {\n\t\t\t\treturn fmt.Errorf(\\\"proto: wrong wireType = %d for field TTL\\\", wireType)\n\t\t\t}\n\t\t\tm.TTL = 0\n\t\t\tfor shift := uint(0); ; shift += 7 {\n\t\t\t\tif shift >= 64 {\n\t\t\t\t\treturn ErrIntOverfl [...] m.ServerNames, string(dAtA[iNdEx:postIndex]))\n\t\t\tiNdEx = postIndex\n\t\tdefault:'''\ncontent = content.replace(old, new)\nopen('/app/api/client/proto/authservice.pb.go', 'w').write(content)\nprint('Done')\n\""
+    },
+    {
+     "sample_id": "instance_protonmail__webclients-8142704f447df6e108d53cab25451c8a94976b92_run07",
+     "edit_turn": 68,
+     "cmd": "cat > /tmp/fix_calendar.ts << 'PYEOF'\ncontent = '''import {\n    CALENDAR_TYPE,\n    CALENDAR_TYPE_EXTENDED,\n    EXTENDED_CALENDAR_TYPE,\n    CALENDAR_DISPLAY,\n    NOTIFICATION_TYPE_API,\n} from '../../calendar/constants';\nimport { Nullable } from '../utils';\nimport { CalendarKey } from './CalendarKey'; [...] g;\n    description?: string;\n}\n'''\n\nwith open('/app/packages/shared/lib/interfaces/calendar/Calendar.ts', 'w') as f:\n    f.write(content)\n\nprint(\"Fixed Calendar.ts\")\nPYEOF\npython3 /tmp/fix_calendar.ts"
+    }
+   ],
+   "dropped:run": [
+    {
+     "sample_id": "instance_NodeBB__NodeBB-1ea9481af6125ffd6da0592ed439aa62af0bca11-vd59a5728dfc977f44533186ace531248c2917516",
+     "edit_turn": 23,
+     "cmd": "cat > /tmp/fix_topic_create.js << 'ENDOFFILE'\nconst fs = require('fs');\nconst content = fs.readFileSync('/app/src/topics/create.js', 'utf8');\n\n// Replace the Topics.post function to add locking mechanism\nconst newContent = content.replace(\n\t`\tTopics.post = async function (data) {\n\t\tdata = await plug [...] \n\t\tawait db.deleteObjectField('locks', \\`topic:creating:\\${uid}\\`);`\n);\n\nfs.writeFileSync('/app/src/topics/create.js', newContent);\nconsole.log('File updated');\nENDOFFILE\nnode /tmp/fix_topic_create.js"
+    },
+    {
+     "sample_id": "instance_NodeBB__NodeBB-b398321a5eb913666f903a794219833926881a8f-vd59a5728dfc977f44533186ace531248c2917516_run06",
+     "edit_turn": 54,
+     "cmd": "cat > /tmp/patch_helpers2.js << 'EOF'\nconst fs = require('fs');\nconst path = '/app/src/controllers/accounts/helpers.js';\nlet content = fs.readFileSync(path, 'utf8');\n\n// Fix the Messaging import - replace the existing line\ncontent = content.replace(\n  /const messaging = require\\('\\.\\.\\/messaging'\\); [...] asPrivateChat = results\\.hasPrivateChat;/,\n  `userData.hasPrivateChat = results.hasPrivateChat;`\n);\n\nfs.writeFileSync(path, content);\nconsole.log('Updated helpers.js');\nEOF\nnode /tmp/patch_helpers2.js"
+    },
+    {
+     "sample_id": "instance_flipt-io__flipt-0fd09def402258834b9d6c0eaa6d3b4ab93b4446_run05",
+     "edit_turn": 61,
+     "cmd": "cat > /tmp/patch_proto.sh << 'SCRIPT'\ncd /app\n\n# Update the proto file to add METHOD_KUBERNETES\nsed -i 's/METHOD_OIDC = 2;/METHOD_OIDC = 2;\\n  METHOD_KUBERNETES = 3;/' rpc/flipt/auth/auth.proto\n\n# Verify the change\ngrep -A 5 \"enum Method\" rpc/flipt/auth/auth.proto\nSCRIPT\nbash /tmp/patch_proto.sh"
+    },
+    {
+     "sample_id": "instance_NodeBB__NodeBB-84dfda59e6a0e8a77240f939a7cb8757e6eaf945-v2c59007b1005cd5cd14cbb523ca5229db1fd2dd8",
+     "edit_turn": 29,
+     "cmd": "cat > /tmp/fix.js << 'EOF'\nconst fs = require('fs');\nconst filePath = '/app/src/posts/uploads.js';\nlet content = fs.readFileSync(filePath, 'utf8');\n\n// Replace the dissociateAll function to also delete files from disk\nconst oldFunc = `\tPosts.uploads.dissociateAll = async (pid) => {\n\t\tconst current = [...] place(/\\\\.([^.]+)$/, '-resized.$1')));\n\t\t}));\n\t};`;\n\ncontent = content.replace(oldFunc, newFunc);\nfs.writeFileSync(filePath, content);\nconsole.log('Fixed dissociateAll function');\nEOF\nnode /tmp/fix.js"
+    },
+    {
+     "sample_id": "instance_NodeBB__NodeBB-f1a80d48cc45877fcbadf34c2345dd9709722c7f-v4fbcfae8b15e4ce5d132c408bca69ebb9cf146ed_run01",
+     "edit_turn": 80,
+     "cmd": "cat > /tmp/fix_global_tpl.js << 'ENDOFSCRIPT'\nconst fs = require('fs');\n\nlet content = fs.readFileSync('/app/src/views/admin/partials/privileges/global.tpl', 'utf8');\n\n// Replace hardcoded data-filter indices with type-based filtering\ncontent = content.replace(\n    /<button type=\"button\" data-filter [...] es:privileges.section-other]]</button>'\n);\n\nfs.writeFileSync('/app/src/views/admin/partials/privileges/global.tpl', content);\nconsole.log('global.tpl updated');\nENDOFSCRIPT\nnode /tmp/fix_global_tpl.js"
+    },
+    {
+     "sample_id": "instance_NodeBB__NodeBB-1ea9481af6125ffd6da0592ed439aa62af0bca11-vd59a5728dfc977f44533186ace531248c2917516_run01",
+     "edit_turn": 31,
+     "cmd": "cat > /tmp/fix_create.js << 'ENDOFFILE'\nconst fs = require('fs');\nconst content = fs.readFileSync('/app/src/topics/create.js', 'utf8');\n\nconst newContent = content.replace(\n\t`\tTopics.post = async function (data) {\n\t\tdata = await plugins.hooks.fire('filter:topic.post', data);\n\t\tconst { uid } = data;\n [...] ait lock(uid);\n\t\t}\n\n\t\tconst tid = await Topics.create(data);`\n);\n\nfs.writeFileSync('/app/src/topics/create.js', newContent);\nconsole.log('File updated successfully');\nENDOFFILE\nnode /tmp/fix_create.js"
+    },
+    {
+     "sample_id": "instance_NodeBB__NodeBB-18c45b44613aecd53e9f60457b9812049ab2998d-v0495b863a912fbff5749c67e860612b91825407c_run02",
+     "edit_turn": 13,
+     "cmd": "cat > /tmp/add_invite_controller.js << 'EOF'\nconst fs = require('fs');\nconst filePath = '/app/src/controllers/write/groups.js';\nlet content = fs.readFileSync(filePath, 'utf8');\n\nconst newMethods = `\n\nGroups.issueInvite = async (req, res) => {\n\tawait api.groups.issueInvite(req, req.params);\n\thelpers. [...] t method (getInvites)\ncontent = content.trimEnd() + newMethods + '\\n';\nfs.writeFileSync(filePath, content);\nconsole.log('Controller methods added successfully');\nEOF\nnode /tmp/add_invite_controller.js"
+    },
+    {
+     "sample_id": "instance_element-hq__element-web-18c03daa865d3c5b10e52b669cd50be34c67b2e5-vnan",
+     "edit_turn": 22,
+     "cmd": "cd /app && cat >> test/Markdown-test.ts << 'EOF'\n\ndescribe(\"nested emphasis URL truncation fix\", () => {\n    it('should preserve full URL when it spans multiple text nodes inside nested emphasis', () => {\n        // This creates nested emphasis where the URL spans multiple text nodes\n        const t [...] RL should be preserved\n        expect(html).toContain('http://example.com/');\n        expect(html).toContain('more text');\n    });\n});\nEOF\nnpm test -- --testPathPattern=\"Markdown-test\" 2>&1 | tail -30"
+    }
+   ],
+   "kept": [
+    {
+     "sample_id": "instance_internetarchive__openlibrary-d8162c226a9d576f094dc1830c4c1ffd0be2dd17-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c_run08",
+     "edit_turn": 45,
+     "cmd": "cat >> /app/openlibrary/catalog/utils/__init__.py << 'EOF'\n\n\ndef has_asin(rec: dict) -> bool:\n    \"\"\"\n    Return True if the record has a non-ISBN ASIN code (Amazon identifier\n    starting with 'B').\n\n    Searches both identifiers['amazon'] and source_records for ASINs.\n    An ASIN is identified as  [...] ntifiers.\n\n    :param dict rec: an import dictionary record.\n    :rtype: bool\n    \"\"\"\n    has_isbn = any(rec.get('isbn_10', []) or rec.get('isbn_13', []))\n    return not has_isbn and has_asin(rec)\nEOF"
+    },
+    {
+     "sample_id": "instance_protonmail__webclients-0200ce0fc1d4dbd35178c10d440a284c82ecc858_run05",
+     "edit_turn": 1,
+     "cmd": "find /app -type f -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.vue\" -o -name \"*.js\" -o -name \"*.jsx\" | head -50"
+    },
+    {
+     "sample_id": "instance_element-hq__element-web-2760bfc8369f1bee640d6d7a7e910783143d4c5f-vnan_run04",
+     "edit_turn": 38,
+     "cmd": "sed -i 's/<RoomKickButton room={room} member={member} startUpdating={startUpdating} stopUpdating={stopUpdating} \\/>/<RoomKickButton room={room} member={member} startUpdating={startUpdating} stopUpdating={stopUpdating} isUpdating={isUpdating} \\/>/' /app/src/components/views/right_panel/UserInfo.tsx"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-e4728e388120b311c4ed469e4f942e0347a2689b-v264a82e2f4818e30f5a25e4da53b27ba119f62b5_run06",
+     "edit_turn": 23,
+     "cmd": "head -n 271 /app/gost/debian.go > /tmp/debian_new.go && cat /tmp/fix_debian.go >> /tmp/debian_new.go && tail -n +295 /app/gost/debian.go >> /tmp/debian_new.go && mv /tmp/debian_new.go /app/gost/debian.go"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-431442c92887a3aece3f8aa771dd029738a80eb1-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c_run06",
+     "edit_turn": 1,
+     "cmd": "find /app -type f -name \"*.py\" | head -50"
+    },
+    {
+     "sample_id": "instance_future-architect__vuls-4b680b996061044e93ef5977a081661665d3360a_run05",
+     "edit_turn": 16,
+     "cmd": "sed -i 's/family:   config.FreeBSD,$/family:   config.FreeBSD,/' /app/models/scanresults_test.go && sed -i '/family:   config.FreeBSD/,/expected:/{s/expected: true/expected: false/}' /app/models/scanresults_test.go"
+    },
+    {
+     "sample_id": "instance_protonmail__webclients-815695401137dac2975400fc610149a16db8214b_run02",
+     "edit_turn": 49,
+     "cmd": "sed -i \"s/import { chunk } from '@proton\\/util\\/array'/import { chunk } from '@proton\\/util\\/chunk'/\" /app/packages/shared/lib/calendar/import/encryptAndSubmit.ts"
+    },
+    {
+     "sample_id": "instance_protonmail__webclients-caf10ba9ab2677761c88522d1ba8ad025779c492_run08",
+     "edit_turn": 1,
+     "cmd": "find /app -type f -name \"*.ts\" -o -name \"*.js\" -o -name \"*.vue\" | head -100"
+    }
+   ],
+   "python_editor_kept": [
+    {
+     "sample_id": "instance_flipt-io__flipt-05d7234fa582df632f70a7cd10194d61bd7043b9_run02",
+     "edit_turn": 48,
+     "cmd": "cat > /tmp/fix_object_store.py << 'EOF'\n# Read the store.go file\nwith open('/app/internal/storage/fs/object/store.go', 'r') as f:\n    content = f.read()\n\n# Update NewFile call to include etag from item\nold_newfile_call = '''\t\tfiles = append(files, NewFile(\n\t\t\tkey,\n\t\t\titem.Size,\n\t\t\trd,\n\t\t\titem.ModTim [...] tent.replace(old_getversion, new_getversion)\n\nwith open('/app/internal/storage/fs/object/store.go', 'w') as f:\n    f.write(content)\n\nprint(\"Fixed object/store.go\")\nEOF\npython3 /tmp/fix_object_store.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-d40ec88713dc95ea791b252f92d2f7b75e107440-v13642507b4fc1f8d234172bf8129942da2c2ca26_run06",
+     "edit_turn": 78,
+     "cmd": "cd /app && python3 << 'EOF'\nwith open('openlibrary/plugins/importapi/code.py', 'r') as f:\n    content = f.read()\n\n# Update ia_import to pass preview to load_book\ncontent = content.replace(\n    'return cls.load_book(edition_data, from_marc_record)',\n    'return cls.load_book(edition_data, from_marc_record, preview=preview)'\n)\n\nwith open('openlibrary/plugins/importapi/code.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done updating ia_import to pass preview\")\nEOF"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-431442c92887a3aece3f8aa771dd029738a80eb1-v76304ecdb3a5954fcf13feb710e8c40fcf24b73c_run09",
+     "edit_turn": 55,
+     "cmd": "cat > /tmp/fix_query_utils.py << 'PATCH_EOF'\nimport re\n\n# Read the file\nwith open('/app/openlibrary/solr/query_utils.py', 'r') as f:\n    content = f.read()\n\n# Find and replace the luqum_replace_child function\nold_function = '''\n\ndef luqum_replace_child(parent: Item, old_child: Item, new_child: Item) [...] ontent.replace(old_function, new_function)\n\nwith open('/app/openlibrary/solr/query_utils.py', 'w') as f:\n    f.write(content)\n\nprint(\"Updated query_utils.py\")\nPATCH_EOF\npython3 /tmp/fix_query_utils.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-111347e9583372e8ef91c82e0612ea437ae3a9c9-v2d9a6c849c60ed19fd0858ce9e40b7cc8e097e59_run03",
+     "edit_turn": 61,
+     "cmd": "cat > /tmp/patch.py << 'EOF'\nimport re\n\n# Read the current file\nwith open('/app/openlibrary/catalog/marc/marc_xml.py', 'r') as f:\n    content = f.read()\n\n# Find the end of the MarcXml class (after decode_field method)\n# Add the get_linkage method before the class ends\n\nget_linkage_method = '''\n    d [...] _line+1:]\n    \n    with open('/app/openlibrary/catalog/marc/marc_xml.py', 'w') as f:\n        f.write(new_content)\n    print(\"Successfully added get_linkage method to MarcXml\")\nEOF\npython /tmp/patch.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-9cd47f4dc21e273320d9e30d889c864f8cb20ccf-v0f5aece3601a5b4419f7ccec1dbda2071be28ee4_run05",
+     "edit_turn": 70,
+     "cmd": "cat > /tmp/fix_code2.py << 'PYEOF'\n# Read the file\nwith open('/app/openlibrary/coverstore/code.py', 'r') as f:\n    content = f.read()\n\n# Fix the response format to match what add_cover expects\nold_code = '''        if not data:\n            # If source_url was provided but download returned None (uns [...] ''\n\ncontent = content.replace(old_code, new_code)\n\n# Write the file back\nwith open('/app/openlibrary/coverstore/code.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done\")\nPYEOF\npython3 /tmp/fix_code2.py"
+    },
+    {
+     "sample_id": "instance_flipt-io__flipt-967855b429f749c28c112b8cb1b15bc79157f973_run03",
+     "edit_turn": 55,
+     "cmd": "cat > /tmp/fix_evaluator.py << 'PYEOF'\nimport re\n\nwith open('/app/internal/server/evaluator.go', 'r') as f:\n    content = f.read()\n\n# 1. Flag disabled - line 78-80\ncontent = content.replace(\n    '''\tif !flag.Enabled {\n\t\tresp.Match = false\n\t\treturn resp, nil\n\t}''',\n    '''\tif !flag.Enabled {\n\t\tresp.M [...] eason_NO_MATCHING_RULE\n\treturn resp, nil\n}'''\n)\n\nwith open('/app/internal/server/evaluator.go', 'w') as f:\n    f.write(content)\n\nprint(\"Done updating evaluator.go\")\nPYEOF\npython3 /tmp/fix_evaluator.py"
+    },
+    {
+     "sample_id": "instance_ansible__ansible-39bd8b99ec8c6624207bf3556ac7f9626dad9173-v1055803c3a812189a1133297f7f5468579283f86_run09",
+     "edit_turn": 49,
+     "cmd": "cat > /tmp/fix_async_wrapper2.py << 'PYEOF'\nwith open('/app/lib/ansible/modules/async_wrapper.py', 'r') as f:\n    content = f.read()\n\n# Fix: Make 'failed' field consistent - use boolean True instead of integer 1\n# In _run_module error paths\ncontent = content.replace(\n    '''    except (OSError, IOEr [...] ption\": to_text(traceback.format_exc()),\n        }))'''\n)\n\nwith open('/app/lib/ansible/modules/async_wrapper.py', 'w') as f:\n    f.write(content)\n\nprint(\"Done\")\nPYEOF\npython /tmp/fix_async_wrapper2.py"
+    },
+    {
+     "sample_id": "instance_internetarchive__openlibrary-d109cc7e6e161170391f98f9a6fa1d02534c18e4-ve8c8d62a2b60610a3c4631f5f23ed866bada9818_run07",
+     "edit_turn": 66,
+     "cmd": "cat > /tmp/patch_edit_template.py << 'PYTHON_EOF'\nwith open('/app/openlibrary/templates/type/list/edit.html', 'r') as f:\n    content = f.read()\n\n# Find and replace the render_seed_field jsdef to include note input\nold_render_seed = '''$# Render the ith seed input field\n$jsdef render_seed_field(i, se [...] render_seed, new_render_seed)\n\nwith open('/app/openlibrary/templates/type/list/edit.html', 'w') as f:\n    f.write(content)\n\nprint(\"Updated edit template\")\nPYTHON_EOF\npython /tmp/patch_edit_template.py"
+    }
+   ]
+  }
+ },
+ "probes": {
+  "currently_compiles": {
+   "best_layer_all_states": 1,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.7502263211604892,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7337019802945273,
+      "n_test": 34138,
+      "n_pos_test": 19411,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.5685857691172129,
+      "auc": 0.7344170707658738,
+      "label_changed_by_edit": {
+       "n_states": 2185,
+       "n_edits": 191,
+       "pos_rate": 0.5812356979405034,
+       "auc": 0.32890581300288285
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.5097388083530239,
+      "auc": 0.7785886177336547,
+      "label_changed_by_edit": {
+       "n_states": 1093,
+       "n_edits": 115,
+       "pos_rate": 0.41171088746569073,
+       "auc": 0.43833074131674443
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.5686039018102994,
+      "auc": 0.7336673421619586,
+      "label_changed_by_edit": {
+       "n_states": 2244,
+       "n_edits": 200,
+       "pos_rate": 0.5704099821746881,
+       "auc": 0.34189493646265556
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.718323124600566,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7375615143801572,
+      "n_test": 34138,
+      "n_pos_test": 19411,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.5685857691172129,
+      "auc": 0.7379594124612787,
+      "label_changed_by_edit": {
+       "n_states": 2185,
+       "n_edits": 191,
+       "pos_rate": 0.5812356979405034,
+       "auc": 0.3724452476227357
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.5097388083530239,
+      "auc": 0.7312199648636291,
+      "label_changed_by_edit": {
+       "n_states": 1093,
+       "n_edits": 115,
+       "pos_rate": 0.41171088746569073,
+       "auc": 0.4796855019872127
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.5686039018102994,
+      "auc": 0.7374338070951524,
+      "label_changed_by_edit": {
+       "n_states": 2244,
+       "n_edits": 200,
+       "pos_rate": 0.5704099821746881,
+       "auc": 0.3874384076763485
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.7110692558244328,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7417051791194677,
+      "n_test": 34138,
+      "n_pos_test": 19411,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.5685857691172129,
+      "auc": 0.7394845695647987,
+      "label_changed_by_edit": {
+       "n_states": 2185,
+       "n_edits": 191,
+       "pos_rate": 0.5812356979405034,
+       "auc": 0.3915201583408631
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.5097388083530239,
+      "auc": 0.7390802240432403,
+      "label_changed_by_edit": {
+       "n_states": 1093,
+       "n_edits": 115,
+       "pos_rate": 0.41171088746569073,
+       "auc": 0.4825194401244168
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.5686039018102994,
+      "auc": 0.738830168619298,
+      "label_changed_by_edit": {
+       "n_states": 2244,
+       "n_edits": 200,
+       "pos_rate": 0.5704099821746881,
+       "auc": 0.4031574170124481
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.7182295844902814,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7385299470947149,
+      "n_test": 34138,
+      "n_pos_test": 19411,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.5685857691172129,
+      "auc": 0.7345829497602214,
+      "label_changed_by_edit": {
+       "n_states": 2185,
+       "n_edits": 191,
+       "pos_rate": 0.5812356979405034,
+       "auc": 0.3939322748590852
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.5097388083530239,
+      "auc": 0.7519887948352726,
+      "label_changed_by_edit": {
+       "n_states": 1093,
+       "n_edits": 115,
+       "pos_rate": 0.41171088746569073,
+       "auc": 0.5013478486262312
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.5686039018102994,
+      "auc": 0.7340894353303833,
+      "label_changed_by_edit": {
+       "n_states": 2244,
+       "n_edits": 200,
+       "pos_rate": 0.5704099821746881,
+       "auc": 0.40545173106846477
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.7196914811333384,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.747449534039462,
+      "n_test": 34138,
+      "n_pos_test": 19411,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.5685857691172129,
+      "auc": 0.7462440284201699,
+      "label_changed_by_edit": {
+       "n_states": 2185,
+       "n_edits": 191,
+       "pos_rate": 0.5812356979405034,
+       "auc": 0.4022864764855213
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.5097388083530239,
+      "auc": 0.7548449019411821,
+      "label_changed_by_edit": {
+       "n_states": 1093,
+       "n_edits": 115,
+       "pos_rate": 0.41171088746569073,
+       "auc": 0.4743355797477104
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.5686039018102994,
+      "auc": 0.7455828180102289,
+      "label_changed_by_edit": {
+       "n_states": 2244,
+       "n_edits": 200,
+       "pos_rate": 0.5704099821746881,
+       "auc": 0.41075758558091285
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.7502263211604892,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.7344170707658738,
+     "ci95": [
+      0.5939255202084107,
+      0.8595168815701696
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.7785886177336547,
+     "ci95": [
+      0.6236818524612713,
+      0.8811154876751975
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.7336673421619586,
+     "ci95": [
+      0.5930858218221784,
+      0.8573126540905688
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 40,
+   "best_after_edit_layer_ci_primary": {
+    "auc": 0.7462440284201699,
+    "ci95": [
+     0.6386641372410612,
+     0.8352780171282749
+    ],
+    "n_boot_valid": 1000
+   }
+  },
+  "currently_correct": {
+   "best_layer_all_states": 31,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.6372708470325006,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.44678742977257146,
+      "n_test": 34138,
+      "n_pos_test": 4389,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.1274579273693534,
+      "auc": 0.45786643033551083,
+      "label_changed_by_edit": {
+       "n_states": 1687,
+       "n_edits": 139,
+       "pos_rate": 0.9324244220509781,
+       "auc": 0.21765873679749279
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.07203525129318603,
+      "auc": 0.5934382886965553,
+      "label_changed_by_edit": {
+       "n_states": 509,
+       "n_edits": 69,
+       "pos_rate": 0.8565815324165029,
+       "auc": 0.264107075530979
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.12856640693655164,
+      "auc": 0.46126511077212645,
+      "label_changed_by_edit": {
+       "n_states": 1743,
+       "n_edits": 149,
+       "pos_rate": 0.9345955249569707,
+       "auc": 0.2210106297050176
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.8023085824002114,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5586498433754139,
+      "n_test": 34138,
+      "n_pos_test": 4389,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.1274579273693534,
+      "auc": 0.583399066443651,
+      "label_changed_by_edit": {
+       "n_states": 1687,
+       "n_edits": 139,
+       "pos_rate": 0.9324244220509781,
+       "auc": 0.2779859693735292
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.07203525129318603,
+      "auc": 0.7407052164338311,
+      "label_changed_by_edit": {
+       "n_states": 509,
+       "n_edits": 69,
+       "pos_rate": 0.8565815324165029,
+       "auc": 0.48268819907000127
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.12856640693655164,
+      "auc": 0.5850499838931118,
+      "label_changed_by_edit": {
+       "n_states": 1743,
+       "n_edits": 149,
+       "pos_rate": 0.9345955249569707,
+       "auc": 0.2802763507910353
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.8146834585620907,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.589321470563465,
+      "n_test": 34138,
+      "n_pos_test": 4389,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.1274579273693534,
+      "auc": 0.635172937082191,
+      "label_changed_by_edit": {
+       "n_states": 1687,
+       "n_edits": 139,
+       "pos_rate": 0.9324244220509781,
+       "auc": 0.2373216894747995
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.07203525129318603,
+      "auc": 0.7484046701817734,
+      "label_changed_by_edit": {
+       "n_states": 509,
+       "n_edits": 69,
+       "pos_rate": 0.8565815324165029,
+       "auc": 0.35742113862008296
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.12856640693655164,
+      "auc": 0.637484708106277,
+      "label_changed_by_edit": {
+       "n_states": 1743,
+       "n_edits": 149,
+       "pos_rate": 0.9345955249569707,
+       "auc": 0.24213003349380208
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.8218086252932206,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6099790746022762,
+      "n_test": 34138,
+      "n_pos_test": 4389,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.1274579273693534,
+      "auc": 0.6582680699271904,
+      "label_changed_by_edit": {
+       "n_states": 1687,
+       "n_edits": 139,
+       "pos_rate": 0.9324244220509781,
+       "auc": 0.21773680864589956
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.07203525129318603,
+      "auc": 0.7707253165279806,
+      "label_changed_by_edit": {
+       "n_states": 509,
+       "n_edits": 69,
+       "pos_rate": 0.8565815324165029,
+       "auc": 0.30501445268317207
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.12856640693655164,
+      "auc": 0.6597140749894225,
+      "label_changed_by_edit": {
+       "n_states": 1743,
+       "n_edits": 149,
+       "pos_rate": 0.9345955249569707,
+       "auc": 0.2193844033041474
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.7586571822957469,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.5716835803504468,
+      "n_test": 34138,
+      "n_pos_test": 4389,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.1274579273693534,
+      "auc": 0.6175288652125064,
+      "label_changed_by_edit": {
+       "n_states": 1687,
+       "n_edits": 139,
+       "pos_rate": 0.9324244220509781,
+       "auc": 0.34407936561046615
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.07203525129318603,
+      "auc": 0.7031392532765606,
+      "label_changed_by_edit": {
+       "n_states": 509,
+       "n_edits": 69,
+       "pos_rate": 0.8565815324165029,
+       "auc": 0.44504838506974986
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.12856640693655164,
+      "auc": 0.6200542871178417,
+      "label_changed_by_edit": {
+       "n_states": 1743,
+       "n_edits": 149,
+       "pos_rate": 0.9345955249569707,
+       "auc": 0.350575641067063
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.8218086252932206,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.6582680699271904,
+     "ci95": [
+      0.5686198691547941,
+      0.7933248791258739
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.7707253165279806,
+     "ci95": [
+      0.684916528275502,
+      0.8488049616395957
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.6597140749894225,
+     "ci95": [
+      0.578004770305766,
+      0.793454478333892
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 31
+  },
+  "currently_reduces_failing": {
+   "best_layer_all_states": 31,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.7667663062040484,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7332098775688557,
+      "n_test": 34138,
+      "n_pos_test": 6901,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.2017124298789489,
+      "auc": 0.7558926764404612,
+      "label_changed_by_edit": {
+       "n_states": 1972,
+       "n_edits": 185,
+       "pos_rate": 0.8301217038539553,
+       "auc": 0.5467956491215273
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.11028801328309598,
+      "auc": 0.7043471840477222,
+      "label_changed_by_edit": {
+       "n_states": 660,
+       "n_edits": 96,
+       "pos_rate": 0.8560606060606061,
+       "auc": 0.3341965533302282
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.20215009666647138,
+      "auc": 0.7557599177329681,
+      "label_changed_by_edit": {
+       "n_states": 2015,
+       "n_edits": 192,
+       "pos_rate": 0.8287841191066998,
+       "auc": 0.5452746680551939
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.8263759223084026,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6407682848849622,
+      "n_test": 34138,
+      "n_pos_test": 6901,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.2017124298789489,
+      "auc": 0.67056866188674,
+      "label_changed_by_edit": {
+       "n_states": 1972,
+       "n_edits": 185,
+       "pos_rate": 0.8301217038539553,
+       "auc": 0.33242279743615455
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.11028801328309598,
+      "auc": 0.7297637744485126,
+      "label_changed_by_edit": {
+       "n_states": 660,
+       "n_edits": 96,
+       "pos_rate": 0.8560606060606061,
+       "auc": 0.41704704238472284
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.20215009666647138,
+      "auc": 0.6714043341519699,
+      "label_changed_by_edit": {
+       "n_states": 2015,
+       "n_edits": 192,
+       "pos_rate": 0.8287841191066998,
+       "auc": 0.3328612340536318
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.829902104117658,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6305972183107528,
+      "n_test": 34138,
+      "n_pos_test": 6901,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.2017124298789489,
+      "auc": 0.6646773496465119,
+      "label_changed_by_edit": {
+       "n_states": 1972,
+       "n_edits": 185,
+       "pos_rate": 0.8301217038539553,
+       "auc": 0.3171372824332826
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.11028801328309598,
+      "auc": 0.7428635297160949,
+      "label_changed_by_edit": {
+       "n_states": 660,
+       "n_edits": 96,
+       "pos_rate": 0.8560606060606061,
+       "auc": 0.41412203074056825
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.20215009666647138,
+      "auc": 0.6653364308441952,
+      "label_changed_by_edit": {
+       "n_states": 2015,
+       "n_edits": 192,
+       "pos_rate": 0.8287841191066998,
+       "auc": 0.3172255489021956
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.8358518094255665,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6562590317833618,
+      "n_test": 34138,
+      "n_pos_test": 6901,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.2017124298789489,
+      "auc": 0.6901216545046411,
+      "label_changed_by_edit": {
+       "n_states": 1972,
+       "n_edits": 185,
+       "pos_rate": 0.8301217038539553,
+       "auc": 0.4065117296838957
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.11028801328309598,
+      "auc": 0.7544608472187103,
+      "label_changed_by_edit": {
+       "n_states": 660,
+       "n_edits": 96,
+       "pos_rate": 0.8560606060606061,
+       "auc": 0.4661574289706567
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.20215009666647138,
+      "auc": 0.6909861564594652,
+      "label_changed_by_edit": {
+       "n_states": 2015,
+       "n_edits": 192,
+       "pos_rate": 0.8287841191066998,
+       "auc": 0.401733923457433
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.8049969252377842,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.6798366058731858,
+      "n_test": 34138,
+      "n_pos_test": 6901,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.2017124298789489,
+      "auc": 0.7115729398670932,
+      "label_changed_by_edit": {
+       "n_states": 1972,
+       "n_edits": 185,
+       "pos_rate": 0.8301217038539553,
+       "auc": 0.4252901649358583
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.11028801328309598,
+      "auc": 0.7587483610109887,
+      "label_changed_by_edit": {
+       "n_states": 660,
+       "n_edits": 96,
+       "pos_rate": 0.8560606060606061,
+       "auc": 0.41279925477410345
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.20215009666647138,
+      "auc": 0.7111712984593308,
+      "label_changed_by_edit": {
+       "n_states": 2015,
+       "n_edits": 192,
+       "pos_rate": 0.8287841191066998,
+       "auc": 0.43279527900720294
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.8358518094255664,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.6901216545046411,
+     "ci95": [
+      0.6064144841630222,
+      0.7916212347782521
+     ],
+     "n_boot_valid": 1000
+    },
+    "strict": {
+     "auc": 0.7544608472187103,
+     "ci95": [
+      0.6749172635449598,
+      0.8249085334419689
+     ],
+     "n_boot_valid": 1000
+    },
+    "none": {
+     "auc": 0.6909861564594652,
+     "ci95": [
+      0.5993325860840192,
+      0.7983263927729392
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 1,
+   "best_after_edit_layer_ci_primary": {
+    "auc": 0.7558926764404612,
+    "ci95": [
+     0.631944872674541,
+     0.8306693272589276
+    ],
+    "n_boot_valid": 1000
+   }
+  },
+  "currently_has_regressions": {
+   "best_layer_all_states": 1,
+   "layers": {
+    "1": {
+     "all_states_stored_test_auc": 0.8403362984340006,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7834102419562319,
+      "n_test": 34138,
+      "n_pos_test": 2246,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.06601712429878949,
+      "auc": 0.8038515883195806,
+      "label_changed_by_edit": {
+       "n_states": 1836,
+       "n_edits": 64,
+       "pos_rate": 0.8006535947712419,
+       "auc": 0.5911415932493216
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.004597994763394853,
+      "auc": 0.8118005210895118,
+      "label_changed_by_edit": {
+       "n_states": 60,
+       "n_edits": 9,
+       "pos_rate": 0.8,
+       "auc": 0.4131944444444444
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.06579178627921964,
+      "auc": 0.8036555420403165,
+      "label_changed_by_edit": {
+       "n_states": 1852,
+       "n_edits": 66,
+       "pos_rate": 0.7991360691144709,
+       "auc": 0.5933049985469341
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "11": {
+     "all_states_stored_test_auc": 0.810601250193601,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.778181488456547,
+      "n_test": 34138,
+      "n_pos_test": 2246,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.06601712429878949,
+      "auc": 0.713377092060206,
+      "label_changed_by_edit": {
+       "n_states": 1836,
+       "n_edits": 64,
+       "pos_rate": 0.8006535947712419,
+       "auc": 0.4493253038920486
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.004597994763394853,
+      "auc": 0.6786602795777107,
+      "label_changed_by_edit": {
+       "n_states": 60,
+       "n_edits": 9,
+       "pos_rate": 0.8,
+       "auc": 0.48611111111111116
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.06579178627921964,
+      "auc": 0.713260856235744,
+      "label_changed_by_edit": {
+       "n_states": 1852,
+       "n_edits": 66,
+       "pos_rate": 0.7991360691144709,
+       "auc": 0.4525646614356292
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "21": {
+     "all_states_stored_test_auc": 0.8183260221751738,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.791626702033862,
+      "n_test": 34138,
+      "n_pos_test": 2246,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.06601712429878949,
+      "auc": 0.71379050930573,
+      "label_changed_by_edit": {
+       "n_states": 1836,
+       "n_edits": 64,
+       "pos_rate": 0.8006535947712419,
+       "auc": 0.3975484182744136
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.004597994763394853,
+      "auc": 0.7409771675826722,
+      "label_changed_by_edit": {
+       "n_states": 60,
+       "n_edits": 9,
+       "pos_rate": 0.8,
+       "auc": 0.6006944444444444
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.06579178627921964,
+      "auc": 0.7130093325324708,
+      "label_changed_by_edit": {
+       "n_states": 1852,
+       "n_edits": 66,
+       "pos_rate": 0.7991360691144709,
+       "auc": 0.39987648939261844
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "31": {
+     "all_states_stored_test_auc": 0.8315437585744193,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.787469631707298,
+      "n_test": 34138,
+      "n_pos_test": 2246,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.06601712429878949,
+      "auc": 0.7216541598377597,
+      "label_changed_by_edit": {
+       "n_states": 1836,
+       "n_edits": 64,
+       "pos_rate": 0.8006535947712419,
+       "auc": 0.43460837887067394
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.004597994763394853,
+      "auc": 0.708312839046784,
+      "label_changed_by_edit": {
+       "n_states": 60,
+       "n_edits": 9,
+       "pos_rate": 0.8,
+       "auc": 0.685763888888889
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.06579178627921964,
+      "auc": 0.7222239735197118,
+      "label_changed_by_edit": {
+       "n_states": 1852,
+       "n_edits": 66,
+       "pos_rate": 0.7991360691144709,
+       "auc": 0.43560193257773905
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    },
+    "40": {
+     "all_states_stored_test_auc": 0.7986103393207303,
+     "all_states_stored_n_test": 467504,
+     "e5_after_edit_stored": {
+      "test_auc": 0.7373671042667531,
+      "n_test": 34138,
+      "n_pos_test": 2246,
+      "n_bins": 10
+     },
+     "primary": {
+      "n_edits": 2393,
+      "n_states": 33870,
+      "n_test_tasks": 94,
+      "n_trajectories": 681,
+      "pos_rate": 0.06601712429878949,
+      "auc": 0.6972377733678682,
+      "label_changed_by_edit": {
+       "n_states": 1836,
+       "n_edits": 64,
+       "pos_rate": 0.8006535947712419,
+       "auc": 0.46118545778967324
+      }
+     },
+     "strict": {
+      "n_edits": 1507,
+      "n_states": 15659,
+      "n_test_tasks": 89,
+      "n_trajectories": 566,
+      "pos_rate": 0.004597994763394853,
+      "auc": 0.7292784941867511,
+      "label_changed_by_edit": {
+       "n_states": 60,
+       "n_edits": 9,
+       "pos_rate": 0.8,
+       "auc": 0.5381944444444444
+      }
+     },
+     "none": {
+      "n_edits": 2437,
+      "n_states": 34138,
+      "n_test_tasks": 94,
+      "n_trajectories": 690,
+      "pos_rate": 0.06579178627921964,
+      "auc": 0.6970653697212063,
+      "label_changed_by_edit": {
+       "n_states": 1852,
+       "n_edits": 66,
+       "pos_rate": 0.7991360691144709,
+       "auc": 0.45820800639349024
+      }
+     },
+     "check_unfiltered_equals_e5_n_test": true
+    }
+   },
+   "all_states_recomputed_auc": 0.8403362984340006,
+   "best_layer_ci": {
+    "primary": {
+     "auc": 0.8038515883195806,
+     "ci95": [
+      0.7004701867908844,
+      0.877924427127951
+     ],
+     "n_boot_valid": 999
+    },
+    "strict": {
+     "auc": 0.8118005210895118,
+     "ci95": [
+      0.7433608341161302,
+      0.8767926827004928
+     ],
+     "n_boot_valid": 994
+    },
+    "none": {
+     "auc": 0.8036555420403165,
+     "ci95": [
+      0.7033533121225587,
+      0.879355849036153
+     ],
+     "n_boot_valid": 1000
+    }
+   },
+   "best_layer_after_edit_primary": 1
+  }
+ }
+}

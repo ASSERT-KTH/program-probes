@@ -1,0 +1,189 @@
+{
+ "mode": "k0",
+ "run": "qwen_pro",
+ "bench": "swebench_pro",
+ "pooled": "qwen36_35b_a3b_pro_full_pooled",
+ "probe": "currently_correct",
+ "layer": 30,
+ "stored_test_auc": 0.8218086252932206,
+ "n_boot": 1000,
+ "C_grid": [
+  0.001,
+  0.0031622776601683794,
+  0.01,
+  0.03162277660168379,
+  0.1,
+  0.31622776601683794,
+  1.0,
+  3.1622776601683795,
+  10.0,
+  31.622776601683793,
+  100.0
+ ],
+ "a2_chars": 32000,
+ "text_info": {
+  "n_units": 327700,
+  "n_trajectories": 5804,
+  "n_train_trajectories_for_vocab": 2974,
+  "n_train_units_for_vocab": 170218,
+  "text_a1": {
+   "shape": [
+    327700,
+    200000
+   ],
+   "nnz": 47941935,
+   "vocab": 200000,
+   "empty_docs": 5804
+  },
+  "n_units_this_cache": 327700
+ },
+ "counts": {
+  "all": {
+   "n": 467504,
+   "share": 1.0,
+   "n_pos": 27136,
+   "pos_rate": 0.05804442314932065,
+   "n_tasks": 94
+  },
+  "not_yet_run": {
+   "n": 301387,
+   "share": 0.6446725589513672,
+   "n_pos": 8270,
+   "pos_rate": 0.027439803309366365,
+   "n_tasks": 94
+  },
+  "already_run": {
+   "n": 166117,
+   "share": 0.35532744104863273,
+   "n_pos": 18866,
+   "pos_rate": 0.11357055569267444,
+   "n_tasks": 87
+  },
+  "not_yet_run_strict": {
+   "n": 249721,
+   "share": 0.5341579965091208,
+   "n_pos": 3208,
+   "pos_rate": 0.012846336511546886,
+   "n_tasks": 94
+  },
+  "already_run_strict": {
+   "n": 217783,
+   "share": 0.46584200349087923,
+   "n_pos": 23928,
+   "pos_rate": 0.10987083472998352,
+   "n_tasks": 91
+  }
+ },
+ "fit": {
+  "text_a1": {
+   "n_train_units": 184011,
+   "n_train_tokens": 2476824,
+   "train_pos_rate": 0.06967874988291457,
+   "val_auc": {
+    "1e-03": 0.6611873446483416,
+    "3e-03": 0.6720717377143055,
+    "1e-02": 0.6773645102119986,
+    "3e-02": 0.6828593342242261,
+    "1e-01": 0.6797009639439544,
+    "3e-01": 0.6662276363648243,
+    "1e+00": 0.6662276363648243,
+    "3e+00": 0.6662276363648243,
+    "1e+01": 0.6662276363648243,
+    "3e+01": 0.6662276363648243,
+    "1e+02": 0.6662276363648243
+   },
+   "C": 0.03162277660168379,
+   "best_val_auc": 0.6828593342242261,
+   "C_at_grid_edge": false
+  }
+ },
+ "auc": {
+  "real_testbest|all": 0.8218086252932206,
+  "real_testbest|not_yet_run": 0.864080809806092,
+  "real_testbest|already_run": 0.71663810226806,
+  "real_testbest|not_yet_run_strict": 0.9228323647006501,
+  "real_testbest|already_run_strict": 0.7010552261747716,
+  "text_a1|all": 0.6541882734191246,
+  "text_a1|not_yet_run": 0.7160480461353549,
+  "text_a1|already_run": 0.55379460129983,
+  "text_a1|not_yet_run_strict": 0.7148827184461639,
+  "text_a1|already_run_strict": 0.5669641262821936,
+  "real-text_a1|all": 0.16762035187409607,
+  "real-text_a1|not_yet_run": 0.14803276367073714,
+  "real-text_a1|already_run": 0.16284350096822997,
+  "real-text_a1|not_yet_run_strict": 0.2079496462544862,
+  "real-text_a1|already_run_strict": 0.13409109989257795,
+  "real|already-not_yet": -0.14744270753803201,
+  "real|already-not_yet_strict": -0.22177713852587855
+ },
+ "ci95": {
+  "real_testbest|all": [
+   0.7874540324353055,
+   0.8609201838300746
+  ],
+  "real_testbest|not_yet_run": [
+   0.823955820648003,
+   0.9107234954242138
+  ],
+  "real_testbest|already_run": [
+   0.6544280681223725,
+   0.7796320512665392
+  ],
+  "real_testbest|not_yet_run_strict": [
+   0.8902633667077122,
+   0.9533355279065248
+  ],
+  "real_testbest|already_run_strict": [
+   0.6450947703990999,
+   0.764414660523237
+  ],
+  "text_a1|all": [
+   0.612833765295631,
+   0.7041519931581008
+  ],
+  "text_a1|not_yet_run": [
+   0.6509815004169112,
+   0.7639744026471247
+  ],
+  "text_a1|already_run": [
+   0.49426152024935344,
+   0.6224048434145423
+  ],
+  "text_a1|not_yet_run_strict": [
+   0.6675448805246357,
+   0.7690667466340763
+  ],
+  "text_a1|already_run_strict": [
+   0.5185684176546572,
+   0.6233778694969057
+  ],
+  "real-text_a1|all": [
+   0.11908706130119996,
+   0.2147884309697627
+  ],
+  "real-text_a1|not_yet_run": [
+   0.08649673553629013,
+   0.2294682701469656
+  ],
+  "real-text_a1|already_run": [
+   0.10066302039476831,
+   0.21281229044901392
+  ],
+  "real-text_a1|not_yet_run_strict": [
+   0.1637420107843143,
+   0.2568619657687265
+  ],
+  "real-text_a1|already_run_strict": [
+   0.07315246026497324,
+   0.19389629217289275
+  ],
+  "real|already-not_yet": [
+   -0.21306603603297933,
+   -0.08605951321785689
+  ],
+  "real|already-not_yet_strict": [
+   -0.2754030603123818,
+   -0.167781847296401
+  ]
+ }
+}
