@@ -407,6 +407,15 @@ Their stored pooled test AUC (same AUC definition) therefore measures transfer t
 - Cost: about 1.1 CPU core-hours (12 jobs, 2 cores, about 3 min each). No summary counts; the table is computed from the JSON.
 - Output: `paper_rebuttal_candidate/table1_k1/` (`scripts/rebuttal_table1_k1.py`, `slurm/table1_k1.sh`).
 
+**Per-trajectory and per-version AUC at k = 0 (E12; 1nZa-W4)**
+- 16 k = 0 cells, best test layer, same test tokens as the AUC table. Pooled AUC reproduced exactly; versions have constant labels (0 violations).
+- **Result: per-unit AUCs are as high as or higher than the pooled AUC in all 16 cells.**
+  - Per-trajectory: 0.75–0.88 vs pooled 0.69–0.84; per-trajectory − pooled has CI > 0 in 11 of 16 and CI < 0 in none.
+  - Per-version: 0.76–0.91; per-version − pooled has CI > 0 in 9 of 16 and CI < 0 in none.
+  - So long trajectories do not inflate the reported AUCs.
+- Cost: about 1 CPU core-hour.
+- Output: `paper_rebuttal_candidate/per_unit_auc/` (`scripts/rebuttal_per_unit_auc.py`, `slurm/per_unit_auc.sh`).
+
 ## Other things to know
 
 - **What "after-edit" means** (rerun). A real edit (`cmd_idx` = N ≥ 0) is issued during assistant turn N, and its effect appears in the labels from turn N+1 on (`edit_labels_by_turn`). `edit_step_index.pt` stores N+1 for each edit (the baseline edit is excluded). The after-edit filter keeps a token only if its **target** turn (`target_step_idx`, the turn its label refers to) is one of these turns. That is exactly the turn after each edit, never later turns. The probes and the persistence baseline use the same filter.

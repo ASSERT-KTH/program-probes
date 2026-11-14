@@ -1,0 +1,66 @@
+{
+ "mode": "per_unit_auc",
+ "run": "laguna_verified",
+ "bench": "swebench",
+ "pooled": "laguna_xs2_full_pooled",
+ "probe": "currently_compiles",
+ "layer": 10,
+ "stored_test_auc": 0.6909625002846291,
+ "n_boot": 1000,
+ "score": "P(y=1)",
+ "counts": {
+  "n_test_tokens": 1130891,
+  "n_pos_tokens": 1017405,
+  "n_test_tasks": 75,
+  "n_test_trajectories": 706,
+  "n_test_versions": 2836,
+  "n_versions_label_not_constant": 0,
+  "n_test_versions_used": 2836,
+  "share_versions_label1": 0.9129055007052186,
+  "share_versions_label0": 0.08709449929478141,
+  "n_versions_label1": 2589,
+  "n_versions_label0": 247,
+  "tokens_per_trajectory": {
+   "median": 1224.5,
+   "max": 11242
+  },
+  "tokens_per_version": {
+   "median": 224.0,
+   "max": 8361
+  },
+  "versions_per_trajectory": {
+   "median": 3.0,
+   "max": 29
+  }
+ },
+ "auc": {
+  "pooled": 0.6909625002846291,
+  "per_traj": 0.7457968478449433,
+  "per_version": 0.8650003205714616,
+  "per_traj-pooled": 0.054834347560314134,
+  "per_version-pooled": 0.17403782028683246
+ },
+ "ci95": {
+  "pooled": [
+   0.6229427502297009,
+   0.7829494610439054
+  ],
+  "per_traj": [
+   0.6781782617765018,
+   0.8164746203434673
+  ],
+  "per_version": [
+   0.7926172317546752,
+   0.9199434007847382
+  ],
+  "per_traj-pooled": [
+   0.020678990662515166,
+   0.07804880656621213
+  ],
+  "per_version-pooled": [
+   0.10499721998605571,
+   0.2143951681731822
+  ]
+ },
+ "label_violations": []
+}

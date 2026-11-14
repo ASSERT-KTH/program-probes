@@ -1,0 +1,66 @@
+{
+ "mode": "per_unit_auc",
+ "run": "qwen_verified",
+ "bench": "swebench",
+ "pooled": "qwen36_35b_a3b_full_pooled",
+ "probe": "currently_has_regressions",
+ "layer": 20,
+ "stored_test_auc": 0.7716114372866317,
+ "n_boot": 1000,
+ "score": "P(y=1)",
+ "counts": {
+  "n_test_tokens": 570687,
+  "n_pos_tokens": 38044,
+  "n_test_tasks": 75,
+  "n_test_trajectories": 667,
+  "n_test_versions": 2091,
+  "n_versions_label_not_constant": 0,
+  "n_test_versions_used": 2091,
+  "share_versions_label1": 0.07125777140124342,
+  "share_versions_label0": 0.9287422285987565,
+  "n_versions_label1": 149,
+  "n_versions_label0": 1942,
+  "tokens_per_trajectory": {
+   "median": 721.0,
+   "max": 3906
+  },
+  "tokens_per_version": {
+   "median": 181.0,
+   "max": 2890
+  },
+  "versions_per_trajectory": {
+   "median": 2.0,
+   "max": 21
+  }
+ },
+ "auc": {
+  "pooled": 0.7716114372866318,
+  "per_traj": 0.7988132691057598,
+  "per_version": 0.7992210341514664,
+  "per_traj-pooled": 0.027201831819127942,
+  "per_version-pooled": 0.02760959686483455
+ },
+ "ci95": {
+  "pooled": [
+   0.7190886966979158,
+   0.8108857788328531
+  ],
+  "per_traj": [
+   0.7380080643478213,
+   0.8407126634377957
+  ],
+  "per_version": [
+   0.7094925187876894,
+   0.8688711773881539
+  ],
+  "per_traj-pooled": [
+   0.002582656102474482,
+   0.046126388822092905
+  ],
+  "per_version-pooled": [
+   -0.03398444934475431,
+   0.08241479681327211
+  ]
+ },
+ "label_violations": []
+}

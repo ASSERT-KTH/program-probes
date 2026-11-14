@@ -139,3 +139,13 @@ Table 1 at k = 1, window 15, strata S0 (y_t = 0) and S2 (y_t = 0 and y_T = 1), 1
 - **Files:** `json/k1_<run>_<property>.json`.
 
 Command: `sbatch ... slurm/table1_k1.sh --run <run> --probe <property> --output paper_rebuttal_candidate/table1_k1/json/k1_<run>_<property>.json` (`scripts/rebuttal_table1_k1.py`; about 3 min per job on 2 cores).
+
+## `per_unit_auc/` (brief E12; 1nZa-W4)
+
+Per-trajectory and per-version AUC of the 16 k = 0 cells of the AUC table (Table 6 here, Table 5 in the paper): the rerun's k = 0 pooled probes at their best test layer (E17 `real_test_best_layer`, 0-indexed), on that table's test tokens (pooled k = 0 cache, task split seed 42, y ≥ 0). No retraining. Per-token scores were not stored, so P(y=1) is recomputed from the stored weights; the pooled AUC equals the stored test AUC in all 16 cells (asserted).
+- **per_traj:** weighted AUC with token weight 1 / (test tokens in its trajectory).
+- **per_version:** one point per program version. Versions are the runs of turns between edits (`edit_step_index.pt`; turn t is in version #{N_e + 1 ≤ t}; the original repository is version 0). Score = mean P(y=1) over the version's test tokens; label = the version's k = 0 label. The label is constant within every version in all 16 cells (0 violations).
+- **CIs:** task-level bootstrap (1000, seed 42), for each metric and paired for metric − pooled. A version's bootstrap weight is its task's weight. The weighted AUCs are cross-checked against sklearn.
+- **Files:** `json/pu_<run>_<property>.json` (`auc`, `ci95`, `counts`: test tokens, tasks, trajectories, versions, label shares).
+
+Command: `sbatch ... slurm/per_unit_auc.sh --run <run> --probe <property> --output ...` (`scripts/rebuttal_per_unit_auc.py`; 1–3 min per job on 2 cores).
